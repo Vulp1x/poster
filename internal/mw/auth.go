@@ -82,7 +82,7 @@ func CheckCredentials(txFunc dbmodel.DBTXFunc, conf sessions.Configuration) func
 			ctx := r.Context()
 			q := dbmodel.New(txFunc(ctx))
 
-			u, err2 := q.FindByEmail(ctx, bodyUser["email"])
+			u, err2 := q.FindByLogin(ctx, bodyUser["email"])
 			if err2 != nil {
 				logger.Infof(ctx, "No user with email: %s", bodyUser["email"])
 				http.Error(w, "No user with email: "+bodyUser["email"], http.StatusNotFound)
