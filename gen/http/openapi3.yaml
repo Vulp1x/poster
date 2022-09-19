@@ -1,0 +1,617 @@
+openapi: 3.0.3
+info:
+  title: REST api for simple route app
+  version: "1.0"
+servers:
+  - url: /
+    description: Default server for rest-api
+paths:
+  /api/admin/driver:
+    post:
+      tags:
+        - admin_service
+      summary: add_manager admin_service
+      description: admins could add drivers from main system
+      operationId: admin_service#add_manager
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddManagerRequestBody'
+            example:
+              login: Illo aut non sint alias.
+              password: roc
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Sit sit voluptatem quo quo velit.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Eum enim.
+        "403":
+          description: 'invalid-scopes: Forbidden response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Enim aut nobis.
+        "404":
+          description: 'user not found: Not Found response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Amet reiciendis dicta quibusdam neque dolores.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/admin/driver/{manager_id}:
+    delete:
+      tags:
+        - admin_service
+      summary: drop_manager admin_service
+      description: admins could delete managers from main system
+      operationId: admin_service#drop_manager
+      parameters:
+        - name: manager_id
+          in: path
+          description: id менеджера, которого необходимо удалить
+          required: true
+          schema:
+            type: string
+            description: id менеджера, которого необходимо удалить
+            example: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            format: uuid
+          example: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Maiores dolorem quia.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Quidem neque.
+        "403":
+          description: 'invalid-scopes: Forbidden response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Enim et assumenda blanditiis nihil exercitationem.
+        "404":
+          description: 'user not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: Internal Server Error response.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/profile:
+    get:
+      tags:
+        - auth_service
+      summary: profile auth_service
+      description: get user profile
+      operationId: auth_service#profile
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: A dolor.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'user not found: Not Found response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Eum ab qui.
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Culpa consequatur.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/signin:
+    post:
+      tags:
+        - auth_service
+      summary: signin auth_service
+      description: Creates a valid JWT
+      operationId: auth_service#signin
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Creds'
+              example:
+                jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Consequuntur explicabo perspiciatis et aut cumque et.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Maxime et.
+        "404":
+          description: 'user not found: Not Found response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Ut et iusto eum veniam.
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Ea numquam.
+      security:
+        - basic_header_Authorization: []
+  /api/tasks/:
+    get:
+      tags:
+        - tasks_service
+      summary: list tasks tasks_service
+      description: получить все задачи для текущего пользователя
+      operationId: tasks_service#list tasks
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Aut blanditiis dolore.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Perspiciatis non id.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+    post:
+      tags:
+        - tasks_service
+      summary: create task tasks_service
+      description: создать драфт задачи
+      operationId: tasks_service#create task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequestBody'
+            example:
+              description: Ipsam expedita libero eum et.
+              tittle: Dolor culpa temporibus sit.
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                type: string
+                description: task_id для созданной задачи
+                example: 74C53540-E974-ABFF-2565-6BF99F9017B2
+                format: uuid
+              example: 773F4E7F-A748-DF6D-4355-233071D2534A
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Accusamus officia ipsum et provident omnis eius.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                description: task_id для созданной задачи
+                example: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
+                format: uuid
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                description: task_id для созданной задачи
+                example: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
+                format: uuid
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Possimus deleniti.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/:
+    get:
+      tags:
+        - tasks_service
+      summary: get task tasks_service
+      description: получить задачу по id
+      operationId: tasks_service#get task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          schema:
+            type: string
+            description: id задачи
+            example: Inventore et minima fugit nihil.
+          example: Veritatis voluptatem voluptas eos rerum maiores nostrum.
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Assumenda voluptate.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Ut aut atque quod.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/start:
+    post:
+      tags:
+        - tasks_service
+      summary: start task tasks_service
+      description: 'начать выполнение задачи '
+      operationId: tasks_service#start task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          schema:
+            type: string
+            description: id задачи
+            example: Rerum consequuntur.
+          example: Blanditiis blanditiis.
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json: {}
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Labore amet ut iure.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/upload:
+    post:
+      tags:
+        - tasks_service
+      summary: upload file tasks_service
+      description: загрузить файл с пользователями, прокси
+      operationId: tasks_service#upload file
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи, в которую загружаем пользователей/прокси
+          required: true
+          schema:
+            type: string
+            description: id задачи, в которую загружаем пользователей/прокси
+            example: Laboriosam quia harum odio fugiat maiores.
+          example: Nobis et ab quod.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadFileRequestBody'
+            example:
+              bytes:
+                - 69
+                - 118
+                - 101
+                - 110
+                - 105
+                - 101
+                - 116
+                - 32
+                - 109
+                - 111
+                - 108
+                - 101
+                - 115
+                - 116
+                - 105
+                - 97
+                - 101
+                - 32
+                - 115
+                - 105
+                - 110
+                - 116
+                - 32
+                - 114
+                - 101
+                - 114
+                - 117
+                - 109
+                - 32
+                - 101
+                - 116
+                - 32
+                - 111
+                - 100
+                - 105
+                - 116
+                - 46
+              file_type: 1
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Veniam qui.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Placeat dicta porro sed repellendus.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+components:
+  schemas:
+    AddManagerRequestBody:
+      type: object
+      properties:
+        login:
+          type: string
+          example: Aut alias blanditiis provident voluptatem.
+        password:
+          type: string
+          example: tdb
+          minLength: 4
+      example:
+        login: Eos iste et.
+        password: 9g1
+      required:
+        - login
+        - password
+    CreateTaskRequestBody:
+      type: object
+      properties:
+        description:
+          type: string
+          description: описание задачи
+          example: Qui exercitationem et mollitia.
+        tittle:
+          type: string
+          description: название задачи
+          example: Eveniet praesentium.
+      example:
+        description: Quis earum maxime omnis reiciendis adipisci facilis.
+        tittle: Amet autem est quia impedit.
+    Creds:
+      type: object
+      properties:
+        jwt:
+          type: string
+          description: JWT token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      example:
+        jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      required:
+        - jwt
+    UploadFileRequestBody:
+      type: object
+      properties:
+        bytes:
+          type: string
+          description: содержимое файла
+          example:
+            - 77
+            - 111
+            - 108
+            - 101
+            - 115
+            - 116
+            - 105
+            - 97
+            - 101
+            - 32
+            - 113
+            - 117
+            - 97
+            - 109
+            - 46
+          format: binary
+        file_type:
+          type: integer
+          description: |2-
+             1 - список ботов
+                2 - список резидентских прокси
+                3 - спиок прокси-шестёрок
+          example: 3
+          enum:
+            - 1
+            - 2
+            - 3
+      example:
+        bytes:
+          - 69
+          - 117
+          - 109
+          - 32
+          - 110
+          - 117
+          - 108
+          - 108
+          - 97
+          - 32
+          - 97
+          - 108
+          - 105
+          - 113
+          - 117
+          - 97
+          - 109
+          - 32
+          - 110
+          - 105
+          - 104
+          - 105
+          - 108
+          - 32
+          - 114
+          - 101
+          - 112
+          - 101
+          - 108
+          - 108
+          - 97
+          - 116
+          - 32
+          - 117
+          - 116
+          - 32
+          - 99
+          - 111
+          - 109
+          - 109
+          - 111
+          - 100
+          - 105
+          - 46
+        file_type: 3
+      required:
+        - file_type
+  securitySchemes:
+    basic_header_Authorization:
+      type: http
+      description: Basic authentication used to authenticate security principal during signin
+      scheme: basic
+    jwt_header_Authorization:
+      type: http
+      description: Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".
+      scheme: bearer
+tags:
+  - name: tasks_service
+    description: сервис для создания, редактирования и работы с задачами (рекламными компаниями)
+  - name: admin_service
+    description: The secured service exposes endpoints that require valid authorization credentials.
+  - name: auth_service
+    description: The secured service exposes endpoints that require valid authorization credentials.

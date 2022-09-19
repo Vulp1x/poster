@@ -1,0 +1,2 @@
+CREATE USER docker WITH PASSWORD 'dN5mYdDVKbuyq6ry';
+GRANT ALL PRIVILEGES ON DATABASE insta_poster TO docker;

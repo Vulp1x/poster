@@ -1,0 +1,23 @@
+listen:
+  port: 8090
+  bind_ip: 0.0.0.0
+logger:
+  enable console: true
+  console json format: true
+  console level: info
+  enable file: true
+  file json format: true
+  file level: debug
+  file location: ./tmp/logs.log
+postgres:
+  host: 65.109.30.237 # used for migrations
+  port: 5432
+  user: docker
+  password: dN5mYdDVKbuyq6ry
+  database: insta_poster
+  ssl mode: disable
+  migrations dir: migrations
+  pg-dsn: "postgres://docker:dN5mYdDVKbuyq6ry@postgres:5432/insta_poster?sslmode=disable&timezone=utc"
+session:
+  JWT signing key: "simple route is the best routing soft ever"
+  token validness duration: 24h

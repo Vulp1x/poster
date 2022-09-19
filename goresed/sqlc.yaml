@@ -1,0 +1,3 @@
+regenerates:
+  - file: "internal/dbmodel/db.go"
+    replace: *entry_point_db

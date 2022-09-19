@@ -1,0 +1,25 @@
+name: Main push [Deploy to test server]
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute remote ssh command using key
+        uses: appleboy/ssh-action@master
+        with:
+
+          host: ${{ secrets.SSH_TEST_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/RoutingAppService
+            docker-compose down
+            git pull
+            docker-compose -f docker-compose.yaml up --build --detach

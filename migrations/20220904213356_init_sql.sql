@@ -1,0 +1,107 @@
+-- +goose Up
+-- +goose StatementBegin
+CREATE
+    EXTENSION IF NOT EXISTS pgcrypto;
+
+
+CREATE TABLE users
+(
+    id            uuid primary key         default gen_random_uuid(),
+    name          text                                   not null,
+    login         text UNIQUE                            not null,
+    password_hash text                                   not null,
+    role          smallint                               not null,
+    constraint valid_role check (role IN (0, 1) ), -- 0 is a manager, 1 is an admin
+
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_at    TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    deleted_at    TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE tasks
+(
+    id            uuid                     not null primary key default gen_random_uuid(),
+    manager_id    uuid                     not null references users,
+    text_template text                     not null,
+    image         bytea                    not null,
+    status        smallint                 not null,
+    started_at    timestamp with time zone not null,
+    created_at    timestamp with time zone not null,
+    updated_at    timestamp with time zone,
+    deleted_at    timestamp with time zone
+);
+
+CREATE TABLE bot_accounts
+(
+    id          uuid primary key default gen_random_uuid(),
+    task_id     uuid        not null references tasks,
+    username    text UNIQUE not null,
+    password    text        not null,
+    user_agent  text        not null,
+    device_data jsonb       not null,
+    session     jsonb       not null,
+    headers     jsonb       not null,
+    res_proxy   jsonb, -- резидентские прокси
+    work_proxy  jsonb,
+    status      smallint    not null,
+    started_at  timestamp   not null,
+    created_at  timestamp   not null,
+    updated_at  timestamp,
+    deleted_at  timestamp,
+
+    constraint not_empty_device check ( device_data <> '[]' AND device_data <> '{}' ),
+    constraint not_empty_headers check ( headers <> '[]' AND headers <> '{}' ),
+    constraint not_empty_session check ( session <> '[]' AND session <> '{}' )
+);
+
+-- таблица с пользователями, которым будет показана реклама
+create table target_users
+(
+    id         uuid primary key default gen_random_uuid(),
+    task_id    uuid        not null references tasks,
+    username   text UNIQUE not null,
+    notified   bool        not null,
+    created_at timestamp   not null,
+    updated_at timestamp,
+    unique (task_id, username)
+);
+
+
+create table proxies
+(
+    id          uuid primary key default gen_random_uuid(),
+    task_id     uuid references tasks not null,
+    assigned_to uuid references bot_accounts,
+    host        text                  not null,
+    port        text                  not null,
+    login       text                  not null,
+    pass        text                  not null,
+    type        smallint              not null,-- 1 is for residential, 2 for usual
+    unique (host, port)
+);
+
+
+create table logs
+(
+    id            uuid primary key default gen_random_uuid(),
+    bot_id        uuid      not null references bot_accounts,
+    request       jsonb     not null,
+    response      jsonb     not null,
+    response_code integer   not null,
+    request_time  timestamp not null,
+    proxy_url     text
+);
+
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+
+DROP TABLE tasks;
+DROP TABLE users;
+DROP TABLE bot_accounts;
+drop table logs;
+
+DROP EXTENSION pgcrypto
+
+-- +goose StatementEnd
