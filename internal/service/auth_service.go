@@ -23,7 +23,7 @@ const userIDContextKey = contextKey("UserID")
 const uniqueIDContextKey = contextKey("UniqueID")
 
 type userStore interface {
-	FindByEmail(ctx context.Context, email string) (dbmodel.User, error)
+	FindByLogin(ctx context.Context, email string) (dbmodel.User, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Create(ctx context.Context, login, hashedPass string) error
 }
@@ -36,14 +36,15 @@ type authServicesrvc struct {
 }
 
 // NewAuthService returns the auth_service service implementation.
-func NewAuthService(txFunc dbmodel.DBTXFunc, cfg sessions.Configuration) authservice.Service {
-	return &authServicesrvc{securityCfg: cfg}
+func NewAuthService(userStore userStore, cfg sessions.Configuration) authservice.Service {
+
+	return &authServicesrvc{securityCfg: cfg, store: userStore}
 }
 
 // BasicAuth implements the authorization logic for service "auth_service" for
 // the "basic" security scheme.
 func (s *authServicesrvc) BasicAuth(ctx context.Context, email, pass string, scheme *security.BasicScheme) (context.Context, error) {
-	u, err := s.store.FindByEmail(ctx, email)
+	u, err := s.store.FindByLogin(ctx, email)
 	if err != nil {
 		if errors.Is(err, users.ErrUserNotFound) {
 			logger.Debugf(ctx, "No user with email: %s", email)

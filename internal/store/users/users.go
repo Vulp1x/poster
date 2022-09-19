@@ -112,9 +112,9 @@ func (us UserStore) FindByID(ctx context.Context, id uuid.UUID) (UserProfile, er
 	return UserProfile{User: u}, nil
 }
 
-// FindByEmail returns user with provided email.
+// FindByLogin returns user with provided email.
 // If there are now user with provided email, then ErrUserNotFound is returned.
-func (us UserStore) FindByEmail(ctx context.Context, login string) (dbmodel.User, error) {
+func (us UserStore) FindByLogin(ctx context.Context, login string) (dbmodel.User, error) {
 	q := dbmodel.New(us.cfg.DBTXf(ctx))
 
 	u, err := q.FindByLogin(ctx, login)
@@ -130,25 +130,32 @@ func (us UserStore) FindByEmail(ctx context.Context, login string) (dbmodel.User
 }
 
 // Create ...
-func (us UserStore) Create(ctx context.Context, name, login, passwordHash string) (*UserProfile, error) {
+func (us UserStore) Create(ctx context.Context, login, passwordHash string) error {
 	q := dbmodel.New(us.cfg.DBTXf(ctx))
-	var err error
 
-	User, err := q.CreateUser(ctx, dbmodel.CreateUserParams{
-		Name:         name,
+	_, err := q.CreateUser(ctx, dbmodel.CreateUserParams{
 		Login:        login,
 		PasswordHash: passwordHash,
 		Role:         0,
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "login") {
-			return nil, ErrLoginIsAlreadyUsed
+			return ErrLoginIsAlreadyUsed
 		}
 
-		return nil, err
+		return err
 	}
 
-	return &UserProfile{
-		User: User,
-	}, nil
+	return nil
+}
+
+func (us UserStore) Delete(ctx context.Context, id uuid.UUID) error {
+	q := dbmodel.New(us.cfg.DBTXf(ctx))
+
+	err := q.DeleteUserByID(ctx, id)
+	if err != nil && errors.Is(err, pgx.ErrNoRows) {
+		return ErrUserNotFound
+	}
+
+	return err
 }

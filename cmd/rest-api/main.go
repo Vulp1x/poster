@@ -16,6 +16,8 @@ import (
 	"github.com/inst-api/poster/internal/config"
 	"github.com/inst-api/poster/internal/postgres"
 	"github.com/inst-api/poster/internal/service"
+	"github.com/inst-api/poster/internal/store"
+	"github.com/inst-api/poster/internal/store/users"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
@@ -54,13 +56,15 @@ func main() {
 		logger.Fatalf(ctx, "Failed to connect to database: %v", err)
 	}
 
-	// txFunc, err := postgres.NewTxFunc(ctx, conf.Postgres)
-	// if err != nil {
-	// 	logger.Fatalf(ctx, "Failed to connect to transaction's database: %v", err)
-	// }
+	txFunc, err := postgres.NewTxFunc(ctx, conf.Postgres)
+	if err != nil {
+		logger.Fatalf(ctx, "Failed to connect to transaction's database: %v", err)
+	}
+
+	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
 
 	// Initialize the services.
-	authServiceSvc := service.NewAuthService(dbTXFunc, conf.Security)
+	authServiceSvc := service.NewAuthService(userStore, conf.Security)
 	tasksService := service.NewTasksService(dbTXFunc, conf.Security)
 
 	// potentially running in different processes.
