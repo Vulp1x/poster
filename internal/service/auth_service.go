@@ -43,13 +43,13 @@ func NewAuthService(userStore userStore, cfg sessions.Configuration) authservice
 
 // BasicAuth implements the authorization logic for service "auth_service" for
 // the "basic" security scheme.
-func (s *authServicesrvc) BasicAuth(ctx context.Context, email, pass string, scheme *security.BasicScheme) (context.Context, error) {
-	u, err := s.store.FindByLogin(ctx, email)
+func (s *authServicesrvc) BasicAuth(ctx context.Context, login, pass string, scheme *security.BasicScheme) (context.Context, error) {
+	u, err := s.store.FindByLogin(ctx, login)
 	if err != nil {
 		if errors.Is(err, users.ErrUserNotFound) {
-			logger.Debugf(ctx, "No user with email: %s", email)
+			logger.Debugf(ctx, "No user with login: %s", login)
 		} else {
-			logger.Errorf(ctx, "failed to find user with email %s: internal error: %v", email, err)
+			logger.Errorf(ctx, "failed to find user with login %s: internal error: %v", login, err)
 		}
 
 		return ctx, authservice.Unauthorized("")
@@ -62,7 +62,7 @@ func (s *authServicesrvc) BasicAuth(ctx context.Context, email, pass string, sch
 	ctx = logger.WithFields(ctx, logger.Fields{"user_id": u.ID})
 	ctx = AddUserIDToContext(ctx, u.ID)
 
-	logger.Debugf(ctx, "Successfully checked credentials for email: %s", u.ID.String())
+	logger.Debugf(ctx, "Successfully checked credentials for login: %s", u.ID.String())
 
 	return ctx, nil
 }

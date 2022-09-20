@@ -14,4 +14,7 @@ func TestName(t *testing.T) {
 	}
 
 	fmt.Println(string(hashPass))
+
+	err = bcrypt.CompareHashAndPassword(hashPass, []byte("admin0"))
+	fmt.Println(err)
 }
