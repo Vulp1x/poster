@@ -7,7 +7,6 @@ CREATE
 CREATE TABLE users
 (
     id            uuid primary key         default gen_random_uuid(),
-    name          text                                   not null,
     login         text UNIQUE                            not null,
     password_hash text                                   not null,
     role          smallint                               not null,

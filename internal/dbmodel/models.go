@@ -73,7 +73,6 @@ type Task struct {
 
 type User struct {
 	ID           uuid.UUID  `json:"id"`
-	Name         string     `json:"name"`
 	Login        string     `json:"login"`
 	PasswordHash string     `json:"password_hash"`
 	Role         int16      `json:"role"`

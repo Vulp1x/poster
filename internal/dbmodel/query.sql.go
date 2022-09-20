@@ -34,29 +34,22 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (name, login, password_hash, role, created_at)
-VALUES ($1, $2, $3, $4, now())
-RETURNING id, name, login, password_hash, role, created_at, updated_at, deleted_at
+INSERT INTO users (login, password_hash, role, created_at)
+VALUES ($1, $2, $3, now())
+RETURNING id, login, password_hash, role, created_at, updated_at, deleted_at
 `
 
 type CreateUserParams struct {
-	Name         string `json:"name"`
 	Login        string `json:"login"`
 	PasswordHash string `json:"password_hash"`
 	Role         int16  `json:"role"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser,
-		arg.Name,
-		arg.Login,
-		arg.PasswordHash,
-		arg.Role,
-	)
+	row := q.db.QueryRow(ctx, createUser, arg.Login, arg.PasswordHash, arg.Role)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
 		&i.Login,
 		&i.PasswordHash,
 		&i.Role,
@@ -121,7 +114,7 @@ func (q *Queries) FindAccountsForTask(ctx context.Context, taskID uuid.UUID) ([]
 }
 
 const findByLogin = `-- name: FindByLogin :one
-SELECT id, name, login, password_hash, role, created_at, updated_at, deleted_at
+SELECT id, login, password_hash, role, created_at, updated_at, deleted_at
 from users
 WHERE login = $1
   AND deleted_at IS NULL
@@ -132,7 +125,6 @@ func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
 		&i.Login,
 		&i.PasswordHash,
 		&i.Role,
@@ -173,7 +165,7 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, login, password_hash, role, created_at, updated_at, deleted_at
+SELECT id, login, password_hash, role, created_at, updated_at, deleted_at
 from users
 WHERE id = $1
 `
@@ -183,7 +175,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
 		&i.Login,
 		&i.PasswordHash,
 		&i.Role,

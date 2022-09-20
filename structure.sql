@@ -139,7 +139,6 @@ CREATE TABLE public.tasks (
 
 CREATE TABLE public.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name text NOT NULL,
     login text NOT NULL,
     password_hash text NOT NULL,
     role smallint NOT NULL,

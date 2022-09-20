@@ -18,8 +18,8 @@ set password_hash = $1
 where id = $2;
 
 -- name: CreateUser :one
-INSERT INTO users (name, login, password_hash, role, created_at)
-VALUES ($1, $2, $3, $4, now())
+INSERT INTO users (login, password_hash, role, created_at)
+VALUES ($1, $2, $3, now())
 RETURNING *;
 
 -- name: DeleteUserByID :exec
