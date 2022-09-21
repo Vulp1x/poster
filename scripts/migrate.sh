@@ -34,7 +34,7 @@ DB_DSN="user=${DB_USER} password=${DB_PASSWORD} dbname=${DB_NAME} host=${DB_HOST
 
 echo "running: ${MIGRATION_DIR}" postgres "${DB_DSN}"
 if [ "$1" = "--dryrun" ]; then
-  goose -dir "${MIGRATION_DIR}" postgres "${DB_DSN}" status
+  ./bin/goose -dir "${MIGRATION_DIR}" postgres "${DB_DSN}" status
 else
-  goose -dir "${MIGRATION_DIR}" postgres "${DB_DSN}" up
+  ./bin/goose -dir "${MIGRATION_DIR}" postgres "${DB_DSN}" up
 fi
