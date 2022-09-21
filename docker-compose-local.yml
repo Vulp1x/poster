@@ -34,7 +34,7 @@ services:
     networks:
       - ompnw
     volumes:
-      - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
+      - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database-local.sql
       - ./pgdata:/var/lib/postgresql/data
 
 
