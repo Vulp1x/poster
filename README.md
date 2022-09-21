@@ -38,3 +38,8 @@ visit: http://127.0.0.1:8090/admin/info/generate/new
 adm generate
 ```
 
+### build container
+```
+docker-compose -f docker-compose-local.yml up --build
+```
+
