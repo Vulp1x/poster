@@ -1,12 +1,46 @@
-version: "3.7"
+version: "3.9"
 
 services:
+  poster:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8090:8090" # REST
+    volumes:
+      - ./tmp:/root/tmp
+    networks:
+      - ompnw
   postgres:
-    image: postgres:14.1
+    image: postgres:14.5
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "insta_poster", "-U", "docker" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     restart: always
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: insta_poster
+      APP_DB_USER: postgres
+      APP_DB_PASS: postgres
+      APP_DB_NAME: insta_poster
+    networks:
+      - ompnw
+    volumes:
+      - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
+      - ./pgdata:/var/lib/postgresql/data
+
+
+volumes:
+  pgdata:
+    driver: local
+networks:
+  ompnw:
+    driver: bridge
