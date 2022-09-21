@@ -111,6 +111,7 @@ func handleHTTPServer(
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		Debug:            true,
 	}))
 	router.Mount("/", mux)
 
