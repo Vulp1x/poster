@@ -19,9 +19,9 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeCreateTaskResponse returns an encoder for responses returned by the
-// tasks_service create task endpoint.
-func EncodeCreateTaskResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeCreateTaskDraftResponse returns an encoder for responses returned by
+// the tasks_service create task draft endpoint.
+func EncodeCreateTaskDraftResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.(string)
 		enc := encoder(ctx, w)
@@ -31,12 +31,12 @@ func EncodeCreateTaskResponse(encoder func(context.Context, http.ResponseWriter)
 	}
 }
 
-// DecodeCreateTaskRequest returns a decoder for requests sent to the
-// tasks_service create task endpoint.
-func DecodeCreateTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeCreateTaskDraftRequest returns a decoder for requests sent to the
+// tasks_service create task draft endpoint.
+func DecodeCreateTaskDraftRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body CreateTaskRequestBody
+			body CreateTaskDraftRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -45,6 +45,10 @@ func DecodeCreateTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 				return nil, goa.MissingPayloadError()
 			}
 			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateCreateTaskDraftRequestBody(&body)
+		if err != nil {
+			return nil, err
 		}
 
 		var (
@@ -57,7 +61,7 @@ func DecodeCreateTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		if err != nil {
 			return nil, err
 		}
-		payload := NewCreateTaskPayload(&body, token)
+		payload := NewCreateTaskDraftPayload(&body, token)
 		if strings.Contains(payload.Token, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Token, " ", 2)[1]
@@ -68,9 +72,9 @@ func DecodeCreateTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 	}
 }
 
-// EncodeCreateTaskError returns an encoder for errors returned by the create
-// task tasks_service endpoint.
-func EncodeCreateTaskError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeCreateTaskDraftError returns an encoder for errors returned by the
+// create task draft tasks_service endpoint.
+func EncodeCreateTaskDraftError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en ErrorNamer
@@ -269,6 +273,93 @@ func DecodeStartTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goaht
 // EncodeStartTaskError returns an encoder for errors returned by the start
 // task tasks_service endpoint.
 func EncodeStartTaskError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeStopTaskResponse returns an encoder for responses returned by the
+// tasks_service stop task endpoint.
+func EncodeStopTaskResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeStopTaskRequest returns a decoder for requests sent to the
+// tasks_service stop task endpoint.
+func DecodeStopTaskRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			taskID string
+			token  string
+			err    error
+
+			params = mux.Vars(r)
+		)
+		taskID = params["task_id"]
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewStopTaskPayload(taskID, token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeStopTaskError returns an encoder for errors returned by the stop task
+// tasks_service endpoint.
+func EncodeStopTaskError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en ErrorNamer

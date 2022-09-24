@@ -11,26 +11,29 @@ import (
 	"github.com/google/uuid"
 )
 
-const createTask = `-- name: CreateTask :exec
-insert into tasks(manager_id, text_template, image, status, created_at)
-VALUES ($1, $2, $3, $4, now())
+const createDraftTask = `-- name: CreateDraftTask :one
+insert into tasks(manager_id, text_template, title, image, status, created_at)
+VALUES ($1, $2, $3, $4, 1, now())
+RETURNING id
 `
 
-type CreateTaskParams struct {
-	ManagerID    uuid.UUID  `json:"manager_id"`
-	TextTemplate string     `json:"text_template"`
-	Image        []byte     `json:"image"`
-	Status       taskStatus `json:"status"`
+type CreateDraftTaskParams struct {
+	ManagerID    uuid.UUID `json:"manager_id"`
+	TextTemplate string    `json:"text_template"`
+	Title        string    `json:"title"`
+	Image        []byte    `json:"image"`
 }
 
-func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) error {
-	_, err := q.db.Exec(ctx, createTask,
+func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, createDraftTask,
 		arg.ManagerID,
 		arg.TextTemplate,
+		arg.Title,
 		arg.Image,
-		arg.Status,
 	)
-	return err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const createUser = `-- name: CreateUser :one
@@ -135,6 +138,30 @@ func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
 	return i, err
 }
 
+const findTaskByID = `-- name: FindTaskByID :one
+select id, manager_id, text_template, image, status, title, created_at, started_at, updated_at, deleted_at
+from tasks
+where id = $1
+`
+
+func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) {
+	row := q.db.QueryRow(ctx, findTaskByID, id)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.ManagerID,
+		&i.TextTemplate,
+		&i.Image,
+		&i.Status,
+		&i.Title,
+		&i.CreatedAt,
+		&i.StartedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getBotByID = `-- name: GetBotByID :one
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
 from bot_accounts
@@ -212,7 +239,7 @@ set status     = 3,
     started_at = now()
 where id = $1
   AND status = 2 --
-returning id, manager_id, text_template, image, status, started_at, created_at, updated_at, deleted_at
+returning id, manager_id, text_template, image, status, title, created_at, started_at, updated_at, deleted_at
 `
 
 func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) (Task, error) {
@@ -224,8 +251,9 @@ func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) (Task, error)
 		&i.TextTemplate,
 		&i.Image,
 		&i.Status,
-		&i.StartedAt,
+		&i.Title,
 		&i.CreatedAt,
+		&i.StartedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
 	)

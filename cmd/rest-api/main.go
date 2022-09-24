@@ -17,6 +17,7 @@ import (
 	"github.com/inst-api/poster/internal/postgres"
 	"github.com/inst-api/poster/internal/service"
 	"github.com/inst-api/poster/internal/store"
+	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/internal/store/users"
 	"github.com/inst-api/poster/pkg/logger"
 )
@@ -62,10 +63,11 @@ func main() {
 	}
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
+	taskStore := tasks.NewStore(5*time.Second, dbTXFunc)
 
 	// Initialize the services.
 	authServiceSvc := service.NewAuthService(userStore, conf.Security)
-	tasksService := service.NewTasksService(dbTXFunc, conf.Security)
+	tasksService := service.NewTasksService(authServiceSvc, taskStore)
 
 	// potentially running in different processes.
 	authServiceEndpoints := authservice.NewEndpoints(authServiceSvc)

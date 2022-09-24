@@ -220,49 +220,6 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-    post:
-      tags:
-        - tasks_service
-      summary: create task tasks_service
-      description: создать драфт задачи
-      operationId: tasks_service#create task
-      parameters:
-        - name: Authorization
-          in: header
-          description: JWT used for authentication
-          required: true
-          type: string
-        - name: Create TaskRequestBody
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/TasksServiceCreateTaskRequestBody'
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            type: string
-            format: uuid
-        "400":
-          description: Bad Request response.
-          schema:
-            type: string
-        "401":
-          description: Unauthorized response.
-          schema:
-            type: string
-        "404":
-          description: Not Found response.
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error response.
-          schema:
-            type: string
-      schemes:
-        - http
-      security:
-        - jwt_header_Authorization: []
   /api/tasks/{task_id}/:
     get:
       tags:
@@ -311,6 +268,47 @@ paths:
       summary: start task tasks_service
       description: 'начать выполнение задачи '
       operationId: tasks_service#start task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: JWT used for authentication
+          required: true
+          type: string
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: Bad Request response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            type: string
+        "404":
+          description: Not Found response.
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error response.
+          schema:
+            type: string
+      schemes:
+        - http
+      security:
+        - jwt_header_Authorization: []
+  /api/tasks/{task_id}/stop:
+    post:
+      tags:
+        - tasks_service
+      summary: stop task tasks_service
+      description: 'остановить выполнение задачи '
+      operationId: tasks_service#stop task
       parameters:
         - name: task_id
           in: path
@@ -395,6 +393,54 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
+  /api/tasks/draft:
+    post:
+      tags:
+        - tasks_service
+      summary: create task draft tasks_service
+      description: создать драфт задачи
+      operationId: tasks_service#create task draft
+      parameters:
+        - name: Authorization
+          in: header
+          description: JWT used for authentication
+          required: true
+          type: string
+        - name: Create Task DraftRequestBody
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TasksServiceCreateTaskDraftRequestBody'
+            required:
+              - title
+              - text_template
+              - post_image
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            type: string
+            format: uuid
+        "400":
+          description: Bad Request response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            type: string
+        "404":
+          description: Not Found response.
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error response.
+          schema:
+            type: string
+      schemes:
+        - http
+      security:
+        - jwt_header_Authorization: []
 definitions:
   AdminServiceAddManagerRequestBody:
     title: AdminServiceAddManagerRequestBody
@@ -402,14 +448,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Nam quis quaerat exercitationem.
+        example: Dolores autem.
       password:
         type: string
-        example: 15z
+        example: otu
         minLength: 4
     example:
-      login: Sit mollitia voluptatibus aperiam ut necessitatibus et.
-      password: mxy
+      login: Harum vitae ut quae dolorem similique laudantium.
+      password: mze
     required:
       - login
       - password
@@ -425,41 +471,43 @@ definitions:
       jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
     required:
       - jwt
-  TasksServiceCreateTaskRequestBody:
-    title: TasksServiceCreateTaskRequestBody
+  TasksServiceCreateTaskDraftRequestBody:
+    title: TasksServiceCreateTaskDraftRequestBody
     type: object
     properties:
-      description:
+      post_image:
         type: string
-        description: описание задачи
-        example: Labore nihil.
-      tittle:
+        description: фотография для постов
+        example: Fuga error dolorem et porro deleniti enim.
+      text_template:
+        type: string
+        description: шаблон для подписи под постом
+        example: Quasi commodi.
+      title:
         type: string
         description: название задачи
-        example: Modi quo repellat nam quasi velit.
+        example: Mollitia vel incidunt sapiente temporibus.
     example:
-      description: Laboriosam sit et id nisi.
-      tittle: Labore et ex ab laudantium officia quia.
+      post_image: Qui laudantium deleniti nostrum odio eos omnis.
+      text_template: Fugiat vel libero et vel eligendi.
+      title: Pariatur et velit unde.
+    required:
+      - title
+      - text_template
+      - post_image
   TasksServiceUploadFileRequestBody:
     title: TasksServiceUploadFileRequestBody
     type: object
     properties:
-      bytes:
+      bots_bytes:
         type: string
-        description: содержимое файла
+        description: список ботов
         example:
-          - 83
-          - 117
-          - 110
+          - 85
           - 116
           - 32
-          - 118
-          - 101
-          - 114
-          - 111
-          - 32
-          - 105
-          - 100
+          - 117
+          - 116
           - 46
         format: byte
       file_type:
@@ -468,63 +516,149 @@ definitions:
            1 - список ботов
               2 - список резидентских прокси
               3 - спиок прокси-шестёрок
-        example: 1
+        example: 3
         enum:
           - 1
           - 2
           - 3
+      image_bytes:
+        type: string
+        description: изображение для поста
+        example:
+          - 67
+          - 111
+          - 114
+          - 112
+          - 111
+          - 114
+          - 105
+          - 115
+          - 32
+          - 97
+          - 32
+          - 114
+          - 101
+          - 105
+          - 99
+          - 105
+          - 101
+          - 110
+          - 100
+          - 105
+          - 115
+          - 32
+          - 97
+          - 100
+          - 105
+          - 112
+          - 105
+          - 115
+          - 99
+          - 105
+          - 32
+          - 118
+          - 105
+          - 116
+          - 97
+          - 101
+          - 46
+        format: byte
+      proxy_bytes:
+        type: string
+        description: содержимое файла
+        example:
+          - 67
+          - 111
+          - 114
+          - 114
+          - 117
+          - 112
+          - 116
+          - 105
+          - 32
+          - 101
+          - 97
+          - 114
+          - 117
+          - 109
+          - 32
+          - 100
+          - 111
+          - 108
+          - 111
+          - 114
+          - 101
+          - 32
+          - 97
+          - 98
+          - 46
+        format: byte
     example:
-      bytes:
-        - 73
-        - 116
-        - 97
-        - 113
-        - 117
+      bots_bytes:
+        - 82
         - 101
-        - 32
-        - 109
-        - 111
-        - 108
-        - 101
-        - 115
-        - 116
-        - 105
-        - 97
-        - 101
-        - 32
-        - 115
-        - 111
-        - 108
-        - 117
-        - 116
-        - 97
-        - 32
-        - 113
-        - 117
-        - 97
-        - 101
-        - 32
-        - 97
-        - 100
-        - 105
         - 112
-        - 105
-        - 115
-        - 99
-        - 105
-        - 32
-        - 109
-        - 111
-        - 100
-        - 105
-        - 32
-        - 100
-        - 111
+        - 101
         - 108
+        - 108
+        - 101
+        - 110
+        - 100
+        - 117
+        - 115
+        - 32
+        - 108
+        - 97
+        - 98
         - 111
         - 114
+        - 105
+        - 111
+        - 115
+        - 97
+        - 109
+        - 32
+        - 109
+        - 111
+        - 108
+        - 101
+        - 115
+        - 116
+        - 105
+        - 97
+        - 101
+        - 32
+        - 115
+        - 105
+        - 110
+        - 116
+        - 32
+        - 108
+        - 105
+        - 98
+        - 101
+        - 114
+        - 111
         - 46
       file_type: 1
+      image_bytes:
+        - 81
+        - 117
+        - 111
+        - 32
+        - 105
+        - 100
+        - 46
+      proxy_bytes:
+        - 69
+        - 110
+        - 105
+        - 109
+        - 32
+        - 114
+        - 101
+        - 109
+        - 46
     required:
       - file_type
 securityDefinitions:

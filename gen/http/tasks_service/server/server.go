@@ -19,12 +19,13 @@ import (
 
 // Server lists the tasks_service service endpoint HTTP handlers.
 type Server struct {
-	Mounts     []*MountPoint
-	CreateTask http.Handler
-	UploadFile http.Handler
-	StartTask  http.Handler
-	GetTask    http.Handler
-	ListTasks  http.Handler
+	Mounts          []*MountPoint
+	CreateTaskDraft http.Handler
+	UploadFile      http.Handler
+	StartTask       http.Handler
+	StopTask        http.Handler
+	GetTask         http.Handler
+	ListTasks       http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -65,17 +66,19 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"CreateTask", "POST", "/api/tasks/"},
+			{"CreateTaskDraft", "POST", "/api/tasks/draft"},
 			{"UploadFile", "POST", "/api/tasks/{task_id}/upload"},
 			{"StartTask", "POST", "/api/tasks/{task_id}/start"},
+			{"StopTask", "POST", "/api/tasks/{task_id}/stop"},
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
 			{"ListTasks", "GET", "/api/tasks/"},
 		},
-		CreateTask: NewCreateTaskHandler(e.CreateTask, mux, decoder, encoder, errhandler, formatter),
-		UploadFile: NewUploadFileHandler(e.UploadFile, mux, NewTasksServiceUploadFileDecoder(mux, tasksServiceUploadFileDecoderFn), encoder, errhandler, formatter),
-		StartTask:  NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
-		GetTask:    NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
-		ListTasks:  NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
+		CreateTaskDraft: NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
+		UploadFile:      NewUploadFileHandler(e.UploadFile, mux, NewTasksServiceUploadFileDecoder(mux, tasksServiceUploadFileDecoderFn), encoder, errhandler, formatter),
+		StartTask:       NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
+		StopTask:        NewStopTaskHandler(e.StopTask, mux, decoder, encoder, errhandler, formatter),
+		GetTask:         NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
+		ListTasks:       NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -84,18 +87,20 @@ func (s *Server) Service() string { return "tasks_service" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.CreateTask = m(s.CreateTask)
+	s.CreateTaskDraft = m(s.CreateTaskDraft)
 	s.UploadFile = m(s.UploadFile)
 	s.StartTask = m(s.StartTask)
+	s.StopTask = m(s.StopTask)
 	s.GetTask = m(s.GetTask)
 	s.ListTasks = m(s.ListTasks)
 }
 
 // Mount configures the mux to serve the tasks_service endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountCreateTaskHandler(mux, h.CreateTask)
+	MountCreateTaskDraftHandler(mux, h.CreateTaskDraft)
 	MountUploadFileHandler(mux, h.UploadFile)
 	MountStartTaskHandler(mux, h.StartTask)
+	MountStopTaskHandler(mux, h.StopTask)
 	MountGetTaskHandler(mux, h.GetTask)
 	MountListTasksHandler(mux, h.ListTasks)
 }
@@ -105,21 +110,21 @@ func (s *Server) Mount(mux goahttp.Muxer) {
 	Mount(mux, s)
 }
 
-// MountCreateTaskHandler configures the mux to serve the "tasks_service"
-// service "create task" endpoint.
-func MountCreateTaskHandler(mux goahttp.Muxer, h http.Handler) {
+// MountCreateTaskDraftHandler configures the mux to serve the "tasks_service"
+// service "create task draft" endpoint.
+func MountCreateTaskDraftHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/", f)
+	mux.Handle("POST", "/api/tasks/draft", f)
 }
 
-// NewCreateTaskHandler creates a HTTP handler which loads the HTTP request and
-// calls the "tasks_service" service "create task" endpoint.
-func NewCreateTaskHandler(
+// NewCreateTaskDraftHandler creates a HTTP handler which loads the HTTP
+// request and calls the "tasks_service" service "create task draft" endpoint.
+func NewCreateTaskDraftHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -128,13 +133,13 @@ func NewCreateTaskHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeCreateTaskRequest(mux, decoder)
-		encodeResponse = EncodeCreateTaskResponse(encoder)
-		encodeError    = EncodeCreateTaskError(encoder, formatter)
+		decodeRequest  = DecodeCreateTaskDraftRequest(mux, decoder)
+		encodeResponse = EncodeCreateTaskDraftResponse(encoder)
+		encodeError    = EncodeCreateTaskDraftError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "create task")
+		ctx = context.WithValue(ctx, goa.MethodKey, "create task draft")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -237,6 +242,57 @@ func NewStartTaskHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "start task")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountStopTaskHandler configures the mux to serve the "tasks_service" service
+// "stop task" endpoint.
+func MountStopTaskHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/tasks/{task_id}/stop", f)
+}
+
+// NewStopTaskHandler creates a HTTP handler which loads the HTTP request and
+// calls the "tasks_service" service "stop task" endpoint.
+func NewStopTaskHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeStopTaskRequest(mux, decoder)
+		encodeResponse = EncodeStopTaskResponse(encoder)
+		encodeError    = EncodeStopTaskError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "stop task")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

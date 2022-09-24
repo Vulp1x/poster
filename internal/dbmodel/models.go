@@ -54,9 +54,15 @@ type TargetUser struct {
 	ID        uuid.UUID  `json:"id"`
 	TaskID    uuid.UUID  `json:"task_id"`
 	Username  string     `json:"username"`
-	Notified  bool       `json:"notified"`
+	UserID    int64      `json:"user_id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
+}
+
+type TargetUsersToTask struct {
+	TargetID   uuid.UUID  `json:"target_id"`
+	TaskID     uuid.UUID  `json:"task_id"`
+	NotifiedAt *time.Time `json:"notified_at"`
 }
 
 type Task struct {
@@ -65,8 +71,9 @@ type Task struct {
 	TextTemplate string     `json:"text_template"`
 	Image        []byte     `json:"image"`
 	Status       taskStatus `json:"status"`
-	StartedAt    time.Time  `json:"started_at"`
+	Title        string     `json:"title"`
 	CreatedAt    time.Time  `json:"created_at"`
+	StartedAt    *time.Time `json:"started_at"`
 	UpdatedAt    *time.Time `json:"updated_at"`
 	DeletedAt    *time.Time `json:"deleted_at"`
 }

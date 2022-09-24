@@ -24,7 +24,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `tasks-service (create-task|upload-file|start-task|get-task|list-tasks)
+	return `tasks-service (create-task-draft|upload-file|start-task|stop-task|get-task|list-tasks)
 admin-service (add-manager|drop-manager)
 auth-service (signin|profile)
 `
@@ -32,14 +32,15 @@ auth-service (signin|profile)
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` tasks-service create-task --body '{
-      "description": "Ipsam expedita libero eum et.",
-      "tittle": "Dolor culpa temporibus sit."
-   }' --token "Ut quibusdam sequi sed unde sed."` + "\n" +
+	return os.Args[0] + ` tasks-service create-task-draft --body '{
+      "post_image": "Eaque facilis autem molestiae nostrum similique voluptatem.",
+      "text_template": "Voluptas cupiditate aut fugit ducimus.",
+      "title": "Eveniet necessitatibus."
+   }' --token "Facere nihil aut."` + "\n" +
 		os.Args[0] + ` admin-service add-manager --body '{
-      "login": "Illo aut non sint alias.",
-      "password": "roc"
-   }' --token "Rerum nam optio animi magnam."` + "\n" +
+      "login": "Vero vero velit non modi.",
+      "password": "f2k"
+   }' --token "Aut aspernatur incidunt quisquam provident dolor quia."` + "\n" +
 		os.Args[0] + ` auth-service signin --login "user@test.ru" --password "password"` + "\n" +
 		""
 }
@@ -57,9 +58,9 @@ func ParseEndpoint(
 	var (
 		tasksServiceFlags = flag.NewFlagSet("tasks-service", flag.ContinueOnError)
 
-		tasksServiceCreateTaskFlags     = flag.NewFlagSet("create-task", flag.ExitOnError)
-		tasksServiceCreateTaskBodyFlag  = tasksServiceCreateTaskFlags.String("body", "REQUIRED", "")
-		tasksServiceCreateTaskTokenFlag = tasksServiceCreateTaskFlags.String("token", "REQUIRED", "")
+		tasksServiceCreateTaskDraftFlags     = flag.NewFlagSet("create-task-draft", flag.ExitOnError)
+		tasksServiceCreateTaskDraftBodyFlag  = tasksServiceCreateTaskDraftFlags.String("body", "REQUIRED", "")
+		tasksServiceCreateTaskDraftTokenFlag = tasksServiceCreateTaskDraftFlags.String("token", "REQUIRED", "")
 
 		tasksServiceUploadFileFlags      = flag.NewFlagSet("upload-file", flag.ExitOnError)
 		tasksServiceUploadFileBodyFlag   = tasksServiceUploadFileFlags.String("body", "REQUIRED", "")
@@ -69,6 +70,10 @@ func ParseEndpoint(
 		tasksServiceStartTaskFlags      = flag.NewFlagSet("start-task", flag.ExitOnError)
 		tasksServiceStartTaskTaskIDFlag = tasksServiceStartTaskFlags.String("task-id", "REQUIRED", "id задачи")
 		tasksServiceStartTaskTokenFlag  = tasksServiceStartTaskFlags.String("token", "REQUIRED", "")
+
+		tasksServiceStopTaskFlags      = flag.NewFlagSet("stop-task", flag.ExitOnError)
+		tasksServiceStopTaskTaskIDFlag = tasksServiceStopTaskFlags.String("task-id", "REQUIRED", "id задачи")
+		tasksServiceStopTaskTokenFlag  = tasksServiceStopTaskFlags.String("token", "REQUIRED", "")
 
 		tasksServiceGetTaskFlags      = flag.NewFlagSet("get-task", flag.ExitOnError)
 		tasksServiceGetTaskTaskIDFlag = tasksServiceGetTaskFlags.String("task-id", "REQUIRED", "id задачи")
@@ -97,9 +102,10 @@ func ParseEndpoint(
 		authServiceProfileTokenFlag = authServiceProfileFlags.String("token", "REQUIRED", "")
 	)
 	tasksServiceFlags.Usage = tasksServiceUsage
-	tasksServiceCreateTaskFlags.Usage = tasksServiceCreateTaskUsage
+	tasksServiceCreateTaskDraftFlags.Usage = tasksServiceCreateTaskDraftUsage
 	tasksServiceUploadFileFlags.Usage = tasksServiceUploadFileUsage
 	tasksServiceStartTaskFlags.Usage = tasksServiceStartTaskUsage
+	tasksServiceStopTaskFlags.Usage = tasksServiceStopTaskUsage
 	tasksServiceGetTaskFlags.Usage = tasksServiceGetTaskUsage
 	tasksServiceListTasksFlags.Usage = tasksServiceListTasksUsage
 
@@ -149,14 +155,17 @@ func ParseEndpoint(
 		switch svcn {
 		case "tasks-service":
 			switch epn {
-			case "create-task":
-				epf = tasksServiceCreateTaskFlags
+			case "create-task-draft":
+				epf = tasksServiceCreateTaskDraftFlags
 
 			case "upload-file":
 				epf = tasksServiceUploadFileFlags
 
 			case "start-task":
 				epf = tasksServiceStartTaskFlags
+
+			case "stop-task":
+				epf = tasksServiceStopTaskFlags
 
 			case "get-task":
 				epf = tasksServiceGetTaskFlags
@@ -209,15 +218,18 @@ func ParseEndpoint(
 		case "tasks-service":
 			c := tasksservicec.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "create-task":
-				endpoint = c.CreateTask()
-				data, err = tasksservicec.BuildCreateTaskPayload(*tasksServiceCreateTaskBodyFlag, *tasksServiceCreateTaskTokenFlag)
+			case "create-task-draft":
+				endpoint = c.CreateTaskDraft()
+				data, err = tasksservicec.BuildCreateTaskDraftPayload(*tasksServiceCreateTaskDraftBodyFlag, *tasksServiceCreateTaskDraftTokenFlag)
 			case "upload-file":
 				endpoint = c.UploadFile(tasksServiceUploadFileEncoderFn)
 				data, err = tasksservicec.BuildUploadFilePayload(*tasksServiceUploadFileBodyFlag, *tasksServiceUploadFileTaskIDFlag, *tasksServiceUploadFileTokenFlag)
 			case "start-task":
 				endpoint = c.StartTask()
 				data, err = tasksservicec.BuildStartTaskPayload(*tasksServiceStartTaskTaskIDFlag, *tasksServiceStartTaskTokenFlag)
+			case "stop-task":
+				endpoint = c.StopTask()
+				data, err = tasksservicec.BuildStopTaskPayload(*tasksServiceStopTaskTaskIDFlag, *tasksServiceStopTaskTokenFlag)
 			case "get-task":
 				endpoint = c.GetTask()
 				data, err = tasksservicec.BuildGetTaskPayload(*tasksServiceGetTaskTaskIDFlag, *tasksServiceGetTaskTokenFlag)
@@ -262,9 +274,10 @@ Usage:
     %[1]s [globalflags] tasks-service COMMAND [flags]
 
 COMMAND:
-    create-task: создать драфт задачи
+    create-task-draft: создать драфт задачи
     upload-file: загрузить файл с пользователями, прокси
     start-task: начать выполнение задачи 
+    stop-task: остановить выполнение задачи 
     get-task: получить задачу по id
     list-tasks: получить все задачи для текущего пользователя
 
@@ -272,18 +285,19 @@ Additional help:
     %[1]s tasks-service COMMAND --help
 `, os.Args[0])
 }
-func tasksServiceCreateTaskUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service create-task -body JSON -token STRING
+func tasksServiceCreateTaskDraftUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service create-task-draft -body JSON -token STRING
 
 создать драфт задачи
     -body JSON: 
     -token STRING: 
 
 Example:
-    %[1]s tasks-service create-task --body '{
-      "description": "Ipsam expedita libero eum et.",
-      "tittle": "Dolor culpa temporibus sit."
-   }' --token "Ut quibusdam sequi sed unde sed."
+    %[1]s tasks-service create-task-draft --body '{
+      "post_image": "Eaque facilis autem molestiae nostrum similique voluptatem.",
+      "text_template": "Voluptas cupiditate aut fugit ducimus.",
+      "title": "Eveniet necessitatibus."
+   }' --token "Facere nihil aut."
 `, os.Args[0])
 }
 
@@ -297,9 +311,11 @@ func tasksServiceUploadFileUsage() {
 
 Example:
     %[1]s tasks-service upload-file --body '{
-      "bytes": "RXZlbmlldCBtb2xlc3RpYWUgc2ludCByZXJ1bSBldCBvZGl0Lg==",
-      "file_type": 1
-   }' --task-id "Saepe excepturi." --token "Ut expedita officiis."
+      "bots_bytes": "RXQgZnVnYSBuaWhpbC4=",
+      "file_type": 3,
+      "image_bytes": "RG9sb3Igc3VudC4=",
+      "proxy_bytes": "RnVnaXQgdGVtcG9yaWJ1cyB2b2x1cHRhdGUgcXVpIGRpZ25pc3NpbW9zLg=="
+   }' --task-id "Voluptatem cumque tenetur dignissimos facilis optio qui." --token "Et id ducimus est error."
 `, os.Args[0])
 }
 
@@ -311,7 +327,19 @@ func tasksServiceStartTaskUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service start-task --task-id "Est error." --token "Ut voluptas sit ut quo."
+    %[1]s tasks-service start-task --task-id "Dolore voluptatem." --token "Optio molestiae eius consequuntur nemo nulla placeat."
+`, os.Args[0])
+}
+
+func tasksServiceStopTaskUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service stop-task -task-id STRING -token STRING
+
+остановить выполнение задачи 
+    -task-id STRING: id задачи
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service stop-task --task-id "Doloremque fugit aspernatur sed culpa." --token "Deleniti dolorem molestiae eos exercitationem consequatur eligendi."
 `, os.Args[0])
 }
 
@@ -323,7 +351,7 @@ func tasksServiceGetTaskUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service get-task --task-id "Optio molestiae eius consequuntur nemo nulla placeat." --token "At odio accusantium."
+    %[1]s tasks-service get-task --task-id "Optio animi magnam suscipit doloremque." --token "Alias vero quibusdam occaecati sit optio."
 `, os.Args[0])
 }
 
@@ -334,7 +362,7 @@ func tasksServiceListTasksUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service list-tasks --token "Doloremque fugit aspernatur sed culpa."
+    %[1]s tasks-service list-tasks --token "Ut veniam."
 `, os.Args[0])
 }
 
@@ -362,9 +390,9 @@ admins could add drivers from main system
 
 Example:
     %[1]s admin-service add-manager --body '{
-      "login": "Illo aut non sint alias.",
-      "password": "roc"
-   }' --token "Rerum nam optio animi magnam."
+      "login": "Vero vero velit non modi.",
+      "password": "f2k"
+   }' --token "Aut aspernatur incidunt quisquam provident dolor quia."
 `, os.Args[0])
 }
 
@@ -376,7 +404,7 @@ admins could delete managers from main system
     -token STRING: 
 
 Example:
-    %[1]s admin-service drop-manager --manager-id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24" --token "Sed voluptatum dolores corrupti expedita."
+    %[1]s admin-service drop-manager --manager-id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24" --token "Laboriosam minima eaque vero fugit occaecati voluptates."
 `, os.Args[0])
 }
 
@@ -414,6 +442,6 @@ get user profile
     -token STRING: 
 
 Example:
-    %[1]s auth-service profile --token "Ipsa non nobis commodi iure unde fugiat."
+    %[1]s auth-service profile --token "Et mollitia."
 `, os.Args[0])
 }

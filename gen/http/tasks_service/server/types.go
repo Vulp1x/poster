@@ -12,13 +12,15 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// CreateTaskRequestBody is the type of the "tasks_service" service "create
-// task" endpoint HTTP request body.
-type CreateTaskRequestBody struct {
+// CreateTaskDraftRequestBody is the type of the "tasks_service" service
+// "create task draft" endpoint HTTP request body.
+type CreateTaskDraftRequestBody struct {
 	// название задачи
-	Tittle *string `form:"tittle,omitempty" json:"tittle,omitempty" xml:"tittle,omitempty"`
-	// описание задачи
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	// шаблон для подписи под постом
+	TextTemplate *string `json:"text_template"`
+	// фотография для постов
+	PostImage *string `json:"post_image"`
 }
 
 // UploadFileRequestBody is the type of the "tasks_service" service "upload
@@ -29,15 +31,20 @@ type UploadFileRequestBody struct {
 	// 3 - спиок прокси-шестёрок
 	FileType *int `form:"file_type,omitempty" json:"file_type,omitempty" xml:"file_type,omitempty"`
 	// содержимое файла
-	Bytes []byte `form:"bytes,omitempty" json:"bytes,omitempty" xml:"bytes,omitempty"`
+	ProxyBytes []byte `json:"proxy_bytes"`
+	// список ботов
+	BotsBytes []byte `json:"bots_bytes"`
+	// изображение для поста
+	ImageBytes []byte `json:"proxy_bytes"`
 }
 
-// NewCreateTaskPayload builds a tasks_service service create task endpoint
-// payload.
-func NewCreateTaskPayload(body *CreateTaskRequestBody, token string) *tasksservice.CreateTaskPayload {
-	v := &tasksservice.CreateTaskPayload{
-		Tittle:      body.Tittle,
-		Description: body.Description,
+// NewCreateTaskDraftPayload builds a tasks_service service create task draft
+// endpoint payload.
+func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *tasksservice.CreateTaskDraftPayload {
+	v := &tasksservice.CreateTaskDraftPayload{
+		Title:        *body.Title,
+		TextTemplate: *body.TextTemplate,
+		PostImage:    *body.PostImage,
 	}
 	v.Token = token
 
@@ -48,8 +55,10 @@ func NewCreateTaskPayload(body *CreateTaskRequestBody, token string) *tasksservi
 // payload.
 func NewUploadFilePayload(body *UploadFileRequestBody, taskID string, token string) *tasksservice.UploadFilePayload {
 	v := &tasksservice.UploadFilePayload{
-		FileType: *body.FileType,
-		Bytes:    body.Bytes,
+		FileType:   *body.FileType,
+		ProxyBytes: body.ProxyBytes,
+		BotsBytes:  body.BotsBytes,
+		ImageBytes: body.ImageBytes,
 	}
 	v.TaskID = taskID
 	v.Token = token
@@ -61,6 +70,15 @@ func NewUploadFilePayload(body *UploadFileRequestBody, taskID string, token stri
 // payload.
 func NewStartTaskPayload(taskID string, token string) *tasksservice.StartTaskPayload {
 	v := &tasksservice.StartTaskPayload{}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
+// NewStopTaskPayload builds a tasks_service service stop task endpoint payload.
+func NewStopTaskPayload(taskID string, token string) *tasksservice.StopTaskPayload {
+	v := &tasksservice.StopTaskPayload{}
 	v.TaskID = taskID
 	v.Token = token
 
@@ -83,6 +101,21 @@ func NewListTasksPayload(token string) *tasksservice.ListTasksPayload {
 	v.Token = token
 
 	return v
+}
+
+// ValidateCreateTaskDraftRequestBody runs the validations defined on Create
+// Task DraftRequestBody
+func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err error) {
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.TextTemplate == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("text_template", "body"))
+	}
+	if body.PostImage == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("post_image", "body"))
+	}
+	return
 }
 
 // ValidateUploadFileRequestBody runs the validations defined on Upload

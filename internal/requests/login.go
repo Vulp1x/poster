@@ -71,7 +71,7 @@ func PrepareLoginRequest(b domain.BotAccount) (*http.Request, error) {
 		"country_codes":       fmt.Sprintf("[{\"country_code\":\"%d\",\"source\":[\"default\"]}]", defaultCountryCode),
 		"phone_id":            b.Session.PhoneID.String(),
 		"enc_password":        encPassword,
-		"username":            b.Bot.Username,
+		"username":            b.Username,
 		"adid":                b.Session.AdvertisingID.String(),
 		"guid":                b.Session.UUID.String(),
 		"device_id":           b.Session.DeviceID,

@@ -30,20 +30,20 @@ type userStore interface {
 
 // auth_service service example implementation.
 // The example methods log the requests and return zero values.
-type authServicesrvc struct {
+type AuthServicesrvc struct {
 	store       userStore
 	securityCfg sessions.Configuration
 }
 
 // NewAuthService returns the auth_service service implementation.
-func NewAuthService(userStore userStore, cfg sessions.Configuration) authservice.Service {
+func NewAuthService(userStore userStore, cfg sessions.Configuration) *AuthServicesrvc {
 
-	return &authServicesrvc{securityCfg: cfg, store: userStore}
+	return &AuthServicesrvc{securityCfg: cfg, store: userStore}
 }
 
 // BasicAuth implements the authorization logic for service "auth_service" for
 // the "basic" security scheme.
-func (s *authServicesrvc) BasicAuth(ctx context.Context, login, pass string, scheme *security.BasicScheme) (context.Context, error) {
+func (s *AuthServicesrvc) BasicAuth(ctx context.Context, login, pass string, scheme *security.BasicScheme) (context.Context, error) {
 	u, err := s.store.FindByLogin(ctx, login)
 	if err != nil {
 		if errors.Is(err, users.ErrUserNotFound) {
@@ -69,7 +69,7 @@ func (s *authServicesrvc) BasicAuth(ctx context.Context, login, pass string, sch
 
 // JWTAuth implements the authorization logic for service "auth_service" for
 // the "jwt" security scheme.
-func (s *authServicesrvc) JWTAuth(ctx context.Context, tokenString string, scheme *security.JWTScheme) (context.Context, error) {
+func (s *AuthServicesrvc) JWTAuth(ctx context.Context, tokenString string, scheme *security.JWTScheme) (context.Context, error) {
 	if tokenString == "" {
 		return ctx, authservice.BadRequest("No token provided")
 	}
@@ -96,7 +96,7 @@ func (s *authServicesrvc) JWTAuth(ctx context.Context, tokenString string, schem
 }
 
 // Signin Creates a valid JWT
-func (s *authServicesrvc) Signin(ctx context.Context, p *authservice.SigninPayload) (*authservice.Creds, error) {
+func (s *AuthServicesrvc) Signin(ctx context.Context, p *authservice.SigninPayload) (*authservice.Creds, error) {
 	logger.Info(ctx, "authService.signin")
 
 	userID, err := UserIDFromContext(ctx)
@@ -117,7 +117,7 @@ func (s *authServicesrvc) Signin(ctx context.Context, p *authservice.SigninPaylo
 	return &authservice.Creds{JWT: signedToken}, nil
 }
 
-func (s *authServicesrvc) Profile(ctx context.Context, payload *authservice.ProfilePayload) (err error) {
+func (s *AuthServicesrvc) Profile(ctx context.Context, payload *authservice.ProfilePayload) (err error) {
 	logger.Infof(ctx, "auth profile method")
 
 	return nil

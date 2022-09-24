@@ -19,9 +19,9 @@ import (
 
 // Client lists the tasks_service service endpoint HTTP clients.
 type Client struct {
-	// CreateTask Doer is the HTTP client used to make requests to the create task
-	// endpoint.
-	CreateTaskDoer goahttp.Doer
+	// CreateTaskDraft Doer is the HTTP client used to make requests to the create
+	// task draft endpoint.
+	CreateTaskDraftDoer goahttp.Doer
 
 	// UploadFile Doer is the HTTP client used to make requests to the upload file
 	// endpoint.
@@ -30,6 +30,10 @@ type Client struct {
 	// StartTask Doer is the HTTP client used to make requests to the start task
 	// endpoint.
 	StartTaskDoer goahttp.Doer
+
+	// StopTask Doer is the HTTP client used to make requests to the stop task
+	// endpoint.
+	StopTaskDoer goahttp.Doer
 
 	// GetTask Doer is the HTTP client used to make requests to the get task
 	// endpoint.
@@ -64,9 +68,10 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		CreateTaskDoer:      doer,
+		CreateTaskDraftDoer: doer,
 		UploadFileDoer:      doer,
 		StartTaskDoer:       doer,
+		StopTaskDoer:        doer,
 		GetTaskDoer:         doer,
 		ListTasksDoer:       doer,
 		RestoreResponseBody: restoreBody,
@@ -77,15 +82,15 @@ func NewClient(
 	}
 }
 
-// CreateTask returns an endpoint that makes HTTP requests to the tasks_service
-// service create task server.
-func (c *Client) CreateTask() goa.Endpoint {
+// CreateTaskDraft returns an endpoint that makes HTTP requests to the
+// tasks_service service create task draft server.
+func (c *Client) CreateTaskDraft() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeCreateTaskRequest(c.encoder)
-		decodeResponse = DecodeCreateTaskResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeCreateTaskDraftRequest(c.encoder)
+		decodeResponse = DecodeCreateTaskDraftResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildCreateTaskRequest(ctx, v)
+		req, err := c.BuildCreateTaskDraftRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -93,9 +98,9 @@ func (c *Client) CreateTask() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.CreateTaskDoer.Do(req)
+		resp, err := c.CreateTaskDraftDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("tasks_service", "create task", err)
+			return nil, goahttp.ErrRequestError("tasks_service", "create task draft", err)
 		}
 		return decodeResponse(resp)
 	}
@@ -144,6 +149,30 @@ func (c *Client) StartTask() goa.Endpoint {
 		resp, err := c.StartTaskDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("tasks_service", "start task", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// StopTask returns an endpoint that makes HTTP requests to the tasks_service
+// service stop task server.
+func (c *Client) StopTask() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeStopTaskRequest(c.encoder)
+		decodeResponse = DecodeStopTaskResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildStopTaskRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.StopTaskDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("tasks_service", "stop task", err)
 		}
 		return decodeResponse(resp)
 	}

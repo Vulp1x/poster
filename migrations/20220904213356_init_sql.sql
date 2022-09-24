@@ -24,8 +24,9 @@ CREATE TABLE tasks
     text_template text                     not null,
     image         bytea                    not null,
     status        smallint                 not null,
-    started_at    timestamp with time zone not null,
+    title         text                     not null,
     created_at    timestamp with time zone not null,
+    started_at    timestamp with time zone,
     updated_at    timestamp with time zone,
     deleted_at    timestamp with time zone
 );
@@ -57,12 +58,18 @@ CREATE TABLE bot_accounts
 create table target_users
 (
     id         uuid primary key default gen_random_uuid(),
-    task_id    uuid        not null references tasks,
-    username   text UNIQUE not null,
-    notified   bool        not null,
-    created_at timestamp   not null,
-    updated_at timestamp,
-    unique (task_id, username)
+    task_id    uuid          not null references tasks,
+    username   text unique   not null,
+    user_id    bigint unique not null,
+    created_at timestamp     not null,
+    updated_at timestamp
+);
+
+create table target_users_to_tasks
+(
+    target_id   uuid not null references target_users,
+    task_id     uuid not null references tasks,
+    notified_at timestamp
 );
 
 

@@ -15,34 +15,37 @@ import (
 
 // Client is the "tasks_service" service client.
 type Client struct {
-	CreateTaskEndpoint goa.Endpoint
-	UploadFileEndpoint goa.Endpoint
-	StartTaskEndpoint  goa.Endpoint
-	GetTaskEndpoint    goa.Endpoint
-	ListTasksEndpoint  goa.Endpoint
+	CreateTaskDraftEndpoint goa.Endpoint
+	UploadFileEndpoint      goa.Endpoint
+	StartTaskEndpoint       goa.Endpoint
+	StopTaskEndpoint        goa.Endpoint
+	GetTaskEndpoint         goa.Endpoint
+	ListTasksEndpoint       goa.Endpoint
 }
 
 // NewClient initializes a "tasks_service" service client given the endpoints.
-func NewClient(createTask, uploadFile, startTask, getTask, listTasks goa.Endpoint) *Client {
+func NewClient(createTaskDraft, uploadFile, startTask, stopTask, getTask, listTasks goa.Endpoint) *Client {
 	return &Client{
-		CreateTaskEndpoint: createTask,
-		UploadFileEndpoint: uploadFile,
-		StartTaskEndpoint:  startTask,
-		GetTaskEndpoint:    getTask,
-		ListTasksEndpoint:  listTasks,
+		CreateTaskDraftEndpoint: createTaskDraft,
+		UploadFileEndpoint:      uploadFile,
+		StartTaskEndpoint:       startTask,
+		StopTaskEndpoint:        stopTask,
+		GetTaskEndpoint:         getTask,
+		ListTasksEndpoint:       listTasks,
 	}
 }
 
-// CreateTask calls the "create task" endpoint of the "tasks_service" service.
-// CreateTask may return the following errors:
+// CreateTaskDraft calls the "create task draft" endpoint of the
+// "tasks_service" service.
+// CreateTaskDraft may return the following errors:
 //   - "unauthorized" (type Unauthorized)
 //   - "bad request" (type BadRequest)
 //   - "internal error" (type InternalError)
 //   - "task not found" (type TaskNotFound)
 //   - error: internal error
-func (c *Client) CreateTask(ctx context.Context, p *CreateTaskPayload) (res string, err error) {
+func (c *Client) CreateTaskDraft(ctx context.Context, p *CreateTaskDraftPayload) (res string, err error) {
 	var ires interface{}
-	ires, err = c.CreateTaskEndpoint(ctx, p)
+	ires, err = c.CreateTaskDraftEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
@@ -70,6 +73,18 @@ func (c *Client) UploadFile(ctx context.Context, p *UploadFilePayload) (err erro
 //   - error: internal error
 func (c *Client) StartTask(ctx context.Context, p *StartTaskPayload) (err error) {
 	_, err = c.StartTaskEndpoint(ctx, p)
+	return
+}
+
+// StopTask calls the "stop task" endpoint of the "tasks_service" service.
+// StopTask may return the following errors:
+//   - "unauthorized" (type Unauthorized)
+//   - "bad request" (type BadRequest)
+//   - "internal error" (type InternalError)
+//   - "task not found" (type TaskNotFound)
+//   - error: internal error
+func (c *Client) StopTask(ctx context.Context, p *StopTaskPayload) (err error) {
+	_, err = c.StopTaskEndpoint(ctx, p)
 	return
 }
 

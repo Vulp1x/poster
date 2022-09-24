@@ -101,7 +101,7 @@ var _ = Service("tasks_service", func() {
 		Response("internal error", StatusInternalServerError)
 	})
 
-	Method("create task", func() {
+	Method("create task draft", func() {
 		Description("создать драфт задачи")
 
 		Security(JWTAuth)
@@ -111,15 +111,21 @@ var _ = Service("tasks_service", func() {
 				Description("JWT used for authentication")
 			})
 
-			Attribute("tittle", String, func() {
+			Attribute("title", String, func() {
 				Description("название задачи")
 			})
 
-			Attribute("description", String, func() {
-				Description("описание задачи")
+			Attribute("text_template", String, func() {
+				Description("шаблон для подписи под постом")
+				Meta("struct:tag:json", "text_template")
 			})
 
-			Required("token")
+			Attribute("post_image", String, func() {
+				Description("фотография для постов")
+				Meta("struct:tag:json", "post_image")
+			})
+
+			Required("token", "title", "text_template", "post_image")
 		})
 
 		Result(String, func() {
@@ -128,7 +134,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/")
+			POST("/api/tasks/draft")
 			// Use Authorization header to provide basic auth value.
 			Response(StatusOK)
 			Response(StatusNotFound)
@@ -158,7 +164,17 @@ var _ = Service("tasks_service", func() {
     3 - спиок прокси-шестёрок`)
 			})
 
-			Attribute("bytes", Bytes, "содержимое файла")
+			Attribute("proxy_bytes", Bytes, "содержимое файла", func() {
+				Meta("struct:tag:json", "proxy_bytes")
+			})
+
+			Attribute("bots_bytes", Bytes, "список ботов", func() {
+				Meta("struct:tag:json", "bots_bytes")
+			})
+
+			Attribute("image_bytes", Bytes, "изображение для поста", func() {
+				Meta("struct:tag:json", "proxy_bytes")
+			})
 
 			Required("token", "file_type", "task_id")
 		})
@@ -199,6 +215,33 @@ var _ = Service("tasks_service", func() {
 
 		HTTP(func() {
 			POST("/api/tasks/{task_id}/start")
+			Response(StatusOK)
+			Response(StatusBadRequest)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
+	Method("stop task", func() {
+		Description("остановить выполнение задачи ")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("token", "task_id")
+		})
+
+		HTTP(func() {
+			POST("/api/tasks/{task_id}/stop")
 			Response(StatusOK)
 			Response(StatusBadRequest)
 			Response(StatusNotFound)
@@ -330,3 +373,14 @@ var _ = Service("admin_service", func() {
 	})
 
 })
+
+//
+// var _ = Type("bot_account", func() {
+// 	Attribute("username", String, "login")
+// 	Attribute("password", String, "login")
+// 	Attribute("username", String, "login")
+//
+// 	Required("username")
+//
+//
+// })

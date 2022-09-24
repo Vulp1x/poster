@@ -110,9 +110,20 @@ CREATE TABLE public.target_users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     task_id uuid NOT NULL,
     username text NOT NULL,
-    notified boolean NOT NULL,
+    user_id bigint NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone
+);
+
+
+--
+-- Name: target_users_to_tasks; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.target_users_to_tasks (
+    target_id uuid NOT NULL,
+    task_id uuid NOT NULL,
+    notified_at timestamp without time zone
 );
 
 
@@ -126,8 +137,9 @@ CREATE TABLE public.tasks (
     text_template text NOT NULL,
     image bytea NOT NULL,
     status smallint NOT NULL,
-    started_at timestamp with time zone NOT NULL,
+    title text NOT NULL,
     created_at timestamp with time zone NOT NULL,
+    started_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone
 );
@@ -198,11 +210,11 @@ ALTER TABLE ONLY public.target_users
 
 
 --
--- Name: target_users target_users_task_id_username_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: target_users target_users_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.target_users
-    ADD CONSTRAINT target_users_task_id_username_key UNIQUE (task_id, username);
+    ADD CONSTRAINT target_users_user_id_key UNIQUE (user_id);
 
 
 --
@@ -275,6 +287,22 @@ ALTER TABLE ONLY public.proxies
 
 ALTER TABLE ONLY public.target_users
     ADD CONSTRAINT target_users_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
+
+
+--
+-- Name: target_users_to_tasks target_users_to_tasks_target_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_users_to_tasks
+    ADD CONSTRAINT target_users_to_tasks_target_id_fkey FOREIGN KEY (target_id) REFERENCES public.target_users(id);
+
+
+--
+-- Name: target_users_to_tasks target_users_to_tasks_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_users_to_tasks
+    ADD CONSTRAINT target_users_to_tasks_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
 
 
 --

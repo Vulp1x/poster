@@ -11,13 +11,15 @@ import (
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 )
 
-// CreateTaskRequestBody is the type of the "tasks_service" service "create
-// task" endpoint HTTP request body.
-type CreateTaskRequestBody struct {
+// CreateTaskDraftRequestBody is the type of the "tasks_service" service
+// "create task draft" endpoint HTTP request body.
+type CreateTaskDraftRequestBody struct {
 	// название задачи
-	Tittle *string `form:"tittle,omitempty" json:"tittle,omitempty" xml:"tittle,omitempty"`
-	// описание задачи
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Title string `form:"title" json:"title" xml:"title"`
+	// шаблон для подписи под постом
+	TextTemplate string `json:"text_template"`
+	// фотография для постов
+	PostImage string `json:"post_image"`
 }
 
 // UploadFileRequestBody is the type of the "tasks_service" service "upload
@@ -28,15 +30,20 @@ type UploadFileRequestBody struct {
 	// 3 - спиок прокси-шестёрок
 	FileType int `form:"file_type" json:"file_type" xml:"file_type"`
 	// содержимое файла
-	Bytes []byte `form:"bytes,omitempty" json:"bytes,omitempty" xml:"bytes,omitempty"`
+	ProxyBytes []byte `json:"proxy_bytes"`
+	// список ботов
+	BotsBytes []byte `json:"bots_bytes"`
+	// изображение для поста
+	ImageBytes []byte `json:"proxy_bytes"`
 }
 
-// NewCreateTaskRequestBody builds the HTTP request body from the payload of
-// the "create task" endpoint of the "tasks_service" service.
-func NewCreateTaskRequestBody(p *tasksservice.CreateTaskPayload) *CreateTaskRequestBody {
-	body := &CreateTaskRequestBody{
-		Tittle:      p.Tittle,
-		Description: p.Description,
+// NewCreateTaskDraftRequestBody builds the HTTP request body from the payload
+// of the "create task draft" endpoint of the "tasks_service" service.
+func NewCreateTaskDraftRequestBody(p *tasksservice.CreateTaskDraftPayload) *CreateTaskDraftRequestBody {
+	body := &CreateTaskDraftRequestBody{
+		Title:        p.Title,
+		TextTemplate: p.TextTemplate,
+		PostImage:    p.PostImage,
 	}
 	return body
 }
@@ -45,39 +52,41 @@ func NewCreateTaskRequestBody(p *tasksservice.CreateTaskPayload) *CreateTaskRequ
 // the "upload file" endpoint of the "tasks_service" service.
 func NewUploadFileRequestBody(p *tasksservice.UploadFilePayload) *UploadFileRequestBody {
 	body := &UploadFileRequestBody{
-		FileType: p.FileType,
-		Bytes:    p.Bytes,
+		FileType:   p.FileType,
+		ProxyBytes: p.ProxyBytes,
+		BotsBytes:  p.BotsBytes,
+		ImageBytes: p.ImageBytes,
 	}
 	return body
 }
 
-// NewCreateTaskBadRequest builds a tasks_service service create task endpoint
-// bad request error.
-func NewCreateTaskBadRequest(body string) tasksservice.BadRequest {
+// NewCreateTaskDraftBadRequest builds a tasks_service service create task
+// draft endpoint bad request error.
+func NewCreateTaskDraftBadRequest(body string) tasksservice.BadRequest {
 	v := tasksservice.BadRequest(body)
 
 	return v
 }
 
-// NewCreateTaskInternalError builds a tasks_service service create task
-// endpoint internal error error.
-func NewCreateTaskInternalError(body string) tasksservice.InternalError {
+// NewCreateTaskDraftInternalError builds a tasks_service service create task
+// draft endpoint internal error error.
+func NewCreateTaskDraftInternalError(body string) tasksservice.InternalError {
 	v := tasksservice.InternalError(body)
 
 	return v
 }
 
-// NewCreateTaskTaskNotFound builds a tasks_service service create task
-// endpoint task not found error.
-func NewCreateTaskTaskNotFound(body string) tasksservice.TaskNotFound {
+// NewCreateTaskDraftTaskNotFound builds a tasks_service service create task
+// draft endpoint task not found error.
+func NewCreateTaskDraftTaskNotFound(body string) tasksservice.TaskNotFound {
 	v := tasksservice.TaskNotFound(body)
 
 	return v
 }
 
-// NewCreateTaskUnauthorized builds a tasks_service service create task
-// endpoint unauthorized error.
-func NewCreateTaskUnauthorized(body string) tasksservice.Unauthorized {
+// NewCreateTaskDraftUnauthorized builds a tasks_service service create task
+// draft endpoint unauthorized error.
+func NewCreateTaskDraftUnauthorized(body string) tasksservice.Unauthorized {
 	v := tasksservice.Unauthorized(body)
 
 	return v
@@ -142,6 +151,38 @@ func NewStartTaskTaskNotFound(body string) tasksservice.TaskNotFound {
 // NewStartTaskUnauthorized builds a tasks_service service start task endpoint
 // unauthorized error.
 func NewStartTaskUnauthorized(body string) tasksservice.Unauthorized {
+	v := tasksservice.Unauthorized(body)
+
+	return v
+}
+
+// NewStopTaskBadRequest builds a tasks_service service stop task endpoint bad
+// request error.
+func NewStopTaskBadRequest(body string) tasksservice.BadRequest {
+	v := tasksservice.BadRequest(body)
+
+	return v
+}
+
+// NewStopTaskInternalError builds a tasks_service service stop task endpoint
+// internal error error.
+func NewStopTaskInternalError(body string) tasksservice.InternalError {
+	v := tasksservice.InternalError(body)
+
+	return v
+}
+
+// NewStopTaskTaskNotFound builds a tasks_service service stop task endpoint
+// task not found error.
+func NewStopTaskTaskNotFound(body string) tasksservice.TaskNotFound {
+	v := tasksservice.TaskNotFound(body)
+
+	return v
+}
+
+// NewStopTaskUnauthorized builds a tasks_service service stop task endpoint
+// unauthorized error.
+func NewStopTaskUnauthorized(body string) tasksservice.Unauthorized {
 	v := tasksservice.Unauthorized(body)
 
 	return v

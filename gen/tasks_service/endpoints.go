@@ -16,11 +16,12 @@ import (
 
 // Endpoints wraps the "tasks_service" service endpoints.
 type Endpoints struct {
-	CreateTask goa.Endpoint
-	UploadFile goa.Endpoint
-	StartTask  goa.Endpoint
-	GetTask    goa.Endpoint
-	ListTasks  goa.Endpoint
+	CreateTaskDraft goa.Endpoint
+	UploadFile      goa.Endpoint
+	StartTask       goa.Endpoint
+	StopTask        goa.Endpoint
+	GetTask         goa.Endpoint
+	ListTasks       goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "tasks_service" service with endpoints.
@@ -28,29 +29,31 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		CreateTask: NewCreateTaskEndpoint(s, a.JWTAuth),
-		UploadFile: NewUploadFileEndpoint(s, a.JWTAuth),
-		StartTask:  NewStartTaskEndpoint(s, a.JWTAuth),
-		GetTask:    NewGetTaskEndpoint(s, a.JWTAuth),
-		ListTasks:  NewListTasksEndpoint(s, a.JWTAuth),
+		CreateTaskDraft: NewCreateTaskDraftEndpoint(s, a.JWTAuth),
+		UploadFile:      NewUploadFileEndpoint(s, a.JWTAuth),
+		StartTask:       NewStartTaskEndpoint(s, a.JWTAuth),
+		StopTask:        NewStopTaskEndpoint(s, a.JWTAuth),
+		GetTask:         NewGetTaskEndpoint(s, a.JWTAuth),
+		ListTasks:       NewListTasksEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "tasks_service" service
 // endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.CreateTask = m(e.CreateTask)
+	e.CreateTaskDraft = m(e.CreateTaskDraft)
 	e.UploadFile = m(e.UploadFile)
 	e.StartTask = m(e.StartTask)
+	e.StopTask = m(e.StopTask)
 	e.GetTask = m(e.GetTask)
 	e.ListTasks = m(e.ListTasks)
 }
 
-// NewCreateTaskEndpoint returns an endpoint function that calls the method
-// "create task" of service "tasks_service".
-func NewCreateTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewCreateTaskDraftEndpoint returns an endpoint function that calls the
+// method "create task draft" of service "tasks_service".
+func NewCreateTaskDraftEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*CreateTaskPayload)
+		p := req.(*CreateTaskDraftPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -61,7 +64,7 @@ func NewCreateTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 		if err != nil {
 			return nil, err
 		}
-		return s.CreateTask(ctx, p)
+		return s.CreateTaskDraft(ctx, p)
 	}
 }
 
@@ -100,6 +103,25 @@ func NewStartTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoin
 			return nil, err
 		}
 		return nil, s.StartTask(ctx, p)
+	}
+}
+
+// NewStopTaskEndpoint returns an endpoint function that calls the method "stop
+// task" of service "tasks_service".
+func NewStopTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*StopTaskPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.StopTask(ctx, p)
 	}
 }
 

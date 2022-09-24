@@ -11,9 +11,9 @@ import (
 	"fmt"
 )
 
-// CreateTaskTasksServicePath returns the URL path to the tasks_service service create task HTTP endpoint.
-func CreateTaskTasksServicePath() string {
-	return "/api/tasks/"
+// CreateTaskDraftTasksServicePath returns the URL path to the tasks_service service create task draft HTTP endpoint.
+func CreateTaskDraftTasksServicePath() string {
+	return "/api/tasks/draft"
 }
 
 // UploadFileTasksServicePath returns the URL path to the tasks_service service upload file HTTP endpoint.
@@ -24,6 +24,11 @@ func UploadFileTasksServicePath(taskID string) string {
 // StartTaskTasksServicePath returns the URL path to the tasks_service service start task HTTP endpoint.
 func StartTaskTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/start", taskID)
+}
+
+// StopTaskTasksServicePath returns the URL path to the tasks_service service stop task HTTP endpoint.
+func StopTaskTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/stop", taskID)
 }
 
 // GetTaskTasksServicePath returns the URL path to the tasks_service service get task HTTP endpoint.

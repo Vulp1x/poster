@@ -15,24 +15,25 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildCreateTaskPayload builds the payload for the tasks_service create task
-// endpoint from CLI flags.
-func BuildCreateTaskPayload(tasksServiceCreateTaskBody string, tasksServiceCreateTaskToken string) (*tasksservice.CreateTaskPayload, error) {
+// BuildCreateTaskDraftPayload builds the payload for the tasks_service create
+// task draft endpoint from CLI flags.
+func BuildCreateTaskDraftPayload(tasksServiceCreateTaskDraftBody string, tasksServiceCreateTaskDraftToken string) (*tasksservice.CreateTaskDraftPayload, error) {
 	var err error
-	var body CreateTaskRequestBody
+	var body CreateTaskDraftRequestBody
 	{
-		err = json.Unmarshal([]byte(tasksServiceCreateTaskBody), &body)
+		err = json.Unmarshal([]byte(tasksServiceCreateTaskDraftBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Ipsam expedita libero eum et.\",\n      \"tittle\": \"Dolor culpa temporibus sit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"post_image\": \"Eaque facilis autem molestiae nostrum similique voluptatem.\",\n      \"text_template\": \"Voluptas cupiditate aut fugit ducimus.\",\n      \"title\": \"Eveniet necessitatibus.\"\n   }'")
 		}
 	}
 	var token string
 	{
-		token = tasksServiceCreateTaskToken
+		token = tasksServiceCreateTaskDraftToken
 	}
-	v := &tasksservice.CreateTaskPayload{
-		Tittle:      body.Tittle,
-		Description: body.Description,
+	v := &tasksservice.CreateTaskDraftPayload{
+		Title:        body.Title,
+		TextTemplate: body.TextTemplate,
+		PostImage:    body.PostImage,
 	}
 	v.Token = token
 
@@ -47,7 +48,7 @@ func BuildUploadFilePayload(tasksServiceUploadFileBody string, tasksServiceUploa
 	{
 		err = json.Unmarshal([]byte(tasksServiceUploadFileBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bytes\": \"RXZlbmlldCBtb2xlc3RpYWUgc2ludCByZXJ1bSBldCBvZGl0Lg==\",\n      \"file_type\": 1\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bots_bytes\": \"RXQgZnVnYSBuaWhpbC4=\",\n      \"file_type\": 3,\n      \"image_bytes\": \"RG9sb3Igc3VudC4=\",\n      \"proxy_bytes\": \"RnVnaXQgdGVtcG9yaWJ1cyB2b2x1cHRhdGUgcXVpIGRpZ25pc3NpbW9zLg==\"\n   }'")
 		}
 		if !(body.FileType == 1 || body.FileType == 2 || body.FileType == 3) {
 			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.file_type", body.FileType, []interface{}{1, 2, 3}))
@@ -65,8 +66,10 @@ func BuildUploadFilePayload(tasksServiceUploadFileBody string, tasksServiceUploa
 		token = tasksServiceUploadFileToken
 	}
 	v := &tasksservice.UploadFilePayload{
-		FileType: body.FileType,
-		Bytes:    body.Bytes,
+		FileType:   body.FileType,
+		ProxyBytes: body.ProxyBytes,
+		BotsBytes:  body.BotsBytes,
+		ImageBytes: body.ImageBytes,
 	}
 	v.TaskID = taskID
 	v.Token = token
@@ -86,6 +89,24 @@ func BuildStartTaskPayload(tasksServiceStartTaskTaskID string, tasksServiceStart
 		token = tasksServiceStartTaskToken
 	}
 	v := &tasksservice.StartTaskPayload{}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v, nil
+}
+
+// BuildStopTaskPayload builds the payload for the tasks_service stop task
+// endpoint from CLI flags.
+func BuildStopTaskPayload(tasksServiceStopTaskTaskID string, tasksServiceStopTaskToken string) (*tasksservice.StopTaskPayload, error) {
+	var taskID string
+	{
+		taskID = tasksServiceStopTaskTaskID
+	}
+	var token string
+	{
+		token = tasksServiceStopTaskToken
+	}
+	v := &tasksservice.StopTaskPayload{}
 	v.TaskID = taskID
 	v.Token = token
 

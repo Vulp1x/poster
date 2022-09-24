@@ -27,9 +27,15 @@ UPDATE users
 SET deleted_at= now()
 where id = $1;
 
--- name: CreateTask :exec
-insert into tasks(manager_id, text_template, image, status, created_at)
-VALUES ($1, $2, $3, $4, now());
+-- name: CreateDraftTask :one
+insert into tasks(manager_id, text_template, title, image, status, created_at)
+VALUES ($1, $2, $3, $4, 1, now())
+RETURNING id;
+
+-- name: FindTaskByID :one
+select *
+from tasks
+where id = $1;
 
 -- name: StartTaskByID :one
 update tasks

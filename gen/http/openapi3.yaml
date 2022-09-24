@@ -20,8 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddManagerRequestBody'
             example:
-              login: Illo aut non sint alias.
-              password: roc
+              login: Vero vero velit non modi.
+              password: f2k
       responses:
         "200":
           description: OK response.
@@ -31,28 +31,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Sit sit voluptatem quo quo velit.
+                example: Voluptatum quaerat odio harum at ea.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Eum enim.
+                example: Laboriosam quia harum odio fugiat maiores.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Enim aut nobis.
+                example: Non dolorum voluptate dolorem.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Amet reiciendis dicta quibusdam neque dolores.
+                example: Nobis et ab quod.
       security:
         - jwt_header_Authorization:
             - driver
@@ -84,21 +84,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Maiores dolorem quia.
+                example: Rerum consequuntur.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Quidem neque.
+                example: Rerum veniam dolorem perspiciatis.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Enim et assumenda blanditiis nihil exercitationem.
+                example: Qui omnis natus voluptatum in est.
         "404":
           description: 'user not found: Not Found response.'
           content:
@@ -125,7 +125,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: A dolor.
+                example: Inventore et minima fugit nihil.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -136,14 +136,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Eum ab qui.
+                example: Accusantium inventore et temporibus voluptatibus.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Culpa consequatur.
+                example: Veritatis voluptatem voluptas eos rerum maiores nostrum.
       security:
         - jwt_header_Authorization:
             - driver
@@ -170,28 +170,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Consequuntur explicabo perspiciatis et aut cumque et.
+                example: Eos ipsa eveniet et molestias molestias non.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Maxime et.
+                example: Blanditiis blanditiis.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Ut et iusto eum veniam.
+                example: Earum nisi et eum aliquid.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Ea numquam.
+                example: Amet nemo quia est.
       security:
         - basic_header_Authorization: []
   /api/tasks/:
@@ -210,7 +210,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Aut blanditiis dolore.
+                example: Quibusdam sapiente.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -225,26 +225,285 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Perspiciatis non id.
+                example: Assumenda eum possimus consequatur.
       security:
         - jwt_header_Authorization:
             - driver
             - admin
+  /api/tasks/{task_id}/:
+    get:
+      tags:
+        - tasks_service
+      summary: get task tasks_service
+      description: получить задачу по id
+      operationId: tasks_service#get task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          schema:
+            type: string
+            description: id задачи
+            example: Nam fugit expedita.
+          example: Et facilis.
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Dignissimos veniam est.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Dolorem eveniet perferendis.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/start:
     post:
       tags:
         - tasks_service
-      summary: create task tasks_service
+      summary: start task tasks_service
+      description: 'начать выполнение задачи '
+      operationId: tasks_service#start task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          schema:
+            type: string
+            description: id задачи
+            example: Magnam illum.
+          example: Cum sint beatae commodi omnis.
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json: {}
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Nam qui quibusdam in pariatur.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/stop:
+    post:
+      tags:
+        - tasks_service
+      summary: stop task tasks_service
+      description: 'остановить выполнение задачи '
+      operationId: tasks_service#stop task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          schema:
+            type: string
+            description: id задачи
+            example: Fugiat ut odio minus doloremque architecto.
+          example: Voluptas nam.
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json: {}
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Facilis fugiat similique ab sint voluptatum aspernatur.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/{task_id}/upload:
+    post:
+      tags:
+        - tasks_service
+      summary: upload file tasks_service
+      description: загрузить файл с пользователями, прокси
+      operationId: tasks_service#upload file
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи, в которую загружаем пользователей/прокси
+          required: true
+          schema:
+            type: string
+            description: id задачи, в которую загружаем пользователей/прокси
+            example: Exercitationem suscipit sit nisi earum perspiciatis nobis.
+          example: Consequatur ea atque reprehenderit esse molestiae.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadFileRequestBody'
+            example:
+              bots_bytes:
+                - 69
+                - 116
+                - 32
+                - 102
+                - 117
+                - 103
+                - 97
+                - 32
+                - 110
+                - 105
+                - 104
+                - 105
+                - 108
+                - 46
+              file_type: 3
+              image_bytes:
+                - 68
+                - 111
+                - 108
+                - 111
+                - 114
+                - 32
+                - 115
+                - 117
+                - 110
+                - 116
+                - 46
+              proxy_bytes:
+                - 70
+                - 117
+                - 103
+                - 105
+                - 116
+                - 32
+                - 116
+                - 101
+                - 109
+                - 112
+                - 111
+                - 114
+                - 105
+                - 98
+                - 117
+                - 115
+                - 32
+                - 118
+                - 111
+                - 108
+                - 117
+                - 112
+                - 116
+                - 97
+                - 116
+                - 101
+                - 32
+                - 113
+                - 117
+                - 105
+                - 32
+                - 100
+                - 105
+                - 103
+                - 110
+                - 105
+                - 115
+                - 115
+                - 105
+                - 109
+                - 111
+                - 115
+                - 46
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: 'bad request: Bad Request response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Fuga quas nisi sapiente.
+        "401":
+          description: 'unauthorized: Unauthorized response.'
+          content:
+            application/json: {}
+        "404":
+          description: 'task not found: Not Found response.'
+          content:
+            application/json: {}
+        "500":
+          description: 'internal error: Internal Server Error response.'
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Debitis in et ipsa et dolorem.
+      security:
+        - jwt_header_Authorization:
+            - driver
+            - admin
+  /api/tasks/draft:
+    post:
+      tags:
+        - tasks_service
+      summary: create task draft tasks_service
       description: создать драфт задачи
-      operationId: tasks_service#create task
+      operationId: tasks_service#create task draft
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTaskRequestBody'
+              $ref: '#/components/schemas/CreateTaskDraftRequestBody'
             example:
-              description: Ipsam expedita libero eum et.
-              tittle: Dolor culpa temporibus sit.
+              post_image: Eaque facilis autem molestiae nostrum similique voluptatem.
+              text_template: Voluptas cupiditate aut fugit ducimus.
+              title: Eveniet necessitatibus.
       responses:
         "200":
           description: OK response.
@@ -262,7 +521,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Accusamus officia ipsum et provident omnis eius.
+                example: Ea numquam.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -287,188 +546,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Possimus deleniti.
-      security:
-        - jwt_header_Authorization:
-            - driver
-            - admin
-  /api/tasks/{task_id}/:
-    get:
-      tags:
-        - tasks_service
-      summary: get task tasks_service
-      description: получить задачу по id
-      operationId: tasks_service#get task
-      parameters:
-        - name: task_id
-          in: path
-          description: id задачи
-          required: true
-          schema:
-            type: string
-            description: id задачи
-            example: Inventore et minima fugit nihil.
-          example: Veritatis voluptatem voluptas eos rerum maiores nostrum.
-      responses:
-        "200":
-          description: OK response.
-        "400":
-          description: 'bad request: Bad Request response.'
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Assumenda voluptate.
-        "401":
-          description: 'unauthorized: Unauthorized response.'
-          content:
-            application/json: {}
-        "404":
-          description: 'task not found: Not Found response.'
-          content:
-            application/json: {}
-        "500":
-          description: 'internal error: Internal Server Error response.'
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Ut aut atque quod.
-      security:
-        - jwt_header_Authorization:
-            - driver
-            - admin
-  /api/tasks/{task_id}/start:
-    post:
-      tags:
-        - tasks_service
-      summary: start task tasks_service
-      description: 'начать выполнение задачи '
-      operationId: tasks_service#start task
-      parameters:
-        - name: task_id
-          in: path
-          description: id задачи
-          required: true
-          schema:
-            type: string
-            description: id задачи
-            example: Rerum consequuntur.
-          example: Blanditiis blanditiis.
-      responses:
-        "200":
-          description: OK response.
-        "400":
-          description: 'bad request: Bad Request response.'
-          content:
-            application/json: {}
-        "401":
-          description: 'unauthorized: Unauthorized response.'
-          content:
-            application/json: {}
-        "404":
-          description: 'task not found: Not Found response.'
-          content:
-            application/json: {}
-        "500":
-          description: 'internal error: Internal Server Error response.'
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Labore amet ut iure.
-      security:
-        - jwt_header_Authorization:
-            - driver
-            - admin
-  /api/tasks/{task_id}/upload:
-    post:
-      tags:
-        - tasks_service
-      summary: upload file tasks_service
-      description: загрузить файл с пользователями, прокси
-      operationId: tasks_service#upload file
-      parameters:
-        - name: task_id
-          in: path
-          description: id задачи, в которую загружаем пользователей/прокси
-          required: true
-          schema:
-            type: string
-            description: id задачи, в которую загружаем пользователей/прокси
-            example: Laboriosam quia harum odio fugiat maiores.
-          example: Nobis et ab quod.
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UploadFileRequestBody'
-            example:
-              bytes:
-                - 69
-                - 118
-                - 101
-                - 110
-                - 105
-                - 101
-                - 116
-                - 32
-                - 109
-                - 111
-                - 108
-                - 101
-                - 115
-                - 116
-                - 105
-                - 97
-                - 101
-                - 32
-                - 115
-                - 105
-                - 110
-                - 116
-                - 32
-                - 114
-                - 101
-                - 114
-                - 117
-                - 109
-                - 32
-                - 101
-                - 116
-                - 32
-                - 111
-                - 100
-                - 105
-                - 116
-                - 46
-              file_type: 1
-      responses:
-        "200":
-          description: OK response.
-        "400":
-          description: 'bad request: Bad Request response.'
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Veniam qui.
-        "401":
-          description: 'unauthorized: Unauthorized response.'
-          content:
-            application/json: {}
-        "404":
-          description: 'task not found: Not Found response.'
-          content:
-            application/json: {}
-        "500":
-          description: 'internal error: Internal Server Error response.'
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Placeat dicta porro sed repellendus.
+                example: Ut et iusto eum veniam.
       security:
         - jwt_header_Authorization:
             - driver
@@ -480,31 +558,40 @@ components:
       properties:
         login:
           type: string
-          example: Aut alias blanditiis provident voluptatem.
+          example: Dolor sed nostrum qui facere nemo.
         password:
           type: string
-          example: tdb
+          example: jdq
           minLength: 4
       example:
-        login: Eos iste et.
-        password: 9g1
+        login: Itaque nihil.
+        password: ckk
       required:
         - login
         - password
-    CreateTaskRequestBody:
+    CreateTaskDraftRequestBody:
       type: object
       properties:
-        description:
+        post_image:
           type: string
-          description: описание задачи
-          example: Qui exercitationem et mollitia.
-        tittle:
+          description: фотография для постов
+          example: Sunt officia inventore.
+        text_template:
+          type: string
+          description: шаблон для подписи под постом
+          example: Possimus deleniti.
+        title:
           type: string
           description: название задачи
-          example: Eveniet praesentium.
+          example: Accusamus officia ipsum et provident omnis eius.
       example:
-        description: Quis earum maxime omnis reiciendis adipisci facilis.
-        tittle: Amet autem est quia impedit.
+        post_image: Ut commodi inventore libero et accusantium commodi.
+        text_template: Aliquam nihil.
+        title: Et molestiae quam beatae quas eum.
+      required:
+        - title
+        - text_template
+        - post_image
     Creds:
       type: object
       properties:
@@ -519,23 +606,43 @@ components:
     UploadFileRequestBody:
       type: object
       properties:
-        bytes:
+        bots_bytes:
           type: string
-          description: содержимое файла
+          description: список ботов
           example:
-            - 77
-            - 111
-            - 108
+            - 82
             - 101
-            - 115
-            - 116
-            - 105
+            - 114
+            - 117
+            - 109
+            - 32
+            - 101
+            - 117
+            - 109
+            - 32
             - 97
-            - 101
+            - 98
             - 32
             - 113
             - 117
+            - 105
+            - 32
+            - 101
+            - 120
+            - 99
+            - 101
+            - 112
+            - 116
+            - 117
+            - 114
+            - 105
+            - 32
+            - 108
             - 97
+            - 98
+            - 111
+            - 114
+            - 117
             - 109
             - 46
           format: binary
@@ -545,58 +652,158 @@ components:
              1 - список ботов
                 2 - список резидентских прокси
                 3 - спиок прокси-шестёрок
-          example: 3
+          example: 2
           enum:
             - 1
             - 2
             - 3
+        image_bytes:
+          type: string
+          description: изображение для поста
+          example:
+            - 81
+            - 117
+            - 105
+            - 32
+            - 113
+            - 117
+            - 111
+            - 115
+            - 32
+            - 110
+            - 111
+            - 115
+            - 116
+            - 114
+            - 117
+            - 109
+            - 32
+            - 109
+            - 111
+            - 108
+            - 108
+            - 105
+            - 116
+            - 105
+            - 97
+            - 32
+            - 99
+            - 111
+            - 110
+            - 115
+            - 101
+            - 113
+            - 117
+            - 117
+            - 110
+            - 116
+            - 117
+            - 114
+            - 46
+          format: binary
+        proxy_bytes:
+          type: string
+          description: содержимое файла
+          example:
+            - 68
+            - 111
+            - 108
+            - 111
+            - 114
+            - 32
+            - 110
+            - 97
+            - 109
+            - 32
+            - 99
+            - 117
+            - 108
+            - 112
+            - 97
+            - 46
+          format: binary
       example:
-        bytes:
-          - 69
-          - 117
-          - 109
-          - 32
+        bots_bytes:
+          - 80
+          - 101
+          - 114
+          - 102
+          - 101
+          - 114
+          - 101
           - 110
-          - 117
-          - 108
-          - 108
-          - 97
-          - 32
-          - 97
-          - 108
+          - 100
           - 105
+          - 115
+          - 32
           - 113
           - 117
+          - 105
           - 97
-          - 109
-          - 32
-          - 110
-          - 105
-          - 104
-          - 105
-          - 108
           - 32
           - 114
           - 101
-          - 112
-          - 101
+          - 109
+          - 32
+          - 110
+          - 111
+          - 115
+          - 116
+          - 114
+          - 117
+          - 109
+          - 32
+          - 115
+          - 105
+          - 110
+          - 116
+          - 32
+          - 100
+          - 111
           - 108
+          - 111
+          - 114
+          - 117
+          - 109
+          - 46
+        file_type: 2
+        image_bytes:
+          - 66
           - 108
           - 97
-          - 116
-          - 32
-          - 117
-          - 116
-          - 32
-          - 99
-          - 111
-          - 109
-          - 109
-          - 111
+          - 110
           - 100
           - 105
+          - 116
+          - 105
+          - 105
+          - 115
+          - 32
+          - 101
+          - 120
+          - 32
+          - 97
+          - 108
+          - 105
+          - 97
+          - 115
           - 46
-        file_type: 3
+        proxy_bytes:
+          - 65
+          - 99
+          - 99
+          - 117
+          - 115
+          - 97
+          - 110
+          - 116
+          - 105
+          - 117
+          - 109
+          - 32
+          - 101
+          - 120
+          - 46
       required:
         - file_type
   securitySchemes:

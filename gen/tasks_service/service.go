@@ -17,11 +17,13 @@ import (
 // компаниями)
 type Service interface {
 	// создать драфт задачи
-	CreateTask(context.Context, *CreateTaskPayload) (res string, err error)
+	CreateTaskDraft(context.Context, *CreateTaskDraftPayload) (res string, err error)
 	// загрузить файл с пользователями, прокси
 	UploadFile(context.Context, *UploadFilePayload) (err error)
 	// начать выполнение задачи
 	StartTask(context.Context, *StartTaskPayload) (err error)
+	// остановить выполнение задачи
+	StopTask(context.Context, *StopTaskPayload) (err error)
 	// получить задачу по id
 	GetTask(context.Context, *GetTaskPayload) (err error)
 	// получить все задачи для текущего пользователя
@@ -42,17 +44,19 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"create task", "upload file", "start task", "get task", "list tasks"}
+var MethodNames = [6]string{"create task draft", "upload file", "start task", "stop task", "get task", "list tasks"}
 
-// CreateTaskPayload is the payload type of the tasks_service service create
-// task method.
-type CreateTaskPayload struct {
+// CreateTaskDraftPayload is the payload type of the tasks_service service
+// create task draft method.
+type CreateTaskDraftPayload struct {
 	// JWT used for authentication
 	Token string
 	// название задачи
-	Tittle *string
-	// описание задачи
-	Description *string
+	Title string
+	// шаблон для подписи под постом
+	TextTemplate string `json:"text_template"`
+	// фотография для постов
+	PostImage string `json:"post_image"`
 }
 
 // GetTaskPayload is the payload type of the tasks_service service get task
@@ -80,6 +84,15 @@ type StartTaskPayload struct {
 	TaskID string `json:"task_id"`
 }
 
+// StopTaskPayload is the payload type of the tasks_service service stop task
+// method.
+type StopTaskPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
 // UploadFilePayload is the payload type of the tasks_service service upload
 // file method.
 type UploadFilePayload struct {
@@ -92,7 +105,11 @@ type UploadFilePayload struct {
 	// 3 - спиок прокси-шестёрок
 	FileType int
 	// содержимое файла
-	Bytes []byte
+	ProxyBytes []byte `json:"proxy_bytes"`
+	// список ботов
+	BotsBytes []byte `json:"bots_bytes"`
+	// изображение для поста
+	ImageBytes []byte `json:"proxy_bytes"`
 }
 
 // Invalid request

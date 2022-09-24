@@ -13,7 +13,7 @@ import (
 	"github.com/inst-api/poster/pkg/logger"
 )
 
-type Hub struct {
+type Store struct {
 	tasksChan   chan domain.TaskWithCtx
 	taskCancels map[uuid.UUID]func()
 	taskMu      *sync.Mutex
@@ -21,18 +21,35 @@ type Hub struct {
 	dbtxf       dbmodel.DBTXFunc
 }
 
-func NewHub(timeout time.Duration) *Hub {
-	return &Hub{
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc) *Store {
+	return &Store{
 		tasksChan:   make(chan domain.TaskWithCtx, 10),
 		taskCancels: make(map[uuid.UUID]func()),
 		pushTimeout: timeout,
+		dbtxf:       dbtxFunc,
 	}
 }
 
 const workersPerTask = 10
 
-func (h *Hub) StartTask(ctx context.Context, taskID uuid.UUID) error {
-	q := dbmodel.New(h.dbtxf(ctx))
+func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	taskID, err := q.CreateDraftTask(ctx, dbmodel.CreateDraftTaskParams{
+		ManagerID:    userID,
+		TextTemplate: textTemplate,
+		Image:        image,
+		Title:        title,
+	})
+	if err != nil {
+		return uuid.UUID{}, fmt.Errorf("failed to create task draft: %w", err)
+	}
+
+	return taskID, nil
+}
+
+func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
+	q := dbmodel.New(s.dbtxf(ctx))
 
 	task, err := q.StartTaskByID(ctx, taskID)
 	if err != nil {
@@ -52,19 +69,18 @@ func (h *Hub) StartTask(ctx context.Context, taskID uuid.UUID) error {
 	for i := 0; i < workersPerTask; i++ {
 		workers = append(workers, &worker{
 			tasksQueue:     botsChan,
-			dbtxf:          h.dbtxf,
+			dbtxf:          s.dbtxf,
 			cli:            transport.InitHTTPClient(),
-			postPipe:       nil,
-			processorIndex: 0,
+			processorIndex: int64(i),
 		})
 	}
 
 	select {
-	case h.tasksChan <- taskWithCtx:
-		h.taskCancels[task.ID] = taskCancel
+	case s.tasksChan <- taskWithCtx:
+		s.taskCancels[task.ID] = taskCancel
 		return nil
 
-	case <-time.After(h.pushTimeout):
+	case <-time.After(s.pushTimeout):
 		logger.Debugf(ctx, "waited for %s, failed to push task to queue")
 		break
 	}
@@ -74,18 +90,19 @@ func (h *Hub) StartTask(ctx context.Context, taskID uuid.UUID) error {
 	return fmt.Errorf("failed to push task to queue")
 }
 
-func (h Hub) StopTask(taskID uuid.UUID) error {
-	cancel, ok := h.taskCancels[taskID]
+func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
+	logger.Infof(ctx, "stopping task '%s'", taskID)
+	cancel, ok := s.taskCancels[taskID]
 	if !ok {
-		return fmt.Errorf("failed to find task '%s' in tasks: %#v", taskID, h.taskCancels)
+		return fmt.Errorf("failed to find task '%s' in tasks: %#v", taskID, s.taskCancels)
 	}
 
 	cancel()
 
-	h.taskMu.Lock()
-	defer h.taskMu.Unlock()
+	s.taskMu.Lock()
+	defer s.taskMu.Unlock()
 
-	delete(h.taskCancels, taskID)
+	delete(s.taskCancels, taskID)
 
 	return nil
 }

@@ -30,7 +30,7 @@ type ServerConfig struct {
 	Port   string `yaml:"port"`
 }
 
-// ParseConfiguration parses configuration from goadmin_config.yml.
+// ParseConfiguration parses configuration from values_*.yaml
 func (c *Config) ParseConfiguration(local bool) error {
 	c.Default()
 

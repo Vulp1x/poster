@@ -21,13 +21,13 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildCreateTaskRequest instantiates a HTTP request object with method and
-// path set to call the "tasks_service" service "create task" endpoint
-func (c *Client) BuildCreateTaskRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateTaskTasksServicePath()}
+// BuildCreateTaskDraftRequest instantiates a HTTP request object with method
+// and path set to call the "tasks_service" service "create task draft" endpoint
+func (c *Client) BuildCreateTaskDraftRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateTaskDraftTasksServicePath()}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("tasks_service", "create task", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("tasks_service", "create task draft", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -36,13 +36,13 @@ func (c *Client) BuildCreateTaskRequest(ctx context.Context, v interface{}) (*ht
 	return req, nil
 }
 
-// EncodeCreateTaskRequest returns an encoder for requests sent to the
-// tasks_service create task server.
-func EncodeCreateTaskRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeCreateTaskDraftRequest returns an encoder for requests sent to the
+// tasks_service create task draft server.
+func EncodeCreateTaskDraftRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*tasksservice.CreateTaskPayload)
+		p, ok := v.(*tasksservice.CreateTaskDraftPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("tasks_service", "create task", "*tasksservice.CreateTaskPayload", v)
+			return goahttp.ErrInvalidType("tasks_service", "create task draft", "*tasksservice.CreateTaskDraftPayload", v)
 		}
 		{
 			head := p.Token
@@ -52,24 +52,24 @@ func EncodeCreateTaskRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 				req.Header.Set("Authorization", head)
 			}
 		}
-		body := NewCreateTaskRequestBody(p)
+		body := NewCreateTaskDraftRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("tasks_service", "create task", err)
+			return goahttp.ErrEncodingError("tasks_service", "create task draft", err)
 		}
 		return nil
 	}
 }
 
-// DecodeCreateTaskResponse returns a decoder for responses returned by the
-// tasks_service create task endpoint. restoreBody controls whether the
-// response body should be restored after having been read.
-// DecodeCreateTaskResponse may return the following errors:
+// DecodeCreateTaskDraftResponse returns a decoder for responses returned by
+// the tasks_service create task draft endpoint. restoreBody controls whether
+// the response body should be restored after having been read.
+// DecodeCreateTaskDraftResponse may return the following errors:
 //   - "bad request" (type tasksservice.BadRequest): http.StatusBadRequest
 //   - "internal error" (type tasksservice.InternalError): http.StatusInternalServerError
 //   - "task not found" (type tasksservice.TaskNotFound): http.StatusNotFound
 //   - "unauthorized" (type tasksservice.Unauthorized): http.StatusUnauthorized
 //   - error: internal error
-func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeCreateTaskDraftResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -91,12 +91,12 @@ func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks_service", "create task", err)
+				return nil, goahttp.ErrDecodingError("tasks_service", "create task draft", err)
 			}
 			err = goa.MergeErrors(err, goa.ValidateFormat("body", body, goa.FormatUUID))
 
 			if err != nil {
-				return nil, goahttp.ErrValidationError("tasks_service", "create task", err)
+				return nil, goahttp.ErrValidationError("tasks_service", "create task draft", err)
 			}
 			return body, nil
 		case http.StatusBadRequest:
@@ -106,9 +106,9 @@ func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks_service", "create task", err)
+				return nil, goahttp.ErrDecodingError("tasks_service", "create task draft", err)
 			}
-			return nil, NewCreateTaskBadRequest(body)
+			return nil, NewCreateTaskDraftBadRequest(body)
 		case http.StatusInternalServerError:
 			var (
 				body string
@@ -116,9 +116,9 @@ func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks_service", "create task", err)
+				return nil, goahttp.ErrDecodingError("tasks_service", "create task draft", err)
 			}
-			return nil, NewCreateTaskInternalError(body)
+			return nil, NewCreateTaskDraftInternalError(body)
 		case http.StatusNotFound:
 			var (
 				body string
@@ -126,9 +126,9 @@ func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks_service", "create task", err)
+				return nil, goahttp.ErrDecodingError("tasks_service", "create task draft", err)
 			}
-			return nil, NewCreateTaskTaskNotFound(body)
+			return nil, NewCreateTaskDraftTaskNotFound(body)
 		case http.StatusUnauthorized:
 			var (
 				body string
@@ -136,12 +136,12 @@ func DecodeCreateTaskResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("tasks_service", "create task", err)
+				return nil, goahttp.ErrDecodingError("tasks_service", "create task draft", err)
 			}
-			return nil, NewCreateTaskUnauthorized(body)
+			return nil, NewCreateTaskDraftUnauthorized(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("tasks_service", "create task", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("tasks_service", "create task draft", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -399,6 +399,124 @@ func DecodeStartTaskResponse(decoder func(*http.Response) goahttp.Decoder, resto
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("tasks_service", "start task", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildStopTaskRequest instantiates a HTTP request object with method and path
+// set to call the "tasks_service" service "stop task" endpoint
+func (c *Client) BuildStopTaskRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		taskID string
+	)
+	{
+		p, ok := v.(*tasksservice.StopTaskPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("tasks_service", "stop task", "*tasksservice.StopTaskPayload", v)
+		}
+		taskID = p.TaskID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: StopTaskTasksServicePath(taskID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("tasks_service", "stop task", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeStopTaskRequest returns an encoder for requests sent to the
+// tasks_service stop task server.
+func EncodeStopTaskRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*tasksservice.StopTaskPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("tasks_service", "stop task", "*tasksservice.StopTaskPayload", v)
+		}
+		{
+			head := p.Token
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeStopTaskResponse returns a decoder for responses returned by the
+// tasks_service stop task endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeStopTaskResponse may return the following errors:
+//   - "bad request" (type tasksservice.BadRequest): http.StatusBadRequest
+//   - "internal error" (type tasksservice.InternalError): http.StatusInternalServerError
+//   - "task not found" (type tasksservice.TaskNotFound): http.StatusNotFound
+//   - "unauthorized" (type tasksservice.Unauthorized): http.StatusUnauthorized
+//   - error: internal error
+func DecodeStopTaskResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusBadRequest:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks_service", "stop task", err)
+			}
+			return nil, NewStopTaskBadRequest(body)
+		case http.StatusInternalServerError:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks_service", "stop task", err)
+			}
+			return nil, NewStopTaskInternalError(body)
+		case http.StatusNotFound:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks_service", "stop task", err)
+			}
+			return nil, NewStopTaskTaskNotFound(body)
+		case http.StatusUnauthorized:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("tasks_service", "stop task", err)
+			}
+			return nil, NewStopTaskUnauthorized(body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("tasks_service", "stop task", resp.StatusCode, string(body))
 		}
 	}
 }
