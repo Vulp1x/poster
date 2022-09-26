@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 
-	routesservice "github.com/SimpleRouting/RoutingAppService/gen/routes_service"
 	"github.com/google/uuid"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
@@ -35,7 +34,7 @@ func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Serv
 func (s *tasksServicesrvc) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	if s.auth == nil {
 		logger.Error(ctx, "routes service has nil auther")
-		return ctx, routesservice.Unauthorized("internal error")
+		return ctx, tasksservice.Unauthorized("internal error")
 	}
 
 	return s.auth.JWTAuth(ctx, token, scheme)

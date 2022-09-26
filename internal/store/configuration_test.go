@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SimpleRouting/RoutingAppService/internal/dbmodel"
 	"github.com/gojuno/minimock/v3"
+	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

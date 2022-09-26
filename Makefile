@@ -101,6 +101,7 @@ gen:
 	$(LOCAL_BIN)/yq -i '.host = "/"' gen/http/openapi.yaml
 	rm -rf ./internal/service/cmd
 	rm -rf ./internal/service/gen
+	rm -rf ./internal/service/cli
 
 
 .PHONY: migrate-prod
