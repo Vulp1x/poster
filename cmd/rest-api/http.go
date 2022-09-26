@@ -15,7 +15,7 @@ import (
 	tasksservicesvr "github.com/inst-api/poster/gen/http/tasks_service/server"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/mw"
-	"github.com/inst-api/poster/internal/service"
+	"github.com/inst-api/poster/internal/service/multipart"
 	"github.com/inst-api/poster/pkg/logger"
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
@@ -70,7 +70,7 @@ func handleHTTPServer(
 	{
 		eh := errorHandler()
 		authServiceServer = authservicesvr.New(authServiceEndpoints, mux, dec, enc, eh, nil)
-		tasksServiceServer = tasksservicesvr.New(tasksServiceEndpoints, mux, dec, enc, eh, nil, service.TasksServiceUploadFileDecoderFunc)
+		tasksServiceServer = tasksservicesvr.New(tasksServiceEndpoints, mux, dec, enc, eh, nil, multipart.TasksServiceUploadFileDecoderFunc)
 
 		authServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
 		authServiceServer.Use(httpmdlwr.RequestID())

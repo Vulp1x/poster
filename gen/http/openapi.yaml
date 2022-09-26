@@ -454,14 +454,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Rerum veniam dolorem perspiciatis.
+        example: Ut quae dolorem similique.
       password:
         type: string
-        example: ja6
+        example: 3mz
         minLength: 4
     example:
-      login: Consequuntur non blanditiis.
-      password: y77
+      login: Odit accusamus officia ipsum.
+      password: b0n
     required:
       - login
       - password
@@ -477,120 +477,86 @@ definitions:
       jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
     required:
       - jwt
-  BotAccountRequestBody:
-    title: BotAccountRequestBody
+  BotAccountRecordRequestBody:
+    title: BotAccountRecordRequestBody
     type: object
     properties:
-      advertising_id:
-        type: string
-        description: adv id
-        example: AC77D914-0A36-9917-2BA7-F519556A50B8
-        format: uuid
-      device_id:
-        type: string
-        description: 'main id, ex: android-0d735e1f4db26782'
-        example: Eos accusantium enim et aliquid nihil maiores.
-      family_device_id:
-        type: string
-        example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
-        format: uuid
-      headers:
-        type: object
-        example:
-          Nam sapiente dolor tempora.: Exercitationem facilis recusandae.
-        additionalProperties:
+      line_number:
+        type: integer
+        description: номер строки в исходном файле
+        example: 805747189354476226
+        format: int64
+      record:
+        type: array
+        items:
           type: string
-          example: Fugiat ut odio minus doloremque architecto.
-      password:
-        type: string
-        description: login
-        example: Facere natus.
-      phone_id:
-        type: string
-        description: phone_id
-        example: 95545D09-3153-0F17-09F7-7FEB1545D780
-        format: uuid
-      user_agent:
-        type: string
-        description: user agent header
-        example: Aut perspiciatis error sit ea dicta vel.
-      username:
-        type: string
-        description: login
-        example: Itaque reiciendis.
-      uuid:
-        type: string
-        example: A45D83CF-F038-77BB-220E-D79EFC31D198
-        format: uuid
+          example: Totam labore amet ut iure praesentium.
+        example:
+          - Eligendi accusantium enim.
+          - Ullam in.
     example:
-      advertising_id: AB12B85B-1864-53B4-4A92-3519B45D0D5E
-      device_id: Nam fugit expedita.
-      family_device_id: 0E0CB887-B526-812D-F285-DE018C555BB8
-      headers:
-        Doloribus qui.: Iusto facere ut et sed.
-      password: Temporibus officia.
-      phone_id: 0C589E55-99C1-3ED8-809A-1463C91242B6
-      user_agent: Magnam voluptatem nesciunt quaerat quasi incidunt sed.
-      username: Corrupti saepe et ipsam fuga est.
-      uuid: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
+      line_number: 8997517691232061191
+      record:
+        - Deleniti ut aut atque quod tenetur rerum.
+        - Labore impedit repellat.
+        - Accusamus dolor rerum est velit optio quod.
+        - Aut blanditiis dolore.
     required:
-      - username
-      - password
-      - user_agent
-      - device_id
-      - uuid
-      - phone_id
-      - advertising_id
-      - family_device_id
-      - headers
-  ProxyRequestBody:
-    title: ProxyRequestBody
+      - record
+      - line_number
+  ProxyRecordRequestBody:
+    title: ProxyRecordRequestBody
     type: object
     properties:
-      host:
-        type: string
-        description: адрес прокси
-        example: Aut velit delectus qui.
-      login:
-        type: string
-        example: Et quas est.
-      password:
-        type: string
-        example: Saepe assumenda.
-      port:
+      line_number:
         type: integer
-        description: номер порта
-        example: 622089363346007223
+        description: номер строки в исходном файле
+        example: 4045927282778919969
         format: int64
+      record:
+        type: array
+        items:
+          type: string
+          example: Id omnis perspiciatis expedita architecto aut.
+        example:
+          - Provident voluptatem tempora culpa voluptas delectus voluptatem.
+          - Iste et illum.
     example:
-      host: Sapiente vero libero sunt eos aut laborum.
-      login: Commodi vel.
-      password: Et quis id repellat.
-      port: 5071709443716736136
+      line_number: 7091889729056040715
+      record:
+        - Pariatur enim aut nobis aut eum enim.
+        - Amet reiciendis dicta quibusdam neque dolores.
+        - Sit sit voluptatem quo quo velit.
     required:
-      - host
-      - port
-      - login
-      - password
-  TargetUserRequestBody:
-    title: TargetUserRequestBody
+      - record
+      - line_number
+  TargetUserRecordRequestBody:
+    title: TargetUserRecordRequestBody
     type: object
     properties:
-      user_id:
+      line_number:
         type: integer
-        description: instagram user id
-        example: 6643404721621771717
+        description: номер строки в исходном файле
+        example: 8585427626504546023
         format: int64
-      username:
-        type: string
-        description: instagram username
-        example: Aut qui corporis asperiores aperiam.
+      record:
+        type: array
+        items:
+          type: string
+          example: Assumenda blanditiis.
+        example:
+          - Saepe quidem neque perspiciatis rerum explicabo.
+          - Omnis reiciendis illo maiores dolorem quia.
     example:
-      user_id: 229270693049596798
-      username: Iusto et sit reprehenderit totam illum molestiae.
+      line_number: 20116900574216398
+      record:
+        - Labore consequuntur explicabo perspiciatis et.
+        - Cumque et.
+        - Ea numquam.
+        - Ut et iusto eum veniam.
     required:
-      - username
-      - user_id
+      - record
+      - line_number
   TasksServiceCreateTaskDraftRequestBody:
     title: TasksServiceCreateTaskDraftRequestBody
     type: object
@@ -598,19 +564,19 @@ definitions:
       post_image:
         type: string
         description: фотография для постов
-        example: Nisi et.
+        example: Et molestiae quam beatae quas eum.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Sed amet nemo quia est similique.
+        example: Sunt officia inventore.
       title:
         type: string
         description: название задачи
-        example: Et molestias molestias.
+        example: Possimus deleniti.
     example:
-      post_image: Voluptatem voluptas eos rerum maiores.
-      text_template: Minima fugit nihil inventore.
-      title: Aliquid laudantium tempore occaecati fugit id inventore.
+      post_image: Veniam qui.
+      text_template: Ut commodi inventore libero et accusantium commodi.
+      title: Aliquam nihil.
     required:
       - title
       - text_template
@@ -622,121 +588,111 @@ definitions:
       bots:
         type: array
         items:
-          $ref: '#/definitions/BotAccountRequestBody'
+          $ref: '#/definitions/BotAccountRecordRequestBody'
         description: список ботов
         example:
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
       proxies:
         type: array
         items:
-          $ref: '#/definitions/ProxyRequestBody'
+          $ref: '#/definitions/ProxyRecordRequestBody'
         description: список проксей для использования
         example:
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
       targets:
         type: array
         items:
-          $ref: '#/definitions/TargetUserRequestBody'
+          $ref: '#/definitions/TargetUserRecordRequestBody'
         description: список аккаунтов, которым показать надо рекламу
         example:
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
     example:
       bots:
-        - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-          device_id: Tenetur sed ea excepturi delectus quasi.
-          family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-          headers:
-            Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-          password: Quidem quis earum maxime omnis reiciendis adipisci.
-          phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-          user_agent: Perspiciatis autem quo.
-          username: Autem est quia.
-          uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-        - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-          device_id: Tenetur sed ea excepturi delectus quasi.
-          family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-          headers:
-            Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-          password: Quidem quis earum maxime omnis reiciendis adipisci.
-          phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-          user_agent: Perspiciatis autem quo.
-          username: Autem est quia.
-          uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+        - line_number: 6957168655539073176
+          record:
+            - Deserunt eum ea et.
+            - Quia reprehenderit.
+        - line_number: 6957168655539073176
+          record:
+            - Deserunt eum ea et.
+            - Quia reprehenderit.
+        - line_number: 6957168655539073176
+          record:
+            - Deserunt eum ea et.
+            - Quia reprehenderit.
+        - line_number: 6957168655539073176
+          record:
+            - Deserunt eum ea et.
+            - Quia reprehenderit.
       proxies:
-        - host: Eligendi accusantium enim.
-          login: In et assumenda voluptate deleniti ut aut.
-          password: Quod tenetur.
-          port: 4440880418486248045
-        - host: Eligendi accusantium enim.
-          login: In et assumenda voluptate deleniti ut aut.
-          password: Quod tenetur.
-          port: 4440880418486248045
-        - host: Eligendi accusantium enim.
-          login: In et assumenda voluptate deleniti ut aut.
-          password: Quod tenetur.
-          port: 4440880418486248045
+        - line_number: 44191890423975802
+          record:
+            - Laudantium veniam ratione culpa non ad.
+            - Est dolorem corporis fugit fugiat.
+            - Quisquam itaque nisi.
+        - line_number: 44191890423975802
+          record:
+            - Laudantium veniam ratione culpa non ad.
+            - Est dolorem corporis fugit fugiat.
+            - Quisquam itaque nisi.
       targets:
-        - user_id: 372918204077540257
-          username: Labore impedit repellat.
-        - user_id: 372918204077540257
-          username: Labore impedit repellat.
-        - user_id: 372918204077540257
-          username: Labore impedit repellat.
+        - line_number: 5176427869412771911
+          record:
+            - Impedit doloremque qui magni molestiae fugiat.
+            - Excepturi eos aspernatur.
+        - line_number: 5176427869412771911
+          record:
+            - Impedit doloremque qui magni molestiae fugiat.
+            - Excepturi eos aspernatur.
     required:
       - bots
       - proxies
@@ -748,29 +704,29 @@ definitions:
       input:
         type: string
         description: номер порта
-        example: Inventore et temporibus voluptatibus aliquam.
+        example: Porro sed.
       line:
         type: integer
-        example: 2538498034293375830
+        example: 8927489701869832308
         format: int64
       reason:
         type: string
-        example: Incidunt nisi tempora enim.
+        example: Molestiae voluptatem.
       type:
         type: integer
         description: |2-
            1 - список ботов
               2 - список прокси
               3 - список получателей рекламы
-        example: 3
+        example: 2
         enum:
           - 1
           - 2
           - 3
     example:
-      input: Deserunt quas.
-      line: 5874623428557586307
-      reason: Repudiandae laborum voluptatibus aliquid ipsam temporibus.
+      input: Qui impedit perferendis.
+      line: 6428177388369134679
+      reason: Ducimus voluptate hic dicta impedit.
       type: 1
     required:
       - type

@@ -33,15 +33,15 @@ tasks-service (create-task-draft|upload-file|start-task|stop-task|get-task|list-
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` admin-service add-manager --body '{
-      "login": "Quia voluptatem impedit mollitia.",
-      "password": "y3x"
-   }' --token "Perferendis odit."` + "\n" +
+      "login": "Ipsum sunt ab distinctio.",
+      "password": "bjc"
+   }' --token "Ut repellendus odit."` + "\n" +
 		os.Args[0] + ` auth-service signin --login "user@test.ru" --password "password"` + "\n" +
 		os.Args[0] + ` tasks-service create-task-draft --body '{
-      "post_image": "Voluptatibus autem.",
-      "text_template": "Dolor nesciunt nisi aperiam deserunt aut.",
-      "title": "Excepturi eos aspernatur."
-   }' --token "Aperiam quo mollitia necessitatibus voluptatibus porro voluptatum."` + "\n" +
+      "post_image": "Optio animi magnam suscipit doloremque.",
+      "text_template": "Veritatis esse earum aliquid rerum.",
+      "title": "Illo aut non sint alias."
+   }' --token "Alias vero quibusdam occaecati sit optio."` + "\n" +
 		""
 }
 
@@ -290,9 +290,9 @@ admins could add drivers from main system
 
 Example:
     %[1]s admin-service add-manager --body '{
-      "login": "Quia voluptatem impedit mollitia.",
-      "password": "y3x"
-   }' --token "Perferendis odit."
+      "login": "Ipsum sunt ab distinctio.",
+      "password": "bjc"
+   }' --token "Ut repellendus odit."
 `, os.Args[0])
 }
 
@@ -304,7 +304,7 @@ admins could delete managers from main system
     -token STRING: 
 
 Example:
-    %[1]s admin-service drop-manager --manager-id "FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE" --token "Omnis odit eligendi temporibus in."
+    %[1]s admin-service drop-manager --manager-id "E330131A-4516-F39A-1E98-7CBF64E7E788" --token "At sint harum quo."
 `, os.Args[0])
 }
 
@@ -342,7 +342,7 @@ get user profile
     -token STRING: 
 
 Example:
-    %[1]s auth-service profile --token "Rerum ea est facere itaque repellendus."
+    %[1]s auth-service profile --token "Doloremque fugit aspernatur sed culpa."
 `, os.Args[0])
 }
 
@@ -374,10 +374,10 @@ func tasksServiceCreateTaskDraftUsage() {
 
 Example:
     %[1]s tasks-service create-task-draft --body '{
-      "post_image": "Voluptatibus autem.",
-      "text_template": "Dolor nesciunt nisi aperiam deserunt aut.",
-      "title": "Excepturi eos aspernatur."
-   }' --token "Aperiam quo mollitia necessitatibus voluptatibus porro voluptatum."
+      "post_image": "Optio animi magnam suscipit doloremque.",
+      "text_template": "Veritatis esse earum aliquid rerum.",
+      "title": "Illo aut non sint alias."
+   }' --token "Alias vero quibusdam occaecati sit optio."
 `, os.Args[0])
 }
 
@@ -393,70 +393,85 @@ Example:
     %[1]s tasks-service upload-file --body '{
       "bots": [
          {
-            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
-            "device_id": "Tenetur sed ea excepturi delectus quasi.",
-            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
-            "headers": {
-               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
-            },
-            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
-            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
-            "user_agent": "Perspiciatis autem quo.",
-            "username": "Autem est quia.",
-            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+            "line_number": 6957168655539073176,
+            "record": [
+               "Deserunt eum ea et.",
+               "Quia reprehenderit."
+            ]
          },
          {
-            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
-            "device_id": "Tenetur sed ea excepturi delectus quasi.",
-            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
-            "headers": {
-               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
-            },
-            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
-            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
-            "user_agent": "Perspiciatis autem quo.",
-            "username": "Autem est quia.",
-            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+            "line_number": 6957168655539073176,
+            "record": [
+               "Deserunt eum ea et.",
+               "Quia reprehenderit."
+            ]
          },
          {
-            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
-            "device_id": "Tenetur sed ea excepturi delectus quasi.",
-            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
-            "headers": {
-               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
-            },
-            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
-            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
-            "user_agent": "Perspiciatis autem quo.",
-            "username": "Autem est quia.",
-            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+            "line_number": 6957168655539073176,
+            "record": [
+               "Deserunt eum ea et.",
+               "Quia reprehenderit."
+            ]
+         },
+         {
+            "line_number": 6957168655539073176,
+            "record": [
+               "Deserunt eum ea et.",
+               "Quia reprehenderit."
+            ]
          }
       ],
       "proxies": [
          {
-            "host": "Eligendi accusantium enim.",
-            "login": "In et assumenda voluptate deleniti ut aut.",
-            "password": "Quod tenetur.",
-            "port": 4440880418486248045
+            "line_number": 44191890423975802,
+            "record": [
+               "Laudantium veniam ratione culpa non ad.",
+               "Est dolorem corporis fugit fugiat.",
+               "Quisquam itaque nisi."
+            ]
          },
          {
-            "host": "Eligendi accusantium enim.",
-            "login": "In et assumenda voluptate deleniti ut aut.",
-            "password": "Quod tenetur.",
-            "port": 4440880418486248045
+            "line_number": 44191890423975802,
+            "record": [
+               "Laudantium veniam ratione culpa non ad.",
+               "Est dolorem corporis fugit fugiat.",
+               "Quisquam itaque nisi."
+            ]
+         },
+         {
+            "line_number": 44191890423975802,
+            "record": [
+               "Laudantium veniam ratione culpa non ad.",
+               "Est dolorem corporis fugit fugiat.",
+               "Quisquam itaque nisi."
+            ]
+         },
+         {
+            "line_number": 44191890423975802,
+            "record": [
+               "Laudantium veniam ratione culpa non ad.",
+               "Est dolorem corporis fugit fugiat.",
+               "Quisquam itaque nisi."
+            ]
          }
       ],
       "targets": [
          {
-            "user_id": 372918204077540257,
-            "username": "Labore impedit repellat."
+            "line_number": 5176427869412771911,
+            "record": [
+               "Impedit doloremque qui magni molestiae fugiat.",
+               "Excepturi eos aspernatur."
+            ]
          },
          {
-            "user_id": 372918204077540257,
-            "username": "Labore impedit repellat."
+            "line_number": 5176427869412771911,
+            "record": [
+               "Impedit doloremque qui magni molestiae fugiat.",
+               "Excepturi eos aspernatur."
+            ]
          }
       ]
-   }' --task-id "Dolor rerum." --token "Velit optio quod rerum aut blanditiis."
+   }' --task-id "Nesciunt nisi aperiam deserunt." --token "Ratione voluptatibus autem vitae."
 `, os.Args[0])
 }
 
@@ -468,7 +483,7 @@ func tasksServiceStartTaskUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service start-task --task-id "Maiores dolorem quia." --token "Maxime et."
+    %[1]s tasks-service start-task --task-id "Neque animi laboriosam minima eaque vero." --token "Occaecati voluptates animi quo sit magni."
 `, os.Args[0])
 }
 
@@ -480,7 +495,7 @@ func tasksServiceStopTaskUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service stop-task --task-id "Perferendis quia rem nostrum sint dolorum." --token "Blanditiis ex alias."
+    %[1]s tasks-service stop-task --task-id "Necessitatibus et earum fuga sit ipsam." --token "Eveniet praesentium."
 `, os.Args[0])
 }
 
@@ -492,7 +507,7 @@ func tasksServiceGetTaskUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service get-task --task-id "Cupiditate eaque dolorem quos." --token "Facilis fugiat similique ab sint voluptatum aspernatur."
+    %[1]s tasks-service get-task --task-id "Officia fugiat esse similique vitae debitis eos." --token "Eius consequatur."
 `, os.Args[0])
 }
 
@@ -503,6 +518,6 @@ func tasksServiceListTasksUsage() {
     -token STRING: 
 
 Example:
-    %[1]s tasks-service list-tasks --token "Veniam ipsum iusto necessitatibus."
+    %[1]s tasks-service list-tasks --token "Qui laudantium deleniti nostrum odio eos omnis."
 `, os.Args[0])
 }

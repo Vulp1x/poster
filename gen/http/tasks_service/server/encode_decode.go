@@ -578,48 +578,45 @@ func EncodeListTasksError(encoder func(context.Context, http.ResponseWriter) goa
 	}
 }
 
-// unmarshalBotAccountRequestBodyToTasksserviceBotAccount builds a value of
-// type *tasksservice.BotAccount from a value of type *BotAccountRequestBody.
-func unmarshalBotAccountRequestBodyToTasksserviceBotAccount(v *BotAccountRequestBody) *tasksservice.BotAccount {
-	res := &tasksservice.BotAccount{
-		Username:       *v.Username,
-		Password:       *v.Password,
-		UserAgent:      *v.UserAgent,
-		DeviceID:       *v.DeviceID,
-		UUID:           *v.UUID,
-		PhoneID:        *v.PhoneID,
-		AdvertisingID:  *v.AdvertisingID,
-		FamilyDeviceID: *v.FamilyDeviceID,
+// unmarshalBotAccountRecordRequestBodyToTasksserviceBotAccountRecord builds a
+// value of type *tasksservice.BotAccountRecord from a value of type
+// *BotAccountRecordRequestBody.
+func unmarshalBotAccountRecordRequestBodyToTasksserviceBotAccountRecord(v *BotAccountRecordRequestBody) *tasksservice.BotAccountRecord {
+	res := &tasksservice.BotAccountRecord{
+		LineNumber: *v.LineNumber,
 	}
-	res.Headers = make(map[string]string, len(v.Headers))
-	for key, val := range v.Headers {
-		tk := key
-		tv := val
-		res.Headers[tk] = tv
+	res.Record = make([]string, len(v.Record))
+	for i, val := range v.Record {
+		res.Record[i] = val
 	}
 
 	return res
 }
 
-// unmarshalProxyRequestBodyToTasksserviceProxy builds a value of type
-// *tasksservice.Proxy from a value of type *ProxyRequestBody.
-func unmarshalProxyRequestBodyToTasksserviceProxy(v *ProxyRequestBody) *tasksservice.Proxy {
-	res := &tasksservice.Proxy{
-		Host:     *v.Host,
-		Port:     *v.Port,
-		Login:    *v.Login,
-		Password: *v.Password,
+// unmarshalProxyRecordRequestBodyToTasksserviceProxyRecord builds a value of
+// type *tasksservice.ProxyRecord from a value of type *ProxyRecordRequestBody.
+func unmarshalProxyRecordRequestBodyToTasksserviceProxyRecord(v *ProxyRecordRequestBody) *tasksservice.ProxyRecord {
+	res := &tasksservice.ProxyRecord{
+		LineNumber: *v.LineNumber,
+	}
+	res.Record = make([]string, len(v.Record))
+	for i, val := range v.Record {
+		res.Record[i] = val
 	}
 
 	return res
 }
 
-// unmarshalTargetUserRequestBodyToTasksserviceTargetUser builds a value of
-// type *tasksservice.TargetUser from a value of type *TargetUserRequestBody.
-func unmarshalTargetUserRequestBodyToTasksserviceTargetUser(v *TargetUserRequestBody) *tasksservice.TargetUser {
-	res := &tasksservice.TargetUser{
-		Username: *v.Username,
-		UserID:   *v.UserID,
+// unmarshalTargetUserRecordRequestBodyToTasksserviceTargetUserRecord builds a
+// value of type *tasksservice.TargetUserRecord from a value of type
+// *TargetUserRecordRequestBody.
+func unmarshalTargetUserRecordRequestBodyToTasksserviceTargetUserRecord(v *TargetUserRecordRequestBody) *tasksservice.TargetUserRecord {
+	res := &tasksservice.TargetUserRecord{
+		LineNumber: *v.LineNumber,
+	}
+	res.Record = make([]string, len(v.Record))
+	for i, val := range v.Record {
+		res.Record[i] = val
 	}
 
 	return res

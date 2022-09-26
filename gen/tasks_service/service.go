@@ -46,22 +46,10 @@ const ServiceName = "tasks_service"
 // MethodKey key.
 var MethodNames = [6]string{"create task draft", "upload file", "start task", "stop task", "get task", "list tasks"}
 
-type BotAccount struct {
-	// login
-	Username string
-	// login
-	Password string
-	// user agent header
-	UserAgent string `json:"user_agent"`
-	// main id, ex: android-0d735e1f4db26782
-	DeviceID string `json:"device_id"`
-	UUID     string
-	// phone_id
-	PhoneID string `json:"phone_id"`
-	// adv id
-	AdvertisingID  string `json:"advertising_id"`
-	FamilyDeviceID string `json:"family_device_id"`
-	Headers        map[string]string
+type BotAccountRecord struct {
+	Record []string
+	// номер строки в исходном файле
+	LineNumber int `json:"line_number"`
 }
 
 // CreateTaskDraftPayload is the payload type of the tasks_service service
@@ -93,13 +81,10 @@ type ListTasksPayload struct {
 	Token string
 }
 
-type Proxy struct {
-	// адрес прокси
-	Host string
-	// номер порта
-	Port     int64
-	Login    string
-	Password string
+type ProxyRecord struct {
+	Record []string
+	// номер строки в исходном файле
+	LineNumber int `json:"line_number"`
 }
 
 // StartTaskPayload is the payload type of the tasks_service service start task
@@ -120,11 +105,10 @@ type StopTaskPayload struct {
 	TaskID string `json:"task_id"`
 }
 
-type TargetUser struct {
-	// instagram username
-	Username string
-	// instagram user id
-	UserID int64 `json:"user_id"`
+type TargetUserRecord struct {
+	Record []string
+	// номер строки в исходном файле
+	LineNumber int `json:"line_number"`
 }
 
 type UploadError struct {
@@ -146,11 +130,11 @@ type UploadFilePayload struct {
 	// id задачи, в которую загружаем пользователей/прокси
 	TaskID string `json:"task_id"`
 	// список ботов
-	Bots []*BotAccount
+	Bots []*BotAccountRecord
 	// список проксей для использования
-	Proxies []*Proxy
+	Proxies []*ProxyRecord
 	// список аккаунтов, которым показать надо рекламу
-	Targets []*TargetUser
+	Targets []*TargetUserRecord
 }
 
 // Invalid request

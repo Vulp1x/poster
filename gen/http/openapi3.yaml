@@ -20,8 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddManagerRequestBody'
             example:
-              login: Quia voluptatem impedit mollitia.
-              password: y3x
+              login: Ipsum sunt ab distinctio.
+              password: bjc
       responses:
         "200":
           description: OK response.
@@ -31,28 +31,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Dolores omnis enim exercitationem saepe.
+                example: Blanditiis ex alias.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Praesentium adipisci unde molestiae alias.
+                example: Ex ipsa.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Et est.
+                example: Consequuntur delectus aut.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Sunt ea ipsum.
+                example: Quia rem nostrum sint dolorum.
       security:
         - jwt_header_Authorization:
             - driver
@@ -72,9 +72,9 @@ paths:
           schema:
             type: string
             description: id менеджера, которого необходимо удалить
-            example: E31B6C92-4A10-2D9D-2B43-B3362900308F
+            example: 773F4E7F-A748-DF6D-4355-233071D2534A
             format: uuid
-          example: EA2D3703-2B9D-E7C0-35B9-DB753C364369
+          example: 5E3B665E-1239-9C12-9643-FFC1E6C04697
       responses:
         "200":
           description: OK response.
@@ -84,21 +84,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Sequi nihil aspernatur dignissimos.
+                example: Qui libero.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Distinctio ex.
+                example: Fuga quas nisi sapiente.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Fugit officiis.
+                example: Dolores laboriosam vel velit doloremque.
         "404":
           description: 'user not found: Not Found response.'
           content:
@@ -125,7 +125,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Ad architecto aliquid.
+                example: Cupiditate eaque dolorem quos.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -136,14 +136,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Aliquam magni beatae quia est aut.
+                example: Assumenda nostrum et et ea blanditiis.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Quas et aut nihil iste qui.
+                example: Facilis fugiat similique ab sint voluptatum aspernatur.
       security:
         - jwt_header_Authorization:
             - driver
@@ -170,28 +170,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Eius cupiditate sed aut.
+                example: Assumenda consequatur vel repellendus et pariatur.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Qui in vel quod veniam neque aperiam.
+                example: Consectetur quam eius.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Voluptatibus amet sit dolores vel modi.
+                example: Ratione quas molestias quaerat corporis.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Soluta eos non cum.
+                example: Nam qui quibusdam in pariatur.
       security:
         - basic_header_Authorization: []
   /api/tasks/:
@@ -210,7 +210,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Similique delectus commodi eligendi quos non.
+                example: Eaque qui non omnis magnam.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -225,7 +225,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Error quasi odio.
+                example: Ut cum sint beatae commodi omnis explicabo.
       security:
         - jwt_header_Authorization:
             - driver
@@ -245,8 +245,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Rerum maxime quasi quis.
-          example: Vel odio quia aliquid.
+            example: Expedita in quis dolores.
+          example: Voluptatem aut commodi.
       responses:
         "200":
           description: OK response.
@@ -256,7 +256,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Voluptatem ut nihil.
+                example: Placeat est dolore perferendis.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -271,7 +271,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Esse qui.
+                example: Accusantium quo maxime.
       security:
         - jwt_header_Authorization:
             - driver
@@ -291,8 +291,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Saepe cumque eum.
-          example: Cupiditate impedit sed dolor omnis.
+            example: Qui sint animi ipsa qui a.
+          example: Ad architecto aliquid.
       responses:
         "200":
           description: OK response.
@@ -314,7 +314,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Autem est nam.
+                example: Eum laboriosam qui velit eum.
       security:
         - jwt_header_Authorization:
             - driver
@@ -334,8 +334,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Cupiditate ullam necessitatibus.
-          example: Et maxime sit eaque.
+            example: Dolor doloremque.
+          example: Voluptatem doloremque.
       responses:
         "200":
           description: OK response.
@@ -357,7 +357,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Repellendus voluptatem dolor aut optio.
+                example: Est exercitationem suscipit sit nisi.
       security:
         - jwt_header_Authorization:
             - driver
@@ -377,8 +377,8 @@ paths:
           schema:
             type: string
             description: id задачи, в которую загружаем пользователей/прокси
-            example: Est voluptatibus nostrum occaecati nulla unde dolor.
-          example: Sint aut sit nihil maiores ex.
+            example: Saepe aut impedit vitae sequi nihil.
+          example: Dignissimos at.
       requestBody:
         required: true
         content:
@@ -387,50 +387,52 @@ paths:
               $ref: '#/components/schemas/UploadFileRequestBody'
             example:
               bots:
-                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-                  device_id: Tenetur sed ea excepturi delectus quasi.
-                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-                  headers:
-                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-                  password: Quidem quis earum maxime omnis reiciendis adipisci.
-                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-                  user_agent: Perspiciatis autem quo.
-                  username: Autem est quia.
-                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-                  device_id: Tenetur sed ea excepturi delectus quasi.
-                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-                  headers:
-                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-                  password: Quidem quis earum maxime omnis reiciendis adipisci.
-                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-                  user_agent: Perspiciatis autem quo.
-                  username: Autem est quia.
-                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-                  device_id: Tenetur sed ea excepturi delectus quasi.
-                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-                  headers:
-                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-                  password: Quidem quis earum maxime omnis reiciendis adipisci.
-                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-                  user_agent: Perspiciatis autem quo.
-                  username: Autem est quia.
-                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+                - line_number: 6957168655539073176
+                  record:
+                    - Deserunt eum ea et.
+                    - Quia reprehenderit.
+                - line_number: 6957168655539073176
+                  record:
+                    - Deserunt eum ea et.
+                    - Quia reprehenderit.
+                - line_number: 6957168655539073176
+                  record:
+                    - Deserunt eum ea et.
+                    - Quia reprehenderit.
+                - line_number: 6957168655539073176
+                  record:
+                    - Deserunt eum ea et.
+                    - Quia reprehenderit.
               proxies:
-                - host: Eligendi accusantium enim.
-                  login: In et assumenda voluptate deleniti ut aut.
-                  password: Quod tenetur.
-                  port: 4440880418486248045
-                - host: Eligendi accusantium enim.
-                  login: In et assumenda voluptate deleniti ut aut.
-                  password: Quod tenetur.
-                  port: 4440880418486248045
+                - line_number: 44191890423975802
+                  record:
+                    - Laudantium veniam ratione culpa non ad.
+                    - Est dolorem corporis fugit fugiat.
+                    - Quisquam itaque nisi.
+                - line_number: 44191890423975802
+                  record:
+                    - Laudantium veniam ratione culpa non ad.
+                    - Est dolorem corporis fugit fugiat.
+                    - Quisquam itaque nisi.
+                - line_number: 44191890423975802
+                  record:
+                    - Laudantium veniam ratione culpa non ad.
+                    - Est dolorem corporis fugit fugiat.
+                    - Quisquam itaque nisi.
+                - line_number: 44191890423975802
+                  record:
+                    - Laudantium veniam ratione culpa non ad.
+                    - Est dolorem corporis fugit fugiat.
+                    - Quisquam itaque nisi.
               targets:
-                - user_id: 372918204077540257
-                  username: Labore impedit repellat.
-                - user_id: 372918204077540257
-                  username: Labore impedit repellat.
+                - line_number: 5176427869412771911
+                  record:
+                    - Impedit doloremque qui magni molestiae fugiat.
+                    - Excepturi eos aspernatur.
+                - line_number: 5176427869412771911
+                  record:
+                    - Impedit doloremque qui magni molestiae fugiat.
+                    - Excepturi eos aspernatur.
       responses:
         "200":
           description: OK response.
@@ -441,26 +443,30 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
+                    type: 2
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
               example:
-                - input: Non id omnis perspiciatis expedita.
-                  line: 8997517691232061191
-                  reason: Aut alias blanditiis provident voluptatem.
+                - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                  line: 6005464615987859264
+                  reason: Optio consequatur ex vel nesciunt vitae corrupti.
                   type: 2
-                - input: Non id omnis perspiciatis expedita.
-                  line: 8997517691232061191
-                  reason: Aut alias blanditiis provident voluptatem.
+                - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                  line: 6005464615987859264
+                  reason: Optio consequatur ex vel nesciunt vitae corrupti.
                   type: 2
-                - input: Non id omnis perspiciatis expedita.
-                  line: 8997517691232061191
-                  reason: Aut alias blanditiis provident voluptatem.
+                - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                  line: 6005464615987859264
+                  reason: Optio consequatur ex vel nesciunt vitae corrupti.
                   type: 2
         "400":
           description: 'bad request: Bad Request response.'
@@ -468,7 +474,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Natus natus totam qui voluptatum.
+                example: Omnis voluptatem voluptas architecto.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -478,13 +484,21 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
+                    type: 2
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
+                    type: 2
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
         "404":
           description: 'task not found: Not Found response.'
@@ -495,17 +509,21 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
-                  - input: Non id omnis perspiciatis expedita.
-                    line: 8997517691232061191
-                    reason: Aut alias blanditiis provident voluptatem.
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
+                    type: 2
+                  - input: Necessitatibus voluptatibus porro voluptatum laboriosam molestiae.
+                    line: 6005464615987859264
+                    reason: Optio consequatur ex vel nesciunt vitae corrupti.
                     type: 2
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -513,7 +531,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Accusamus repudiandae mollitia.
+                example: Quia et omnis distinctio.
       security:
         - jwt_header_Authorization:
             - driver
@@ -532,9 +550,9 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateTaskDraftRequestBody'
             example:
-              post_image: Voluptatibus autem.
-              text_template: Dolor nesciunt nisi aperiam deserunt aut.
-              title: Excepturi eos aspernatur.
+              post_image: Optio animi magnam suscipit doloremque.
+              text_template: Veritatis esse earum aliquid rerum.
+              title: Illo aut non sint alias.
       responses:
         "200":
           description: OK response.
@@ -543,16 +561,16 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 77DFBD55-EC3C-CF64-7021-5A80D932517B
+                example: 74C53540-E974-ABFF-2565-6BF99F9017B2
                 format: uuid
-              example: 9A05BD8A-CA8D-335E-C26E-14DB8FEBAB04
+              example: 1265498D-5A84-134A-1C7A-ED5B4B92788E
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Cum nisi consequatur atque dolorem est dignissimos.
+                example: Facere natus.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -560,7 +578,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 233374F1-297F-8711-5FC3-4F6B3731AD63
+                example: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
                 format: uuid
         "404":
           description: 'task not found: Not Found response.'
@@ -569,7 +587,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 2AE5027E-EF4C-E00D-314E-1CB4449A11C0
+                example: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
                 format: uuid
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -577,7 +595,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Tenetur provident veritatis veniam.
+                example: Aut perspiciatis error sit ea dicta vel.
       security:
         - jwt_header_Authorization:
             - driver
@@ -589,104 +607,60 @@ components:
       properties:
         login:
           type: string
-          example: Excepturi ut eligendi.
+          example: A dolor.
         password:
           type: string
-          example: yal
+          example: iro
           minLength: 4
       example:
-        login: Veniam et amet saepe.
-        password: d3c
+        login: Ab qui excepturi laborum.
+        password: bas
       required:
         - login
         - password
-    BotAccount:
+    BotAccountRecord:
       type: object
       properties:
-        advertising_id:
-          type: string
-          description: adv id
-          example: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
-          format: uuid
-        device_id:
-          type: string
-          description: 'main id, ex: android-0d735e1f4db26782'
-          example: Ratione et magnam pariatur suscipit.
-        family_device_id:
-          type: string
-          example: D358BA94-28F1-C0F1-EA4E-E3BFBD8A6AE2
-          format: uuid
-        headers:
-          type: object
-          example:
-            Mollitia nemo quis.: Sapiente repellendus sint.
-            Omnis ipsam distinctio modi.: Voluptatibus voluptatem.
-            Unde libero aperiam.: Omnis temporibus commodi iure modi.
-          additionalProperties:
+        line_number:
+          type: integer
+          description: номер строки в исходном файле
+          example: 2840087556141586518
+          format: int64
+        record:
+          type: array
+          items:
             type: string
-            example: Sed voluptatum hic omnis qui iste.
-        password:
-          type: string
-          description: login
-          example: Quas voluptatem quidem reiciendis et corporis reiciendis.
-        phone_id:
-          type: string
-          description: phone_id
-          example: 1576BB1F-D21C-05AD-6677-73725A387FA6
-          format: uuid
-        user_agent:
-          type: string
-          description: user agent header
-          example: Tenetur tenetur qui culpa tempore.
-        username:
-          type: string
-          description: login
-          example: Quis in.
-        uuid:
-          type: string
-          example: A8E7C55C-B3EA-B228-EF84-9DB3D55D57A4
-          format: uuid
+            example: At atque labore.
+          example:
+            - Aut recusandae tenetur.
+            - Sed nihil delectus et inventore dicta non.
       example:
-        advertising_id: F25C441B-B3AA-5871-1077-53EACA084D5A
-        device_id: Ex id corrupti non et aut.
-        family_device_id: E058AD50-5D7F-E9A8-E010-D33044724992
-        headers:
-          Illo voluptatem sunt aperiam.: Id quasi repellendus et.
-          Provident consectetur voluptatum tempore vero.: Distinctio consequatur sed consequuntur soluta.
-        password: Et qui molestias dolorem.
-        phone_id: CEF3CAF7-AB82-083A-2F08-9497BE6B7488
-        user_agent: Nemo eius.
-        username: Qui ut ut unde autem repellendus recusandae.
-        uuid: 6D98E750-AE3D-1948-4270-2B4874F82503
+        line_number: 2235909914658340376
+        record:
+          - Voluptas vitae quia et assumenda.
+          - Voluptas corrupti quidem.
       required:
-        - username
-        - password
-        - user_agent
-        - device_id
-        - uuid
-        - phone_id
-        - advertising_id
-        - family_device_id
-        - headers
+        - record
+        - line_number
     CreateTaskDraftRequestBody:
       type: object
       properties:
         post_image:
           type: string
           description: фотография для постов
-          example: Dolor doloremque.
+          example: Dolorem eveniet perferendis.
         text_template:
           type: string
           description: шаблон для подписи под постом
-          example: Fugit quibusdam expedita et.
+          example: Dignissimos veniam est.
         title:
           type: string
           description: название задачи
-          example: Nihil expedita consequatur.
+          example: Quia est nam.
       example:
-        post_image: Voluptatem vero molestias.
-        text_template: Reprehenderit omnis similique ratione.
-        title: Voluptatem doloremque.
+        post_image: Quibusdam sapiente.
+        text_template: Quidem sed laudantium deleniti doloribus nihil voluptas.
+        title: Ullam laboriosam maxime.
       required:
         - title
         - text_template
@@ -702,82 +676,36 @@ components:
         jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       required:
         - jwt
-    Proxy:
-      type: object
-      properties:
-        host:
-          type: string
-          description: адрес прокси
-          example: Quia error vel quos.
-        login:
-          type: string
-          example: Porro rerum aut laboriosam.
-        password:
-          type: string
-          example: Ea sequi consequatur aut velit odit ut.
-        port:
-          type: integer
-          description: номер порта
-          example: 84859098339370993
-          format: int64
-      example:
-        host: Doloribus repellat voluptas placeat non ut.
-        login: Facere velit ex et qui dicta corrupti.
-        password: Ut incidunt cumque similique.
-        port: 218032170587342579
-      required:
-        - host
-        - port
-        - login
-        - password
-    TargetUser:
-      type: object
-      properties:
-        user_id:
-          type: integer
-          description: instagram user id
-          example: 7626817135828888699
-          format: int64
-        username:
-          type: string
-          description: instagram username
-          example: Voluptatem aut ea sunt pariatur.
-      example:
-        user_id: 1265749063732130389
-        username: Animi perspiciatis quaerat in sint.
-      required:
-        - username
-        - user_id
     UploadError:
       type: object
       properties:
         input:
           type: string
           description: номер порта
-          example: Et autem quasi aliquid voluptas.
+          example: Quaerat voluptatem et dolore eaque qui.
         line:
           type: integer
-          example: 5346004466247460411
+          example: 6265114283469757541
           format: int64
         reason:
           type: string
-          example: Quod excepturi provident qui deserunt.
+          example: Asperiores est aliquam ea in et consequatur.
         type:
           type: integer
           description: |2-
              1 - список ботов
                 2 - список прокси
                 3 - список получателей рекламы
-          example: 2
+          example: 1
           enum:
             - 1
             - 2
             - 3
       example:
-        input: Earum quia laborum sequi dicta.
-        line: 3086394925635416340
-        reason: Ipsam aut.
-        type: 3
+        input: Voluptatem necessitatibus qui.
+        line: 8035467953179830869
+        reason: Placeat aut.
+        type: 1
       required:
         - type
         - line
@@ -789,117 +717,103 @@ components:
         bots:
           type: array
           items:
-            $ref: '#/components/schemas/BotAccount'
+            $ref: '#/components/schemas/BotAccountRecord'
           description: список ботов
           example:
-            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-              device_id: Tenetur sed ea excepturi delectus quasi.
-              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-              headers:
-                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-              password: Quidem quis earum maxime omnis reiciendis adipisci.
-              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-              user_agent: Perspiciatis autem quo.
-              username: Autem est quia.
-              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-              device_id: Tenetur sed ea excepturi delectus quasi.
-              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-              headers:
-                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-              password: Quidem quis earum maxime omnis reiciendis adipisci.
-              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-              user_agent: Perspiciatis autem quo.
-              username: Autem est quia.
-              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-              device_id: Tenetur sed ea excepturi delectus quasi.
-              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-              headers:
-                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-              password: Quidem quis earum maxime omnis reiciendis adipisci.
-              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-              user_agent: Perspiciatis autem quo.
-              username: Autem est quia.
-              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+            - line_number: 6957168655539073176
+              record:
+                - Deserunt eum ea et.
+                - Quia reprehenderit.
+            - line_number: 6957168655539073176
+              record:
+                - Deserunt eum ea et.
+                - Quia reprehenderit.
         proxies:
           type: array
           items:
-            $ref: '#/components/schemas/Proxy'
+            $ref: '#/components/schemas/BotAccountRecord'
           description: список проксей для использования
           example:
-            - host: Eligendi accusantium enim.
-              login: In et assumenda voluptate deleniti ut aut.
-              password: Quod tenetur.
-              port: 4440880418486248045
-            - host: Eligendi accusantium enim.
-              login: In et assumenda voluptate deleniti ut aut.
-              password: Quod tenetur.
-              port: 4440880418486248045
-            - host: Eligendi accusantium enim.
-              login: In et assumenda voluptate deleniti ut aut.
-              password: Quod tenetur.
-              port: 4440880418486248045
-            - host: Eligendi accusantium enim.
-              login: In et assumenda voluptate deleniti ut aut.
-              password: Quod tenetur.
-              port: 4440880418486248045
+            - line_number: 44191890423975802
+              record:
+                - Laudantium veniam ratione culpa non ad.
+                - Est dolorem corporis fugit fugiat.
+                - Quisquam itaque nisi.
+            - line_number: 44191890423975802
+              record:
+                - Laudantium veniam ratione culpa non ad.
+                - Est dolorem corporis fugit fugiat.
+                - Quisquam itaque nisi.
+            - line_number: 44191890423975802
+              record:
+                - Laudantium veniam ratione culpa non ad.
+                - Est dolorem corporis fugit fugiat.
+                - Quisquam itaque nisi.
         targets:
           type: array
           items:
-            $ref: '#/components/schemas/TargetUser'
+            $ref: '#/components/schemas/BotAccountRecord'
           description: список аккаунтов, которым показать надо рекламу
           example:
-            - user_id: 372918204077540257
-              username: Labore impedit repellat.
-            - user_id: 372918204077540257
-              username: Labore impedit repellat.
-            - user_id: 372918204077540257
-              username: Labore impedit repellat.
+            - line_number: 5176427869412771911
+              record:
+                - Impedit doloremque qui magni molestiae fugiat.
+                - Excepturi eos aspernatur.
+            - line_number: 5176427869412771911
+              record:
+                - Impedit doloremque qui magni molestiae fugiat.
+                - Excepturi eos aspernatur.
+            - line_number: 5176427869412771911
+              record:
+                - Impedit doloremque qui magni molestiae fugiat.
+                - Excepturi eos aspernatur.
       example:
         bots:
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
-          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-            device_id: Tenetur sed ea excepturi delectus quasi.
-            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
-            headers:
-              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
-            password: Quidem quis earum maxime omnis reiciendis adipisci.
-            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
-            user_agent: Perspiciatis autem quo.
-            username: Autem est quia.
-            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
+          - line_number: 6957168655539073176
+            record:
+              - Deserunt eum ea et.
+              - Quia reprehenderit.
         proxies:
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
-          - host: Eligendi accusantium enim.
-            login: In et assumenda voluptate deleniti ut aut.
-            password: Quod tenetur.
-            port: 4440880418486248045
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
+          - line_number: 44191890423975802
+            record:
+              - Laudantium veniam ratione culpa non ad.
+              - Est dolorem corporis fugit fugiat.
+              - Quisquam itaque nisi.
         targets:
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
-          - user_id: 372918204077540257
-            username: Labore impedit repellat.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
+          - line_number: 5176427869412771911
+            record:
+              - Impedit doloremque qui magni molestiae fugiat.
+              - Excepturi eos aspernatur.
       required:
         - bots
         - proxies

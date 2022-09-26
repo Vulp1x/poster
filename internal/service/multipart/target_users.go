@@ -1,4 +1,4 @@
-package reader
+package multipart
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"io"
 
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
-	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/pkg/logger"
+	"go.uber.org/multierr"
 )
 
-func ParseUsersList(ctx context.Context, reader io.Reader) ([]*tasksservice.BotAccount, []error) {
+func readTargetsList(ctx context.Context, reader io.Reader) ([]*tasksservice.TargetUserRecord, error) {
 	csvReader := csv.NewReader(reader)
 
 	csvReader.Comma = '|'
-	csvReader.FieldsPerRecord = 4
+	csvReader.FieldsPerRecord = 2
 
-	var botAccounts []domain.BotAccount
+	var botAccounts []*tasksservice.TargetUserRecord
 	var errs []error
 
 	var line int
@@ -34,18 +34,13 @@ func ParseUsersList(ctx context.Context, reader io.Reader) ([]*tasksservice.BotA
 			continue
 		}
 
-		var botAccount domain.BotAccount
-
-		err = botAccount.Parse(record)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("failed to parse bot account on line %d: %v", line, err))
-			continue
-		}
-
-		botAccounts = append(botAccounts, botAccount)
+		botAccounts = append(botAccounts, &tasksservice.TargetUserRecord{
+			Record:     record,
+			LineNumber: line,
+		})
 	}
 
 	logger.Debugf(ctx, "read %d lines\n", line)
 
-	return botAccounts, errs
+	return botAccounts, multierr.Combine(errs...)
 }

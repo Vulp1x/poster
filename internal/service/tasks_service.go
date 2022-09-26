@@ -116,7 +116,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 	return
 }
 
-func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.UploadFilePayload) (err error) {
+func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.UploadFilePayload) ([]*tasksservice.UploadError, error) {
 	logger.Debug(ctx, "starting UploadFile with payload %#v", p)
-	return nil
+	return nil, nil
 }

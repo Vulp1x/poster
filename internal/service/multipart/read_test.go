@@ -1,4 +1,4 @@
-package reader
+package multipart
 
 import (
 	"context"
@@ -22,9 +22,9 @@ func TestName(t *testing.T) {
 
 	defer f.Close()
 
-	bots, errs := ParseUsersList(context.Background(), f)
-	if len(errs) != 0 {
-		t.Fatalf("got %d errors: %v", len(errs), errs)
+	bots, err := readUsersList(context.Background(), f)
+	if err != nil {
+		t.Fatalf("got errors: %v", err)
 	}
 
 	if len(bots) != 100 {
@@ -44,7 +44,7 @@ func TestParseBotAccount(t *testing.T) {
 	}
 
 	wantedBot := domain.BotAccount{
-		Bot: dbmodel.BotAccount{
+		BotAccount: dbmodel.BotAccount{
 			Username:  "michellemagana598",
 			Password:  "fMS7ZbA7Uu",
 			UserAgent: "Instagram 248.0.0.17.109 Android (29/10; 540dpi; 1440x2400; LGE; LG-P690; gelato_tmb-sk; qcom; ru-RU; 239490569)",

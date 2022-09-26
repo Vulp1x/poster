@@ -158,8 +158,8 @@ var _ = Service("tasks_service", func() {
 			})
 
 			Attribute("bots", ArrayOf(BotAccountRecord), "список ботов")
-			Attribute("proxies", ArrayOf(Proxy), "список проксей для использования")
-			Attribute("targets", ArrayOf(TargetUser), "список аккаунтов, которым показать надо рекламу")
+			Attribute("proxies", ArrayOf(ProxyRecord), "список проксей для использования")
+			Attribute("targets", ArrayOf(TargetUserRecord), "список аккаунтов, которым показать надо рекламу")
 
 			Required("token", "task_id", "bots", "proxies", "targets")
 		})
