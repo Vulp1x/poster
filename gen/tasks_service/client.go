@@ -59,9 +59,13 @@ func (c *Client) CreateTaskDraft(ctx context.Context, p *CreateTaskDraftPayload)
 //   - "internal error" (type InternalError)
 //   - "task not found" (type TaskNotFound)
 //   - error: internal error
-func (c *Client) UploadFile(ctx context.Context, p *UploadFilePayload) (err error) {
-	_, err = c.UploadFileEndpoint(ctx, p)
-	return
+func (c *Client) UploadFile(ctx context.Context, p *UploadFilePayload) (res []*UploadError, err error) {
+	var ires interface{}
+	ires, err = c.UploadFileEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.([]*UploadError), nil
 }
 
 // StartTask calls the "start task" endpoint of the "tasks_service" service.

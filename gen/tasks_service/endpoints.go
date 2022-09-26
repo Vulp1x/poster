@@ -83,7 +83,7 @@ func NewUploadFileEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.UploadFile(ctx, p)
+		return s.UploadFile(ctx, p)
 	}
 }
 

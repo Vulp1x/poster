@@ -369,10 +369,16 @@ paths:
           schema:
             $ref: '#/definitions/TasksServiceUploadFileRequestBody'
             required:
-              - file_type
+              - bots
+              - proxies
+              - targets
       responses:
         "200":
           description: OK response.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UploadErrorResponse'
         "400":
           description: Bad Request response.
           schema:
@@ -448,14 +454,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Dolores autem.
+        example: Rerum veniam dolorem perspiciatis.
       password:
         type: string
-        example: otu
+        example: ja6
         minLength: 4
     example:
-      login: Harum vitae ut quae dolorem similique laudantium.
-      password: mze
+      login: Consequuntur non blanditiis.
+      password: y77
     required:
       - login
       - password
@@ -471,6 +477,120 @@ definitions:
       jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
     required:
       - jwt
+  BotAccountRequestBody:
+    title: BotAccountRequestBody
+    type: object
+    properties:
+      advertising_id:
+        type: string
+        description: adv id
+        example: AC77D914-0A36-9917-2BA7-F519556A50B8
+        format: uuid
+      device_id:
+        type: string
+        description: 'main id, ex: android-0d735e1f4db26782'
+        example: Eos accusantium enim et aliquid nihil maiores.
+      family_device_id:
+        type: string
+        example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
+        format: uuid
+      headers:
+        type: object
+        example:
+          Nam sapiente dolor tempora.: Exercitationem facilis recusandae.
+        additionalProperties:
+          type: string
+          example: Fugiat ut odio minus doloremque architecto.
+      password:
+        type: string
+        description: login
+        example: Facere natus.
+      phone_id:
+        type: string
+        description: phone_id
+        example: 95545D09-3153-0F17-09F7-7FEB1545D780
+        format: uuid
+      user_agent:
+        type: string
+        description: user agent header
+        example: Aut perspiciatis error sit ea dicta vel.
+      username:
+        type: string
+        description: login
+        example: Itaque reiciendis.
+      uuid:
+        type: string
+        example: A45D83CF-F038-77BB-220E-D79EFC31D198
+        format: uuid
+    example:
+      advertising_id: AB12B85B-1864-53B4-4A92-3519B45D0D5E
+      device_id: Nam fugit expedita.
+      family_device_id: 0E0CB887-B526-812D-F285-DE018C555BB8
+      headers:
+        Doloribus qui.: Iusto facere ut et sed.
+      password: Temporibus officia.
+      phone_id: 0C589E55-99C1-3ED8-809A-1463C91242B6
+      user_agent: Magnam voluptatem nesciunt quaerat quasi incidunt sed.
+      username: Corrupti saepe et ipsam fuga est.
+      uuid: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
+    required:
+      - username
+      - password
+      - user_agent
+      - device_id
+      - uuid
+      - phone_id
+      - advertising_id
+      - family_device_id
+      - headers
+  ProxyRequestBody:
+    title: ProxyRequestBody
+    type: object
+    properties:
+      host:
+        type: string
+        description: адрес прокси
+        example: Aut velit delectus qui.
+      login:
+        type: string
+        example: Et quas est.
+      password:
+        type: string
+        example: Saepe assumenda.
+      port:
+        type: integer
+        description: номер порта
+        example: 622089363346007223
+        format: int64
+    example:
+      host: Sapiente vero libero sunt eos aut laborum.
+      login: Commodi vel.
+      password: Et quis id repellat.
+      port: 5071709443716736136
+    required:
+      - host
+      - port
+      - login
+      - password
+  TargetUserRequestBody:
+    title: TargetUserRequestBody
+    type: object
+    properties:
+      user_id:
+        type: integer
+        description: instagram user id
+        example: 6643404721621771717
+        format: int64
+      username:
+        type: string
+        description: instagram username
+        example: Aut qui corporis asperiores aperiam.
+    example:
+      user_id: 229270693049596798
+      username: Iusto et sit reprehenderit totam illum molestiae.
+    required:
+      - username
+      - user_id
   TasksServiceCreateTaskDraftRequestBody:
     title: TasksServiceCreateTaskDraftRequestBody
     type: object
@@ -478,19 +598,19 @@ definitions:
       post_image:
         type: string
         description: фотография для постов
-        example: Fuga error dolorem et porro deleniti enim.
+        example: Nisi et.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Quasi commodi.
+        example: Sed amet nemo quia est similique.
       title:
         type: string
         description: название задачи
-        example: Mollitia vel incidunt sapiente temporibus.
+        example: Et molestias molestias.
     example:
-      post_image: Qui laudantium deleniti nostrum odio eos omnis.
-      text_template: Fugiat vel libero et vel eligendi.
-      title: Pariatur et velit unde.
+      post_image: Voluptatem voluptas eos rerum maiores.
+      text_template: Minima fugit nihil inventore.
+      title: Aliquid laudantium tempore occaecati fugit id inventore.
     required:
       - title
       - text_template
@@ -499,168 +619,164 @@ definitions:
     title: TasksServiceUploadFileRequestBody
     type: object
     properties:
-      bots_bytes:
-        type: string
+      bots:
+        type: array
+        items:
+          $ref: '#/definitions/BotAccountRequestBody'
         description: список ботов
         example:
-          - 85
-          - 116
-          - 32
-          - 117
-          - 116
-          - 46
-        format: byte
-      file_type:
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+      proxies:
+        type: array
+        items:
+          $ref: '#/definitions/ProxyRequestBody'
+        description: список проксей для использования
+        example:
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+      targets:
+        type: array
+        items:
+          $ref: '#/definitions/TargetUserRequestBody'
+        description: список аккаунтов, которым показать надо рекламу
+        example:
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+    example:
+      bots:
+        - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+          device_id: Tenetur sed ea excepturi delectus quasi.
+          family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+          headers:
+            Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+          password: Quidem quis earum maxime omnis reiciendis adipisci.
+          phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+          user_agent: Perspiciatis autem quo.
+          username: Autem est quia.
+          uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+        - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+          device_id: Tenetur sed ea excepturi delectus quasi.
+          family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+          headers:
+            Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+          password: Quidem quis earum maxime omnis reiciendis adipisci.
+          phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+          user_agent: Perspiciatis autem quo.
+          username: Autem est quia.
+          uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+      proxies:
+        - host: Eligendi accusantium enim.
+          login: In et assumenda voluptate deleniti ut aut.
+          password: Quod tenetur.
+          port: 4440880418486248045
+        - host: Eligendi accusantium enim.
+          login: In et assumenda voluptate deleniti ut aut.
+          password: Quod tenetur.
+          port: 4440880418486248045
+        - host: Eligendi accusantium enim.
+          login: In et assumenda voluptate deleniti ut aut.
+          password: Quod tenetur.
+          port: 4440880418486248045
+      targets:
+        - user_id: 372918204077540257
+          username: Labore impedit repellat.
+        - user_id: 372918204077540257
+          username: Labore impedit repellat.
+        - user_id: 372918204077540257
+          username: Labore impedit repellat.
+    required:
+      - bots
+      - proxies
+      - targets
+  UploadErrorResponse:
+    title: UploadErrorResponse
+    type: object
+    properties:
+      input:
+        type: string
+        description: номер порта
+        example: Inventore et temporibus voluptatibus aliquam.
+      line:
+        type: integer
+        example: 2538498034293375830
+        format: int64
+      reason:
+        type: string
+        example: Incidunt nisi tempora enim.
+      type:
         type: integer
         description: |2-
            1 - список ботов
-              2 - список резидентских прокси
-              3 - спиок прокси-шестёрок
+              2 - список прокси
+              3 - список получателей рекламы
         example: 3
         enum:
           - 1
           - 2
           - 3
-      image_bytes:
-        type: string
-        description: изображение для поста
-        example:
-          - 67
-          - 111
-          - 114
-          - 112
-          - 111
-          - 114
-          - 105
-          - 115
-          - 32
-          - 97
-          - 32
-          - 114
-          - 101
-          - 105
-          - 99
-          - 105
-          - 101
-          - 110
-          - 100
-          - 105
-          - 115
-          - 32
-          - 97
-          - 100
-          - 105
-          - 112
-          - 105
-          - 115
-          - 99
-          - 105
-          - 32
-          - 118
-          - 105
-          - 116
-          - 97
-          - 101
-          - 46
-        format: byte
-      proxy_bytes:
-        type: string
-        description: содержимое файла
-        example:
-          - 67
-          - 111
-          - 114
-          - 114
-          - 117
-          - 112
-          - 116
-          - 105
-          - 32
-          - 101
-          - 97
-          - 114
-          - 117
-          - 109
-          - 32
-          - 100
-          - 111
-          - 108
-          - 111
-          - 114
-          - 101
-          - 32
-          - 97
-          - 98
-          - 46
-        format: byte
     example:
-      bots_bytes:
-        - 82
-        - 101
-        - 112
-        - 101
-        - 108
-        - 108
-        - 101
-        - 110
-        - 100
-        - 117
-        - 115
-        - 32
-        - 108
-        - 97
-        - 98
-        - 111
-        - 114
-        - 105
-        - 111
-        - 115
-        - 97
-        - 109
-        - 32
-        - 109
-        - 111
-        - 108
-        - 101
-        - 115
-        - 116
-        - 105
-        - 97
-        - 101
-        - 32
-        - 115
-        - 105
-        - 110
-        - 116
-        - 32
-        - 108
-        - 105
-        - 98
-        - 101
-        - 114
-        - 111
-        - 46
-      file_type: 1
-      image_bytes:
-        - 81
-        - 117
-        - 111
-        - 32
-        - 105
-        - 100
-        - 46
-      proxy_bytes:
-        - 69
-        - 110
-        - 105
-        - 109
-        - 32
-        - 114
-        - 101
-        - 109
-        - 46
+      input: Deserunt quas.
+      line: 5874623428557586307
+      reason: Repudiandae laborum voluptatibus aliquid ipsam temporibus.
+      type: 1
     required:
-      - file_type
+      - type
+      - line
+      - input
+      - reason
 securityDefinitions:
   basic_header_Authorization:
     type: basic

@@ -157,29 +157,14 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
-			Attribute("file_type", Int, "тип файла, который загружается", func() {
-				Enum(1, 2, 3)
-				Description(` 1 - список ботов
-    2 - список резидентских прокси
-    3 - спиок прокси-шестёрок`)
-			})
+			Attribute("bots", ArrayOf(BotAccountRecord), "список ботов")
+			Attribute("proxies", ArrayOf(Proxy), "список проксей для использования")
+			Attribute("targets", ArrayOf(TargetUser), "список аккаунтов, которым показать надо рекламу")
 
-			Attribute("proxy_bytes", Bytes, "содержимое файла", func() {
-				Meta("struct:tag:json", "proxy_bytes")
-			})
-
-			Attribute("bots_bytes", Bytes, "список ботов", func() {
-				Meta("struct:tag:json", "bots_bytes")
-			})
-
-			Attribute("image_bytes", Bytes, "изображение для поста", func() {
-				Meta("struct:tag:json", "proxy_bytes")
-			})
-
-			Required("token", "file_type", "task_id")
+			Required("token", "task_id", "bots", "proxies", "targets")
 		})
 
-		// Result(String)
+		Result(ArrayOf(UploadError))
 
 		HTTP(func() {
 			POST("/api/tasks/{task_id}/upload")
@@ -373,14 +358,3 @@ var _ = Service("admin_service", func() {
 	})
 
 })
-
-//
-// var _ = Type("bot_account", func() {
-// 	Attribute("username", String, "login")
-// 	Attribute("password", String, "login")
-// 	Attribute("username", String, "login")
-//
-// 	Required("username")
-//
-//
-// })

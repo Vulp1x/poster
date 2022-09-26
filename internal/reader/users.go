@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"io"
 
+	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
-func ParseUsersList(ctx context.Context, reader io.Reader) ([]domain.BotAccount, []error) {
+func ParseUsersList(ctx context.Context, reader io.Reader) ([]*tasksservice.BotAccount, []error) {
 	csvReader := csv.NewReader(reader)
 
 	csvReader.Comma = '|'

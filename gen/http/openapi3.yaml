@@ -20,8 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddManagerRequestBody'
             example:
-              login: Vero vero velit non modi.
-              password: f2k
+              login: Quia voluptatem impedit mollitia.
+              password: y3x
       responses:
         "200":
           description: OK response.
@@ -31,28 +31,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Voluptatum quaerat odio harum at ea.
+                example: Dolores omnis enim exercitationem saepe.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Laboriosam quia harum odio fugiat maiores.
+                example: Praesentium adipisci unde molestiae alias.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Non dolorum voluptate dolorem.
+                example: Et est.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Nobis et ab quod.
+                example: Sunt ea ipsum.
       security:
         - jwt_header_Authorization:
             - driver
@@ -72,9 +72,9 @@ paths:
           schema:
             type: string
             description: id менеджера, которого необходимо удалить
-            example: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            example: E31B6C92-4A10-2D9D-2B43-B3362900308F
             format: uuid
-          example: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+          example: EA2D3703-2B9D-E7C0-35B9-DB753C364369
       responses:
         "200":
           description: OK response.
@@ -84,21 +84,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Rerum consequuntur.
+                example: Sequi nihil aspernatur dignissimos.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Rerum veniam dolorem perspiciatis.
+                example: Distinctio ex.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Qui omnis natus voluptatum in est.
+                example: Fugit officiis.
         "404":
           description: 'user not found: Not Found response.'
           content:
@@ -125,7 +125,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Inventore et minima fugit nihil.
+                example: Ad architecto aliquid.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -136,14 +136,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Accusantium inventore et temporibus voluptatibus.
+                example: Aliquam magni beatae quia est aut.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Veritatis voluptatem voluptas eos rerum maiores nostrum.
+                example: Quas et aut nihil iste qui.
       security:
         - jwt_header_Authorization:
             - driver
@@ -170,28 +170,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Eos ipsa eveniet et molestias molestias non.
+                example: Eius cupiditate sed aut.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Blanditiis blanditiis.
+                example: Qui in vel quod veniam neque aperiam.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Earum nisi et eum aliquid.
+                example: Voluptatibus amet sit dolores vel modi.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Amet nemo quia est.
+                example: Soluta eos non cum.
       security:
         - basic_header_Authorization: []
   /api/tasks/:
@@ -210,7 +210,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Quibusdam sapiente.
+                example: Similique delectus commodi eligendi quos non.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -225,7 +225,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Assumenda eum possimus consequatur.
+                example: Error quasi odio.
       security:
         - jwt_header_Authorization:
             - driver
@@ -245,8 +245,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Nam fugit expedita.
-          example: Et facilis.
+            example: Rerum maxime quasi quis.
+          example: Vel odio quia aliquid.
       responses:
         "200":
           description: OK response.
@@ -256,7 +256,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Dignissimos veniam est.
+                example: Voluptatem ut nihil.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -271,7 +271,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Dolorem eveniet perferendis.
+                example: Esse qui.
       security:
         - jwt_header_Authorization:
             - driver
@@ -291,8 +291,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Magnam illum.
-          example: Cum sint beatae commodi omnis.
+            example: Saepe cumque eum.
+          example: Cupiditate impedit sed dolor omnis.
       responses:
         "200":
           description: OK response.
@@ -314,7 +314,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Nam qui quibusdam in pariatur.
+                example: Autem est nam.
       security:
         - jwt_header_Authorization:
             - driver
@@ -334,8 +334,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Fugiat ut odio minus doloremque architecto.
-          example: Voluptas nam.
+            example: Cupiditate ullam necessitatibus.
+          example: Et maxime sit eaque.
       responses:
         "200":
           description: OK response.
@@ -357,7 +357,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Facilis fugiat similique ab sint voluptatum aspernatur.
+                example: Repellendus voluptatem dolor aut optio.
       security:
         - jwt_header_Authorization:
             - driver
@@ -377,8 +377,8 @@ paths:
           schema:
             type: string
             description: id задачи, в которую загружаем пользователей/прокси
-            example: Exercitationem suscipit sit nisi earum perspiciatis nobis.
-          example: Consequatur ea atque reprehenderit esse molestiae.
+            example: Est voluptatibus nostrum occaecati nulla unde dolor.
+          example: Sint aut sit nihil maiores ex.
       requestBody:
         required: true
         content:
@@ -386,103 +386,134 @@ paths:
             schema:
               $ref: '#/components/schemas/UploadFileRequestBody'
             example:
-              bots_bytes:
-                - 69
-                - 116
-                - 32
-                - 102
-                - 117
-                - 103
-                - 97
-                - 32
-                - 110
-                - 105
-                - 104
-                - 105
-                - 108
-                - 46
-              file_type: 3
-              image_bytes:
-                - 68
-                - 111
-                - 108
-                - 111
-                - 114
-                - 32
-                - 115
-                - 117
-                - 110
-                - 116
-                - 46
-              proxy_bytes:
-                - 70
-                - 117
-                - 103
-                - 105
-                - 116
-                - 32
-                - 116
-                - 101
-                - 109
-                - 112
-                - 111
-                - 114
-                - 105
-                - 98
-                - 117
-                - 115
-                - 32
-                - 118
-                - 111
-                - 108
-                - 117
-                - 112
-                - 116
-                - 97
-                - 116
-                - 101
-                - 32
-                - 113
-                - 117
-                - 105
-                - 32
-                - 100
-                - 105
-                - 103
-                - 110
-                - 105
-                - 115
-                - 115
-                - 105
-                - 109
-                - 111
-                - 115
-                - 46
+              bots:
+                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+                  device_id: Tenetur sed ea excepturi delectus quasi.
+                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+                  headers:
+                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+                  password: Quidem quis earum maxime omnis reiciendis adipisci.
+                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+                  user_agent: Perspiciatis autem quo.
+                  username: Autem est quia.
+                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+                  device_id: Tenetur sed ea excepturi delectus quasi.
+                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+                  headers:
+                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+                  password: Quidem quis earum maxime omnis reiciendis adipisci.
+                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+                  user_agent: Perspiciatis autem quo.
+                  username: Autem est quia.
+                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+                - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+                  device_id: Tenetur sed ea excepturi delectus quasi.
+                  family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+                  headers:
+                    Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+                  password: Quidem quis earum maxime omnis reiciendis adipisci.
+                  phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+                  user_agent: Perspiciatis autem quo.
+                  username: Autem est quia.
+                  uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+              proxies:
+                - host: Eligendi accusantium enim.
+                  login: In et assumenda voluptate deleniti ut aut.
+                  password: Quod tenetur.
+                  port: 4440880418486248045
+                - host: Eligendi accusantium enim.
+                  login: In et assumenda voluptate deleniti ut aut.
+                  password: Quod tenetur.
+                  port: 4440880418486248045
+              targets:
+                - user_id: 372918204077540257
+                  username: Labore impedit repellat.
+                - user_id: 372918204077540257
+                  username: Labore impedit repellat.
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UploadError'
+                example:
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
+              example:
+                - input: Non id omnis perspiciatis expedita.
+                  line: 8997517691232061191
+                  reason: Aut alias blanditiis provident voluptatem.
+                  type: 2
+                - input: Non id omnis perspiciatis expedita.
+                  line: 8997517691232061191
+                  reason: Aut alias blanditiis provident voluptatem.
+                  type: 2
+                - input: Non id omnis perspiciatis expedita.
+                  line: 8997517691232061191
+                  reason: Aut alias blanditiis provident voluptatem.
+                  type: 2
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Fuga quas nisi sapiente.
+                example: Natus natus totam qui voluptatum.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UploadError'
+                example:
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
         "404":
           description: 'task not found: Not Found response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UploadError'
+                example:
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
+                  - input: Non id omnis perspiciatis expedita.
+                    line: 8997517691232061191
+                    reason: Aut alias blanditiis provident voluptatem.
+                    type: 2
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Debitis in et ipsa et dolorem.
+                example: Accusamus repudiandae mollitia.
       security:
         - jwt_header_Authorization:
             - driver
@@ -501,9 +532,9 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateTaskDraftRequestBody'
             example:
-              post_image: Eaque facilis autem molestiae nostrum similique voluptatem.
-              text_template: Voluptas cupiditate aut fugit ducimus.
-              title: Eveniet necessitatibus.
+              post_image: Voluptatibus autem.
+              text_template: Dolor nesciunt nisi aperiam deserunt aut.
+              title: Excepturi eos aspernatur.
       responses:
         "200":
           description: OK response.
@@ -512,16 +543,16 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 74C53540-E974-ABFF-2565-6BF99F9017B2
+                example: 77DFBD55-EC3C-CF64-7021-5A80D932517B
                 format: uuid
-              example: 773F4E7F-A748-DF6D-4355-233071D2534A
+              example: 9A05BD8A-CA8D-335E-C26E-14DB8FEBAB04
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Ea numquam.
+                example: Cum nisi consequatur atque dolorem est dignissimos.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -529,7 +560,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
+                example: 233374F1-297F-8711-5FC3-4F6B3731AD63
                 format: uuid
         "404":
           description: 'task not found: Not Found response.'
@@ -538,7 +569,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
+                example: 2AE5027E-EF4C-E00D-314E-1CB4449A11C0
                 format: uuid
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -546,7 +577,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Ut et iusto eum veniam.
+                example: Tenetur provident veritatis veniam.
       security:
         - jwt_header_Authorization:
             - driver
@@ -558,36 +589,104 @@ components:
       properties:
         login:
           type: string
-          example: Dolor sed nostrum qui facere nemo.
+          example: Excepturi ut eligendi.
         password:
           type: string
-          example: jdq
+          example: yal
           minLength: 4
       example:
-        login: Itaque nihil.
-        password: ckk
+        login: Veniam et amet saepe.
+        password: d3c
       required:
         - login
         - password
+    BotAccount:
+      type: object
+      properties:
+        advertising_id:
+          type: string
+          description: adv id
+          example: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
+          format: uuid
+        device_id:
+          type: string
+          description: 'main id, ex: android-0d735e1f4db26782'
+          example: Ratione et magnam pariatur suscipit.
+        family_device_id:
+          type: string
+          example: D358BA94-28F1-C0F1-EA4E-E3BFBD8A6AE2
+          format: uuid
+        headers:
+          type: object
+          example:
+            Mollitia nemo quis.: Sapiente repellendus sint.
+            Omnis ipsam distinctio modi.: Voluptatibus voluptatem.
+            Unde libero aperiam.: Omnis temporibus commodi iure modi.
+          additionalProperties:
+            type: string
+            example: Sed voluptatum hic omnis qui iste.
+        password:
+          type: string
+          description: login
+          example: Quas voluptatem quidem reiciendis et corporis reiciendis.
+        phone_id:
+          type: string
+          description: phone_id
+          example: 1576BB1F-D21C-05AD-6677-73725A387FA6
+          format: uuid
+        user_agent:
+          type: string
+          description: user agent header
+          example: Tenetur tenetur qui culpa tempore.
+        username:
+          type: string
+          description: login
+          example: Quis in.
+        uuid:
+          type: string
+          example: A8E7C55C-B3EA-B228-EF84-9DB3D55D57A4
+          format: uuid
+      example:
+        advertising_id: F25C441B-B3AA-5871-1077-53EACA084D5A
+        device_id: Ex id corrupti non et aut.
+        family_device_id: E058AD50-5D7F-E9A8-E010-D33044724992
+        headers:
+          Illo voluptatem sunt aperiam.: Id quasi repellendus et.
+          Provident consectetur voluptatum tempore vero.: Distinctio consequatur sed consequuntur soluta.
+        password: Et qui molestias dolorem.
+        phone_id: CEF3CAF7-AB82-083A-2F08-9497BE6B7488
+        user_agent: Nemo eius.
+        username: Qui ut ut unde autem repellendus recusandae.
+        uuid: 6D98E750-AE3D-1948-4270-2B4874F82503
+      required:
+        - username
+        - password
+        - user_agent
+        - device_id
+        - uuid
+        - phone_id
+        - advertising_id
+        - family_device_id
+        - headers
     CreateTaskDraftRequestBody:
       type: object
       properties:
         post_image:
           type: string
           description: фотография для постов
-          example: Sunt officia inventore.
+          example: Dolor doloremque.
         text_template:
           type: string
           description: шаблон для подписи под постом
-          example: Possimus deleniti.
+          example: Fugit quibusdam expedita et.
         title:
           type: string
           description: название задачи
-          example: Accusamus officia ipsum et provident omnis eius.
+          example: Nihil expedita consequatur.
       example:
-        post_image: Ut commodi inventore libero et accusantium commodi.
-        text_template: Aliquam nihil.
-        title: Et molestiae quam beatae quas eum.
+        post_image: Voluptatem vero molestias.
+        text_template: Reprehenderit omnis similique ratione.
+        title: Voluptatem doloremque.
       required:
         - title
         - text_template
@@ -603,209 +702,208 @@ components:
         jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       required:
         - jwt
-    UploadFileRequestBody:
+    Proxy:
       type: object
       properties:
-        bots_bytes:
+        host:
           type: string
-          description: список ботов
-          example:
-            - 82
-            - 101
-            - 114
-            - 117
-            - 109
-            - 32
-            - 101
-            - 117
-            - 109
-            - 32
-            - 97
-            - 98
-            - 32
-            - 113
-            - 117
-            - 105
-            - 32
-            - 101
-            - 120
-            - 99
-            - 101
-            - 112
-            - 116
-            - 117
-            - 114
-            - 105
-            - 32
-            - 108
-            - 97
-            - 98
-            - 111
-            - 114
-            - 117
-            - 109
-            - 46
-          format: binary
-        file_type:
+          description: адрес прокси
+          example: Quia error vel quos.
+        login:
+          type: string
+          example: Porro rerum aut laboriosam.
+        password:
+          type: string
+          example: Ea sequi consequatur aut velit odit ut.
+        port:
+          type: integer
+          description: номер порта
+          example: 84859098339370993
+          format: int64
+      example:
+        host: Doloribus repellat voluptas placeat non ut.
+        login: Facere velit ex et qui dicta corrupti.
+        password: Ut incidunt cumque similique.
+        port: 218032170587342579
+      required:
+        - host
+        - port
+        - login
+        - password
+    TargetUser:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: instagram user id
+          example: 7626817135828888699
+          format: int64
+        username:
+          type: string
+          description: instagram username
+          example: Voluptatem aut ea sunt pariatur.
+      example:
+        user_id: 1265749063732130389
+        username: Animi perspiciatis quaerat in sint.
+      required:
+        - username
+        - user_id
+    UploadError:
+      type: object
+      properties:
+        input:
+          type: string
+          description: номер порта
+          example: Et autem quasi aliquid voluptas.
+        line:
+          type: integer
+          example: 5346004466247460411
+          format: int64
+        reason:
+          type: string
+          example: Quod excepturi provident qui deserunt.
+        type:
           type: integer
           description: |2-
              1 - список ботов
-                2 - список резидентских прокси
-                3 - спиок прокси-шестёрок
+                2 - список прокси
+                3 - список получателей рекламы
           example: 2
           enum:
             - 1
             - 2
             - 3
-        image_bytes:
-          type: string
-          description: изображение для поста
-          example:
-            - 81
-            - 117
-            - 105
-            - 32
-            - 113
-            - 117
-            - 111
-            - 115
-            - 32
-            - 110
-            - 111
-            - 115
-            - 116
-            - 114
-            - 117
-            - 109
-            - 32
-            - 109
-            - 111
-            - 108
-            - 108
-            - 105
-            - 116
-            - 105
-            - 97
-            - 32
-            - 99
-            - 111
-            - 110
-            - 115
-            - 101
-            - 113
-            - 117
-            - 117
-            - 110
-            - 116
-            - 117
-            - 114
-            - 46
-          format: binary
-        proxy_bytes:
-          type: string
-          description: содержимое файла
-          example:
-            - 68
-            - 111
-            - 108
-            - 111
-            - 114
-            - 32
-            - 110
-            - 97
-            - 109
-            - 32
-            - 99
-            - 117
-            - 108
-            - 112
-            - 97
-            - 46
-          format: binary
       example:
-        bots_bytes:
-          - 80
-          - 101
-          - 114
-          - 102
-          - 101
-          - 114
-          - 101
-          - 110
-          - 100
-          - 105
-          - 115
-          - 32
-          - 113
-          - 117
-          - 105
-          - 97
-          - 32
-          - 114
-          - 101
-          - 109
-          - 32
-          - 110
-          - 111
-          - 115
-          - 116
-          - 114
-          - 117
-          - 109
-          - 32
-          - 115
-          - 105
-          - 110
-          - 116
-          - 32
-          - 100
-          - 111
-          - 108
-          - 111
-          - 114
-          - 117
-          - 109
-          - 46
-        file_type: 2
-        image_bytes:
-          - 66
-          - 108
-          - 97
-          - 110
-          - 100
-          - 105
-          - 116
-          - 105
-          - 105
-          - 115
-          - 32
-          - 101
-          - 120
-          - 32
-          - 97
-          - 108
-          - 105
-          - 97
-          - 115
-          - 46
-        proxy_bytes:
-          - 65
-          - 99
-          - 99
-          - 117
-          - 115
-          - 97
-          - 110
-          - 116
-          - 105
-          - 117
-          - 109
-          - 32
-          - 101
-          - 120
-          - 46
+        input: Earum quia laborum sequi dicta.
+        line: 3086394925635416340
+        reason: Ipsam aut.
+        type: 3
       required:
-        - file_type
+        - type
+        - line
+        - input
+        - reason
+    UploadFileRequestBody:
+      type: object
+      properties:
+        bots:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotAccount'
+          description: список ботов
+          example:
+            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+              device_id: Tenetur sed ea excepturi delectus quasi.
+              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+              headers:
+                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+              password: Quidem quis earum maxime omnis reiciendis adipisci.
+              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+              user_agent: Perspiciatis autem quo.
+              username: Autem est quia.
+              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+              device_id: Tenetur sed ea excepturi delectus quasi.
+              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+              headers:
+                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+              password: Quidem quis earum maxime omnis reiciendis adipisci.
+              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+              user_agent: Perspiciatis autem quo.
+              username: Autem est quia.
+              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+            - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+              device_id: Tenetur sed ea excepturi delectus quasi.
+              family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+              headers:
+                Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+              password: Quidem quis earum maxime omnis reiciendis adipisci.
+              phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+              user_agent: Perspiciatis autem quo.
+              username: Autem est quia.
+              uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+        proxies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Proxy'
+          description: список проксей для использования
+          example:
+            - host: Eligendi accusantium enim.
+              login: In et assumenda voluptate deleniti ut aut.
+              password: Quod tenetur.
+              port: 4440880418486248045
+            - host: Eligendi accusantium enim.
+              login: In et assumenda voluptate deleniti ut aut.
+              password: Quod tenetur.
+              port: 4440880418486248045
+            - host: Eligendi accusantium enim.
+              login: In et assumenda voluptate deleniti ut aut.
+              password: Quod tenetur.
+              port: 4440880418486248045
+            - host: Eligendi accusantium enim.
+              login: In et assumenda voluptate deleniti ut aut.
+              password: Quod tenetur.
+              port: 4440880418486248045
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TargetUser'
+          description: список аккаунтов, которым показать надо рекламу
+          example:
+            - user_id: 372918204077540257
+              username: Labore impedit repellat.
+            - user_id: 372918204077540257
+              username: Labore impedit repellat.
+            - user_id: 372918204077540257
+              username: Labore impedit repellat.
+      example:
+        bots:
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+          - advertising_id: 7D80331A-7620-D09D-7CCB-2EF87B797732
+            device_id: Tenetur sed ea excepturi delectus quasi.
+            family_device_id: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+            headers:
+              Ducimus voluptate hic dicta impedit.: Totam labore amet ut iure praesentium.
+            password: Quidem quis earum maxime omnis reiciendis adipisci.
+            phone_id: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+            user_agent: Perspiciatis autem quo.
+            username: Autem est quia.
+            uuid: 5E3B665E-1239-9C12-9643-FFC1E6C04697
+        proxies:
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+          - host: Eligendi accusantium enim.
+            login: In et assumenda voluptate deleniti ut aut.
+            password: Quod tenetur.
+            port: 4440880418486248045
+        targets:
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+          - user_id: 372918204077540257
+            username: Labore impedit repellat.
+      required:
+        - bots
+        - proxies
+        - targets
   securitySchemes:
     basic_header_Authorization:
       type: http
@@ -816,9 +914,9 @@ components:
       description: Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".
       scheme: bearer
 tags:
-  - name: tasks_service
-    description: сервис для создания, редактирования и работы с задачами (рекламными компаниями)
   - name: admin_service
     description: The secured service exposes endpoints that require valid authorization credentials.
   - name: auth_service
     description: The secured service exposes endpoints that require valid authorization credentials.
+  - name: tasks_service
+    description: сервис для создания, редактирования и работы с задачами (рекламными компаниями)

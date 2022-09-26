@@ -24,24 +24,24 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `tasks-service (create-task-draft|upload-file|start-task|stop-task|get-task|list-tasks)
-admin-service (add-manager|drop-manager)
+	return `admin-service (add-manager|drop-manager)
 auth-service (signin|profile)
+tasks-service (create-task-draft|upload-file|start-task|stop-task|get-task|list-tasks)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` tasks-service create-task-draft --body '{
-      "post_image": "Eaque facilis autem molestiae nostrum similique voluptatem.",
-      "text_template": "Voluptas cupiditate aut fugit ducimus.",
-      "title": "Eveniet necessitatibus."
-   }' --token "Facere nihil aut."` + "\n" +
-		os.Args[0] + ` admin-service add-manager --body '{
-      "login": "Vero vero velit non modi.",
-      "password": "f2k"
-   }' --token "Aut aspernatur incidunt quisquam provident dolor quia."` + "\n" +
+	return os.Args[0] + ` admin-service add-manager --body '{
+      "login": "Quia voluptatem impedit mollitia.",
+      "password": "y3x"
+   }' --token "Perferendis odit."` + "\n" +
 		os.Args[0] + ` auth-service signin --login "user@test.ru" --password "password"` + "\n" +
+		os.Args[0] + ` tasks-service create-task-draft --body '{
+      "post_image": "Voluptatibus autem.",
+      "text_template": "Dolor nesciunt nisi aperiam deserunt aut.",
+      "title": "Excepturi eos aspernatur."
+   }' --token "Aperiam quo mollitia necessitatibus voluptatibus porro voluptatum."` + "\n" +
 		""
 }
 
@@ -56,6 +56,25 @@ func ParseEndpoint(
 	tasksServiceUploadFileEncoderFn tasksservicec.TasksServiceUploadFileEncoderFunc,
 ) (goa.Endpoint, interface{}, error) {
 	var (
+		adminServiceFlags = flag.NewFlagSet("admin-service", flag.ContinueOnError)
+
+		adminServiceAddManagerFlags     = flag.NewFlagSet("add-manager", flag.ExitOnError)
+		adminServiceAddManagerBodyFlag  = adminServiceAddManagerFlags.String("body", "REQUIRED", "")
+		adminServiceAddManagerTokenFlag = adminServiceAddManagerFlags.String("token", "", "")
+
+		adminServiceDropManagerFlags         = flag.NewFlagSet("drop-manager", flag.ExitOnError)
+		adminServiceDropManagerManagerIDFlag = adminServiceDropManagerFlags.String("manager-id", "REQUIRED", "id менеджера, которого необходимо удалить")
+		adminServiceDropManagerTokenFlag     = adminServiceDropManagerFlags.String("token", "", "")
+
+		authServiceFlags = flag.NewFlagSet("auth-service", flag.ContinueOnError)
+
+		authServiceSigninFlags        = flag.NewFlagSet("signin", flag.ExitOnError)
+		authServiceSigninLoginFlag    = authServiceSigninFlags.String("login", "REQUIRED", "login used to perform signin")
+		authServiceSigninPasswordFlag = authServiceSigninFlags.String("password", "REQUIRED", "Password used to perform signin")
+
+		authServiceProfileFlags     = flag.NewFlagSet("profile", flag.ExitOnError)
+		authServiceProfileTokenFlag = authServiceProfileFlags.String("token", "REQUIRED", "")
+
 		tasksServiceFlags = flag.NewFlagSet("tasks-service", flag.ContinueOnError)
 
 		tasksServiceCreateTaskDraftFlags     = flag.NewFlagSet("create-task-draft", flag.ExitOnError)
@@ -81,34 +100,7 @@ func ParseEndpoint(
 
 		tasksServiceListTasksFlags     = flag.NewFlagSet("list-tasks", flag.ExitOnError)
 		tasksServiceListTasksTokenFlag = tasksServiceListTasksFlags.String("token", "REQUIRED", "")
-
-		adminServiceFlags = flag.NewFlagSet("admin-service", flag.ContinueOnError)
-
-		adminServiceAddManagerFlags     = flag.NewFlagSet("add-manager", flag.ExitOnError)
-		adminServiceAddManagerBodyFlag  = adminServiceAddManagerFlags.String("body", "REQUIRED", "")
-		adminServiceAddManagerTokenFlag = adminServiceAddManagerFlags.String("token", "", "")
-
-		adminServiceDropManagerFlags         = flag.NewFlagSet("drop-manager", flag.ExitOnError)
-		adminServiceDropManagerManagerIDFlag = adminServiceDropManagerFlags.String("manager-id", "REQUIRED", "id менеджера, которого необходимо удалить")
-		adminServiceDropManagerTokenFlag     = adminServiceDropManagerFlags.String("token", "", "")
-
-		authServiceFlags = flag.NewFlagSet("auth-service", flag.ContinueOnError)
-
-		authServiceSigninFlags        = flag.NewFlagSet("signin", flag.ExitOnError)
-		authServiceSigninLoginFlag    = authServiceSigninFlags.String("login", "REQUIRED", "login used to perform signin")
-		authServiceSigninPasswordFlag = authServiceSigninFlags.String("password", "REQUIRED", "Password used to perform signin")
-
-		authServiceProfileFlags     = flag.NewFlagSet("profile", flag.ExitOnError)
-		authServiceProfileTokenFlag = authServiceProfileFlags.String("token", "REQUIRED", "")
 	)
-	tasksServiceFlags.Usage = tasksServiceUsage
-	tasksServiceCreateTaskDraftFlags.Usage = tasksServiceCreateTaskDraftUsage
-	tasksServiceUploadFileFlags.Usage = tasksServiceUploadFileUsage
-	tasksServiceStartTaskFlags.Usage = tasksServiceStartTaskUsage
-	tasksServiceStopTaskFlags.Usage = tasksServiceStopTaskUsage
-	tasksServiceGetTaskFlags.Usage = tasksServiceGetTaskUsage
-	tasksServiceListTasksFlags.Usage = tasksServiceListTasksUsage
-
 	adminServiceFlags.Usage = adminServiceUsage
 	adminServiceAddManagerFlags.Usage = adminServiceAddManagerUsage
 	adminServiceDropManagerFlags.Usage = adminServiceDropManagerUsage
@@ -116,6 +108,14 @@ func ParseEndpoint(
 	authServiceFlags.Usage = authServiceUsage
 	authServiceSigninFlags.Usage = authServiceSigninUsage
 	authServiceProfileFlags.Usage = authServiceProfileUsage
+
+	tasksServiceFlags.Usage = tasksServiceUsage
+	tasksServiceCreateTaskDraftFlags.Usage = tasksServiceCreateTaskDraftUsage
+	tasksServiceUploadFileFlags.Usage = tasksServiceUploadFileUsage
+	tasksServiceStartTaskFlags.Usage = tasksServiceStartTaskUsage
+	tasksServiceStopTaskFlags.Usage = tasksServiceStopTaskUsage
+	tasksServiceGetTaskFlags.Usage = tasksServiceGetTaskUsage
+	tasksServiceListTasksFlags.Usage = tasksServiceListTasksUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -132,12 +132,12 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
-		case "tasks-service":
-			svcf = tasksServiceFlags
 		case "admin-service":
 			svcf = adminServiceFlags
 		case "auth-service":
 			svcf = authServiceFlags
+		case "tasks-service":
+			svcf = tasksServiceFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -153,6 +153,26 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
+		case "admin-service":
+			switch epn {
+			case "add-manager":
+				epf = adminServiceAddManagerFlags
+
+			case "drop-manager":
+				epf = adminServiceDropManagerFlags
+
+			}
+
+		case "auth-service":
+			switch epn {
+			case "signin":
+				epf = authServiceSigninFlags
+
+			case "profile":
+				epf = authServiceProfileFlags
+
+			}
+
 		case "tasks-service":
 			switch epn {
 			case "create-task-draft":
@@ -172,26 +192,6 @@ func ParseEndpoint(
 
 			case "list-tasks":
 				epf = tasksServiceListTasksFlags
-
-			}
-
-		case "admin-service":
-			switch epn {
-			case "add-manager":
-				epf = adminServiceAddManagerFlags
-
-			case "drop-manager":
-				epf = adminServiceDropManagerFlags
-
-			}
-
-		case "auth-service":
-			switch epn {
-			case "signin":
-				epf = authServiceSigninFlags
-
-			case "profile":
-				epf = authServiceProfileFlags
 
 			}
 
@@ -215,6 +215,26 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
+		case "admin-service":
+			c := adminservicec.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "add-manager":
+				endpoint = c.AddManager()
+				data, err = adminservicec.BuildAddManagerPayload(*adminServiceAddManagerBodyFlag, *adminServiceAddManagerTokenFlag)
+			case "drop-manager":
+				endpoint = c.DropManager()
+				data, err = adminservicec.BuildDropManagerPayload(*adminServiceDropManagerManagerIDFlag, *adminServiceDropManagerTokenFlag)
+			}
+		case "auth-service":
+			c := authservicec.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "signin":
+				endpoint = c.Signin()
+				data, err = authservicec.BuildSigninPayload(*authServiceSigninLoginFlag, *authServiceSigninPasswordFlag)
+			case "profile":
+				endpoint = c.Profile()
+				data, err = authservicec.BuildProfilePayload(*authServiceProfileTokenFlag)
+			}
 		case "tasks-service":
 			c := tasksservicec.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -237,26 +257,6 @@ func ParseEndpoint(
 				endpoint = c.ListTasks()
 				data, err = tasksservicec.BuildListTasksPayload(*tasksServiceListTasksTokenFlag)
 			}
-		case "admin-service":
-			c := adminservicec.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "add-manager":
-				endpoint = c.AddManager()
-				data, err = adminservicec.BuildAddManagerPayload(*adminServiceAddManagerBodyFlag, *adminServiceAddManagerTokenFlag)
-			case "drop-manager":
-				endpoint = c.DropManager()
-				data, err = adminservicec.BuildDropManagerPayload(*adminServiceDropManagerManagerIDFlag, *adminServiceDropManagerTokenFlag)
-			}
-		case "auth-service":
-			c := authservicec.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "signin":
-				endpoint = c.Signin()
-				data, err = authservicec.BuildSigninPayload(*authServiceSigninLoginFlag, *authServiceSigninPasswordFlag)
-			case "profile":
-				endpoint = c.Profile()
-				data, err = authservicec.BuildProfilePayload(*authServiceProfileTokenFlag)
-			}
 		}
 	}
 	if err != nil {
@@ -264,106 +264,6 @@ func ParseEndpoint(
 	}
 
 	return endpoint, data, nil
-}
-
-// tasks-serviceUsage displays the usage of the tasks-service command and its
-// subcommands.
-func tasksServiceUsage() {
-	fmt.Fprintf(os.Stderr, `сервис для создания, редактирования и работы с задачами (рекламными компаниями)
-Usage:
-    %[1]s [globalflags] tasks-service COMMAND [flags]
-
-COMMAND:
-    create-task-draft: создать драфт задачи
-    upload-file: загрузить файл с пользователями, прокси
-    start-task: начать выполнение задачи 
-    stop-task: остановить выполнение задачи 
-    get-task: получить задачу по id
-    list-tasks: получить все задачи для текущего пользователя
-
-Additional help:
-    %[1]s tasks-service COMMAND --help
-`, os.Args[0])
-}
-func tasksServiceCreateTaskDraftUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service create-task-draft -body JSON -token STRING
-
-создать драфт задачи
-    -body JSON: 
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service create-task-draft --body '{
-      "post_image": "Eaque facilis autem molestiae nostrum similique voluptatem.",
-      "text_template": "Voluptas cupiditate aut fugit ducimus.",
-      "title": "Eveniet necessitatibus."
-   }' --token "Facere nihil aut."
-`, os.Args[0])
-}
-
-func tasksServiceUploadFileUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service upload-file -body JSON -task-id STRING -token STRING
-
-загрузить файл с пользователями, прокси
-    -body JSON: 
-    -task-id STRING: id задачи, в которую загружаем пользователей/прокси
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service upload-file --body '{
-      "bots_bytes": "RXQgZnVnYSBuaWhpbC4=",
-      "file_type": 3,
-      "image_bytes": "RG9sb3Igc3VudC4=",
-      "proxy_bytes": "RnVnaXQgdGVtcG9yaWJ1cyB2b2x1cHRhdGUgcXVpIGRpZ25pc3NpbW9zLg=="
-   }' --task-id "Voluptatem cumque tenetur dignissimos facilis optio qui." --token "Et id ducimus est error."
-`, os.Args[0])
-}
-
-func tasksServiceStartTaskUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service start-task -task-id STRING -token STRING
-
-начать выполнение задачи 
-    -task-id STRING: id задачи
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service start-task --task-id "Dolore voluptatem." --token "Optio molestiae eius consequuntur nemo nulla placeat."
-`, os.Args[0])
-}
-
-func tasksServiceStopTaskUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service stop-task -task-id STRING -token STRING
-
-остановить выполнение задачи 
-    -task-id STRING: id задачи
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service stop-task --task-id "Doloremque fugit aspernatur sed culpa." --token "Deleniti dolorem molestiae eos exercitationem consequatur eligendi."
-`, os.Args[0])
-}
-
-func tasksServiceGetTaskUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service get-task -task-id STRING -token STRING
-
-получить задачу по id
-    -task-id STRING: id задачи
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service get-task --task-id "Optio animi magnam suscipit doloremque." --token "Alias vero quibusdam occaecati sit optio."
-`, os.Args[0])
-}
-
-func tasksServiceListTasksUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service list-tasks -token STRING
-
-получить все задачи для текущего пользователя
-    -token STRING: 
-
-Example:
-    %[1]s tasks-service list-tasks --token "Ut veniam."
-`, os.Args[0])
 }
 
 // admin-serviceUsage displays the usage of the admin-service command and its
@@ -390,9 +290,9 @@ admins could add drivers from main system
 
 Example:
     %[1]s admin-service add-manager --body '{
-      "login": "Vero vero velit non modi.",
-      "password": "f2k"
-   }' --token "Aut aspernatur incidunt quisquam provident dolor quia."
+      "login": "Quia voluptatem impedit mollitia.",
+      "password": "y3x"
+   }' --token "Perferendis odit."
 `, os.Args[0])
 }
 
@@ -404,7 +304,7 @@ admins could delete managers from main system
     -token STRING: 
 
 Example:
-    %[1]s admin-service drop-manager --manager-id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24" --token "Laboriosam minima eaque vero fugit occaecati voluptates."
+    %[1]s admin-service drop-manager --manager-id "FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE" --token "Omnis odit eligendi temporibus in."
 `, os.Args[0])
 }
 
@@ -442,6 +342,167 @@ get user profile
     -token STRING: 
 
 Example:
-    %[1]s auth-service profile --token "Et mollitia."
+    %[1]s auth-service profile --token "Rerum ea est facere itaque repellendus."
+`, os.Args[0])
+}
+
+// tasks-serviceUsage displays the usage of the tasks-service command and its
+// subcommands.
+func tasksServiceUsage() {
+	fmt.Fprintf(os.Stderr, `сервис для создания, редактирования и работы с задачами (рекламными компаниями)
+Usage:
+    %[1]s [globalflags] tasks-service COMMAND [flags]
+
+COMMAND:
+    create-task-draft: создать драфт задачи
+    upload-file: загрузить файл с пользователями, прокси
+    start-task: начать выполнение задачи 
+    stop-task: остановить выполнение задачи 
+    get-task: получить задачу по id
+    list-tasks: получить все задачи для текущего пользователя
+
+Additional help:
+    %[1]s tasks-service COMMAND --help
+`, os.Args[0])
+}
+func tasksServiceCreateTaskDraftUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service create-task-draft -body JSON -token STRING
+
+создать драфт задачи
+    -body JSON: 
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service create-task-draft --body '{
+      "post_image": "Voluptatibus autem.",
+      "text_template": "Dolor nesciunt nisi aperiam deserunt aut.",
+      "title": "Excepturi eos aspernatur."
+   }' --token "Aperiam quo mollitia necessitatibus voluptatibus porro voluptatum."
+`, os.Args[0])
+}
+
+func tasksServiceUploadFileUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service upload-file -body JSON -task-id STRING -token STRING
+
+загрузить файл с пользователями, прокси
+    -body JSON: 
+    -task-id STRING: id задачи, в которую загружаем пользователей/прокси
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service upload-file --body '{
+      "bots": [
+         {
+            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
+            "device_id": "Tenetur sed ea excepturi delectus quasi.",
+            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
+            "headers": {
+               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
+            },
+            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
+            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
+            "user_agent": "Perspiciatis autem quo.",
+            "username": "Autem est quia.",
+            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+         },
+         {
+            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
+            "device_id": "Tenetur sed ea excepturi delectus quasi.",
+            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
+            "headers": {
+               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
+            },
+            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
+            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
+            "user_agent": "Perspiciatis autem quo.",
+            "username": "Autem est quia.",
+            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+         },
+         {
+            "advertising_id": "7D80331A-7620-D09D-7CCB-2EF87B797732",
+            "device_id": "Tenetur sed ea excepturi delectus quasi.",
+            "family_device_id": "76FB876C-96AC-91E7-BD21-B0C2988DDF65",
+            "headers": {
+               "Ducimus voluptate hic dicta impedit.": "Totam labore amet ut iure praesentium."
+            },
+            "password": "Quidem quis earum maxime omnis reiciendis adipisci.",
+            "phone_id": "1265498D-5A84-134A-1C7A-ED5B4B92788E",
+            "user_agent": "Perspiciatis autem quo.",
+            "username": "Autem est quia.",
+            "uuid": "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+         }
+      ],
+      "proxies": [
+         {
+            "host": "Eligendi accusantium enim.",
+            "login": "In et assumenda voluptate deleniti ut aut.",
+            "password": "Quod tenetur.",
+            "port": 4440880418486248045
+         },
+         {
+            "host": "Eligendi accusantium enim.",
+            "login": "In et assumenda voluptate deleniti ut aut.",
+            "password": "Quod tenetur.",
+            "port": 4440880418486248045
+         }
+      ],
+      "targets": [
+         {
+            "user_id": 372918204077540257,
+            "username": "Labore impedit repellat."
+         },
+         {
+            "user_id": 372918204077540257,
+            "username": "Labore impedit repellat."
+         }
+      ]
+   }' --task-id "Dolor rerum." --token "Velit optio quod rerum aut blanditiis."
+`, os.Args[0])
+}
+
+func tasksServiceStartTaskUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service start-task -task-id STRING -token STRING
+
+начать выполнение задачи 
+    -task-id STRING: id задачи
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service start-task --task-id "Maiores dolorem quia." --token "Maxime et."
+`, os.Args[0])
+}
+
+func tasksServiceStopTaskUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service stop-task -task-id STRING -token STRING
+
+остановить выполнение задачи 
+    -task-id STRING: id задачи
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service stop-task --task-id "Perferendis quia rem nostrum sint dolorum." --token "Blanditiis ex alias."
+`, os.Args[0])
+}
+
+func tasksServiceGetTaskUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service get-task -task-id STRING -token STRING
+
+получить задачу по id
+    -task-id STRING: id задачи
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service get-task --task-id "Cupiditate eaque dolorem quos." --token "Facilis fugiat similique ab sint voluptatum aspernatur."
+`, os.Args[0])
+}
+
+func tasksServiceListTasksUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] tasks-service list-tasks -token STRING
+
+получить все задачи для текущего пользователя
+    -token STRING: 
+
+Example:
+    %[1]s tasks-service list-tasks --token "Veniam ipsum iusto necessitatibus."
 `, os.Args[0])
 }

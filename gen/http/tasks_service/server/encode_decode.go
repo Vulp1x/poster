@@ -124,8 +124,11 @@ func EncodeCreateTaskDraftError(encoder func(context.Context, http.ResponseWrite
 // tasks_service upload file endpoint.
 func EncodeUploadFileResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.([]*tasksservice.UploadError)
+		enc := encoder(ctx, w)
+		body := NewUploadFileResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -573,4 +576,64 @@ func EncodeListTasksError(encoder func(context.Context, http.ResponseWriter) goa
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// unmarshalBotAccountRequestBodyToTasksserviceBotAccount builds a value of
+// type *tasksservice.BotAccount from a value of type *BotAccountRequestBody.
+func unmarshalBotAccountRequestBodyToTasksserviceBotAccount(v *BotAccountRequestBody) *tasksservice.BotAccount {
+	res := &tasksservice.BotAccount{
+		Username:       *v.Username,
+		Password:       *v.Password,
+		UserAgent:      *v.UserAgent,
+		DeviceID:       *v.DeviceID,
+		UUID:           *v.UUID,
+		PhoneID:        *v.PhoneID,
+		AdvertisingID:  *v.AdvertisingID,
+		FamilyDeviceID: *v.FamilyDeviceID,
+	}
+	res.Headers = make(map[string]string, len(v.Headers))
+	for key, val := range v.Headers {
+		tk := key
+		tv := val
+		res.Headers[tk] = tv
+	}
+
+	return res
+}
+
+// unmarshalProxyRequestBodyToTasksserviceProxy builds a value of type
+// *tasksservice.Proxy from a value of type *ProxyRequestBody.
+func unmarshalProxyRequestBodyToTasksserviceProxy(v *ProxyRequestBody) *tasksservice.Proxy {
+	res := &tasksservice.Proxy{
+		Host:     *v.Host,
+		Port:     *v.Port,
+		Login:    *v.Login,
+		Password: *v.Password,
+	}
+
+	return res
+}
+
+// unmarshalTargetUserRequestBodyToTasksserviceTargetUser builds a value of
+// type *tasksservice.TargetUser from a value of type *TargetUserRequestBody.
+func unmarshalTargetUserRequestBodyToTasksserviceTargetUser(v *TargetUserRequestBody) *tasksservice.TargetUser {
+	res := &tasksservice.TargetUser{
+		Username: *v.Username,
+		UserID:   *v.UserID,
+	}
+
+	return res
+}
+
+// marshalTasksserviceUploadErrorToUploadErrorResponse builds a value of type
+// *UploadErrorResponse from a value of type *tasksservice.UploadError.
+func marshalTasksserviceUploadErrorToUploadErrorResponse(v *tasksservice.UploadError) *UploadErrorResponse {
+	res := &UploadErrorResponse{
+		Type:   v.Type,
+		Line:   v.Line,
+		Input:  v.Input,
+		Reason: v.Reason,
+	}
+
+	return res
 }

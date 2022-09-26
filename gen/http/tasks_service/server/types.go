@@ -26,16 +26,75 @@ type CreateTaskDraftRequestBody struct {
 // UploadFileRequestBody is the type of the "tasks_service" service "upload
 // file" endpoint HTTP request body.
 type UploadFileRequestBody struct {
-	// 1 - список ботов
-	// 2 - список резидентских прокси
-	// 3 - спиок прокси-шестёрок
-	FileType *int `form:"file_type,omitempty" json:"file_type,omitempty" xml:"file_type,omitempty"`
-	// содержимое файла
-	ProxyBytes []byte `json:"proxy_bytes"`
 	// список ботов
-	BotsBytes []byte `json:"bots_bytes"`
-	// изображение для поста
-	ImageBytes []byte `json:"proxy_bytes"`
+	Bots []*BotAccountRequestBody `form:"bots,omitempty" json:"bots,omitempty" xml:"bots,omitempty"`
+	// список проксей для использования
+	Proxies []*ProxyRequestBody `form:"proxies,omitempty" json:"proxies,omitempty" xml:"proxies,omitempty"`
+	// список аккаунтов, которым показать надо рекламу
+	Targets []*TargetUserRequestBody `form:"targets,omitempty" json:"targets,omitempty" xml:"targets,omitempty"`
+}
+
+// UploadFileResponseBody is the type of the "tasks_service" service "upload
+// file" endpoint HTTP response body.
+type UploadFileResponseBody []*UploadErrorResponse
+
+// UploadErrorResponse is used to define fields on response body types.
+type UploadErrorResponse struct {
+	// 1 - список ботов
+	// 2 - список прокси
+	// 3 - список получателей рекламы
+	Type int `form:"type" json:"type" xml:"type"`
+	Line int `form:"line" json:"line" xml:"line"`
+	// номер порта
+	Input  string `form:"input" json:"input" xml:"input"`
+	Reason string `form:"reason" json:"reason" xml:"reason"`
+}
+
+// BotAccountRequestBody is used to define fields on request body types.
+type BotAccountRequestBody struct {
+	// login
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// login
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	// user agent header
+	UserAgent *string `json:"user_agent"`
+	// main id, ex: android-0d735e1f4db26782
+	DeviceID *string `json:"device_id"`
+	UUID     *string `form:"uuid,omitempty" json:"uuid,omitempty" xml:"uuid,omitempty"`
+	// phone_id
+	PhoneID *string `json:"phone_id"`
+	// adv id
+	AdvertisingID  *string           `json:"advertising_id"`
+	FamilyDeviceID *string           `json:"family_device_id"`
+	Headers        map[string]string `form:"headers,omitempty" json:"headers,omitempty" xml:"headers,omitempty"`
+}
+
+// ProxyRequestBody is used to define fields on request body types.
+type ProxyRequestBody struct {
+	// адрес прокси
+	Host *string `form:"host,omitempty" json:"host,omitempty" xml:"host,omitempty"`
+	// номер порта
+	Port     *int64  `form:"port,omitempty" json:"port,omitempty" xml:"port,omitempty"`
+	Login    *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+}
+
+// TargetUserRequestBody is used to define fields on request body types.
+type TargetUserRequestBody struct {
+	// instagram username
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// instagram user id
+	UserID *int64 `json:"user_id"`
+}
+
+// NewUploadFileResponseBody builds the HTTP response body from the result of
+// the "upload file" endpoint of the "tasks_service" service.
+func NewUploadFileResponseBody(res []*tasksservice.UploadError) UploadFileResponseBody {
+	body := make([]*UploadErrorResponse, len(res))
+	for i, val := range res {
+		body[i] = marshalTasksserviceUploadErrorToUploadErrorResponse(val)
+	}
+	return body
 }
 
 // NewCreateTaskDraftPayload builds a tasks_service service create task draft
@@ -54,11 +113,18 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 // NewUploadFilePayload builds a tasks_service service upload file endpoint
 // payload.
 func NewUploadFilePayload(body *UploadFileRequestBody, taskID string, token string) *tasksservice.UploadFilePayload {
-	v := &tasksservice.UploadFilePayload{
-		FileType:   *body.FileType,
-		ProxyBytes: body.ProxyBytes,
-		BotsBytes:  body.BotsBytes,
-		ImageBytes: body.ImageBytes,
+	v := &tasksservice.UploadFilePayload{}
+	v.Bots = make([]*tasksservice.BotAccount, len(body.Bots))
+	for i, val := range body.Bots {
+		v.Bots[i] = unmarshalBotAccountRequestBodyToTasksserviceBotAccount(val)
+	}
+	v.Proxies = make([]*tasksservice.Proxy, len(body.Proxies))
+	for i, val := range body.Proxies {
+		v.Proxies[i] = unmarshalProxyRequestBodyToTasksserviceProxy(val)
+	}
+	v.Targets = make([]*tasksservice.TargetUser, len(body.Targets))
+	for i, val := range body.Targets {
+		v.Targets[i] = unmarshalTargetUserRequestBodyToTasksserviceTargetUser(val)
 	}
 	v.TaskID = taskID
 	v.Token = token
@@ -121,13 +187,109 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 // ValidateUploadFileRequestBody runs the validations defined on Upload
 // FileRequestBody
 func ValidateUploadFileRequestBody(body *UploadFileRequestBody) (err error) {
-	if body.FileType == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("file_type", "body"))
+	if body.Bots == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bots", "body"))
 	}
-	if body.FileType != nil {
-		if !(*body.FileType == 1 || *body.FileType == 2 || *body.FileType == 3) {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.file_type", *body.FileType, []interface{}{1, 2, 3}))
+	if body.Proxies == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("proxies", "body"))
+	}
+	if body.Targets == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("targets", "body"))
+	}
+	for _, e := range body.Bots {
+		if e != nil {
+			if err2 := ValidateBotAccountRequestBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
+	}
+	for _, e := range body.Proxies {
+		if e != nil {
+			if err2 := ValidateProxyRequestBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Targets {
+		if e != nil {
+			if err2 := ValidateTargetUserRequestBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateBotAccountRequestBody runs the validations defined on
+// BotAccountRequestBody
+func ValidateBotAccountRequestBody(body *BotAccountRequestBody) (err error) {
+	if body.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
+	}
+	if body.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	if body.UserAgent == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user_agent", "body"))
+	}
+	if body.DeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("device_id", "body"))
+	}
+	if body.UUID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("uuid", "body"))
+	}
+	if body.PhoneID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("phone_id", "body"))
+	}
+	if body.AdvertisingID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("advertising_id", "body"))
+	}
+	if body.FamilyDeviceID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("family_device_id", "body"))
+	}
+	if body.Headers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("headers", "body"))
+	}
+	if body.UUID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.uuid", *body.UUID, goa.FormatUUID))
+	}
+	if body.PhoneID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.phone_id", *body.PhoneID, goa.FormatUUID))
+	}
+	if body.AdvertisingID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.advertising_id", *body.AdvertisingID, goa.FormatUUID))
+	}
+	if body.FamilyDeviceID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.family_device_id", *body.FamilyDeviceID, goa.FormatUUID))
+	}
+	return
+}
+
+// ValidateProxyRequestBody runs the validations defined on ProxyRequestBody
+func ValidateProxyRequestBody(body *ProxyRequestBody) (err error) {
+	if body.Host == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("host", "body"))
+	}
+	if body.Port == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("port", "body"))
+	}
+	if body.Login == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("login", "body"))
+	}
+	if body.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	return
+}
+
+// ValidateTargetUserRequestBody runs the validations defined on
+// TargetUserRequestBody
+func ValidateTargetUserRequestBody(body *TargetUserRequestBody) (err error) {
+	if body.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
+	}
+	if body.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user_id", "body"))
 	}
 	return
 }

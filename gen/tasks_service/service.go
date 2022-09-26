@@ -19,7 +19,7 @@ type Service interface {
 	// создать драфт задачи
 	CreateTaskDraft(context.Context, *CreateTaskDraftPayload) (res string, err error)
 	// загрузить файл с пользователями, прокси
-	UploadFile(context.Context, *UploadFilePayload) (err error)
+	UploadFile(context.Context, *UploadFilePayload) (res []*UploadError, err error)
 	// начать выполнение задачи
 	StartTask(context.Context, *StartTaskPayload) (err error)
 	// остановить выполнение задачи
@@ -45,6 +45,24 @@ const ServiceName = "tasks_service"
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
 var MethodNames = [6]string{"create task draft", "upload file", "start task", "stop task", "get task", "list tasks"}
+
+type BotAccount struct {
+	// login
+	Username string
+	// login
+	Password string
+	// user agent header
+	UserAgent string `json:"user_agent"`
+	// main id, ex: android-0d735e1f4db26782
+	DeviceID string `json:"device_id"`
+	UUID     string
+	// phone_id
+	PhoneID string `json:"phone_id"`
+	// adv id
+	AdvertisingID  string `json:"advertising_id"`
+	FamilyDeviceID string `json:"family_device_id"`
+	Headers        map[string]string
+}
 
 // CreateTaskDraftPayload is the payload type of the tasks_service service
 // create task draft method.
@@ -75,6 +93,15 @@ type ListTasksPayload struct {
 	Token string
 }
 
+type Proxy struct {
+	// адрес прокси
+	Host string
+	// номер порта
+	Port     int64
+	Login    string
+	Password string
+}
+
 // StartTaskPayload is the payload type of the tasks_service service start task
 // method.
 type StartTaskPayload struct {
@@ -93,6 +120,24 @@ type StopTaskPayload struct {
 	TaskID string `json:"task_id"`
 }
 
+type TargetUser struct {
+	// instagram username
+	Username string
+	// instagram user id
+	UserID int64 `json:"user_id"`
+}
+
+type UploadError struct {
+	// 1 - список ботов
+	// 2 - список прокси
+	// 3 - список получателей рекламы
+	Type int
+	Line int
+	// номер порта
+	Input  string
+	Reason string
+}
+
 // UploadFilePayload is the payload type of the tasks_service service upload
 // file method.
 type UploadFilePayload struct {
@@ -100,16 +145,12 @@ type UploadFilePayload struct {
 	Token string
 	// id задачи, в которую загружаем пользователей/прокси
 	TaskID string `json:"task_id"`
-	// 1 - список ботов
-	// 2 - список резидентских прокси
-	// 3 - спиок прокси-шестёрок
-	FileType int
-	// содержимое файла
-	ProxyBytes []byte `json:"proxy_bytes"`
 	// список ботов
-	BotsBytes []byte `json:"bots_bytes"`
-	// изображение для поста
-	ImageBytes []byte `json:"proxy_bytes"`
+	Bots []*BotAccount
+	// список проксей для использования
+	Proxies []*Proxy
+	// список аккаунтов, которым показать надо рекламу
+	Targets []*TargetUser
 }
 
 // Invalid request
