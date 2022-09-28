@@ -20,6 +20,10 @@ type Service interface {
 	CreateTaskDraft(context.Context, *CreateTaskDraftPayload) (res string, err error)
 	// загрузить файл с пользователями, прокси
 	UploadFile(context.Context, *UploadFilePayload) (res []*UploadError, err error)
+	// присвоить ботам прокси
+	AssignProxies(context.Context, *AssignProxiesPayload) (err error)
+	// удалить задачу и все связанные с ней сущности. Использовать только для тестов
+	ForceDelete(context.Context, *ForceDeletePayload) (err error)
 	// начать выполнение задачи
 	StartTask(context.Context, *StartTaskPayload) (err error)
 	// остановить выполнение задачи
@@ -44,7 +48,16 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"create task draft", "upload file", "start task", "stop task", "get task", "list tasks"}
+var MethodNames = [8]string{"create task draft", "upload file", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
+
+// AssignProxiesPayload is the payload type of the tasks_service service assign
+// proxies method.
+type AssignProxiesPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+}
 
 type BotAccountRecord struct {
 	Record []string
@@ -63,6 +76,15 @@ type CreateTaskDraftPayload struct {
 	TextTemplate string `json:"text_template"`
 	// фотография для постов
 	PostImage string `json:"post_image"`
+}
+
+// ForceDeletePayload is the payload type of the tasks_service service force
+// delete method.
+type ForceDeletePayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
 }
 
 // GetTaskPayload is the payload type of the tasks_service service get task

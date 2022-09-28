@@ -176,9 +176,60 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
-	// Method("assign proxies", func() {
-	// 	TODO add endpoint description
-	// })
+	Method("assign proxies", func() {
+		Description("присвоить ботам прокси")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("token", "task_id")
+		})
+
+		HTTP(func() {
+			POST("/api/tasks/{task_id}/assign")
+			Response(StatusOK)
+			Response(StatusBadRequest)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
+	Method("force delete", func() {
+		Description("удалить задачу и все связанные с ней сущности. Использовать только для тестов")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("token", "task_id")
+		})
+
+		HTTP(func() {
+			DELETE("/api/tasks/{task_id}/force")
+			Response(StatusOK)
+			Response(StatusBadRequest)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+			Response(StatusInternalServerError)
+		})
+	})
 
 	Method("start task", func() {
 		Description("начать выполнение задачи ")

@@ -21,6 +21,16 @@ func UploadFileTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/upload", taskID)
 }
 
+// AssignProxiesTasksServicePath returns the URL path to the tasks_service service assign proxies HTTP endpoint.
+func AssignProxiesTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/assign", taskID)
+}
+
+// ForceDeleteTasksServicePath returns the URL path to the tasks_service service force delete HTTP endpoint.
+func ForceDeleteTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/force", taskID)
+}
+
 // StartTaskTasksServicePath returns the URL path to the tasks_service service start task HTTP endpoint.
 func StartTaskTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/start", taskID)

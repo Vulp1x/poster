@@ -19,6 +19,7 @@ type taskStore interface {
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
 	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers) error
+	ForceDelete(ctx context.Context, taskID uuid.UUID) error
 }
 
 // tasks_service service example implementation.
@@ -160,4 +161,31 @@ func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.Uploa
 	}
 
 	return uploadErrors, nil
+}
+
+func (s *tasksServicesrvc) AssignProxies(ctx context.Context, payload *tasksservice.AssignProxiesPayload) (err error) {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.ForceDeletePayload) error {
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
+		return tasksservice.BadRequest("bad task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	err = s.store.ForceDelete(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to force delete task: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return tasksservice.TaskNotFound("")
+		}
+
+		return tasksservice.InternalError("")
+	}
+
+	return nil
 }

@@ -18,6 +18,8 @@ import (
 type Endpoints struct {
 	CreateTaskDraft goa.Endpoint
 	UploadFile      goa.Endpoint
+	AssignProxies   goa.Endpoint
+	ForceDelete     goa.Endpoint
 	StartTask       goa.Endpoint
 	StopTask        goa.Endpoint
 	GetTask         goa.Endpoint
@@ -31,6 +33,8 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		CreateTaskDraft: NewCreateTaskDraftEndpoint(s, a.JWTAuth),
 		UploadFile:      NewUploadFileEndpoint(s, a.JWTAuth),
+		AssignProxies:   NewAssignProxiesEndpoint(s, a.JWTAuth),
+		ForceDelete:     NewForceDeleteEndpoint(s, a.JWTAuth),
 		StartTask:       NewStartTaskEndpoint(s, a.JWTAuth),
 		StopTask:        NewStopTaskEndpoint(s, a.JWTAuth),
 		GetTask:         NewGetTaskEndpoint(s, a.JWTAuth),
@@ -43,6 +47,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateTaskDraft = m(e.CreateTaskDraft)
 	e.UploadFile = m(e.UploadFile)
+	e.AssignProxies = m(e.AssignProxies)
+	e.ForceDelete = m(e.ForceDelete)
 	e.StartTask = m(e.StartTask)
 	e.StopTask = m(e.StopTask)
 	e.GetTask = m(e.GetTask)
@@ -84,6 +90,44 @@ func NewUploadFileEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 			return nil, err
 		}
 		return s.UploadFile(ctx, p)
+	}
+}
+
+// NewAssignProxiesEndpoint returns an endpoint function that calls the method
+// "assign proxies" of service "tasks_service".
+func NewAssignProxiesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AssignProxiesPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.AssignProxies(ctx, p)
+	}
+}
+
+// NewForceDeleteEndpoint returns an endpoint function that calls the method
+// "force delete" of service "tasks_service".
+func NewForceDeleteEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ForceDeletePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.ForceDelete(ctx, p)
 	}
 }
 

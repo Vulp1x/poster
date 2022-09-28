@@ -116,6 +116,26 @@ func NewUploadFilePayload(body *UploadFileRequestBody, taskID string, token stri
 	return v
 }
 
+// NewAssignProxiesPayload builds a tasks_service service assign proxies
+// endpoint payload.
+func NewAssignProxiesPayload(taskID string, token string) *tasksservice.AssignProxiesPayload {
+	v := &tasksservice.AssignProxiesPayload{}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
+// NewForceDeletePayload builds a tasks_service service force delete endpoint
+// payload.
+func NewForceDeletePayload(taskID string, token string) *tasksservice.ForceDeletePayload {
+	v := &tasksservice.ForceDeletePayload{}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
 // NewStartTaskPayload builds a tasks_service service start task endpoint
 // payload.
 func NewStartTaskPayload(taskID string, token string) *tasksservice.StartTaskPayload {
@@ -213,6 +233,12 @@ func ValidateBotAccountRecordRequestBody(body *BotAccountRecordRequestBody) (err
 	if body.LineNumber == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("line_number", "body"))
 	}
+	if len(body.Record) < 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 4, true))
+	}
+	if len(body.Record) > 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 4, false))
+	}
 	return
 }
 
@@ -225,6 +251,12 @@ func ValidateProxyRecordRequestBody(body *ProxyRecordRequestBody) (err error) {
 	if body.LineNumber == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("line_number", "body"))
 	}
+	if len(body.Record) < 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 4, true))
+	}
+	if len(body.Record) > 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 4, false))
+	}
 	return
 }
 
@@ -236,6 +268,12 @@ func ValidateTargetUserRecordRequestBody(body *TargetUserRecordRequestBody) (err
 	}
 	if body.LineNumber == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("line_number", "body"))
+	}
+	if len(body.Record) < 2 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 2, true))
+	}
+	if len(body.Record) > 2 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.record", body.Record, len(body.Record), 2, false))
 	}
 	return
 }

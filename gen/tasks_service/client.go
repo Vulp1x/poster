@@ -17,6 +17,8 @@ import (
 type Client struct {
 	CreateTaskDraftEndpoint goa.Endpoint
 	UploadFileEndpoint      goa.Endpoint
+	AssignProxiesEndpoint   goa.Endpoint
+	ForceDeleteEndpoint     goa.Endpoint
 	StartTaskEndpoint       goa.Endpoint
 	StopTaskEndpoint        goa.Endpoint
 	GetTaskEndpoint         goa.Endpoint
@@ -24,10 +26,12 @@ type Client struct {
 }
 
 // NewClient initializes a "tasks_service" service client given the endpoints.
-func NewClient(createTaskDraft, uploadFile, startTask, stopTask, getTask, listTasks goa.Endpoint) *Client {
+func NewClient(createTaskDraft, uploadFile, assignProxies, forceDelete, startTask, stopTask, getTask, listTasks goa.Endpoint) *Client {
 	return &Client{
 		CreateTaskDraftEndpoint: createTaskDraft,
 		UploadFileEndpoint:      uploadFile,
+		AssignProxiesEndpoint:   assignProxies,
+		ForceDeleteEndpoint:     forceDelete,
 		StartTaskEndpoint:       startTask,
 		StopTaskEndpoint:        stopTask,
 		GetTaskEndpoint:         getTask,
@@ -66,6 +70,31 @@ func (c *Client) UploadFile(ctx context.Context, p *UploadFilePayload) (res []*U
 		return
 	}
 	return ires.([]*UploadError), nil
+}
+
+// AssignProxies calls the "assign proxies" endpoint of the "tasks_service"
+// service.
+// AssignProxies may return the following errors:
+//   - "unauthorized" (type Unauthorized)
+//   - "bad request" (type BadRequest)
+//   - "internal error" (type InternalError)
+//   - "task not found" (type TaskNotFound)
+//   - error: internal error
+func (c *Client) AssignProxies(ctx context.Context, p *AssignProxiesPayload) (err error) {
+	_, err = c.AssignProxiesEndpoint(ctx, p)
+	return
+}
+
+// ForceDelete calls the "force delete" endpoint of the "tasks_service" service.
+// ForceDelete may return the following errors:
+//   - "unauthorized" (type Unauthorized)
+//   - "bad request" (type BadRequest)
+//   - "internal error" (type InternalError)
+//   - "task not found" (type TaskNotFound)
+//   - error: internal error
+func (c *Client) ForceDelete(ctx context.Context, p *ForceDeletePayload) (err error) {
+	_, err = c.ForceDeleteEndpoint(ctx, p)
+	return
 }
 
 // StartTask calls the "start task" endpoint of the "tasks_service" service.

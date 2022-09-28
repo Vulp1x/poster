@@ -24,7 +24,7 @@ func BuildAddManagerPayload(adminServiceAddManagerBody string, adminServiceAddMa
 	{
 		err = json.Unmarshal([]byte(adminServiceAddManagerBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"login\": \"Ipsum sunt ab distinctio.\",\n      \"password\": \"bjc\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"login\": \"Repellendus odit culpa.\",\n      \"password\": \"51n\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 4 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 4, true))

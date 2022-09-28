@@ -163,6 +163,59 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 	return i, err
 }
 
+const forceDeleteBotAccountsForTask = `-- name: ForceDeleteBotAccountsForTask :execrows
+DELETE
+FROM bot_accounts
+where task_id = $1
+`
+
+func (q *Queries) ForceDeleteBotAccountsForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, forceDeleteBotAccountsForTask, taskID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const forceDeleteProxiesForTask = `-- name: ForceDeleteProxiesForTask :execrows
+DELETE
+FROM proxies
+where task_id = $1
+`
+
+func (q *Queries) ForceDeleteProxiesForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, forceDeleteProxiesForTask, taskID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const forceDeleteTargetUsersForTask = `-- name: ForceDeleteTargetUsersForTask :execrows
+DELETE
+FROM target_users
+where task_id = $1
+`
+
+func (q *Queries) ForceDeleteTargetUsersForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, forceDeleteTargetUsersForTask, taskID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const forceDeleteTaskByID = `-- name: ForceDeleteTaskByID :exec
+DELETE
+FROM tasks
+where id = $1
+`
+
+func (q *Queries) ForceDeleteTaskByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, forceDeleteTaskByID, id)
+	return err
+}
+
 const getBotByID = `-- name: GetBotByID :one
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
 from bot_accounts

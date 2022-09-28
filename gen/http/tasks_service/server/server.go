@@ -22,6 +22,8 @@ type Server struct {
 	Mounts          []*MountPoint
 	CreateTaskDraft http.Handler
 	UploadFile      http.Handler
+	AssignProxies   http.Handler
+	ForceDelete     http.Handler
 	StartTask       http.Handler
 	StopTask        http.Handler
 	GetTask         http.Handler
@@ -68,6 +70,8 @@ func New(
 		Mounts: []*MountPoint{
 			{"CreateTaskDraft", "POST", "/api/tasks/draft"},
 			{"UploadFile", "POST", "/api/tasks/{task_id}/upload"},
+			{"AssignProxies", "POST", "/api/tasks/{task_id}/assign"},
+			{"ForceDelete", "DELETE", "/api/tasks/{task_id}/force"},
 			{"StartTask", "POST", "/api/tasks/{task_id}/start"},
 			{"StopTask", "POST", "/api/tasks/{task_id}/stop"},
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
@@ -75,6 +79,8 @@ func New(
 		},
 		CreateTaskDraft: NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
 		UploadFile:      NewUploadFileHandler(e.UploadFile, mux, NewTasksServiceUploadFileDecoder(mux, tasksServiceUploadFileDecoderFn), encoder, errhandler, formatter),
+		AssignProxies:   NewAssignProxiesHandler(e.AssignProxies, mux, decoder, encoder, errhandler, formatter),
+		ForceDelete:     NewForceDeleteHandler(e.ForceDelete, mux, decoder, encoder, errhandler, formatter),
 		StartTask:       NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
 		StopTask:        NewStopTaskHandler(e.StopTask, mux, decoder, encoder, errhandler, formatter),
 		GetTask:         NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
@@ -89,6 +95,8 @@ func (s *Server) Service() string { return "tasks_service" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.CreateTaskDraft = m(s.CreateTaskDraft)
 	s.UploadFile = m(s.UploadFile)
+	s.AssignProxies = m(s.AssignProxies)
+	s.ForceDelete = m(s.ForceDelete)
 	s.StartTask = m(s.StartTask)
 	s.StopTask = m(s.StopTask)
 	s.GetTask = m(s.GetTask)
@@ -99,6 +107,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountCreateTaskDraftHandler(mux, h.CreateTaskDraft)
 	MountUploadFileHandler(mux, h.UploadFile)
+	MountAssignProxiesHandler(mux, h.AssignProxies)
+	MountForceDeleteHandler(mux, h.ForceDelete)
 	MountStartTaskHandler(mux, h.StartTask)
 	MountStopTaskHandler(mux, h.StopTask)
 	MountGetTaskHandler(mux, h.GetTask)
@@ -191,6 +201,108 @@ func NewUploadFileHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "upload file")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountAssignProxiesHandler configures the mux to serve the "tasks_service"
+// service "assign proxies" endpoint.
+func MountAssignProxiesHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/tasks/{task_id}/assign", f)
+}
+
+// NewAssignProxiesHandler creates a HTTP handler which loads the HTTP request
+// and calls the "tasks_service" service "assign proxies" endpoint.
+func NewAssignProxiesHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAssignProxiesRequest(mux, decoder)
+		encodeResponse = EncodeAssignProxiesResponse(encoder)
+		encodeError    = EncodeAssignProxiesError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "assign proxies")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountForceDeleteHandler configures the mux to serve the "tasks_service"
+// service "force delete" endpoint.
+func MountForceDeleteHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/api/tasks/{task_id}/force", f)
+}
+
+// NewForceDeleteHandler creates a HTTP handler which loads the HTTP request
+// and calls the "tasks_service" service "force delete" endpoint.
+func NewForceDeleteHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeForceDeleteRequest(mux, decoder)
+		encodeResponse = EncodeForceDeleteResponse(encoder)
+		encodeError    = EncodeForceDeleteError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "force delete")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

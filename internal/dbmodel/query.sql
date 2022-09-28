@@ -79,3 +79,23 @@ values ($1, $2, $3, $4, $5, $6);
 -- name: SaveTargetUsers :copyfrom
 insert into target_users (task_id, username, user_id)
 values ($1, $2, $3);
+
+-- name: ForceDeleteBotAccountsForTask :execrows
+DELETE
+FROM bot_accounts
+where task_id = $1;
+
+-- name: ForceDeleteProxiesForTask :execrows
+DELETE
+FROM proxies
+where task_id = $1;
+
+-- name: ForceDeleteTargetUsersForTask :execrows
+DELETE
+FROM target_users
+where task_id = $1;
+
+-- name: ForceDeleteTaskByID :exec
+DELETE
+FROM tasks
+where id = $1;

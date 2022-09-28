@@ -26,6 +26,55 @@ type Store struct {
 	txf         dbmodel.TxFunc
 }
 
+func (s *Store) ForceDelete(ctx context.Context, taskID uuid.UUID) error {
+	tx, err := s.txf(ctx)
+	if err != nil {
+		return store.ErrTransactionFail
+	}
+
+	defer dbtx.RollbackUnlessCommitted(ctx, tx)
+
+	q := dbmodel.New(tx)
+
+	_, err = q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrTaskNotFound
+		}
+
+		return fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
+	}
+	var deleteCount int64
+
+	deleteCount, err = q.ForceDeleteBotAccountsForTask(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to delete bot accounts: %v", err)
+	}
+
+	logger.Infof(ctx, "deleted %d bot accounts", deleteCount)
+
+	deleteCount, err = q.ForceDeleteProxiesForTask(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to delete proxies: %v", err)
+	}
+
+	logger.Infof(ctx, "deleted %d proxies", deleteCount)
+
+	deleteCount, err = q.ForceDeleteTargetUsersForTask(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to delete target users: %v", err)
+	}
+
+	logger.Infof(ctx, "deleted %d target users", deleteCount)
+
+	err = q.ForceDeleteTaskByID(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to delete task: %v", err)
+	}
+
+	return tx.Commit(ctx)
+}
+
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")
 

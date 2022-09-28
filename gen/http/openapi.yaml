@@ -261,6 +261,88 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
+  /api/tasks/{task_id}/assign:
+    post:
+      tags:
+        - tasks_service
+      summary: assign proxies tasks_service
+      description: присвоить ботам прокси
+      operationId: tasks_service#assign proxies
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: JWT used for authentication
+          required: true
+          type: string
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: Bad Request response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            type: string
+        "404":
+          description: Not Found response.
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error response.
+          schema:
+            type: string
+      schemes:
+        - http
+      security:
+        - jwt_header_Authorization: []
+  /api/tasks/{task_id}/force:
+    delete:
+      tags:
+        - tasks_service
+      summary: force delete tasks_service
+      description: удалить задачу и все связанные с ней сущности. Использовать только для тестов
+      operationId: tasks_service#force delete
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: JWT used for authentication
+          required: true
+          type: string
+      responses:
+        "200":
+          description: OK response.
+        "400":
+          description: Bad Request response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            type: string
+        "404":
+          description: Not Found response.
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error response.
+          schema:
+            type: string
+      schemes:
+        - http
+      security:
+        - jwt_header_Authorization: []
   /api/tasks/{task_id}/start:
     post:
       tags:
@@ -454,14 +536,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Ut quae dolorem similique.
+        example: Perspiciatis non id.
       password:
         type: string
-        example: 3mz
+        example: zlr
         minLength: 4
     example:
-      login: Odit accusamus officia ipsum.
-      password: b0n
+      login: Alias blanditiis provident voluptatem.
+      password: tdb
     required:
       - login
       - password
@@ -484,23 +566,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 805747189354476226
+        example: 6422064375054389602
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Totam labore amet ut iure praesentium.
+          example: Ea numquam.
         example:
-          - Eligendi accusantium enim.
-          - Ullam in.
+          - Ut et iusto eum veniam.
+          - Quas dolor deleniti nesciunt.
+          - A dolor.
+        minItems: 4
+        maxItems: 4
     example:
-      line_number: 8997517691232061191
+      line_number: 3025855469475495301
       record:
-        - Deleniti ut aut atque quod tenetur rerum.
-        - Labore impedit repellat.
-        - Accusamus dolor rerum est velit optio quod.
-        - Aut blanditiis dolore.
+        - Consequatur rerum.
+        - Ab qui excepturi laborum.
+        - Qui quos nostrum mollitia consequuntur.
     required:
       - record
       - line_number
@@ -511,22 +595,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 4045927282778919969
+        example: 7319450387844346941
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Id omnis perspiciatis expedita architecto aut.
+          example: Ex ipsa.
         example:
-          - Provident voluptatem tempora culpa voluptas delectus voluptatem.
-          - Iste et illum.
+          - Quia rem nostrum sint dolorum.
+          - Blanditiis ex alias.
+          - Dolores laboriosam vel velit doloremque.
+        minItems: 4
+        maxItems: 4
     example:
-      line_number: 7091889729056040715
+      line_number: 7043087570200238910
       record:
-        - Pariatur enim aut nobis aut eum enim.
-        - Amet reiciendis dicta quibusdam neque dolores.
-        - Sit sit voluptatem quo quo velit.
+        - Quas nisi sapiente eos debitis in et.
+        - Et dolorem qui qui libero voluptatum.
+        - Quam eius amet assumenda.
     required:
       - record
       - line_number
@@ -537,23 +624,23 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 8585427626504546023
+        example: 215687653494101828
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Assumenda blanditiis.
+          example: Et pariatur.
         example:
-          - Saepe quidem neque perspiciatis rerum explicabo.
-          - Omnis reiciendis illo maiores dolorem quia.
+          - Nam qui quibusdam in pariatur.
+          - Ratione quas molestias quaerat corporis.
+        minItems: 2
+        maxItems: 2
     example:
-      line_number: 20116900574216398
+      line_number: 5667556114527130137
       record:
-        - Labore consequuntur explicabo perspiciatis et.
-        - Cumque et.
-        - Ea numquam.
-        - Ut et iusto eum veniam.
+        - Velit excepturi consequatur.
+        - Itaque cupiditate.
     required:
       - record
       - line_number
@@ -564,19 +651,19 @@ definitions:
       post_image:
         type: string
         description: фотография для постов
-        example: Et molestiae quam beatae quas eum.
+        example: Aut nobis aut eum enim reprehenderit.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Sunt officia inventore.
+        example: Velit nostrum optio pariatur.
       title:
         type: string
         description: название задачи
-        example: Possimus deleniti.
+        example: Eos iste et.
     example:
-      post_image: Veniam qui.
-      text_template: Ut commodi inventore libero et accusantium commodi.
-      title: Aliquam nihil.
+      post_image: Velit qui enim.
+      text_template: Dolores molestiae sit sit voluptatem quo.
+      title: Reiciendis dicta quibusdam.
     required:
       - title
       - text_template
@@ -591,108 +678,107 @@ definitions:
           $ref: '#/definitions/BotAccountRecordRequestBody'
         description: список ботов
         example:
-          - line_number: 6957168655539073176
+          - line_number: 2724879934005373904
             record:
-              - Deserunt eum ea et.
-              - Quia reprehenderit.
-          - line_number: 6957168655539073176
+              - Necessitatibus deserunt eum ea.
+              - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+              - Veniam ratione culpa.
+          - line_number: 2724879934005373904
             record:
-              - Deserunt eum ea et.
-              - Quia reprehenderit.
-          - line_number: 6957168655539073176
+              - Necessitatibus deserunt eum ea.
+              - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+              - Veniam ratione culpa.
+          - line_number: 2724879934005373904
             record:
-              - Deserunt eum ea et.
-              - Quia reprehenderit.
-          - line_number: 6957168655539073176
+              - Necessitatibus deserunt eum ea.
+              - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+              - Veniam ratione culpa.
+          - line_number: 2724879934005373904
             record:
-              - Deserunt eum ea et.
-              - Quia reprehenderit.
+              - Necessitatibus deserunt eum ea.
+              - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+              - Veniam ratione culpa.
       proxies:
         type: array
         items:
           $ref: '#/definitions/ProxyRecordRequestBody'
         description: список проксей для использования
         example:
-          - line_number: 44191890423975802
+          - line_number: 6373588431339295647
             record:
-              - Laudantium veniam ratione culpa non ad.
               - Est dolorem corporis fugit fugiat.
               - Quisquam itaque nisi.
-          - line_number: 44191890423975802
+              - Voluptatem natus.
+          - line_number: 6373588431339295647
             record:
-              - Laudantium veniam ratione culpa non ad.
               - Est dolorem corporis fugit fugiat.
               - Quisquam itaque nisi.
-          - line_number: 44191890423975802
+              - Voluptatem natus.
+          - line_number: 6373588431339295647
             record:
-              - Laudantium veniam ratione culpa non ad.
               - Est dolorem corporis fugit fugiat.
               - Quisquam itaque nisi.
-          - line_number: 44191890423975802
+              - Voluptatem natus.
+          - line_number: 6373588431339295647
             record:
-              - Laudantium veniam ratione culpa non ad.
               - Est dolorem corporis fugit fugiat.
               - Quisquam itaque nisi.
+              - Voluptatem natus.
       targets:
         type: array
         items:
           $ref: '#/definitions/TargetUserRecordRequestBody'
         description: список аккаунтов, которым показать надо рекламу
         example:
-          - line_number: 5176427869412771911
+          - line_number: 4094789948831010935
             record:
-              - Impedit doloremque qui magni molestiae fugiat.
-              - Excepturi eos aspernatur.
-          - line_number: 5176427869412771911
+              - Qui magni molestiae.
+              - Voluptas excepturi.
+          - line_number: 4094789948831010935
             record:
-              - Impedit doloremque qui magni molestiae fugiat.
-              - Excepturi eos aspernatur.
-          - line_number: 5176427869412771911
-            record:
-              - Impedit doloremque qui magni molestiae fugiat.
-              - Excepturi eos aspernatur.
-          - line_number: 5176427869412771911
-            record:
-              - Impedit doloremque qui magni molestiae fugiat.
-              - Excepturi eos aspernatur.
+              - Qui magni molestiae.
+              - Voluptas excepturi.
     example:
       bots:
-        - line_number: 6957168655539073176
+        - line_number: 2724879934005373904
           record:
-            - Deserunt eum ea et.
-            - Quia reprehenderit.
-        - line_number: 6957168655539073176
+            - Necessitatibus deserunt eum ea.
+            - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+            - Veniam ratione culpa.
+        - line_number: 2724879934005373904
           record:
-            - Deserunt eum ea et.
-            - Quia reprehenderit.
-        - line_number: 6957168655539073176
-          record:
-            - Deserunt eum ea et.
-            - Quia reprehenderit.
-        - line_number: 6957168655539073176
-          record:
-            - Deserunt eum ea et.
-            - Quia reprehenderit.
+            - Necessitatibus deserunt eum ea.
+            - Adipisci quia reprehenderit repellendus est tenetur consequatur.
+            - Veniam ratione culpa.
       proxies:
-        - line_number: 44191890423975802
+        - line_number: 6373588431339295647
           record:
-            - Laudantium veniam ratione culpa non ad.
             - Est dolorem corporis fugit fugiat.
             - Quisquam itaque nisi.
-        - line_number: 44191890423975802
+            - Voluptatem natus.
+        - line_number: 6373588431339295647
           record:
-            - Laudantium veniam ratione culpa non ad.
             - Est dolorem corporis fugit fugiat.
             - Quisquam itaque nisi.
+            - Voluptatem natus.
+        - line_number: 6373588431339295647
+          record:
+            - Est dolorem corporis fugit fugiat.
+            - Quisquam itaque nisi.
+            - Voluptatem natus.
       targets:
-        - line_number: 5176427869412771911
+        - line_number: 4094789948831010935
           record:
-            - Impedit doloremque qui magni molestiae fugiat.
-            - Excepturi eos aspernatur.
-        - line_number: 5176427869412771911
+            - Qui magni molestiae.
+            - Voluptas excepturi.
+        - line_number: 4094789948831010935
           record:
-            - Impedit doloremque qui magni molestiae fugiat.
-            - Excepturi eos aspernatur.
+            - Qui magni molestiae.
+            - Voluptas excepturi.
+        - line_number: 4094789948831010935
+          record:
+            - Qui magni molestiae.
+            - Voluptas excepturi.
     required:
       - bots
       - proxies
@@ -704,30 +790,30 @@ definitions:
       input:
         type: string
         description: номер порта
-        example: Porro sed.
+        example: Nihil exercitationem saepe quidem neque perspiciatis rerum.
       line:
         type: integer
-        example: 8927489701869832308
+        example: 1789036758941930528
         format: int64
       reason:
         type: string
-        example: Molestiae voluptatem.
+        example: Sunt omnis reiciendis illo maiores dolorem quia.
       type:
         type: integer
         description: |2-
            1 - список ботов
               2 - список прокси
               3 - список получателей рекламы
-        example: 2
+        example: 3
         enum:
           - 1
           - 2
           - 3
     example:
-      input: Qui impedit perferendis.
-      line: 6428177388369134679
-      reason: Ducimus voluptate hic dicta impedit.
-      type: 1
+      input: Labore consequuntur explicabo perspiciatis et.
+      line: 2606336897386619681
+      reason: Cumque et.
+      type: 2
     required:
       - type
       - line
