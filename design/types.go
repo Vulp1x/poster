@@ -15,7 +15,10 @@ var Creds = Type("Creds", func() {
 
 // BotAccountRecord defines set of bot's fields and line in input file
 var BotAccountRecord = Type("BotAccountRecord", func() {
-	Attribute("record", ArrayOf(String))
+	Attribute("record", ArrayOf(String), func() {
+		MinLength(4)
+		MaxLength(4)
+	})
 	Attribute("line_number", Int, "номер строки в исходном файле", func() {
 		Meta("struct:tag:json", "line_number")
 	})
@@ -24,7 +27,10 @@ var BotAccountRecord = Type("BotAccountRecord", func() {
 
 // TargetUserRecord описывает пользователя, которому будет показана реклама
 var TargetUserRecord = Type("TargetUserRecord", func() {
-	Attribute("record", ArrayOf(String))
+	Attribute("record", ArrayOf(String), func() {
+		MinLength(2)
+		MaxLength(2)
+	})
 	Attribute("line_number", Int, "номер строки в исходном файле", func() {
 		Meta("struct:tag:json", "line_number")
 	})
@@ -33,7 +39,10 @@ var TargetUserRecord = Type("TargetUserRecord", func() {
 
 // ProxyRecord описывает пользователя, которому будет показана реклама
 var ProxyRecord = Type("ProxyRecord", func() {
-	Attribute("record", ArrayOf(String))
+	Attribute("record", ArrayOf(String), func() {
+		MinLength(4)
+		MaxLength(4)
+	})
 	Attribute("line_number", Int, "номер строки в исходном файле", func() {
 		Meta("struct:tag:json", "line_number")
 	})

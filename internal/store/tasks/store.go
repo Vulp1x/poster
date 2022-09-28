@@ -2,15 +2,19 @@ package tasks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
+	"github.com/inst-api/poster/internal/dbtx"
 	"github.com/inst-api/poster/internal/domain"
+	"github.com/inst-api/poster/internal/store"
 	"github.com/inst-api/poster/internal/transport"
 	"github.com/inst-api/poster/pkg/logger"
+	"github.com/jackc/pgx/v4"
 )
 
 type Store struct {
@@ -19,14 +23,79 @@ type Store struct {
 	taskMu      *sync.Mutex
 	pushTimeout time.Duration
 	dbtxf       dbmodel.DBTXFunc
+	txf         dbmodel.TxFunc
 }
 
-func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc) *Store {
+// ErrTaskNotFound не смогли найти таску
+var ErrTaskNotFound = errors.New("task not found")
+
+var ErrTaskInvalidStatus = errors.New("invalid task status")
+
+func (s *Store) PrepareTask(
+	ctx context.Context,
+	taskID uuid.UUID,
+	botAccounts domain.BotAccounts,
+	proxies domain.Proxies,
+	targets domain.TargetUsers,
+) error {
+	tx, err := s.txf(ctx)
+	if err != nil {
+		return store.ErrTransactionFail
+	}
+
+	defer dbtx.RollbackUnlessCommitted(ctx, tx)
+
+	q := dbmodel.New(tx)
+
+	task, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrTaskNotFound
+		}
+
+		return fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
+	}
+
+	if task.Status != dbmodel.DraftTaskStatus {
+		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DraftTaskStatus, task.Status)
+	}
+
+	savedCount, err := q.SaveBotAccounts(ctx, botAccounts.ToSaveParams(taskID))
+	logger.Infof(ctx, "saved %d bots", savedCount)
+	if err != nil {
+		return err
+	}
+
+	savedCount, err = q.SaveProxies(ctx, proxies.ToSaveParams(taskID))
+	logger.Infof(ctx, "saved %d proxies", savedCount)
+	if err != nil {
+		return err
+	}
+
+	savedCount, err = q.SaveTargetUsers(ctx, targets.ToSaveParams(taskID))
+	logger.Infof(ctx, "saved %d target users", savedCount)
+	if err != nil {
+		return err
+	}
+
+	err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
+		Status: dbmodel.DataUploadedTaskStatus,
+		ID:     taskID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
+}
+
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc) *Store {
 	return &Store{
 		tasksChan:   make(chan domain.TaskWithCtx, 10),
 		taskCancels: make(map[uuid.UUID]func()),
 		pushTimeout: timeout,
 		dbtxf:       dbtxFunc,
+		txf:         txFunc,
 	}
 }
 

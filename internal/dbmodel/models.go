@@ -22,8 +22,8 @@ type BotAccount struct {
 	Headers    headers.Base           `json:"headers"`
 	ResProxy   *Proxy                 `json:"res_proxy"`
 	WorkProxy  *Proxy                 `json:"work_proxy"`
-	Status     int16                  `json:"status"`
-	StartedAt  time.Time              `json:"started_at"`
+	Status     botStatus              `json:"status"`
+	StartedAt  *time.Time             `json:"started_at"`
 	CreatedAt  time.Time              `json:"created_at"`
 	UpdatedAt  *time.Time             `json:"updated_at"`
 	DeletedAt  *time.Time             `json:"deleted_at"`
@@ -44,7 +44,7 @@ type Proxy struct {
 	TaskID     uuid.UUID  `json:"task_id"`
 	AssignedTo *uuid.UUID `json:"assigned_to"`
 	Host       string     `json:"host"`
-	Port       string     `json:"port"`
+	Port       int32      `json:"port"`
 	Login      string     `json:"login"`
 	Pass       string     `json:"pass"`
 	Type       int16      `json:"type"`

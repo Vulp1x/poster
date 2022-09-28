@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/inst-api/poster/internal/headers"
 )
 
 const createDraftTask = `-- name: CreateDraftTask :one
@@ -212,6 +213,32 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+type SaveBotAccountsParams struct {
+	TaskID     uuid.UUID              `json:"task_id"`
+	Username   string                 `json:"username"`
+	Password   string                 `json:"password"`
+	UserAgent  string                 `json:"user_agent"`
+	DeviceData headers.DeviceSettings `json:"device_data"`
+	Session    headers.Session        `json:"session"`
+	Headers    headers.Base           `json:"headers"`
+	Status     botStatus              `json:"status"`
+}
+
+type SaveProxiesParams struct {
+	TaskID uuid.UUID `json:"task_id"`
+	Host   string    `json:"host"`
+	Port   int32     `json:"port"`
+	Login  string    `json:"login"`
+	Pass   string    `json:"pass"`
+	Type   int16     `json:"type"`
+}
+
+type SaveTargetUsersParams struct {
+	TaskID   uuid.UUID `json:"task_id"`
+	Username string    `json:"username"`
+	UserID   int64     `json:"user_id"`
+}
+
 const selectNow = `-- name: SelectNow :exec
 SELECT now()
 `
@@ -264,11 +291,16 @@ const updateTaskStatus = `-- name: UpdateTaskStatus :exec
 update tasks
 set status     = $1,
     updated_at = now()
-where id = $1
+where id = $2
 `
 
-func (q *Queries) UpdateTaskStatus(ctx context.Context, status taskStatus) error {
-	_, err := q.db.Exec(ctx, updateTaskStatus, status)
+type UpdateTaskStatusParams struct {
+	Status taskStatus `json:"status"`
+	ID     uuid.UUID  `json:"id"`
+}
+
+func (q *Queries) UpdateTaskStatus(ctx context.Context, arg UpdateTaskStatusParams) error {
+	_, err := q.db.Exec(ctx, updateTaskStatus, arg.Status, arg.ID)
 	return err
 }
 

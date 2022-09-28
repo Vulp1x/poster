@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/headers"
 )
@@ -30,7 +31,7 @@ func (b BotAccount) ProxyURL() *url.URL {
 
 	buf.WriteString(b.ResProxy.Host)
 	buf.WriteByte(':')
-	buf.WriteString(b.ResProxy.Port)
+	buf.WriteString(strconv.FormatInt(int64(b.ResProxy.Port), 10))
 
 	return &url.URL{
 		Scheme: "http",
@@ -39,8 +40,28 @@ func (b BotAccount) ProxyURL() *url.URL {
 	}
 }
 
-// Parse заполняет информацию об аккаунте
-func (b *BotAccount) Parse(fields []string) error {
+func ParseBotAccounts(bots []*tasksservice.BotAccountRecord) (BotAccounts, []*tasksservice.UploadError) {
+	botAccounts := make([]BotAccount, len(bots))
+	var errs []*tasksservice.UploadError
+	var err error
+
+	for i, botAccountRecord := range bots {
+		err = botAccounts[i].parse(botAccountRecord.Record)
+		if err != nil {
+			errs = append(errs, &tasksservice.UploadError{
+				Type:   tasksservice.BotAccountUploadErrorType,
+				Line:   botAccountRecord.LineNumber,
+				Input:  strings.Join(botAccountRecord.Record, "|"),
+				Reason: err.Error(),
+			})
+		}
+	}
+
+	return botAccounts, errs
+}
+
+// parse заполняет информацию об аккаунте
+func (b *BotAccount) parse(fields []string) error {
 	err := b.assignLoginAndPassword(fields[0])
 	if err != nil {
 		return err

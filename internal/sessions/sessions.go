@@ -33,7 +33,6 @@ var (
 // SessionClaims session parameters to validate.
 type SessionClaims struct {
 	UserID     uuid.UUID `json:"user_id"`
-	UniqueID   string    `json:"unique_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	ValidUntil time.Time `json:"valid_until"`
 }

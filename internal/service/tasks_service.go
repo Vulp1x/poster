@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 
 	"github.com/google/uuid"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
+	"github.com/inst-api/poster/internal/domain"
+	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
 )
@@ -15,6 +18,7 @@ type taskStore interface {
 	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
+	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers) error
 }
 
 // tasks_service service example implementation.
@@ -42,7 +46,7 @@ func (s *tasksServicesrvc) JWTAuth(ctx context.Context, token string, scheme *se
 
 // CreateTask создаёт драфт задачи
 func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.CreateTaskDraftPayload) (string, error) {
-	logger.Debug(ctx, "starting CreateTask with payload %#v", p)
+	logger.Debug(ctx, "starting CreateTask")
 
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {
@@ -117,5 +121,43 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 
 func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.UploadFilePayload) ([]*tasksservice.UploadError, error) {
 	logger.Debug(ctx, "starting UploadFile with payload %#v", p)
-	return nil, nil
+
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("bad task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	domainAccounts, uploadErrors := domain.ParseBotAccounts(p.Bots)
+	previousLen := len(uploadErrors)
+	logger.Infof(ctx, "got %d bots and %d errors from %d inputs", len(domainAccounts), previousLen, len(p.Bots))
+
+	domainProxies := domain.ParseProxies(p.Proxies, uploadErrors)
+	logger.Infof(ctx, "got %d proxies and %d errors from %d inputs",
+		len(domainProxies), len(uploadErrors)-previousLen, len(p.Proxies),
+	)
+
+	previousLen = len(uploadErrors)
+	domainTargets := domain.ParseTargetUsers(p.Targets, uploadErrors)
+	logger.Infof(ctx, "got %d targets and %d errors from %d inputs",
+		len(domainTargets), len(uploadErrors)-previousLen, len(p.Targets),
+	)
+
+	err = s.store.PrepareTask(ctx, taskID, domainAccounts, domainProxies, domainTargets)
+	if err != nil {
+		logger.Errorf(ctx, "failed to prepare task: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return uploadErrors, tasksservice.TaskNotFound("")
+		}
+
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return uploadErrors, tasksservice.BadRequest("invalid task status")
+		}
+
+		return uploadErrors, tasksservice.InternalError("")
+	}
+
+	return uploadErrors, nil
 }

@@ -63,7 +63,7 @@ func main() {
 	}
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
-	taskStore := tasks.NewStore(5*time.Second, dbTXFunc)
+	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc)
 
 	// Initialize the services.
 	authServiceSvc := service.NewAuthService(userStore, conf.Security)

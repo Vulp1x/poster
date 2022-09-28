@@ -48,8 +48,8 @@ CREATE TABLE public.bot_accounts (
     res_proxy jsonb,
     work_proxy jsonb,
     status smallint NOT NULL,
-    started_at timestamp without time zone NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    started_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone,
     deleted_at timestamp without time zone,
     CONSTRAINT not_empty_device CHECK (((device_data <> '[]'::jsonb) AND (device_data <> '{}'::jsonb))),
@@ -95,7 +95,7 @@ CREATE TABLE public.proxies (
     task_id uuid NOT NULL,
     assigned_to uuid,
     host text NOT NULL,
-    port text NOT NULL,
+    port integer NOT NULL,
     login text NOT NULL,
     pass text NOT NULL,
     type smallint NOT NULL
@@ -111,7 +111,7 @@ CREATE TABLE public.target_users (
     task_id uuid NOT NULL,
     username text NOT NULL,
     user_id bigint NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone
 );
 
@@ -210,22 +210,6 @@ ALTER TABLE ONLY public.target_users
 
 
 --
--- Name: target_users target_users_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.target_users
-    ADD CONSTRAINT target_users_user_id_key UNIQUE (user_id);
-
-
---
--- Name: target_users target_users_username_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.target_users
-    ADD CONSTRAINT target_users_username_key UNIQUE (username);
-
-
---
 -- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -247,6 +231,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: target_users_uniq_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX target_users_uniq_idx ON public.target_users USING btree (task_id, username, user_id);
 
 
 --

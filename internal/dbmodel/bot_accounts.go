@@ -9,6 +9,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type botStatus int16
+
+const (
+	CreatedBotStatus        botStatus = 1
+	ProxieAssignedBotStatus botStatus = 2
+	StartedBotStatus        botStatus = 3
+	// DoneBotStatus проставляется после того как все посты выложены
+	DoneBotStatus botStatus = 3
+	// FailBotStatus
+	FailBotStatus botStatus = 4
+)
+
 type RequestHeaders struct {
 	Device         headers.DeviceSettings
 	AndroidID      string // for example: "android-0d735e1f4db26782"

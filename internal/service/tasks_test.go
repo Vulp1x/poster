@@ -65,7 +65,7 @@ func TestCreateDraftTask(t *testing.T) {
 		logger.Fatalf(ctx, "Failed to connect to database: %v", err)
 	}
 
-	store := tasks.NewStore(5*time.Second, dbTXFunc)
+	store := tasks.NewStore(5*time.Second, dbTXFunc, nil)
 
 	service := NewTasksService(nil, store)
 

@@ -33,6 +33,10 @@ overrides:
     go_type:
       type: "Base"
       import: "github.com/inst-api/poster/internal/headers"
+  - column: "bot_accounts.status"
+    go_type:
+      type: "botStatus"
+      import: ""
   - column: "tasks.status"
     go_type:
       type: "taskStatus"

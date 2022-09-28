@@ -33,7 +33,7 @@ CREATE TABLE tasks
 
 CREATE TABLE bot_accounts
 (
-    id          uuid primary key default gen_random_uuid(),
+    id          uuid primary key     default gen_random_uuid(),
     task_id     uuid        not null references tasks,
     username    text UNIQUE not null,
     password    text        not null,
@@ -44,8 +44,8 @@ CREATE TABLE bot_accounts
     res_proxy   jsonb, -- резидентские прокси
     work_proxy  jsonb,
     status      smallint    not null,
-    started_at  timestamp   not null,
-    created_at  timestamp   not null,
+    started_at  timestamp,
+    created_at  timestamp   not null default now(),
     updated_at  timestamp,
     deleted_at  timestamp,
 
@@ -57,13 +57,15 @@ CREATE TABLE bot_accounts
 -- таблица с пользователями, которым будет показана реклама
 create table target_users
 (
-    id         uuid primary key default gen_random_uuid(),
-    task_id    uuid          not null references tasks,
-    username   text unique   not null,
-    user_id    bigint unique not null,
-    created_at timestamp     not null,
+    id         uuid primary key   default gen_random_uuid(),
+    task_id    uuid      not null references tasks,
+    username   text      not null,
+    user_id    bigint    not null,
+    created_at timestamp not null default now(),
     updated_at timestamp
 );
+
+create unique index target_users_uniq_idx on target_users (task_id, username, user_id);
 
 create table target_users_to_tasks
 (
@@ -79,7 +81,7 @@ create table proxies
     task_id     uuid references tasks not null,
     assigned_to uuid references bot_accounts,
     host        text                  not null,
-    port        text                  not null,
+    port        integer               not null,
     login       text                  not null,
     pass        text                  not null,
     type        smallint              not null,-- 1 is for residential, 2 for usual

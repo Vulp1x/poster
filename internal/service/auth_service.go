@@ -20,7 +20,6 @@ import (
 type contextKey string
 
 const userIDContextKey = contextKey("UserID")
-const uniqueIDContextKey = contextKey("UniqueID")
 
 type userStore interface {
 	FindByLogin(ctx context.Context, email string) (dbmodel.User, error)
@@ -84,7 +83,7 @@ func (s *AuthServicesrvc) JWTAuth(ctx context.Context, tokenString string, schem
 	// logger.Debugf(ctx, "got sec scheme %+v", scheme)
 
 	if claims, ok := token.Claims.(*sessions.SessionClaims); ok && token.Valid {
-		ctx = logger.WithFields(ctx, logger.Fields{"user_id": claims.UserID, "unique_id": claims.UniqueID})
+		ctx = logger.WithFields(ctx, logger.Fields{"user_id": claims.UserID})
 		ctx = AddUserIDToContext(ctx, claims.UserID)
 		logger.Debugf(ctx, "Successfully checked token")
 		return ctx, nil

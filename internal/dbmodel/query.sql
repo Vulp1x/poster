@@ -60,10 +60,22 @@ where task_id = $1;
 update tasks
 set status     = $1,
     updated_at = now()
-where id = $1;
+where id = $2;
 
 -- name: SetAccountAsCompleted :exec
 update bot_accounts
 set status     = 4,
     updated_at = now()
 where id = $1;
+
+-- name: SaveBotAccounts :copyfrom
+insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)
+values ($1, $2, $3, $4, $5, $6, $7, $8);
+
+-- name: SaveProxies :copyfrom
+insert into proxies (task_id, host, port, login, pass, type)
+values ($1, $2, $3, $4, $5, $6);
+
+-- name: SaveTargetUsers :copyfrom
+insert into target_users (task_id, username, user_id)
+values ($1, $2, $3);
