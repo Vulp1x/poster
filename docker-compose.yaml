@@ -2,9 +2,7 @@ version: "3.9"
 
 services:
   poster:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 'vulp1x/inst-api.poster:latest'
     restart: unless-stopped
     depends_on:
       - postgres
