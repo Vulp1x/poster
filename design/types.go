@@ -90,3 +90,42 @@ var UploadError = Type("UploadError", func() {
 // 	Required("app_version", "android_version", "android_release", "dpi", "resolution", "manufacturer",
 // 		"device", "model", "cpu", "version_code")
 // })
+
+// Task описывает рекламную кампанию
+var Task = Type("Task", func() {
+	Attribute("id", String, "", func() {
+		Format(FormatUUID)
+	})
+
+	Attribute("text_template", String, func() {
+		Meta("struct:tag:json", "text_template")
+		Description("описание под постом")
+	})
+
+	Attribute("image", String, "base64 строка картинки")
+	Attribute("status", Int)
+	Attribute("title", String, "название задачи")
+
+	Attribute("bots_num", Int, "количество ботов в задаче", func() {
+		Meta("struct:tag:json", "bots_num")
+	})
+	Attribute("proxies_num", Int, "количество прокси в задаче", func() {
+		Meta("struct:tag:json", "proxies_num")
+	})
+	Attribute("targets_num", Int, "количество целевых пользователей в задаче", func() {
+		Meta("struct:tag:json", "targets_num")
+	})
+
+	Attribute("bots_filename", Int, "название файла, из которого брали ботов", func() {
+		Meta("struct:tag:json", "bots_filename")
+	})
+	Attribute("proxies_filename", Int, "название файла, из которого брали прокси", func() {
+		Meta("struct:tag:json", "proxies_filename")
+	})
+	Attribute("targets_filename", Int, "название файла, из которого брали целевых пользователей", func() {
+		Meta("struct:tag:json", "targets_filename")
+	})
+
+	Required("id", "text_template", "image", "status", "title", "bots_num", "proxies_num", "targets_num",
+		"bots_filename", "proxies_filename", "targets_filename")
+})

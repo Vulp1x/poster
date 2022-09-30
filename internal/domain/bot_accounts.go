@@ -35,3 +35,14 @@ func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsPar
 
 	return dbBots
 }
+
+// Ids возвращает список айдишников аккаунтов
+func Ids[T IDer](models []T) []uuid.UUID {
+	ids := make([]uuid.UUID, len(models))
+
+	for i, account := range models {
+		ids[i] = account.GetID()
+	}
+
+	return ids
+}

@@ -50,11 +50,16 @@ select *
 from bot_accounts
 where id = $1;
 
-
 -- name: FindAccountsForTask :many
 select *
 from bot_accounts
 where task_id = $1;
+
+-- name: FindProxiesForTask :many
+select *
+from proxies
+where task_id = $1;
+
 
 -- name: UpdateTaskStatus :exec
 update tasks
@@ -99,3 +104,31 @@ where task_id = $1;
 DELETE
 FROM tasks
 where id = $1;
+
+-- name: AssignProxiesToBotsForTask :exec
+UPDATE bot_accounts
+set res_proxy = x.proxy
+From (SELECT UNNEST(sqlc.arg(proxies)::jsonb[]) as proxy,
+             UNNEST(sqlc.arg(ids)::uuid[])      as id) x
+where bot_accounts.id = x.id
+  AND task_id = $1;
+
+-- name: AssignBotsToProxiesForTask :exec
+UPDATE proxies
+set assigned_to = x.bot_id
+From (SELECT UNNEST(sqlc.arg(bot_ids)::uuid[]) as bot_id,
+             UNNEST(sqlc.arg(ids)::uuid[])      as id) x
+where proxies.id = x.id
+  AND task_id = $1;
+
+-- name: DeleteProxiesForTask :execrows
+DELETE
+FROM proxies
+where id in ($1::uuid[])
+RETURNING 1;
+
+-- name: DeleteBotAccountsForTask :execrows
+DELETE
+FROM bot_accounts
+where id = ANY ($1::uuid[])
+RETURNING 1;

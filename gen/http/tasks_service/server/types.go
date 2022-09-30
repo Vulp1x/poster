@@ -38,6 +38,31 @@ type UploadFileRequestBody struct {
 // file" endpoint HTTP response body.
 type UploadFileResponseBody []*UploadErrorResponse
 
+// GetTaskOKResponseBody is the type of the "tasks_service" service "get task"
+// endpoint HTTP response body.
+type GetTaskOKResponseBody struct {
+	ID string `form:"id" json:"id" xml:"id"`
+	// описание под постом
+	TextTemplate string `json:"text_template"`
+	// base64 строка картинки
+	Image  string `form:"image" json:"image" xml:"image"`
+	Status int    `form:"status" json:"status" xml:"status"`
+	// название задачи
+	Title string `form:"title" json:"title" xml:"title"`
+	// количество ботов в задаче
+	BotsNum int `json:"bots_num"`
+	// количество прокси в задаче
+	ProxiesNum int `json:"proxies_num"`
+	// количество целевых пользователей в задаче
+	TargetsNum int `json:"targets_num"`
+	// название файла, из которого брали ботов
+	BotsFilename int `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename int `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename int `json:"targets_filename"`
+}
+
 // UploadErrorResponse is used to define fields on response body types.
 type UploadErrorResponse struct {
 	// 1 - список ботов
@@ -77,6 +102,25 @@ func NewUploadFileResponseBody(res []*tasksservice.UploadError) UploadFileRespon
 	body := make([]*UploadErrorResponse, len(res))
 	for i, val := range res {
 		body[i] = marshalTasksserviceUploadErrorToUploadErrorResponse(val)
+	}
+	return body
+}
+
+// NewGetTaskOKResponseBody builds the HTTP response body from the result of
+// the "get task" endpoint of the "tasks_service" service.
+func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
+	body := &GetTaskOKResponseBody{
+		ID:              res.ID,
+		TextTemplate:    res.TextTemplate,
+		Image:           res.Image,
+		Status:          res.Status,
+		Title:           res.Title,
+		BotsNum:         res.BotsNum,
+		ProxiesNum:      res.ProxiesNum,
+		TargetsNum:      res.TargetsNum,
+		BotsFilename:    res.BotsFilename,
+		ProxiesFilename: res.ProxiesFilename,
+		TargetsFilename: res.TargetsFilename,
 	}
 	return body
 }

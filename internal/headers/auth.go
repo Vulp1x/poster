@@ -2,7 +2,7 @@ package headers
 
 type AuthorizationData struct {
 	DsUserID  string `json:"ds_user_id"`
-	SessionID string `json:"sessionid"`
+	SessionID string `json:"session_id"`
 	CSRFToken string `json:"csrf_token"`
 }
 

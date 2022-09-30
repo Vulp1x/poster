@@ -108,7 +108,7 @@ func NewAssignProxiesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.AssignProxies(ctx, p)
+		return s.AssignProxies(ctx, p)
 	}
 }
 
@@ -184,7 +184,7 @@ func NewGetTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.GetTask(ctx, p)
+		return s.GetTask(ctx, p)
 	}
 }
 

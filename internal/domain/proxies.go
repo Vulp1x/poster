@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -9,11 +10,11 @@ import (
 
 type Proxies []Proxy
 
-func (b Proxies) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveProxiesParams {
-	dbProxies := make([]dbmodel.SaveProxiesParams, 0, len(b))
-	uniqueMap := make(map[string]bool, len(b))
+func (p Proxies) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveProxiesParams {
+	dbProxies := make([]dbmodel.SaveProxiesParams, 0, len(p))
+	uniqueMap := make(map[string]bool, len(p))
 
-	for _, proxy := range b {
+	for _, proxy := range p {
 		uniqueKey := proxy.Host + strconv.FormatInt(int64(proxy.Port), 10)
 		_, ok := uniqueMap[uniqueKey]
 		if ok {
@@ -33,4 +34,15 @@ func (b Proxies) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveProxiesParams {
 	}
 
 	return dbProxies
+}
+
+func (p Proxies) ToStrings() []string {
+	ret := make([]string, len(p))
+
+	for i, proxy := range p {
+		bytes, _ := json.Marshal(proxy)
+		ret[i] = string(bytes)
+	}
+
+	return ret
 }

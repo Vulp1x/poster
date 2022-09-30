@@ -80,9 +80,13 @@ func (c *Client) UploadFile(ctx context.Context, p *UploadFilePayload) (res []*U
 //   - "internal error" (type InternalError)
 //   - "task not found" (type TaskNotFound)
 //   - error: internal error
-func (c *Client) AssignProxies(ctx context.Context, p *AssignProxiesPayload) (err error) {
-	_, err = c.AssignProxiesEndpoint(ctx, p)
-	return
+func (c *Client) AssignProxies(ctx context.Context, p *AssignProxiesPayload) (res int, err error) {
+	var ires interface{}
+	ires, err = c.AssignProxiesEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(int), nil
 }
 
 // ForceDelete calls the "force delete" endpoint of the "tasks_service" service.
@@ -128,9 +132,13 @@ func (c *Client) StopTask(ctx context.Context, p *StopTaskPayload) (err error) {
 //   - "internal error" (type InternalError)
 //   - "task not found" (type TaskNotFound)
 //   - error: internal error
-func (c *Client) GetTask(ctx context.Context, p *GetTaskPayload) (err error) {
-	_, err = c.GetTaskEndpoint(ctx, p)
-	return
+func (c *Client) GetTask(ctx context.Context, p *GetTaskPayload) (res *Task, err error) {
+	var ires interface{}
+	ires, err = c.GetTaskEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Task), nil
 }
 
 // ListTasks calls the "list tasks" endpoint of the "tasks_service" service.

@@ -194,6 +194,11 @@ var _ = Service("tasks_service", func() {
 			Required("token", "task_id")
 		})
 
+		Result(Int, "bots_number", func() {
+			Description("количество аккаунтов с проксями, которые будут использованы для текущей задачи")
+			Meta("struct:tag:json", "bots_number")
+		})
+
 		HTTP(func() {
 			POST("/api/tasks/{task_id}/assign")
 			Response(StatusOK)
@@ -228,6 +233,7 @@ var _ = Service("tasks_service", func() {
 			Response(StatusNotFound)
 			Response(StatusUnauthorized)
 			Response(StatusInternalServerError)
+
 		})
 	})
 
@@ -302,6 +308,8 @@ var _ = Service("tasks_service", func() {
 
 			Required("token", "task_id")
 		})
+
+		Result(Task)
 
 		HTTP(func() {
 			GET("/api/tasks/{task_id}/")

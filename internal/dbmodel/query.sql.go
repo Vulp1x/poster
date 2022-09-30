@@ -12,6 +12,46 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
+const assignBotsToProxiesForTask = `-- name: AssignBotsToProxiesForTask :exec
+UPDATE proxies
+set assigned_to = x.bot_id
+From (SELECT UNNEST($2::uuid[]) as bot_id,
+             UNNEST($3::uuid[])      as id) x
+where proxies.id = x.id
+  AND task_id = $1
+`
+
+type AssignBotsToProxiesForTaskParams struct {
+	TaskID uuid.UUID   `json:"task_id"`
+	BotIds []uuid.UUID `json:"bot_ids"`
+	Ids    []uuid.UUID `json:"ids"`
+}
+
+func (q *Queries) AssignBotsToProxiesForTask(ctx context.Context, arg AssignBotsToProxiesForTaskParams) error {
+	_, err := q.db.Exec(ctx, assignBotsToProxiesForTask, arg.TaskID, arg.BotIds, arg.Ids)
+	return err
+}
+
+const assignProxiesToBotsForTask = `-- name: AssignProxiesToBotsForTask :exec
+UPDATE bot_accounts
+set res_proxy = x.proxy
+From (SELECT UNNEST($2::jsonb[]) as proxy,
+             UNNEST($3::uuid[])      as id) x
+where bot_accounts.id = x.id
+  AND task_id = $1
+`
+
+type AssignProxiesToBotsForTaskParams struct {
+	TaskID  uuid.UUID   `json:"task_id"`
+	Proxies []string    `json:"proxies"`
+	Ids     []uuid.UUID `json:"ids"`
+}
+
+func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProxiesToBotsForTaskParams) error {
+	_, err := q.db.Exec(ctx, assignProxiesToBotsForTask, arg.TaskID, arg.Proxies, arg.Ids)
+	return err
+}
+
 const createDraftTask = `-- name: CreateDraftTask :one
 insert into tasks(manager_id, text_template, title, image, status, created_at)
 VALUES ($1, $2, $3, $4, 1, now())
@@ -62,6 +102,36 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const deleteBotAccountsForTask = `-- name: DeleteBotAccountsForTask :execrows
+DELETE
+FROM bot_accounts
+where id = ANY ($1::uuid[])
+RETURNING 1
+`
+
+func (q *Queries) DeleteBotAccountsForTask(ctx context.Context, dollar_1 []uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteBotAccountsForTask, dollar_1)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const deleteProxiesForTask = `-- name: DeleteProxiesForTask :execrows
+DELETE
+FROM proxies
+where id in ($1::uuid[])
+RETURNING 1
+`
+
+func (q *Queries) DeleteProxiesForTask(ctx context.Context, dollar_1 []uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteProxiesForTask, dollar_1)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const deleteUserByID = `-- name: DeleteUserByID :exec
@@ -137,6 +207,41 @@ func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const findProxiesForTask = `-- name: FindProxiesForTask :many
+select id, task_id, assigned_to, host, port, login, pass, type
+from proxies
+where task_id = $1
+`
+
+func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
+	rows, err := q.db.Query(ctx, findProxiesForTask, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Proxy
+	for rows.Next() {
+		var i Proxy
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.AssignedTo,
+			&i.Host,
+			&i.Port,
+			&i.Login,
+			&i.Pass,
+			&i.Type,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const findTaskByID = `-- name: FindTaskByID :one

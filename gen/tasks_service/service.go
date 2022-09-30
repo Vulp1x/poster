@@ -21,7 +21,7 @@ type Service interface {
 	// загрузить файл с пользователями, прокси
 	UploadFile(context.Context, *UploadFilePayload) (res []*UploadError, err error)
 	// присвоить ботам прокси
-	AssignProxies(context.Context, *AssignProxiesPayload) (err error)
+	AssignProxies(context.Context, *AssignProxiesPayload) (res int, err error)
 	// удалить задачу и все связанные с ней сущности. Использовать только для тестов
 	ForceDelete(context.Context, *ForceDeletePayload) (err error)
 	// начать выполнение задачи
@@ -29,7 +29,7 @@ type Service interface {
 	// остановить выполнение задачи
 	StopTask(context.Context, *StopTaskPayload) (err error)
 	// получить задачу по id
-	GetTask(context.Context, *GetTaskPayload) (err error)
+	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
 	// получить все задачи для текущего пользователя
 	ListTasks(context.Context, *ListTasksPayload) (err error)
 }
@@ -131,6 +131,30 @@ type TargetUserRecord struct {
 	Record []string
 	// номер строки в исходном файле
 	LineNumber int `json:"line_number"`
+}
+
+// Task is the result type of the tasks_service service get task method.
+type Task struct {
+	ID string
+	// описание под постом
+	TextTemplate string `json:"text_template"`
+	// base64 строка картинки
+	Image  string
+	Status int
+	// название задачи
+	Title string
+	// количество ботов в задаче
+	BotsNum int `json:"bots_num"`
+	// количество прокси в задаче
+	ProxiesNum int `json:"proxies_num"`
+	// количество целевых пользователей в задаче
+	TargetsNum int `json:"targets_num"`
+	// название файла, из которого брали ботов
+	BotsFilename int `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename int `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename int `json:"targets_filename"`
 }
 
 type UploadError struct {

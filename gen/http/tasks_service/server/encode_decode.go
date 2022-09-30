@@ -238,8 +238,11 @@ func EncodeUploadFileError(encoder func(context.Context, http.ResponseWriter) go
 // tasks_service assign proxies endpoint.
 func EncodeAssignProxiesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(int)
+		enc := encoder(ctx, w)
+		body := res
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -586,8 +589,11 @@ func EncodeStopTaskError(encoder func(context.Context, http.ResponseWriter) goah
 // tasks_service get task endpoint.
 func EncodeGetTaskResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*tasksservice.Task)
+		enc := encoder(ctx, w)
+		body := NewGetTaskOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 

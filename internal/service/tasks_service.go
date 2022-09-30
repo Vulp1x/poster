@@ -20,6 +20,8 @@ type taskStore interface {
 	StopTask(ctx context.Context, taskID uuid.UUID) error
 	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers) error
 	ForceDelete(ctx context.Context, taskID uuid.UUID) error
+	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
+	GetTask(ctx context.Context, taskID uuid.UUID) (*tasksservice.Task, error)
 }
 
 // tasks_service service example implementation.
@@ -109,9 +111,29 @@ func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTas
 }
 
 // получить задачу по id
-func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskPayload) (err error) {
+func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskPayload) (*tasksservice.Task, error) {
 	logger.Debug(ctx, "starting GetTask with payload %#v", p)
-	return
+
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("bad task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	task, err := s.store.GetTask(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to find task: %v", err)
+
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, tasksservice.InternalError("")
+	}
+
+	return task, nil
 }
 
 // получить все задачи для текущего пользователя
@@ -163,9 +185,28 @@ func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.Uploa
 	return uploadErrors, nil
 }
 
-func (s *tasksServicesrvc) AssignProxies(ctx context.Context, payload *tasksservice.AssignProxiesPayload) (err error) {
-	// TODO implement me
-	panic("implement me")
+func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.AssignProxiesPayload) (int, error) {
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
+		return 0, tasksservice.BadRequest("bad task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	botAccounts, err := s.store.AssignProxies(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to assign proxies: %v", err)
+
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return 0, tasksservice.BadRequest("invalid task status")
+		}
+
+		return 0, tasksservice.InternalError("")
+	}
+
+	return botAccounts, nil
+
 }
 
 func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.ForceDeletePayload) error {
