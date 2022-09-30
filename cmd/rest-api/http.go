@@ -125,6 +125,10 @@ func handleHTTPServer(
 		logger.Infof(ctx, "HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 
+	for _, m := range tasksServiceServer.Mounts {
+		logger.Infof(ctx, "HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+
 	(*wg).Add(1)
 	go func() {
 		defer (*wg).Done()
