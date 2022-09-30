@@ -48,7 +48,6 @@ jobs:
           done < files.txt
   api_service:
     needs: check
-    if: needs.check.outputs.api_service == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
