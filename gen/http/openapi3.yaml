@@ -20,8 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddManagerRequestBody'
             example:
-              login: Commodi est.
-              password: 6x5
+              login: Est error.
+              password: q7d
       responses:
         "200":
           description: OK response.
@@ -31,28 +31,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Voluptatem vero molestias.
+                example: Quia ratione autem minima ea esse.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Voluptatem doloremque.
+                example: Iure suscipit.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Dolor doloremque.
+                example: Quos at.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Reprehenderit omnis similique ratione.
+                example: Totam officia qui perferendis dolorum.
       security:
         - jwt_header_Authorization:
             - driver
@@ -84,21 +84,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Voluptatem aut commodi.
+                example: Cupiditate quia ipsum dolores.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Rerum possimus a sequi aut quis.
+                example: Repellat id ut quo.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Beatae vitae ea ipsam eligendi sint.
+                example: Dolores quo molestias.
         "404":
           description: 'user not found: Not Found response.'
           content:
@@ -125,7 +125,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Nobis eius ut.
+                example: Deserunt id voluptatem ut ratione.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -136,14 +136,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Id accusamus est commodi.
+                example: Cupiditate quisquam.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: In et.
+                example: Architecto aut sunt voluptatem neque nihil porro.
       security:
         - jwt_header_Authorization:
             - driver
@@ -170,28 +170,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Reprehenderit porro sed deleniti.
+                example: Aut voluptates modi.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Assumenda consectetur culpa nesciunt quas laudantium cumque.
+                example: Autem neque nisi et optio quo.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Voluptates suscipit aut rem provident quia eum.
+                example: Quia quis tempora odio.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Iusto enim voluptas.
+                example: Repudiandae maxime tenetur.
       security:
         - basic_header_Authorization: []
   /api/tasks/:
@@ -210,7 +210,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Id quasi repellendus et.
+                example: Eligendi nostrum adipisci.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -225,7 +225,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Ut quia error vel quos officia.
+                example: Eum fugiat atque aut aut.
       security:
         - jwt_header_Authorization:
             - driver
@@ -245,8 +245,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Cum quo optio eum.
-          example: Est voluptatibus nostrum occaecati nulla unde dolor.
+            example: Sed possimus illum.
+          example: Quam dolorum.
       responses:
         "200":
           description: OK response.
@@ -255,24 +255,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
               example:
-                bots_filename: 6715705410774538728
-                bots_num: 20116900574216398
+                bots_filename: Sapiente fuga quas nisi sapiente eos.
+                bots_num: 4637486054795607
                 id: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
-                image: Perspiciatis et aut cumque et cum ea.
-                proxies_filename: 8008851331452116580
-                proxies_num: 9212883098251177775
-                status: 1814220570588380364
-                targets_filename: 5975647596319666942
-                targets_num: 1647430243774377203
-                text_template: Eius maxime et labore consequuntur.
-                title: Ut et iusto eum veniam.
+                image: Perferendis quia rem nostrum sint dolorum.
+                proxies_filename: In et ipsa et.
+                proxies_num: 3854164353205004780
+                status: 506772552543768352
+                targets_filename: Qui qui libero.
+                targets_num: 5163035109799715032
+                text_template: Accusantium ex.
+                title: Ex alias saepe dolores.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Earum nesciunt cum id ut.
+                example: Consequatur aut omnis quis nihil consequatur qui.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -291,7 +291,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Provident consectetur voluptatum tempore vero.
+                example: Minima saepe.
       security:
         - jwt_header_Authorization:
             - driver
@@ -311,8 +311,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Dolores nihil laboriosam eos rerum amet.
-          example: Dolor odit aliquam ut.
+            example: Vel odio quia aliquid.
+          example: Quae et maiores.
       responses:
         "200":
           description: OK response.
@@ -321,9 +321,9 @@ paths:
               schema:
                 type: integer
                 description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 2052523660038237617
+                example: 6735641304139066460
                 format: int64
-              example: 3197973706887572428
+              example: 2426067860934213327
         "400":
           description: 'bad request: Bad Request response.'
           content:
@@ -331,7 +331,7 @@ paths:
               schema:
                 type: integer
                 description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 5545754155349317491
+                example: 3154676963153222802
                 format: int64
         "401":
           description: 'unauthorized: Unauthorized response.'
@@ -340,7 +340,7 @@ paths:
               schema:
                 type: integer
                 description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 2881387093040405300
+                example: 1942120056607448089
                 format: int64
         "404":
           description: 'task not found: Not Found response.'
@@ -349,7 +349,7 @@ paths:
               schema:
                 type: integer
                 description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 2215796185864279519
+                example: 6233975586208328991
                 format: int64
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -357,7 +357,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Omnis qui iste ut beatae mollitia nemo.
+                example: Vero iusto distinctio consequatur.
       security:
         - jwt_header_Authorization:
             - driver
@@ -377,8 +377,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Nisi omnis.
-          example: Quia maxime quod eum accusamus voluptate eius.
+            example: Non accusamus.
+          example: Soluta architecto non.
       responses:
         "200":
           description: OK response.
@@ -417,8 +417,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Est sit.
-          example: Id quo aut distinctio architecto consectetur.
+            example: Esse eos adipisci dignissimos nulla sit iure.
+          example: Blanditiis non modi dolore aut.
       responses:
         "200":
           description: OK response.
@@ -440,7 +440,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Nemo eius.
+                example: Corrupti et ut incidunt cumque.
       security:
         - jwt_header_Authorization:
             - driver
@@ -460,8 +460,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Dolores reiciendis.
-          example: Dolore adipisci sit et.
+            example: Quia animi et saepe distinctio.
+          example: Eligendi dolor eligendi.
       responses:
         "200":
           description: OK response.
@@ -483,7 +483,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Nam debitis ea atque accusantium consequatur.
+                example: Deserunt possimus nobis aut ipsa doloribus.
       security:
         - jwt_header_Authorization:
             - driver
@@ -492,9 +492,9 @@ paths:
     post:
       tags:
         - tasks_service
-      summary: upload file tasks_service
+      summary: upload files tasks_service
       description: загрузить файл с пользователями, прокси
-      operationId: tasks_service#upload file
+      operationId: tasks_service#upload files
       parameters:
         - name: task_id
           in: path
@@ -503,55 +503,78 @@ paths:
           schema:
             type: string
             description: id задачи, в которую загружаем пользователей/прокси
-            example: Alias vitae reiciendis.
-          example: Culpa aut.
+            example: Aut et maxime sit.
+          example: Nihil ut.
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UploadFileRequestBody'
+              $ref: '#/components/schemas/UploadFilesRequestBody'
             example:
               bots:
-                - line_number: 3891707058504905243
+                - line_number: 1530681320648418897
                   record:
-                    - Maiores accusantium illum rem molestiae qui fugiat.
-                    - Sint quos cupiditate porro voluptatum neque.
-                    - Laboriosam minima eaque vero fugit occaecati voluptates.
-                - line_number: 3891707058504905243
+                    - Et ex ab laudantium.
+                    - Quia accusamus laboriosam sit.
+                    - Id nisi.
+                - line_number: 1530681320648418897
                   record:
-                    - Maiores accusantium illum rem molestiae qui fugiat.
-                    - Sint quos cupiditate porro voluptatum neque.
-                    - Laboriosam minima eaque vero fugit occaecati voluptates.
-                - line_number: 3891707058504905243
+                    - Et ex ab laudantium.
+                    - Quia accusamus laboriosam sit.
+                    - Id nisi.
+                - line_number: 1530681320648418897
                   record:
-                    - Maiores accusantium illum rem molestiae qui fugiat.
-                    - Sint quos cupiditate porro voluptatum neque.
-                    - Laboriosam minima eaque vero fugit occaecati voluptates.
+                    - Et ex ab laudantium.
+                    - Quia accusamus laboriosam sit.
+                    - Id nisi.
+                - line_number: 1530681320648418897
+                  record:
+                    - Et ex ab laudantium.
+                    - Quia accusamus laboriosam sit.
+                    - Id nisi.
+              filenames:
+                bots_filename: Aliquid animi reiciendis magni.
+                proxies_filename: Modi quo repellat nam quasi velit.
+                targets_filename: Labore nihil.
               proxies:
-                - line_number: 5216197663359156422
+                - line_number: 5762439881369486609
                   record:
-                    - Magni maiores aliquid animi reiciendis magni.
-                    - Modi quo repellat nam quasi velit.
-                    - Labore nihil.
-                - line_number: 5216197663359156422
+                    - Vero id nostrum dolor itaque molestiae.
+                    - Quae adipisci modi.
+                    - Dignissimos nam quis quaerat exercitationem ut inventore.
+                - line_number: 5762439881369486609
                   record:
-                    - Magni maiores aliquid animi reiciendis magni.
-                    - Modi quo repellat nam quasi velit.
-                    - Labore nihil.
+                    - Vero id nostrum dolor itaque molestiae.
+                    - Quae adipisci modi.
+                    - Dignissimos nam quis quaerat exercitationem ut inventore.
+                - line_number: 5762439881369486609
+                  record:
+                    - Vero id nostrum dolor itaque molestiae.
+                    - Quae adipisci modi.
+                    - Dignissimos nam quis quaerat exercitationem ut inventore.
+                - line_number: 5762439881369486609
+                  record:
+                    - Vero id nostrum dolor itaque molestiae.
+                    - Quae adipisci modi.
+                    - Dignissimos nam quis quaerat exercitationem ut inventore.
               targets:
-                - line_number: 8805248178777047561
+                - line_number: 7457996689799145942
                   record:
-                    - Ex ab laudantium.
-                    - Quia accusamus laboriosam sit.
-                - line_number: 8805248178777047561
+                    - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                    - Fuga sit ipsam aliquam eveniet.
+                - line_number: 7457996689799145942
                   record:
-                    - Ex ab laudantium.
-                    - Quia accusamus laboriosam sit.
-                - line_number: 8805248178777047561
+                    - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                    - Fuga sit ipsam aliquam eveniet.
+                - line_number: 7457996689799145942
                   record:
-                    - Ex ab laudantium.
-                    - Quia accusamus laboriosam sit.
+                    - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                    - Fuga sit ipsam aliquam eveniet.
+                - line_number: 7457996689799145942
+                  record:
+                    - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                    - Fuga sit ipsam aliquam eveniet.
       responses:
         "200":
           description: OK response.
@@ -562,30 +585,22 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
               example:
-                - input: Quae adipisci modi.
-                  line: 5344138153947935142
-                  reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                - input: Maxime omnis reiciendis adipisci facilis.
+                  line: 1603721514616807088
+                  reason: Autem quo esse tenetur sed.
                   type: 1
-                - input: Quae adipisci modi.
-                  line: 5344138153947935142
-                  reason: Dignissimos nam quis quaerat exercitationem ut inventore.
-                  type: 1
-                - input: Quae adipisci modi.
-                  line: 5344138153947935142
-                  reason: Dignissimos nam quis quaerat exercitationem ut inventore.
-                  type: 1
-                - input: Quae adipisci modi.
-                  line: 5344138153947935142
-                  reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                - input: Maxime omnis reiciendis adipisci facilis.
+                  line: 1603721514616807088
+                  reason: Autem quo esse tenetur sed.
                   type: 1
         "400":
           description: 'bad request: Bad Request response.'
@@ -593,7 +608,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Voluptatibus temporibus.
+                example: Sunt error dolor nesciunt modi labore et.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -603,17 +618,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
-                    type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
         "404":
           description: 'task not found: Not Found response.'
@@ -624,21 +635,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/UploadError'
                 example:
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
-                    type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
-                    type: 1
-                  - input: Quae adipisci modi.
-                    line: 5344138153947935142
-                    reason: Dignissimos nam quis quaerat exercitationem ut inventore.
+                  - input: Maxime omnis reiciendis adipisci facilis.
+                    line: 1603721514616807088
+                    reason: Autem quo esse tenetur sed.
                     type: 1
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -646,7 +649,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Necessitatibus illum qui sed mollitia.
+                example: Voluptates necessitatibus vel qui adipisci.
       security:
         - jwt_header_Authorization:
             - driver
@@ -665,9 +668,9 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateTaskDraftRequestBody'
             example:
-              post_image: Adipisci in fugit.
-              text_template: Ullam dolor amet enim repellendus.
-              title: Nisi sit id libero voluptate voluptatum.
+              post_image: Eum quod suscipit.
+              text_template: Veritatis reiciendis nulla.
+              title: Aspernatur incidunt quisquam provident dolor.
       responses:
         "200":
           description: OK response.
@@ -685,7 +688,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Tempora odio itaque quia.
+                example: Autem quas aperiam doloremque sint fuga officiis.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -710,7 +713,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Laboriosam consequatur.
+                example: Nemo nihil blanditiis soluta neque.
       security:
         - jwt_header_Authorization:
             - driver
@@ -722,14 +725,14 @@ components:
       properties:
         login:
           type: string
-          example: Magni beatae.
+          example: Voluptatem quidem reiciendis et.
         password:
           type: string
-          example: 18a
+          example: tcj
           minLength: 4
       example:
-        login: Expedita consequatur quia.
-        password: a6d
+        login: Qui culpa tempore et ratione.
+        password: vuv
       required:
         - login
         - password
@@ -739,25 +742,25 @@ components:
         line_number:
           type: integer
           description: номер строки в исходном файле
-          example: 507354266463482318
+          example: 2238497754885479995
           format: int64
         record:
           type: array
           items:
             type: string
-            example: Architecto aut sunt voluptatem neque nihil porro.
+            example: Eligendi laboriosam blanditiis ratione libero.
           example:
-            - Cupiditate quisquam.
-            - Atque non et tenetur provident.
-            - Pariatur deleniti ut qui quasi.
+            - Autem quis.
+            - Numquam sit.
+            - Rerum recusandae.
           minItems: 4
           maxItems: 4
       example:
-        line_number: 3507790665368049296
+        line_number: 5747118890365380068
         record:
-          - Placeat corporis corrupti sed magni quia.
-          - Rerum qui.
-          - Quia quaerat minus.
+          - Qui exercitationem ut est et fugit est.
+          - Quis et magnam sunt.
+          - Omnis deleniti.
       required:
         - record
         - line_number
@@ -767,19 +770,19 @@ components:
         post_image:
           type: string
           description: фотография для постов
-          example: Omnis itaque vel laborum.
+          example: Neque placeat corporis corrupti sed magni.
         text_template:
           type: string
           description: шаблон для подписи под постом
-          example: Similique dolorem laborum id ipsam.
+          example: Pariatur deleniti ut qui quasi.
         title:
           type: string
           description: название задачи
-          example: Rerum nihil explicabo ipsa autem est.
+          example: Atque non et tenetur provident.
       example:
-        post_image: Doloremque rerum soluta.
-        text_template: Autem sit.
-        title: Ut voluptate expedita ipsa.
+        post_image: Neque nihil.
+        text_template: Id est.
+        title: Alias rerum qui et quia quaerat minus.
       required:
         - title
         - text_template
@@ -799,14 +802,13 @@ components:
       type: object
       properties:
         bots_filename:
-          type: integer
+          type: string
           description: название файла, из которого брали ботов
-          example: 9202924139488775830
-          format: int64
+          example: Quo nisi repellat.
         bots_num:
           type: integer
           description: количество ботов в задаче
-          example: 9150473952282192365
+          example: 1989083077293101348
           format: int64
         id:
           type: string
@@ -815,51 +817,49 @@ components:
         image:
           type: string
           description: base64 строка картинки
-          example: Rerum recusandae.
+          example: Nihil velit modi in vitae delectus.
         proxies_filename:
-          type: integer
+          type: string
           description: название файла, из которого брали прокси
-          example: 38996407481403667
-          format: int64
+          example: Rerum quas nemo dolores optio.
         proxies_num:
           type: integer
           description: количество прокси в задаче
-          example: 8296765813568307663
+          example: 1910013867088893732
           format: int64
         status:
           type: integer
-          example: 2238497754885479995
+          example: 830872294083749528
           format: int64
         targets_filename:
-          type: integer
+          type: string
           description: название файла, из которого брали целевых пользователей
-          example: 2541697808168446016
-          format: int64
+          example: Nostrum fuga inventore ratione repellendus.
         targets_num:
           type: integer
           description: количество целевых пользователей в задаче
-          example: 2400352339304451373
+          example: 4835698328583107926
           format: int64
         text_template:
           type: string
           description: описание под постом
-          example: Tenetur autem quis perferendis numquam sit.
+          example: Non sequi.
         title:
           type: string
           description: название задачи
-          example: Qui exercitationem ut est et fugit est.
+          example: Illo autem est nam.
       example:
-        bots_filename: 3083748517787457383
-        bots_num: 1523780552927213890
+        bots_filename: Ut dolor dolorum necessitatibus dolores nam.
+        bots_num: 2525926433998955261
         id: AB12B85B-1864-53B4-4A92-3519B45D0D5E
-        image: Sunt error dolor nesciunt modi labore et.
-        proxies_filename: 8382157569699955146
-        proxies_num: 99187915321069963
-        status: 8161665712995971621
-        targets_filename: 5472785322282566090
-        targets_num: 5327774424621946942
-        text_template: Atque asperiores distinctio.
-        title: Necessitatibus vel qui adipisci aut animi.
+        image: Ut consequatur omnis beatae qui at aliquid.
+        proxies_filename: Tempore debitis.
+        proxies_num: 4061165753035191807
+        status: 8871135944981799766
+        targets_filename: Est sed natus.
+        targets_num: 8157270369546457403
+        text_template: Quidem alias et.
+        title: Quod non veritatis voluptate est at.
       required:
         - id
         - text_template
@@ -869,6 +869,26 @@ components:
         - bots_num
         - proxies_num
         - targets_num
+    TaskFileNames:
+      type: object
+      properties:
+        bots_filename:
+          type: string
+          description: название файла, из которого брали ботов
+          example: Ducimus aut.
+        proxies_filename:
+          type: string
+          description: название файла, из которого брали прокси
+          example: Esse molestiae.
+        targets_filename:
+          type: string
+          description: название файла, из которого брали целевых пользователей
+          example: Quia et.
+      example:
+        bots_filename: Nihil eligendi natus suscipit omnis modi ea.
+        proxies_filename: Fugit non nobis dolore.
+        targets_filename: Cupiditate dolore laudantium.
+      required:
         - bots_filename
         - proxies_filename
         - targets_filename
@@ -878,36 +898,36 @@ components:
         input:
           type: string
           description: номер порта
-          example: Deleniti facere earum et.
+          example: Necessitatibus nisi earum vel omnis assumenda.
         line:
           type: integer
-          example: 2710052909298745705
+          example: 1266061003342115468
           format: int64
         reason:
           type: string
-          example: Officiis est provident sunt praesentium.
+          example: Quo quia consequatur et et hic dolores.
         type:
           type: integer
           description: |2-
              1 - список ботов
                 2 - список прокси
                 3 - список получателей рекламы
-          example: 1
+          example: 2
           enum:
             - 1
             - 2
             - 3
       example:
-        input: Minima et doloremque eligendi vel.
-        line: 8429809141368118353
-        reason: Architecto cum.
+        input: Dolores ducimus hic autem eligendi adipisci.
+        line: 729945619932247134
+        reason: Tempore mollitia voluptatem ut ipsum.
         type: 2
       required:
         - type
         - line
         - input
         - reason
-    UploadFileRequestBody:
+    UploadFilesRequestBody:
       type: object
       properties:
         bots:
@@ -916,92 +936,102 @@ components:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список ботов
           example:
-            - line_number: 3891707058504905243
+            - line_number: 1530681320648418897
               record:
-                - Maiores accusantium illum rem molestiae qui fugiat.
-                - Sint quos cupiditate porro voluptatum neque.
-                - Laboriosam minima eaque vero fugit occaecati voluptates.
-            - line_number: 3891707058504905243
+                - Et ex ab laudantium.
+                - Quia accusamus laboriosam sit.
+                - Id nisi.
+            - line_number: 1530681320648418897
               record:
-                - Maiores accusantium illum rem molestiae qui fugiat.
-                - Sint quos cupiditate porro voluptatum neque.
-                - Laboriosam minima eaque vero fugit occaecati voluptates.
-            - line_number: 3891707058504905243
-              record:
-                - Maiores accusantium illum rem molestiae qui fugiat.
-                - Sint quos cupiditate porro voluptatum neque.
-                - Laboriosam minima eaque vero fugit occaecati voluptates.
+                - Et ex ab laudantium.
+                - Quia accusamus laboriosam sit.
+                - Id nisi.
+        filenames:
+          $ref: '#/components/schemas/TaskFileNames'
         proxies:
           type: array
           items:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список проксей для использования
           example:
-            - line_number: 5216197663359156422
+            - line_number: 5762439881369486609
               record:
-                - Magni maiores aliquid animi reiciendis magni.
-                - Modi quo repellat nam quasi velit.
-                - Labore nihil.
-            - line_number: 5216197663359156422
+                - Vero id nostrum dolor itaque molestiae.
+                - Quae adipisci modi.
+                - Dignissimos nam quis quaerat exercitationem ut inventore.
+            - line_number: 5762439881369486609
               record:
-                - Magni maiores aliquid animi reiciendis magni.
-                - Modi quo repellat nam quasi velit.
-                - Labore nihil.
-            - line_number: 5216197663359156422
-              record:
-                - Magni maiores aliquid animi reiciendis magni.
-                - Modi quo repellat nam quasi velit.
-                - Labore nihil.
+                - Vero id nostrum dolor itaque molestiae.
+                - Quae adipisci modi.
+                - Dignissimos nam quis quaerat exercitationem ut inventore.
         targets:
           type: array
           items:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список аккаунтов, которым показать надо рекламу
           example:
-            - line_number: 8805248178777047561
+            - line_number: 7457996689799145942
               record:
-                - Ex ab laudantium.
-                - Quia accusamus laboriosam sit.
-            - line_number: 8805248178777047561
+                - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                - Fuga sit ipsam aliquam eveniet.
+            - line_number: 7457996689799145942
               record:
-                - Ex ab laudantium.
-                - Quia accusamus laboriosam sit.
+                - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                - Fuga sit ipsam aliquam eveniet.
+            - line_number: 7457996689799145942
+              record:
+                - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                - Fuga sit ipsam aliquam eveniet.
+            - line_number: 7457996689799145942
+              record:
+                - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+                - Fuga sit ipsam aliquam eveniet.
       example:
         bots:
-          - line_number: 3891707058504905243
+          - line_number: 1530681320648418897
             record:
-              - Maiores accusantium illum rem molestiae qui fugiat.
-              - Sint quos cupiditate porro voluptatum neque.
-              - Laboriosam minima eaque vero fugit occaecati voluptates.
-          - line_number: 3891707058504905243
+              - Et ex ab laudantium.
+              - Quia accusamus laboriosam sit.
+              - Id nisi.
+          - line_number: 1530681320648418897
             record:
-              - Maiores accusantium illum rem molestiae qui fugiat.
-              - Sint quos cupiditate porro voluptatum neque.
-              - Laboriosam minima eaque vero fugit occaecati voluptates.
+              - Et ex ab laudantium.
+              - Quia accusamus laboriosam sit.
+              - Id nisi.
+        filenames:
+          bots_filename: Aliquid animi reiciendis magni.
+          proxies_filename: Modi quo repellat nam quasi velit.
+          targets_filename: Labore nihil.
         proxies:
-          - line_number: 5216197663359156422
+          - line_number: 5762439881369486609
             record:
-              - Magni maiores aliquid animi reiciendis magni.
-              - Modi quo repellat nam quasi velit.
-              - Labore nihil.
-          - line_number: 5216197663359156422
+              - Vero id nostrum dolor itaque molestiae.
+              - Quae adipisci modi.
+              - Dignissimos nam quis quaerat exercitationem ut inventore.
+          - line_number: 5762439881369486609
             record:
-              - Magni maiores aliquid animi reiciendis magni.
-              - Modi quo repellat nam quasi velit.
-              - Labore nihil.
+              - Vero id nostrum dolor itaque molestiae.
+              - Quae adipisci modi.
+              - Dignissimos nam quis quaerat exercitationem ut inventore.
+          - line_number: 5762439881369486609
+            record:
+              - Vero id nostrum dolor itaque molestiae.
+              - Quae adipisci modi.
+              - Dignissimos nam quis quaerat exercitationem ut inventore.
         targets:
-          - line_number: 8805248178777047561
+          - line_number: 7457996689799145942
             record:
-              - Ex ab laudantium.
-              - Quia accusamus laboriosam sit.
-          - line_number: 8805248178777047561
+              - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+              - Fuga sit ipsam aliquam eveniet.
+          - line_number: 7457996689799145942
             record:
-              - Ex ab laudantium.
-              - Quia accusamus laboriosam sit.
+              - Sit mollitia voluptatibus aperiam ut necessitatibus et.
+              - Fuga sit ipsam aliquam eveniet.
       required:
         - bots
         - proxies
         - targets
+        - filenames
   securitySchemes:
     basic_header_Authorization:
       type: http

@@ -21,7 +21,7 @@ import (
 type Server struct {
 	Mounts          []*MountPoint
 	CreateTaskDraft http.Handler
-	UploadFile      http.Handler
+	UploadFiles     http.Handler
 	AssignProxies   http.Handler
 	ForceDelete     http.Handler
 	StartTask       http.Handler
@@ -47,9 +47,9 @@ type MountPoint struct {
 	Pattern string
 }
 
-// TasksServiceUploadFileDecoderFunc is the type to decode multipart request
-// for the "tasks_service" service "upload file" endpoint.
-type TasksServiceUploadFileDecoderFunc func(*multipart.Reader, **tasksservice.UploadFilePayload) error
+// TasksServiceUploadFilesDecoderFunc is the type to decode multipart request
+// for the "tasks_service" service "upload files" endpoint.
+type TasksServiceUploadFilesDecoderFunc func(*multipart.Reader, **tasksservice.UploadFilesPayload) error
 
 // New instantiates HTTP handlers for all the tasks_service service endpoints
 // using the provided encoder and decoder. The handlers are mounted on the
@@ -64,12 +64,12 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(err error) goahttp.Statuser,
-	tasksServiceUploadFileDecoderFn TasksServiceUploadFileDecoderFunc,
+	tasksServiceUploadFilesDecoderFn TasksServiceUploadFilesDecoderFunc,
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
 			{"CreateTaskDraft", "POST", "/api/tasks/draft"},
-			{"UploadFile", "POST", "/api/tasks/{task_id}/upload"},
+			{"UploadFiles", "POST", "/api/tasks/{task_id}/upload"},
 			{"AssignProxies", "POST", "/api/tasks/{task_id}/assign"},
 			{"ForceDelete", "DELETE", "/api/tasks/{task_id}/force"},
 			{"StartTask", "POST", "/api/tasks/{task_id}/start"},
@@ -78,7 +78,7 @@ func New(
 			{"ListTasks", "GET", "/api/tasks/"},
 		},
 		CreateTaskDraft: NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
-		UploadFile:      NewUploadFileHandler(e.UploadFile, mux, NewTasksServiceUploadFileDecoder(mux, tasksServiceUploadFileDecoderFn), encoder, errhandler, formatter),
+		UploadFiles:     NewUploadFilesHandler(e.UploadFiles, mux, NewTasksServiceUploadFilesDecoder(mux, tasksServiceUploadFilesDecoderFn), encoder, errhandler, formatter),
 		AssignProxies:   NewAssignProxiesHandler(e.AssignProxies, mux, decoder, encoder, errhandler, formatter),
 		ForceDelete:     NewForceDeleteHandler(e.ForceDelete, mux, decoder, encoder, errhandler, formatter),
 		StartTask:       NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
@@ -94,7 +94,7 @@ func (s *Server) Service() string { return "tasks_service" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.CreateTaskDraft = m(s.CreateTaskDraft)
-	s.UploadFile = m(s.UploadFile)
+	s.UploadFiles = m(s.UploadFiles)
 	s.AssignProxies = m(s.AssignProxies)
 	s.ForceDelete = m(s.ForceDelete)
 	s.StartTask = m(s.StartTask)
@@ -106,7 +106,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the tasks_service endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountCreateTaskDraftHandler(mux, h.CreateTaskDraft)
-	MountUploadFileHandler(mux, h.UploadFile)
+	MountUploadFilesHandler(mux, h.UploadFiles)
 	MountAssignProxiesHandler(mux, h.AssignProxies)
 	MountForceDeleteHandler(mux, h.ForceDelete)
 	MountStartTaskHandler(mux, h.StartTask)
@@ -171,9 +171,9 @@ func NewCreateTaskDraftHandler(
 	})
 }
 
-// MountUploadFileHandler configures the mux to serve the "tasks_service"
-// service "upload file" endpoint.
-func MountUploadFileHandler(mux goahttp.Muxer, h http.Handler) {
+// MountUploadFilesHandler configures the mux to serve the "tasks_service"
+// service "upload files" endpoint.
+func MountUploadFilesHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -183,9 +183,9 @@ func MountUploadFileHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/api/tasks/{task_id}/upload", f)
 }
 
-// NewUploadFileHandler creates a HTTP handler which loads the HTTP request and
-// calls the "tasks_service" service "upload file" endpoint.
-func NewUploadFileHandler(
+// NewUploadFilesHandler creates a HTTP handler which loads the HTTP request
+// and calls the "tasks_service" service "upload files" endpoint.
+func NewUploadFilesHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -194,13 +194,13 @@ func NewUploadFileHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeUploadFileRequest(mux, decoder)
-		encodeResponse = EncodeUploadFileResponse(encoder)
-		encodeError    = EncodeUploadFileError(encoder, formatter)
+		decodeRequest  = DecodeUploadFilesRequest(mux, decoder)
+		encodeResponse = EncodeUploadFilesResponse(encoder)
+		encodeError    = EncodeUploadFilesError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "upload file")
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload files")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

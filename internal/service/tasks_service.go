@@ -18,10 +18,10 @@ type taskStore interface {
 	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
-	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers) error
+	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
 	ForceDelete(ctx context.Context, taskID uuid.UUID) error
 	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
-	GetTask(ctx context.Context, taskID uuid.UUID) (*tasksservice.Task, error)
+	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
 }
 
 // tasks_service service example implementation.
@@ -133,7 +133,7 @@ func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskP
 		return nil, tasksservice.InternalError("")
 	}
 
-	return task, nil
+	return task.ToProto(), nil
 }
 
 // получить все задачи для текущего пользователя
@@ -142,7 +142,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 	return
 }
 
-func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.UploadFilePayload) ([]*tasksservice.UploadError, error) {
+func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) ([]*tasksservice.UploadError, error) {
 	logger.Debug(ctx, "starting UploadFile with payload %#v", p)
 
 	taskID, err := uuid.Parse(p.TaskID)
@@ -168,7 +168,7 @@ func (s *tasksServicesrvc) UploadFile(ctx context.Context, p *tasksservice.Uploa
 		len(domainTargets), len(uploadErrors)-previousLen, len(p.Targets),
 	)
 
-	err = s.store.PrepareTask(ctx, taskID, domainAccounts, domainProxies, domainTargets)
+	err = s.store.PrepareTask(ctx, taskID, domainAccounts, domainProxies, domainTargets, p.Filenames)
 	if err != nil {
 		logger.Errorf(ctx, "failed to prepare task: %v", err)
 		if errors.Is(err, tasks.ErrTaskNotFound) {

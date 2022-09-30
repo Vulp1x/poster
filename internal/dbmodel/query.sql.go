@@ -16,7 +16,7 @@ const assignBotsToProxiesForTask = `-- name: AssignBotsToProxiesForTask :exec
 UPDATE proxies
 set assigned_to = x.bot_id
 From (SELECT UNNEST($2::uuid[]) as bot_id,
-             UNNEST($3::uuid[])      as id) x
+             UNNEST($3::uuid[])     as id) x
 where proxies.id = x.id
   AND task_id = $1
 `
@@ -245,7 +245,7 @@ func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]P
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, image, status, title, created_at, started_at, updated_at, deleted_at
+select id, manager_id, text_template, image, status, title, bots_filename, proxies_filename, targets_filename, created_at, started_at, updated_at, deleted_at
 from tasks
 where id = $1
 `
@@ -260,6 +260,9 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.Image,
 		&i.Status,
 		&i.Title,
+		&i.BotsFilename,
+		&i.ProxiesFilename,
+		&i.TargetsFilename,
 		&i.CreatedAt,
 		&i.StartedAt,
 		&i.UpdatedAt,
@@ -397,6 +400,51 @@ type SaveTargetUsersParams struct {
 	UserID   int64     `json:"user_id"`
 }
 
+const saveUploadedDataToTask = `-- name: SaveUploadedDataToTask :exec
+update tasks
+set status           = 2, --dbmodel.DataUploadedTaskStatus,
+    bots_filename    = $2,
+    proxies_filename = $3,
+    targets_filename = $4
+where id = $1
+`
+
+type SaveUploadedDataToTaskParams struct {
+	ID              uuid.UUID `json:"id"`
+	BotsFilename    *string   `json:"bots_filename"`
+	ProxiesFilename *string   `json:"proxies_filename"`
+	TargetsFilename *string   `json:"targets_filename"`
+}
+
+func (q *Queries) SaveUploadedDataToTask(ctx context.Context, arg SaveUploadedDataToTaskParams) error {
+	_, err := q.db.Exec(ctx, saveUploadedDataToTask,
+		arg.ID,
+		arg.BotsFilename,
+		arg.ProxiesFilename,
+		arg.TargetsFilename,
+	)
+	return err
+}
+
+const selectCountsForTask = `-- name: SelectCountsForTask :one
+select (select count(*) from proxies p where p.task_id = $1)      as proxies_count,
+       (select count(*) from bot_accounts b where b.task_id = $1) as bots_count,
+       (select count(*) from target_users t where t.task_id = $1) as targets_count
+`
+
+type SelectCountsForTaskRow struct {
+	ProxiesCount int64 `json:"proxies_count"`
+	BotsCount    int64 `json:"bots_count"`
+	TargetsCount int64 `json:"targets_count"`
+}
+
+func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (SelectCountsForTaskRow, error) {
+	row := q.db.QueryRow(ctx, selectCountsForTask, taskID)
+	var i SelectCountsForTaskRow
+	err := row.Scan(&i.ProxiesCount, &i.BotsCount, &i.TargetsCount)
+	return i, err
+}
+
 const selectNow = `-- name: SelectNow :exec
 SELECT now()
 `
@@ -424,7 +472,7 @@ set status     = 3,
     started_at = now()
 where id = $1
   AND status = 2 --
-returning id, manager_id, text_template, image, status, title, created_at, started_at, updated_at, deleted_at
+returning id, manager_id, text_template, image, status, title, bots_filename, proxies_filename, targets_filename, created_at, started_at, updated_at, deleted_at
 `
 
 func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) (Task, error) {
@@ -437,6 +485,9 @@ func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) (Task, error)
 		&i.Image,
 		&i.Status,
 		&i.Title,
+		&i.BotsFilename,
+		&i.ProxiesFilename,
+		&i.TargetsFilename,
 		&i.CreatedAt,
 		&i.StartedAt,
 		&i.UpdatedAt,

@@ -19,7 +19,7 @@ type Service interface {
 	// создать драфт задачи
 	CreateTaskDraft(context.Context, *CreateTaskDraftPayload) (res string, err error)
 	// загрузить файл с пользователями, прокси
-	UploadFile(context.Context, *UploadFilePayload) (res []*UploadError, err error)
+	UploadFiles(context.Context, *UploadFilesPayload) (res []*UploadError, err error)
 	// присвоить ботам прокси
 	AssignProxies(context.Context, *AssignProxiesPayload) (res int, err error)
 	// удалить задачу и все связанные с ней сущности. Использовать только для тестов
@@ -48,7 +48,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [8]string{"create task draft", "upload file", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
+var MethodNames = [8]string{"create task draft", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -150,11 +150,20 @@ type Task struct {
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
-	BotsFilename int `json:"bots_filename"`
+	BotsFilename *string `json:"bots_filename"`
 	// название файла, из которого брали прокси
-	ProxiesFilename int `json:"proxies_filename"`
+	ProxiesFilename *string `json:"proxies_filename"`
 	// название файла, из которого брали целевых пользователей
-	TargetsFilename int `json:"targets_filename"`
+	TargetsFilename *string `json:"targets_filename"`
+}
+
+type TaskFileNames struct {
+	// название файла, из которого брали ботов
+	BotsFilename string `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename string `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename string `json:"targets_filename"`
 }
 
 type UploadError struct {
@@ -168,13 +177,14 @@ type UploadError struct {
 	Reason string
 }
 
-// UploadFilePayload is the payload type of the tasks_service service upload
-// file method.
-type UploadFilePayload struct {
+// UploadFilesPayload is the payload type of the tasks_service service upload
+// files method.
+type UploadFilesPayload struct {
 	// JWT used for authentication
 	Token string
 	// id задачи, в которую загружаем пользователей/прокси
-	TaskID string `json:"task_id"`
+	TaskID    string `json:"task_id"`
+	Filenames *TaskFileNames
 	// список ботов
 	Bots []*BotAccountRecord
 	// список проксей для использования

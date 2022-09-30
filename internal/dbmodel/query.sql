@@ -117,7 +117,7 @@ where bot_accounts.id = x.id
 UPDATE proxies
 set assigned_to = x.bot_id
 From (SELECT UNNEST(sqlc.arg(bot_ids)::uuid[]) as bot_id,
-             UNNEST(sqlc.arg(ids)::uuid[])      as id) x
+             UNNEST(sqlc.arg(ids)::uuid[])     as id) x
 where proxies.id = x.id
   AND task_id = $1;
 
@@ -132,3 +132,16 @@ DELETE
 FROM bot_accounts
 where id = ANY ($1::uuid[])
 RETURNING 1;
+
+-- name: SelectCountsForTask :one
+select (select count(*) from proxies p where p.task_id = $1)      as proxies_count,
+       (select count(*) from bot_accounts b where b.task_id = $1) as bots_count,
+       (select count(*) from target_users t where t.task_id = $1) as targets_count;
+
+-- name: SaveUploadedDataToTask :exec
+update tasks
+set status           = 2, --dbmodel.DataUploadedTaskStatus,
+    bots_filename    = $2,
+    proxies_filename = $3,
+    targets_filename = $4
+where id = $1;

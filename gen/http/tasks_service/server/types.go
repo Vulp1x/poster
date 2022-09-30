@@ -23,9 +23,10 @@ type CreateTaskDraftRequestBody struct {
 	PostImage *string `json:"post_image"`
 }
 
-// UploadFileRequestBody is the type of the "tasks_service" service "upload
-// file" endpoint HTTP request body.
-type UploadFileRequestBody struct {
+// UploadFilesRequestBody is the type of the "tasks_service" service "upload
+// files" endpoint HTTP request body.
+type UploadFilesRequestBody struct {
+	Filenames *TaskFileNamesRequestBody `form:"filenames,omitempty" json:"filenames,omitempty" xml:"filenames,omitempty"`
 	// список ботов
 	Bots []*BotAccountRecordRequestBody `form:"bots,omitempty" json:"bots,omitempty" xml:"bots,omitempty"`
 	// список проксей для использования
@@ -34,9 +35,9 @@ type UploadFileRequestBody struct {
 	Targets []*TargetUserRecordRequestBody `form:"targets,omitempty" json:"targets,omitempty" xml:"targets,omitempty"`
 }
 
-// UploadFileResponseBody is the type of the "tasks_service" service "upload
-// file" endpoint HTTP response body.
-type UploadFileResponseBody []*UploadErrorResponse
+// UploadFilesResponseBody is the type of the "tasks_service" service "upload
+// files" endpoint HTTP response body.
+type UploadFilesResponseBody []*UploadErrorResponse
 
 // GetTaskOKResponseBody is the type of the "tasks_service" service "get task"
 // endpoint HTTP response body.
@@ -56,11 +57,11 @@ type GetTaskOKResponseBody struct {
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
-	BotsFilename int `json:"bots_filename"`
+	BotsFilename *string `json:"bots_filename"`
 	// название файла, из которого брали прокси
-	ProxiesFilename int `json:"proxies_filename"`
+	ProxiesFilename *string `json:"proxies_filename"`
 	// название файла, из которого брали целевых пользователей
-	TargetsFilename int `json:"targets_filename"`
+	TargetsFilename *string `json:"targets_filename"`
 }
 
 // UploadErrorResponse is used to define fields on response body types.
@@ -73,6 +74,16 @@ type UploadErrorResponse struct {
 	// номер порта
 	Input  string `form:"input" json:"input" xml:"input"`
 	Reason string `form:"reason" json:"reason" xml:"reason"`
+}
+
+// TaskFileNamesRequestBody is used to define fields on request body types.
+type TaskFileNamesRequestBody struct {
+	// название файла, из которого брали ботов
+	BotsFilename *string `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename *string `json:"targets_filename"`
 }
 
 // BotAccountRecordRequestBody is used to define fields on request body types.
@@ -96,9 +107,9 @@ type TargetUserRecordRequestBody struct {
 	LineNumber *int `json:"line_number"`
 }
 
-// NewUploadFileResponseBody builds the HTTP response body from the result of
-// the "upload file" endpoint of the "tasks_service" service.
-func NewUploadFileResponseBody(res []*tasksservice.UploadError) UploadFileResponseBody {
+// NewUploadFilesResponseBody builds the HTTP response body from the result of
+// the "upload files" endpoint of the "tasks_service" service.
+func NewUploadFilesResponseBody(res []*tasksservice.UploadError) UploadFilesResponseBody {
 	body := make([]*UploadErrorResponse, len(res))
 	for i, val := range res {
 		body[i] = marshalTasksserviceUploadErrorToUploadErrorResponse(val)
@@ -138,10 +149,11 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 	return v
 }
 
-// NewUploadFilePayload builds a tasks_service service upload file endpoint
+// NewUploadFilesPayload builds a tasks_service service upload files endpoint
 // payload.
-func NewUploadFilePayload(body *UploadFileRequestBody, taskID string, token string) *tasksservice.UploadFilePayload {
-	v := &tasksservice.UploadFilePayload{}
+func NewUploadFilesPayload(body *UploadFilesRequestBody, taskID string, token string) *tasksservice.UploadFilesPayload {
+	v := &tasksservice.UploadFilesPayload{}
+	v.Filenames = unmarshalTaskFileNamesRequestBodyToTasksserviceTaskFileNames(body.Filenames)
 	v.Bots = make([]*tasksservice.BotAccountRecord, len(body.Bots))
 	for i, val := range body.Bots {
 		v.Bots[i] = unmarshalBotAccountRecordRequestBodyToTasksserviceBotAccountRecord(val)
@@ -232,9 +244,9 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 	return
 }
 
-// ValidateUploadFileRequestBody runs the validations defined on Upload
-// FileRequestBody
-func ValidateUploadFileRequestBody(body *UploadFileRequestBody) (err error) {
+// ValidateUploadFilesRequestBody runs the validations defined on Upload
+// FilesRequestBody
+func ValidateUploadFilesRequestBody(body *UploadFilesRequestBody) (err error) {
 	if body.Bots == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("bots", "body"))
 	}
@@ -243,6 +255,14 @@ func ValidateUploadFileRequestBody(body *UploadFileRequestBody) (err error) {
 	}
 	if body.Targets == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("targets", "body"))
+	}
+	if body.Filenames == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("filenames", "body"))
+	}
+	if body.Filenames != nil {
+		if err2 := ValidateTaskFileNamesRequestBody(body.Filenames); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	for _, e := range body.Bots {
 		if e != nil {
@@ -264,6 +284,21 @@ func ValidateUploadFileRequestBody(body *UploadFileRequestBody) (err error) {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
+	}
+	return
+}
+
+// ValidateTaskFileNamesRequestBody runs the validations defined on
+// TaskFileNamesRequestBody
+func ValidateTaskFileNamesRequestBody(body *TaskFileNamesRequestBody) (err error) {
+	if body.BotsFilename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bots_filename", "body"))
+	}
+	if body.ProxiesFilename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("proxies_filename", "body"))
+	}
+	if body.TargetsFilename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("targets_filename", "body"))
 	}
 	return
 }

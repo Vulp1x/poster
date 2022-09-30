@@ -142,7 +142,7 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
-	Method("upload file", func() {
+	Method("upload files", func() {
 		Description("загрузить файл с пользователями, прокси")
 
 		Security(JWTAuth)
@@ -157,11 +157,13 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
+			Attribute("filenames", TaskFilenames)
+
 			Attribute("bots", ArrayOf(BotAccountRecord), "список ботов")
 			Attribute("proxies", ArrayOf(ProxyRecord), "список проксей для использования")
 			Attribute("targets", ArrayOf(TargetUserRecord), "список аккаунтов, которым показать надо рекламу")
 
-			Required("token", "task_id", "bots", "proxies", "targets")
+			Required("token", "task_id", "bots", "proxies", "targets", "filenames")
 		})
 
 		Result(ArrayOf(UploadError))

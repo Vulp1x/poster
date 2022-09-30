@@ -116,16 +116,29 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_num")
 	})
 
-	Attribute("bots_filename", Int, "название файла, из которого брали ботов", func() {
+	Attribute("bots_filename", String, "название файла, из которого брали ботов", func() {
 		Meta("struct:tag:json", "bots_filename")
 	})
-	Attribute("proxies_filename", Int, "название файла, из которого брали прокси", func() {
+	Attribute("proxies_filename", String, "название файла, из которого брали прокси", func() {
 		Meta("struct:tag:json", "proxies_filename")
 	})
-	Attribute("targets_filename", Int, "название файла, из которого брали целевых пользователей", func() {
+	Attribute("targets_filename", String, "название файла, из которого брали целевых пользователей", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("id", "text_template", "image", "status", "title", "bots_num", "proxies_num", "targets_num",
-		"bots_filename", "proxies_filename", "targets_filename")
+	Required("id", "text_template", "image", "status", "title", "bots_num", "proxies_num", "targets_num")
+})
+
+var TaskFilenames = Type("TaskFileNames", func() {
+	Attribute("bots_filename", String, "название файла, из которого брали ботов", func() {
+		Meta("struct:tag:json", "bots_filename")
+	})
+	Attribute("proxies_filename", String, "название файла, из которого брали прокси", func() {
+		Meta("struct:tag:json", "proxies_filename")
+	})
+	Attribute("targets_filename", String, "название файла, из которого брали целевых пользователей", func() {
+		Meta("struct:tag:json", "targets_filename")
+	})
+
+	Required("bots_filename", "proxies_filename", "targets_filename")
 })

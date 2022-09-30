@@ -32,8 +32,24 @@ type Store struct {
 	txf         dbmodel.TxFunc
 }
 
-func (s *Store) GetTask(ctx context.Context, taskID uuid.UUID) (*tasksservice.Task, error) {
-	return nil, nil
+func (s *Store) GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	task, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.TaskWithCounters{}, ErrTaskNotFound
+		}
+
+		return domain.TaskWithCounters{}, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
+	}
+
+	counters, err := q.SelectCountsForTask(ctx, taskID)
+	if err != nil {
+		return domain.TaskWithCounters{}, fmt.Errorf("failed to select counters: %v", err)
+	}
+
+	return domain.TaskWithCounters{Task: task, SelectCountsForTaskRow: counters}, nil
 }
 
 func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error) {
@@ -151,13 +167,7 @@ func (s *Store) ForceDelete(ctx context.Context, taskID uuid.UUID) error {
 	return tx.Commit(ctx)
 }
 
-func (s *Store) PrepareTask(
-	ctx context.Context,
-	taskID uuid.UUID,
-	botAccounts domain.BotAccounts,
-	proxies domain.Proxies,
-	targets domain.TargetUsers,
-) error {
+func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error {
 	tx, err := s.txf(ctx)
 	if err != nil {
 		return store.ErrTransactionFail
@@ -198,9 +208,11 @@ func (s *Store) PrepareTask(
 		return err
 	}
 
-	err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
-		Status: dbmodel.DataUploadedTaskStatus,
-		ID:     taskID,
+	err = q.SaveUploadedDataToTask(ctx, dbmodel.SaveUploadedDataToTaskParams{
+		ID:              taskID,
+		BotsFilename:    &filenames.BotsFilename,
+		ProxiesFilename: &filenames.ProxiesFilename,
+		TargetsFilename: &filenames.TargetsFilename,
 	})
 	if err != nil {
 		return err

@@ -17,7 +17,7 @@ import (
 // Endpoints wraps the "tasks_service" service endpoints.
 type Endpoints struct {
 	CreateTaskDraft goa.Endpoint
-	UploadFile      goa.Endpoint
+	UploadFiles     goa.Endpoint
 	AssignProxies   goa.Endpoint
 	ForceDelete     goa.Endpoint
 	StartTask       goa.Endpoint
@@ -32,7 +32,7 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		CreateTaskDraft: NewCreateTaskDraftEndpoint(s, a.JWTAuth),
-		UploadFile:      NewUploadFileEndpoint(s, a.JWTAuth),
+		UploadFiles:     NewUploadFilesEndpoint(s, a.JWTAuth),
 		AssignProxies:   NewAssignProxiesEndpoint(s, a.JWTAuth),
 		ForceDelete:     NewForceDeleteEndpoint(s, a.JWTAuth),
 		StartTask:       NewStartTaskEndpoint(s, a.JWTAuth),
@@ -46,7 +46,7 @@ func NewEndpoints(s Service) *Endpoints {
 // endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateTaskDraft = m(e.CreateTaskDraft)
-	e.UploadFile = m(e.UploadFile)
+	e.UploadFiles = m(e.UploadFiles)
 	e.AssignProxies = m(e.AssignProxies)
 	e.ForceDelete = m(e.ForceDelete)
 	e.StartTask = m(e.StartTask)
@@ -74,11 +74,11 @@ func NewCreateTaskDraftEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.E
 	}
 }
 
-// NewUploadFileEndpoint returns an endpoint function that calls the method
-// "upload file" of service "tasks_service".
-func NewUploadFileEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewUploadFilesEndpoint returns an endpoint function that calls the method
+// "upload files" of service "tasks_service".
+func NewUploadFilesEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*UploadFilePayload)
+		p := req.(*UploadFilesPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
@@ -89,7 +89,7 @@ func NewUploadFileEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 		if err != nil {
 			return nil, err
 		}
-		return s.UploadFile(ctx, p)
+		return s.UploadFiles(ctx, p)
 	}
 }
 

@@ -19,16 +19,19 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE tasks
 (
-    id            uuid                     not null primary key default gen_random_uuid(),
-    manager_id    uuid                     not null references users,
-    text_template text                     not null,
-    image         bytea                    not null,
-    status        smallint                 not null,
-    title         text                     not null,
-    created_at    timestamp with time zone not null,
-    started_at    timestamp with time zone,
-    updated_at    timestamp with time zone,
-    deleted_at    timestamp with time zone
+    id               uuid                     not null primary key default gen_random_uuid(),
+    manager_id       uuid                     not null references users,
+    text_template    text                     not null,
+    image            bytea                    not null,
+    status           smallint                 not null,
+    title            text                     not null,
+    bots_filename    text, -- название файла с ботами
+    proxies_filename text, -- название файла с прокси
+    targets_filename text, -- название файла с получателями
+    created_at       timestamp with time zone not null,
+    started_at       timestamp with time zone,
+    updated_at       timestamp with time zone,
+    deleted_at       timestamp with time zone
 );
 
 CREATE TABLE bot_accounts

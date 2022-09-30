@@ -120,23 +120,23 @@ func EncodeCreateTaskDraftError(encoder func(context.Context, http.ResponseWrite
 	}
 }
 
-// EncodeUploadFileResponse returns an encoder for responses returned by the
-// tasks_service upload file endpoint.
-func EncodeUploadFileResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeUploadFilesResponse returns an encoder for responses returned by the
+// tasks_service upload files endpoint.
+func EncodeUploadFilesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.([]*tasksservice.UploadError)
 		enc := encoder(ctx, w)
-		body := NewUploadFileResponseBody(res)
+		body := NewUploadFilesResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeUploadFileRequest returns a decoder for requests sent to the
-// tasks_service upload file endpoint.
-func DecodeUploadFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeUploadFilesRequest returns a decoder for requests sent to the
+// tasks_service upload files endpoint.
+func DecodeUploadFilesRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
-		var payload *tasksservice.UploadFilePayload
+		var payload *tasksservice.UploadFilesPayload
 		if err := decoder(r).Decode(&payload); err != nil {
 			return nil, goa.DecodePayloadError(err.Error())
 		}
@@ -150,17 +150,17 @@ func DecodeUploadFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 	}
 }
 
-// NewTasksServiceUploadFileDecoder returns a decoder to decode the multipart
-// request for the "tasks_service" service "upload file" endpoint.
-func NewTasksServiceUploadFileDecoder(mux goahttp.Muxer, tasksServiceUploadFileDecoderFn TasksServiceUploadFileDecoderFunc) func(r *http.Request) goahttp.Decoder {
+// NewTasksServiceUploadFilesDecoder returns a decoder to decode the multipart
+// request for the "tasks_service" service "upload files" endpoint.
+func NewTasksServiceUploadFilesDecoder(mux goahttp.Muxer, tasksServiceUploadFilesDecoderFn TasksServiceUploadFilesDecoderFunc) func(r *http.Request) goahttp.Decoder {
 	return func(r *http.Request) goahttp.Decoder {
 		return goahttp.EncodingFunc(func(v interface{}) error {
 			mr, merr := r.MultipartReader()
 			if merr != nil {
 				return merr
 			}
-			p := v.(**tasksservice.UploadFilePayload)
-			if err := tasksServiceUploadFileDecoderFn(mr, p); err != nil {
+			p := v.(**tasksservice.UploadFilesPayload)
+			if err := tasksServiceUploadFilesDecoderFn(mr, p); err != nil {
 				return err
 			}
 
@@ -186,9 +186,9 @@ func NewTasksServiceUploadFileDecoder(mux goahttp.Muxer, tasksServiceUploadFileD
 	}
 }
 
-// EncodeUploadFileError returns an encoder for errors returned by the upload
-// file tasks_service endpoint.
-func EncodeUploadFileError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeUploadFilesError returns an encoder for errors returned by the upload
+// files tasks_service endpoint.
+func EncodeUploadFilesError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en ErrorNamer
@@ -756,6 +756,19 @@ func EncodeListTasksError(encoder func(context.Context, http.ResponseWriter) goa
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// unmarshalTaskFileNamesRequestBodyToTasksserviceTaskFileNames builds a value
+// of type *tasksservice.TaskFileNames from a value of type
+// *TaskFileNamesRequestBody.
+func unmarshalTaskFileNamesRequestBodyToTasksserviceTaskFileNames(v *TaskFileNamesRequestBody) *tasksservice.TaskFileNames {
+	res := &tasksservice.TaskFileNames{
+		BotsFilename:    *v.BotsFilename,
+		ProxiesFilename: *v.ProxiesFilename,
+		TargetsFilename: *v.TargetsFilename,
+	}
+
+	return res
 }
 
 // unmarshalBotAccountRecordRequestBodyToTasksserviceBotAccountRecord builds a
