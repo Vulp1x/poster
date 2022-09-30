@@ -102,6 +102,10 @@ gen:
 	rm -rf ./internal/service/cmd
 	rm -rf ./internal/service/gen
 	rm -rf ./internal/service/cli
+	rm -rf ./gen/http/*/client
+	rm -rf ./gen/*/client.go
+	rm -rf ./gen/http/cli
+	git restore ./gen/tasks_service/consts.go
 
 
 .PHONY: migrate-prod
