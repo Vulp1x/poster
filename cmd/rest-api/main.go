@@ -87,6 +87,8 @@ func main() {
 
 	var wg sync.WaitGroup
 
+	logger.Infof(ctx, "starting...")
+
 	// Start the servers and send errors (if any) to the error channel.
 	handleHTTPServer(
 		ctx,
