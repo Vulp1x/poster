@@ -75,4 +75,5 @@ jobs:
           script: |
             cd /home/poster
             docker-compose down
+            docker-compose -f docker-compose.yaml pull
             docker-compose -f docker-compose.yaml up --build --detach
