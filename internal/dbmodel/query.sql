@@ -37,6 +37,11 @@ select *
 from tasks
 where id = $1;
 
+-- name: FindTasksByManagerID :many
+select *
+from tasks
+where manager_id = $1;
+
 -- name: StartTaskByID :one
 update tasks
 set status     = 3,

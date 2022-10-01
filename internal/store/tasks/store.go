@@ -32,6 +32,26 @@ type Store struct {
 	txf         dbmodel.TxFunc
 }
 
+func (s *Store) ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	tasks, err := q.FindTasksByManagerID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrTaskNotFound
+		}
+
+		return nil, fmt.Errorf("failed to find tasks for manager '%s': %v", userID, err)
+	}
+
+	domainTasks := make([]domain.TaskWithCounters, len(tasks))
+	for i, task := range tasks {
+		domainTasks[i] = domain.TaskWithCounters{Task: task}
+	}
+
+	return domainTasks, nil
+}
+
 func (s *Store) GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
 

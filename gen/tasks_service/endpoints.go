@@ -203,6 +203,6 @@ func NewListTasksEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoin
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.ListTasks(ctx, p)
+		return s.ListTasks(ctx, p)
 	}
 }

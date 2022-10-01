@@ -271,6 +271,46 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 	return i, err
 }
 
+const findTasksByManagerID = `-- name: FindTasksByManagerID :many
+select id, manager_id, text_template, image, status, title, bots_filename, proxies_filename, targets_filename, created_at, started_at, updated_at, deleted_at
+from tasks
+where manager_id = $1
+`
+
+func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID) ([]Task, error) {
+	rows, err := q.db.Query(ctx, findTasksByManagerID, managerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Task
+	for rows.Next() {
+		var i Task
+		if err := rows.Scan(
+			&i.ID,
+			&i.ManagerID,
+			&i.TextTemplate,
+			&i.Image,
+			&i.Status,
+			&i.Title,
+			&i.BotsFilename,
+			&i.ProxiesFilename,
+			&i.TargetsFilename,
+			&i.CreatedAt,
+			&i.StartedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const forceDeleteBotAccountsForTask = `-- name: ForceDeleteBotAccountsForTask :execrows
 DELETE
 FROM bot_accounts

@@ -22,6 +22,7 @@ type taskStore interface {
 	ForceDelete(ctx context.Context, taskID uuid.UUID) error
 	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
 	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
+	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
 }
 
 // tasks_service service example implementation.
@@ -137,9 +138,27 @@ func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskP
 }
 
 // получить все задачи для текущего пользователя
-func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTasksPayload) (err error) {
+func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTasksPayload) ([]*tasksservice.Task, error) {
 	logger.Debug(ctx, "starting ListTasks with payload %#v", p)
-	return
+
+	userID, err := UserIDFromContext(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "failed to get user id from context: %v", err)
+		return nil, tasksservice.InternalError("")
+	}
+
+	domainTasks, err := s.store.ListTasks(ctx, userID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to find task: %v", err)
+
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, tasksservice.InternalError("")
+	}
+
+	return domainTasks.ToProto(), nil
 }
 
 func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) ([]*tasksservice.UploadError, error) {

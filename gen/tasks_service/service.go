@@ -31,7 +31,7 @@ type Service interface {
 	// получить задачу по id
 	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
 	// получить все задачи для текущего пользователя
-	ListTasks(context.Context, *ListTasksPayload) (err error)
+	ListTasks(context.Context, *ListTasksPayload) (res []*Task, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.

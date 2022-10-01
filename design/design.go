@@ -334,11 +334,14 @@ var _ = Service("tasks_service", func() {
 			Required("token")
 		})
 
+		Result(ArrayOf(Task))
+
 		HTTP(func() {
 			GET("/api/tasks/")
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response(StatusUnauthorized)
+			Response(StatusInternalServerError)
 		})
 	})
 })

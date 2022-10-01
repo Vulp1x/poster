@@ -64,6 +64,10 @@ type GetTaskOKResponseBody struct {
 	TargetsFilename *string `json:"targets_filename"`
 }
 
+// ListTasksResponseBody is the type of the "tasks_service" service "list
+// tasks" endpoint HTTP response body.
+type ListTasksResponseBody []*TaskResponse
+
 // UploadErrorResponse is used to define fields on response body types.
 type UploadErrorResponse struct {
 	// 1 - список ботов
@@ -74,6 +78,30 @@ type UploadErrorResponse struct {
 	// номер порта
 	Input  string `form:"input" json:"input" xml:"input"`
 	Reason string `form:"reason" json:"reason" xml:"reason"`
+}
+
+// TaskResponse is used to define fields on response body types.
+type TaskResponse struct {
+	ID string `form:"id" json:"id" xml:"id"`
+	// описание под постом
+	TextTemplate string `json:"text_template"`
+	// base64 строка картинки
+	Image  string `form:"image" json:"image" xml:"image"`
+	Status int    `form:"status" json:"status" xml:"status"`
+	// название задачи
+	Title string `form:"title" json:"title" xml:"title"`
+	// количество ботов в задаче
+	BotsNum int `json:"bots_num"`
+	// количество прокси в задаче
+	ProxiesNum int `json:"proxies_num"`
+	// количество целевых пользователей в задаче
+	TargetsNum int `json:"targets_num"`
+	// название файла, из которого брали ботов
+	BotsFilename *string `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename *string `json:"targets_filename"`
 }
 
 // TaskFileNamesRequestBody is used to define fields on request body types.
@@ -132,6 +160,16 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		BotsFilename:    res.BotsFilename,
 		ProxiesFilename: res.ProxiesFilename,
 		TargetsFilename: res.TargetsFilename,
+	}
+	return body
+}
+
+// NewListTasksResponseBody builds the HTTP response body from the result of
+// the "list tasks" endpoint of the "tasks_service" service.
+func NewListTasksResponseBody(res []*tasksservice.Task) ListTasksResponseBody {
+	body := make([]*TaskResponse, len(res))
+	for i, val := range res {
+		body[i] = marshalTasksserviceTaskToTaskResponse(val)
 	}
 	return body
 }

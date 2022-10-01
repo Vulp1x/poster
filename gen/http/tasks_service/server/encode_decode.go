@@ -679,8 +679,11 @@ func EncodeGetTaskError(encoder func(context.Context, http.ResponseWriter) goaht
 // tasks_service list tasks endpoint.
 func EncodeListTasksResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.([]*tasksservice.Task)
+		enc := encoder(ctx, w)
+		body := NewListTasksResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -823,6 +826,26 @@ func marshalTasksserviceUploadErrorToUploadErrorResponse(v *tasksservice.UploadE
 		Line:   v.Line,
 		Input:  v.Input,
 		Reason: v.Reason,
+	}
+
+	return res
+}
+
+// marshalTasksserviceTaskToTaskResponse builds a value of type *TaskResponse
+// from a value of type *tasksservice.Task.
+func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
+	res := &TaskResponse{
+		ID:              v.ID,
+		TextTemplate:    v.TextTemplate,
+		Image:           v.Image,
+		Status:          v.Status,
+		Title:           v.Title,
+		BotsNum:         v.BotsNum,
+		ProxiesNum:      v.ProxiesNum,
+		TargetsNum:      v.TargetsNum,
+		BotsFilename:    v.BotsFilename,
+		ProxiesFilename: v.ProxiesFilename,
+		TargetsFilename: v.TargetsFilename,
 	}
 
 	return res
