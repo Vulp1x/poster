@@ -2,9 +2,10 @@ package transport
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/inst-api/poster/pkg/logger"
 )
 
 var elapsedTimeKey = ctxKey("elapsed_time")
@@ -22,13 +23,19 @@ type loggingRoundTripper struct {
 // RoundTrip add started_at request field
 func (lrt loggingRoundTripper) RoundTrip(req *http.Request) (res *http.Response, e error) {
 	// Do "before sending requests" actions here.
-	fmt.Printf("Sending request to %v\n", req.URL)
+	ctx := req.Context()
+	logger.Infof(ctx, "sending request to %s", req.URL)
 	startedAt := time.Now()
 
 	// Send the request, get the response (or the error)
 	res, e = lrt.Proxied.RoundTrip(req)
 
-	req.WithContext(contextWithElapsedTime(req.Context(), time.Since(startedAt)))
+	var statusCode = -666
+	if res != nil {
+		statusCode = res.StatusCode
+	}
+
+	logger.Infof(ctx, "got response in %s, status code: %d", time.Since(startedAt), statusCode)
 
 	return
 }

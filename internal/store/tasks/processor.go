@@ -3,6 +3,7 @@ package tasks
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
 	"github.com/inst-api/poster/internal/requests"
+	"github.com/inst-api/poster/internal/transport"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
@@ -163,6 +165,50 @@ func (p *worker) saveFailedRequest(r *http.Request, resp *http.Response) {
 }
 
 func (p *worker) createPost(ctx context.Context, botAccount domain.BotAccount, targetUsers []dbmodel.TargetUser) error {
+	// req, _ := http.NewRequestWithContext(
+	// 	transport.ContextWithProxy(context.Background(), botAccount.ProxyURL()),
+	// 	"GET",
+	// 	"https://2ip.ru",
+	// 	nil,
+	// )
+	//
+	// checkresp, err := p.cli.Do(req)
+	// if err != nil {
+	// 	return err
+	// }
+	// bytes, err := io.ReadAll(checkresp.Body)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to read body: %v", err)
+	// }
+	//
+	// fmt.Printf("got '%s' from body\n", string(bytes))
+
+	photoUploadReq, err := requests.PrepareUploadRequest(ctx, botAccount, p.generator.Next(ctx))
+	if err != nil {
+		return err
+	}
+
+	pr, err := transport.FromContext()(photoUploadReq)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(pr)
+
+	resp, err := p.cli.Do(photoUploadReq)
+	if err != nil {
+		return fmt.Errorf("failed to upload photo: %v", err)
+	}
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read body: %v", err)
+	}
+
+	fmt.Printf("got '%s' from body\n", string(bytes))
 
 	return nil
 }
+
+// '{"upload_id":"1664888837874","xsharing_nonces":{},"status":"ok"}' webp
+// got '{"upload_id":"1664889100793","xsharing_nonces":{},"status":"ok"}' from body jpeg

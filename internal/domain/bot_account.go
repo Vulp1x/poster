@@ -146,12 +146,13 @@ var headersRegexp = regexp.MustCompile(`(?m)X-MID=(.*);IG-U-DS-USER-ID=(.+);IG-U
 const authHeaderPrefix = "Bearer IGT:2:"
 
 func (b *BotAccount) assignHeaders(input string) error {
-	matches := headersRegexp.FindStringSubmatch(input)
-	if len(matches) != 6 {
-		return fmt.Errorf("from headers '%s' got %d matches, expected %d", input, len(matches), 6)
-	}
+	headersMap := parseHeaders(input)
 
-	authData, err := parseSessionToken(strings.TrimPrefix(matches[4], authHeaderPrefix))
+	auth, ok := headersMap["authorization"]
+	if !ok {
+		return fmt.Errorf("'Authorization' header is missing in %+v", headersMap)
+	}
+	authData, err := parseSessionToken(strings.TrimPrefix(auth, authHeaderPrefix))
 	if err != nil {
 		return err
 	}
@@ -159,16 +160,32 @@ func (b *BotAccount) assignHeaders(input string) error {
 	authData.SessionID = strings.ReplaceAll(authData.SessionID, "%3A", ":")
 
 	b.Headers = headers.Base{
-		Mid:             matches[1],
-		DsUserID:        matches[2],
-		Rur:             matches[3],
-		Authorization:   matches[4],
-		WWWClaim:        matches[5],
+		Mid:             headersMap["x-mid"],
+		DsUserID:        headersMap["ig-u-ds-user-id"],
+		Rur:             headersMap["ig-u-rur"],
+		Authorization:   auth,
+		WWWClaim:        headersMap["x-ig-www-claim"],
 		AuthData:        authData,
 		BlocksVersionID: buildBloksVersioningID(b.DeviceData),
 	}
 
 	return nil
+}
+
+// parseHeaders из строки вида key1=val1;key2=val2 делает мапу {key1: val1, ke2:val2}
+func parseHeaders(input string) map[string]string {
+	headerPairs := strings.Split(input, ";")
+	m := make(map[string]string)
+	for _, pair := range headerPairs {
+		keyAndValue := strings.SplitN(pair, "=", 2)
+		if len(keyAndValue) != 2 {
+			continue
+		}
+
+		m[strings.ToLower(keyAndValue[0])] = keyAndValue[1]
+	}
+
+	return m
 }
 
 func parseSessionToken(authToken string) (headers.AuthorizationData, error) {
@@ -183,10 +200,15 @@ func parseSessionToken(authToken string) (headers.AuthorizationData, error) {
 		return headers.AuthorizationData{}, fmt.Errorf("failed to unmarshal auth data from '%s': %v", string(tokenBytes), err)
 	}
 
+	if authData.SessionID == "" {
+		return headers.AuthorizationData{}, fmt.Errorf("got empty session id from %s", authToken)
+	}
+
 	return authData, nil
 }
 
-func (b BotAccount) Header(contentLen int64) map[string][]string {
+// ConstructHeaders создает заголовки, которые используются для запросов
+func (b BotAccount) ConstructHeaders(contentLen int64) map[string][]string {
 	h := headers.Default()
 
 	h["User-Agent"] = []string{b.UserAgent}
@@ -197,8 +219,19 @@ func (b BotAccount) Header(contentLen int64) map[string][]string {
 	h["X-MID"] = []string{b.Headers.Mid}
 	h["X-Bloks-Version-Id"] = []string{b.Headers.BlocksVersionID}
 	h["Content-Length"] = []string{strconv.FormatInt(contentLen, 10)}
+	h["Authorization"] = []string{b.Headers.Authorization}
 
 	return h
+}
+
+func (b BotAccount) PrepareDevice() string {
+	return fmt.Sprintf(
+		`{"manufacturer": "%s","model": "%s","android_version": %d, "android_release": "%s"}`,
+		b.DeviceData.Manufacturer,
+		b.DeviceData.Model,
+		b.DeviceData.AndroidVersion,
+		b.DeviceData.AndroidRelease,
+	)
 }
 
 func buildBloksVersioningID(deviceSettings headers.DeviceSettings) string {

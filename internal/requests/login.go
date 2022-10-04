@@ -25,7 +25,7 @@ func PrepareContactPointPrefillRequest(b domain.BotAccount) *http.Request {
 			Host:   instHost,
 			Path:   "/api/v1/BotAccounts/contact_point_prefill/",
 		},
-		Header: b.Header(int64(body.Len())),
+		Header: b.ConstructHeaders(int64(body.Len())),
 		Body:   io.NopCloser(body),
 	}
 
@@ -53,7 +53,7 @@ func PrepareSyncLauncherRequest(b domain.BotAccount, login bool) *http.Request {
 			Host:   instHost,
 			Path:   "/api/v1/launcher/sync/",
 		},
-		Header: b.Header(int64(body.Len())),
+		Header: b.ConstructHeaders(int64(body.Len())),
 		Body:   io.NopCloser(body),
 	}
 
@@ -88,7 +88,7 @@ func PrepareLoginRequest(b domain.BotAccount) (*http.Request, error) {
 			Host:   instHost,
 			Path:   "/api/v1/BotAccounts/contact_point_prefill/",
 		},
-		Header: b.Header(int64(body.Len())),
+		Header: b.ConstructHeaders(int64(body.Len())),
 		Body:   io.NopCloser(body),
 	}
 

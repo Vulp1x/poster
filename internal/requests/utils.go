@@ -3,6 +3,7 @@ package requests
 import (
 	"bytes"
 	"encoding/json"
+	"math/rand"
 	"net/url"
 	"strconv"
 
@@ -31,4 +32,15 @@ func generateSignature(data map[string]string) *bytes.Buffer {
 	buff.WriteString(url.QueryEscape(string(dataBytes)))
 
 	return buff
+}
+
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func GenerateCSRFToken() string {
+	buf := &bytes.Buffer{}
+	for i := 0; i < 64; i++ {
+		buf.WriteByte(alphabet[rand.Intn(len(alphabet))])
+	}
+
+	return buf.String()
 }

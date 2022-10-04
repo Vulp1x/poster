@@ -51,15 +51,15 @@ func RequestLoggerWithDebug(mux goahttp.Muxer, debug bool) func(http.Handler) ht
 			// buf.WriteString(fmt.Sprintf("> [%s] %s %s", reqID, r.Method, r.URL.String()))
 			//
 			// // Request Headers
-			// keys := make([]string, len(r.Header))
+			// keys := make([]string, len(r.ConstructHeaders))
 			// i := 0
-			// for k := range r.Header {
+			// for k := range r.ConstructHeaders {
 			// 	keys[i] = k
 			// 	i++
 			// }
 			// sort.Strings(keys)
 			// for _, k := range keys {
-			// 	buf.WriteString(fmt.Sprintf("\n> [%s] %s: %s", reqID, k, strings.Join(r.Header[k], ", ")))
+			// 	buf.WriteString(fmt.Sprintf("\n> [%s] %s: %s", reqID, k, strings.Join(r.ConstructHeaders[k], ", ")))
 			// }
 			//
 			// // Request parameters
@@ -93,15 +93,15 @@ func RequestLoggerWithDebug(mux goahttp.Muxer, debug bool) func(http.Handler) ht
 			// h.ServeHTTP(dupper, r)
 			//
 			// buf.WriteString(fmt.Sprintf("\n< [%s] %s", reqID, http.StatusText(dupper.Status)))
-			// keys = make([]string, len(dupper.Header()))
+			// keys = make([]string, len(dupper.ConstructHeaders()))
 			// i = 0
-			// for k := range dupper.Header() {
+			// for k := range dupper.ConstructHeaders() {
 			// 	keys[i] = k
 			// 	i++
 			// }
 			// sort.Strings(keys)
 			// for _, k := range keys {
-			// 	buf.WriteString(fmt.Sprintf("\n< [%s] %s: %s", reqID, k, strings.Join(dupper.Header()[k], ", ")))
+			// 	buf.WriteString(fmt.Sprintf("\n< [%s] %s: %s", reqID, k, strings.Join(dupper.ConstructHeaders()[k], ", ")))
 			// }
 			// if dupper.Buffer.Len() > 0 {
 			// 	buf.WriteByte('\n')

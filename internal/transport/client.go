@@ -6,5 +6,9 @@ import (
 )
 
 func InitHTTPClient() *http.Client {
-	return &http.Client{Transport: &http.Transport{Proxy: FromContext()}, Timeout: 5 * time.Second}
+
+	return &http.Client{
+		Transport: &loggingRoundTripper{Proxied: http.DefaultTransport},
+		Timeout:   40 * time.Second,
+	}
 }
