@@ -78,6 +78,7 @@ CREATE SEQUENCE public.goose_db_version_id_seq
 CREATE TABLE public.logs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     bot_id uuid NOT NULL,
+    operation text NOT NULL,
     request jsonb NOT NULL,
     response jsonb NOT NULL,
     response_code integer NOT NULL,
@@ -111,6 +112,7 @@ CREATE TABLE public.target_users (
     task_id uuid NOT NULL,
     username text NOT NULL,
     user_id bigint NOT NULL,
+    status smallint DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone
 );

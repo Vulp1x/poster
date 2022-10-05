@@ -46,27 +46,25 @@ async def auth_login(username: str = Form(...),
 {
   "session_id": "55421762746%3ALGcXzRrjhSjwE4%3A12%3AAYfqa6OVkj3BlaYZwks_WiewL5fWn-LIwmguOOnSsQ",
   "uuids": {
-     "android_id": "android-ed0d3b157e361500", 
+    "android_id": "android-ed0d3b157e361500", 
     "phone_id": "dc36ada3-c9ce-488c-89e0-48b564c8f060", 
     "uuid": "249160d7-3663-42ee-9e6e-c5d64eeb4ec4", 
     "advertising_id": "748a2e89-3fda-4c36-bf12-405d86557897"
   },
   "device_settings": {
-  "app_version": "252.0.0.17.111",
-  "android_version": 28,
-  "android_release": "9.0.0",
-  "dpi": "320dpi",
-  "resolution": "720x1402",
-  "manufacturer": "samsung",
-  "device": "a10e",
-  "model":  "SM-S102DL",
-  "cpu": "exynos7885",
-  "version_code": "397702079"
+    "app_version": "252.0.0.17.111",
+    "android_version": 28,
+    "android_release": "9.0.0",
+    "dpi": "320dpi",
+    "resolution": "720x1402",
+    "manufacturer": "samsung",
+    "device": "a10e",
+    "model":  "SM-S102DL",
+    "cpu": "exynos7885",
+    "version_code": "397702079"
   },
   "user_agent": "Instagram 252.0.0.17.111 Android (28/9; 320dpi; 720x1402; samsung; SM-S102DL; a10e; exynos7885; en_IN; 397702079)",
-  "proxy": "109.248.7.220:10475:dmitrijkholodkov7815:21e49b",
-  "locale": "",
-  "timezone": ""
+  "proxy": "http://dmitrijkholodkov7815:21e49b@109.248.7.220:10475",
 }
 """
 

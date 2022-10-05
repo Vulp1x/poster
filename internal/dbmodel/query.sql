@@ -42,41 +42,46 @@ select *
 from tasks
 where manager_id = $1;
 
--- name: StartTaskByID :one
+-- name: StartTaskByID :exec
 update tasks
-set status     = 3,
+set status     = 4,
     started_at = now()
 where id = $1
-  AND status = 2 --
-returning *;
+  AND status = 3;
 
 -- name: GetBotByID :one
 select *
 from bot_accounts
 where id = $1;
 
--- name: FindAccountsForTask :many
+-- name: FindBotsForTask :many
 select *
 from bot_accounts
 where task_id = $1;
+
+-- name: FindReadyBotsForTask :many
+select *
+from bot_accounts
+where task_id = $1
+  and status = 0;
 
 -- name: FindProxiesForTask :many
 select *
 from proxies
 where task_id = $1;
 
+-- name: FindUnprocessedTargetsForTask :many
+select *
+from target_users
+where task_id = $1
+  AND status = 0
+limit $2;
 
 -- name: UpdateTaskStatus :exec
 update tasks
 set status     = $1,
     updated_at = now()
 where id = $2;
-
--- name: SetAccountAsCompleted :exec
-update bot_accounts
-set status     = 4,
-    updated_at = now()
-where id = $1;
 
 -- name: SaveBotAccounts :copyfrom
 insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)
@@ -150,3 +155,14 @@ set status           = 2, --dbmodel.DataUploadedTaskStatus,
     proxies_filename = $3,
     targets_filename = $4
 where id = $1;
+
+-- name: MarkBotAsCompleted :exec
+update bot_accounts
+set status = 4
+where id = $1;
+
+-- name: MarkTargetsAsNotified :exec
+update target_users
+set notified = true
+where task_id = $1
+  and status = 0;

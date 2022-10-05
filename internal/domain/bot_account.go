@@ -18,9 +18,7 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
-type BotAccount struct {
-	dbmodel.BotAccount
-}
+type BotAccount dbmodel.BotAccount
 
 func (b BotAccount) ProxyURL() *url.URL {
 	var buf bytes.Buffer

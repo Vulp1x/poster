@@ -8,19 +8,16 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 )
 
-type TaskWithCtx struct {
-	dbmodel.Task
-	Ctx context.Context
-}
+type Task dbmodel.Task
 
-type TaskPerBot struct {
+type BotWithTargets struct {
 	BotAccount
 	Targets []dbmodel.TargetUser
 }
 
 // PostingsPipe общий интерфейс для создания постов
 type PostingsPipe interface {
-	Process(ctx context.Context, account *TaskPerBot) error
+	Process(ctx context.Context, account *BotWithTargets) error
 }
 
 //

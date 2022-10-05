@@ -7,74 +7,14 @@ import (
 	"encoding/csv"
 	"fmt"
 	"image/jpeg"
-	"net/http"
 	"testing"
 
-	"github.com/google/uuid"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
-	"github.com/inst-api/poster/internal/transport"
+	"github.com/inst-api/poster/internal/instagrapi"
 )
-
-func Test_generateJazoest(t *testing.T) {
-	type args struct {
-		phoneId uuid.UUID
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := generateJazoest(tt.args.phoneId); got != tt.want {
-				t.Errorf("generateJazoest() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_worker_Login(t *testing.T) {
-	type fields struct {
-		tasksQueue     chan *domain.TaskPerBot
-		dbtxf          dbmodel.DBTXFunc
-		cli            *http.Client
-		generator      images.Generator
-		processorIndex int64
-		captionFormat  string
-	}
-	type args struct {
-		ctx     context.Context
-		account domain.BotAccount
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &worker{
-				tasksQueue:     tt.fields.tasksQueue,
-				dbtxf:          tt.fields.dbtxf,
-				cli:            tt.fields.cli,
-				generator:      tt.fields.generator,
-				processorIndex: tt.fields.processorIndex,
-				captionFormat:  tt.fields.captionFormat,
-			}
-			if err := p.Login(tt.args.ctx, tt.args.account); (err != nil) != tt.wantErr {
-				t.Errorf("Login() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
 
 //go:embed testdata/test_cat.jpeg
 var catPhotoBytes []byte
@@ -127,9 +67,9 @@ func Test_worker_createPost(t *testing.T) {
 	fmt.Println(img.Bounds(), img.ColorModel(), len(catPhotoBytes)/1280)
 
 	type fields struct {
-		tasksQueue     chan *domain.TaskPerBot
+		tasksQueue     chan *domain.BotWithTargets
 		dbtxf          dbmodel.DBTXFunc
-		cli            *http.Client
+		cli            instagrapiClient
 		generator      images.Generator
 		processorIndex int64
 		captionFormat  string
@@ -148,7 +88,7 @@ func Test_worker_createPost(t *testing.T) {
 		{
 			name: "OK",
 			fields: fields{
-				cli:       transport.InitHTTPClient(),
+				cli:       instagrapi.NewClient(),
 				generator: images.NewDummyGenerator(catPhotoBytes),
 			},
 			args: args{

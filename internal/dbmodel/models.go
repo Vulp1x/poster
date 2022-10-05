@@ -32,6 +32,7 @@ type BotAccount struct {
 type Log struct {
 	ID           uuid.UUID `json:"id"`
 	BotID        uuid.UUID `json:"bot_id"`
+	Operation    string    `json:"operation"`
 	Request      string    `json:"request"`
 	Response     string    `json:"response"`
 	ResponseCode int32     `json:"response_code"`
@@ -55,6 +56,7 @@ type TargetUser struct {
 	TaskID    uuid.UUID  `json:"task_id"`
 	Username  string     `json:"username"`
 	UserID    int64      `json:"user_id"`
+	Status    int16      `json:"status"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 }

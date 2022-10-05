@@ -37,3 +37,7 @@ func (p *Proxy) Scan(value interface{}) error {
 func (p Proxy) GetID() uuid.UUID {
 	return p.ID
 }
+
+func (p Proxy) PythonString() string {
+	return fmt.Sprintf("http://%s:%s@%s:%d", p.Login, p.Pass, p.Host, p.Port)
+}

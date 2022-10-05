@@ -12,19 +12,32 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/dbtx"
 	"github.com/inst-api/poster/internal/domain"
+	"github.com/inst-api/poster/internal/images"
+	"github.com/inst-api/poster/internal/instagrapi"
 	"github.com/inst-api/poster/internal/store"
-	"github.com/inst-api/poster/internal/transport"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/jackc/pgx/v4"
 )
+
+const workersPerTask = 30
 
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")
 
 var ErrTaskInvalidStatus = errors.New("invalid task status")
 
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc) *Store {
+	return &Store{
+		tasksChan:   make(chan domain.Task, 10),
+		taskCancels: make(map[uuid.UUID]func()),
+		pushTimeout: timeout,
+		dbtxf:       dbtxFunc,
+		txf:         txFunc,
+	}
+}
+
 type Store struct {
-	tasksChan   chan domain.TaskWithCtx
+	tasksChan   chan domain.Task
 	taskCancels map[uuid.UUID]func()
 	taskMu      *sync.Mutex
 	pushTimeout time.Duration
@@ -95,7 +108,7 @@ func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error
 		return 0, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DataUploadedTaskStatus, task.Status)
 	}
 
-	botAccounts, err := q.FindAccountsForTask(ctx, taskID)
+	botAccounts, err := q.FindBotsForTask(ctx, taskID)
 	if err != nil {
 		return 0, fmt.Errorf("failed to find bot accounts for task: %v", err)
 	}
@@ -241,18 +254,6 @@ func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts d
 	return tx.Commit(ctx)
 }
 
-func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc) *Store {
-	return &Store{
-		tasksChan:   make(chan domain.TaskWithCtx, 10),
-		taskCancels: make(map[uuid.UUID]func()),
-		pushTimeout: timeout,
-		dbtxf:       dbtxFunc,
-		txf:         txFunc,
-	}
-}
-
-const workersPerTask = 10
-
 func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
 
@@ -272,43 +273,64 @@ func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, te
 func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 	q := dbmodel.New(s.dbtxf(ctx))
 
-	task, err := q.StartTaskByID(ctx, taskID)
+	task, err := q.FindTaskByID(ctx, taskID)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrTaskNotFound
+		}
+
 		return fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
 	}
 
-	taskCtx, taskCancel := context.WithCancel(ctx)
-
-	taskWithCtx := domain.TaskWithCtx{
-		Task: task,
-		Ctx:  taskCtx,
+	if task.Status != dbmodel.ReadyTaskStatus {
+		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
 	}
 
-	botsChan := make(chan *domain.TaskPerBot, 20)
+	imageGenerator, err := images.NewRandomGammaGenerator(task.Image)
+	if err != nil {
+		return err
+	}
 
-	var workers []*worker
+	bots, err := q.FindReadyBotsForTask(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to find bots for task: %v", err)
+	}
+
+	maximumTargetsNum := int32(len(bots) * postsPerBot * targetsPerPost)
+	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
+		TaskID: taskID, Limit: maximumTargetsNum,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to find targets for task: %v", err)
+	}
+
+	neededBotsNum := len(targets) / (postsPerBot * targetsPerPost)
+
+	logger.Infof(ctx, "going to use %d/%d bots for %d targets", neededBotsNum, len(bots), len(targets))
+
+	bots = bots[:neededBotsNum-1]
+
+	taskCtx, taskCancel := context.WithCancel(ctx)
+	s.taskCancels[task.ID] = taskCancel
+
+	botsChan := make(chan *domain.BotWithTargets, 20)
+
 	for i := 0; i < workersPerTask; i++ {
-		workers = append(workers, &worker{
+		postingWorker := &worker{
 			tasksQueue:     botsChan,
 			dbtxf:          s.dbtxf,
-			cli:            transport.InitHTTPClient(),
+			cli:            instagrapi.NewClient(),
+			task:           domain.Task(task),
+			generator:      imageGenerator,
 			processorIndex: int64(i),
-		})
+		}
+
+		go postingWorker.run(taskCtx)
 	}
 
-	select {
-	case s.tasksChan <- taskWithCtx:
-		s.taskCancels[task.ID] = taskCancel
-		return nil
+	go s.asyncPushBots(ctx, botsChan, bots, targets)
 
-	case <-time.After(s.pushTimeout):
-		logger.Debugf(ctx, "waited for %s, failed to push task to queue")
-		break
-	}
-
-	taskCancel()
-
-	return fmt.Errorf("failed to push task to queue")
+	return nil
 }
 
 func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
@@ -368,6 +390,40 @@ func (s *Store) deleteUnnecessaryRows(ctx context.Context, tx dbmodel.Tx, accoun
 	}
 
 	return accounts[:remainRows], proxies[:remainRows], nil
+}
+
+func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWithTargets, bots []dbmodel.BotAccount, targets []dbmodel.TargetUser) {
+	startedAt := time.Now()
+
+	var batchEnd int
+	var allTargetsProcessed bool
+
+	for i, bot := range bots {
+		select {
+		case <-ctx.Done():
+			logger.Infof(ctx, "stopping bot pushes, pushed %d/%d bots: context done", i, len(bots))
+			return
+		default:
+		}
+
+		batchEnd = (i + 1) * postsPerBot * targetsPerPost
+		if batchEnd > len(targets) {
+			batchEnd = len(targets) - 1
+			allTargetsProcessed = true
+		}
+
+		botsChan <- &domain.BotWithTargets{
+			BotAccount: domain.BotAccount(bot),
+			Targets:    targets[i*postsPerBot*targetsPerPost : batchEnd],
+		}
+
+		if allTargetsProcessed && i != len(bots)-1 {
+			logger.Warnf(ctx, "processed %d targets with %d batches, breaking", len(targets), i+1)
+		}
+	}
+
+	logger.Infof(ctx, "pushed all bots in %s: closing chan", time.Since(startedAt))
+	close(botsChan)
 }
 
 // accountsLastIds возвращает список из rowsToDelete последних айдишников

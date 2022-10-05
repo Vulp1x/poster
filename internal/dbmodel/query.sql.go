@@ -145,14 +145,14 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const findAccountsForTask = `-- name: FindAccountsForTask :many
+const findBotsForTask = `-- name: FindBotsForTask :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where task_id = $1
 `
 
-func (q *Queries) FindAccountsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
-	rows, err := q.db.Query(ctx, findAccountsForTask, taskID)
+func (q *Queries) FindBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	rows, err := q.db.Query(ctx, findBotsForTask, taskID)
 	if err != nil {
 		return nil, err
 	}
@@ -244,6 +244,49 @@ func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]P
 	return items, nil
 }
 
+const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
+from bot_accounts
+where task_id = $1
+  and status = 0
+`
+
+func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	rows, err := q.db.Query(ctx, findReadyBotsForTask, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BotAccount
+	for rows.Next() {
+		var i BotAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.Password,
+			&i.UserAgent,
+			&i.DeviceData,
+			&i.Session,
+			&i.Headers,
+			&i.ResProxy,
+			&i.WorkProxy,
+			&i.Status,
+			&i.StartedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findTaskByID = `-- name: FindTaskByID :one
 select id, manager_id, text_template, image, status, title, bots_filename, proxies_filename, targets_filename, created_at, started_at, updated_at, deleted_at
 from tasks
@@ -300,6 +343,47 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.StartedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findUnprocessedTargetsForTask = `-- name: FindUnprocessedTargetsForTask :many
+select id, task_id, username, user_id, status, created_at, updated_at
+from target_users
+where task_id = $1
+  AND status = 0
+limit $2
+`
+
+type FindUnprocessedTargetsForTaskParams struct {
+	TaskID uuid.UUID `json:"task_id"`
+	Limit  int32     `json:"limit"`
+}
+
+func (q *Queries) FindUnprocessedTargetsForTask(ctx context.Context, arg FindUnprocessedTargetsForTaskParams) ([]TargetUser, error) {
+	rows, err := q.db.Query(ctx, findUnprocessedTargetsForTask, arg.TaskID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TargetUser
+	for rows.Next() {
+		var i TargetUser
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.UserID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -414,6 +498,29 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const markBotAsCompleted = `-- name: MarkBotAsCompleted :exec
+update bot_accounts
+set status = 4
+where id = $1
+`
+
+func (q *Queries) MarkBotAsCompleted(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, markBotAsCompleted, id)
+	return err
+}
+
+const markTargetsAsNotified = `-- name: MarkTargetsAsNotified :exec
+update target_users
+set notified = true
+where task_id = $1
+  and status = 0
+`
+
+func (q *Queries) MarkTargetsAsNotified(ctx context.Context, taskID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, markTargetsAsNotified, taskID)
+	return err
+}
+
 type SaveBotAccountsParams struct {
 	TaskID     uuid.UUID              `json:"task_id"`
 	Username   string                 `json:"username"`
@@ -494,46 +601,17 @@ func (q *Queries) SelectNow(ctx context.Context) error {
 	return err
 }
 
-const setAccountAsCompleted = `-- name: SetAccountAsCompleted :exec
-update bot_accounts
-set status     = 4,
-    updated_at = now()
-where id = $1
-`
-
-func (q *Queries) SetAccountAsCompleted(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, setAccountAsCompleted, id)
-	return err
-}
-
-const startTaskByID = `-- name: StartTaskByID :one
+const startTaskByID = `-- name: StartTaskByID :exec
 update tasks
-set status     = 3,
+set status     = 4,
     started_at = now()
 where id = $1
-  AND status = 2 --
-returning id, manager_id, text_template, image, status, title, bots_filename, proxies_filename, targets_filename, created_at, started_at, updated_at, deleted_at
+  AND status = 3
 `
 
-func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) (Task, error) {
-	row := q.db.QueryRow(ctx, startTaskByID, id)
-	var i Task
-	err := row.Scan(
-		&i.ID,
-		&i.ManagerID,
-		&i.TextTemplate,
-		&i.Image,
-		&i.Status,
-		&i.Title,
-		&i.BotsFilename,
-		&i.ProxiesFilename,
-		&i.TargetsFilename,
-		&i.CreatedAt,
-		&i.StartedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
+func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, startTaskByID, id)
+	return err
 }
 
 const updateTaskStatus = `-- name: UpdateTaskStatus :exec

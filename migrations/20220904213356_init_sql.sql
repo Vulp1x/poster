@@ -64,6 +64,7 @@ create table target_users
     task_id    uuid      not null references tasks,
     username   text      not null,
     user_id    bigint    not null,
+    status     smallint  not null default 0, -- 0 - не показывали рекламу, 1 - пытались показать рекламу, но не получилось, 2-показали рекламу
     created_at timestamp not null default now(),
     updated_at timestamp
 );
@@ -96,6 +97,7 @@ create table logs
 (
     id            uuid primary key default gen_random_uuid(),
     bot_id        uuid      not null references bot_accounts,
+    operation     text      not null,
     request       jsonb     not null,
     response      jsonb     not null,
     response_code integer   not null,
