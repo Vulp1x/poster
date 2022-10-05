@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   poster:
-    image: 'inst-api/poster:latest'
+    image: 'ghcr.io/inst-api/poster:latest'
     restart: unless-stopped
     depends_on:
       - postgres
@@ -41,7 +41,7 @@ services:
       - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - ./pgdata:/var/lib/postgresql/data
   api:
-    image: 'inst-api/poster.python-api:latest'
+    image: 'ghcr.io/inst-api/poster.python-api:latest'
     stdin_open: true
     tty: true
     ports:

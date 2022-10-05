@@ -65,14 +65,14 @@ jobs:
         with:
           context: .
           push: true
-          tags: 'inst-api/poster:latest'
+          tags: ghcr.io/inst-api/poster:latest
 
       - name: Publish to Registry inst-api
         uses: docker/build-push-action@v3
         with:
           context: ./instagrapi-rest
           push: true
-          tags: 'inst-api/poster.python-api:latest'
+          tags: ghcr.io/inst-api/poster.python-api:latest
 
       - name: Execute remote ssh command using key
         uses: appleboy/ssh-action@master
