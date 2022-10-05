@@ -83,6 +83,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/poster
+            git pull
             docker-compose down
-            docker pull vulp1x/inst-api.poster:latest
+            docker-compose -f docker-compose.yaml pull
             docker-compose -f docker-compose.yaml up --detach
