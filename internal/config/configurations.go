@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 
@@ -12,8 +13,13 @@ import (
 )
 
 const (
-	localConfigFilePath = "deploy/configs/values_local.yaml"
-	prodConfigFilePath  = "deploy/configs/values_production.yaml"
+	localConfigFilePath       = "deploy/configs/values_local.yaml"
+	localDockerConfigFilePath = "deploy/configs/values_docker.yaml"
+	prodConfigFilePath        = "deploy/configs/values_production.yaml"
+
+	localConfigMode       = "local"
+	localDockerConfigMode = "local_docker"
+	prodConfigMode        = "prod"
 )
 
 // Config represents application configuration.
@@ -31,12 +37,25 @@ type ServerConfig struct {
 }
 
 // ParseConfiguration parses configuration from values_*.yaml
-func (c *Config) ParseConfiguration(local bool) error {
+func (c *Config) ParseConfiguration(configMode string) error {
 	c.Default()
 
-	configFilePath := prodConfigFilePath
-	if local {
+	var configFilePath string
+	switch {
+	case configMode == localConfigMode:
 		configFilePath = localConfigFilePath
+	case configMode == localDockerConfigMode:
+		configFilePath = localDockerConfigFilePath
+	case configMode == prodConfigMode:
+		configFilePath = prodConfigFilePath
+	default:
+		return fmt.Errorf(
+			"unexpected config mode: '%s', expected one of ['%s', '%s', '%s']",
+			configMode,
+			localConfigMode,
+			localDockerConfigMode,
+			prodConfigMode,
+		)
 	}
 
 	configFile, err := os.Open(configFilePath)

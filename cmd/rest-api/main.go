@@ -29,16 +29,17 @@ func main() {
 	// Define command line flags, add any other flag required to configure the
 	// service.
 	var (
-		localFlag = flag.Bool("local-config-enabled", false, "Use localFlag values config instead of prod")
 		debugFlag = flag.Bool("debug", false, "Log request and response bodies")
 	)
 	flag.Parse()
 
-	fmt.Println(*localFlag, *debugFlag)
+	configMode := os.Getenv("CONFIG_MODE")
 
 	conf := &config.Config{}
 
-	err := conf.ParseConfiguration(*localFlag)
+	fmt.Println(configMode, *debugFlag)
+
+	err := conf.ParseConfiguration(configMode)
 	if err != nil {
 		log.Fatal("Failed to parse configuration: ", err)
 	}

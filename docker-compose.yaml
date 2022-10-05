@@ -40,6 +40,15 @@ services:
     volumes:
       - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - ./pgdata:/var/lib/postgresql/data
+  api:
+    image: 'vulp1x/inst-api.python-api:latest'
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./instagrapi-rest:/app
+
 
 
 volumes:

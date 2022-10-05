@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        CONFIG_MODE: local_docker
     restart: unless-stopped
     depends_on:
       - postgres
@@ -23,7 +25,7 @@ services:
       retries: 10
     restart: always
     ports:
-      - "5432:5432"
+      - "5435:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -36,6 +38,16 @@ services:
     volumes:
       - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database-local.sql
       - ./pgdata:/var/lib/postgresql/data
+  api:
+    build:
+      context: ./instagrapi-rest
+      dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./instagrapi-rest:/app
 
 
 volumes:
