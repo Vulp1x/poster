@@ -17,6 +17,7 @@ import (
 // Endpoints wraps the "tasks_service" service endpoints.
 type Endpoints struct {
 	CreateTaskDraft goa.Endpoint
+	UpdateTask      goa.Endpoint
 	UploadFiles     goa.Endpoint
 	AssignProxies   goa.Endpoint
 	ForceDelete     goa.Endpoint
@@ -32,6 +33,7 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		CreateTaskDraft: NewCreateTaskDraftEndpoint(s, a.JWTAuth),
+		UpdateTask:      NewUpdateTaskEndpoint(s, a.JWTAuth),
 		UploadFiles:     NewUploadFilesEndpoint(s, a.JWTAuth),
 		AssignProxies:   NewAssignProxiesEndpoint(s, a.JWTAuth),
 		ForceDelete:     NewForceDeleteEndpoint(s, a.JWTAuth),
@@ -46,6 +48,7 @@ func NewEndpoints(s Service) *Endpoints {
 // endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateTaskDraft = m(e.CreateTaskDraft)
+	e.UpdateTask = m(e.UpdateTask)
 	e.UploadFiles = m(e.UploadFiles)
 	e.AssignProxies = m(e.AssignProxies)
 	e.ForceDelete = m(e.ForceDelete)
@@ -71,6 +74,25 @@ func NewCreateTaskDraftEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.E
 			return nil, err
 		}
 		return s.CreateTaskDraft(ctx, p)
+	}
+}
+
+// NewUpdateTaskEndpoint returns an endpoint function that calls the method
+// "update task" of service "tasks_service".
+func NewUpdateTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdateTaskPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.UpdateTask(ctx, p)
 	}
 }
 

@@ -41,6 +41,11 @@ overrides:
     go_type:
       type: "taskStatus"
       import: ""
+  - column: "target_users.status"
+    go_type:
+      type: "targetStatus"
+      import: ""
+
   - db_type: "pg_catalog.int2"
     nullable: true
     go_type:

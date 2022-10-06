@@ -142,6 +142,50 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
+	Method("update task", func() {
+		Description(`обновить информацию о задаче. Не меняет статус задачи, можно вызывать сколько угодно раз.
+			Нельзя вызвать для задачи, которая уже выполняется, для этого надо сначала остановить выполнение.`)
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи, которую хотим обновить")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("title", String, func() {
+				Description("название задачи")
+			})
+
+			Attribute("text_template", String, func() {
+				Description("шаблон для подписи под постом")
+				Meta("struct:tag:json", "text_template")
+			})
+
+			Attribute("post_image", String, func() {
+				Description("фотография для постов")
+				Meta("struct:tag:json", "post_image")
+			})
+
+			Required("token", "task_id")
+		})
+
+		Result(Task)
+
+		HTTP(func() {
+			PUT("/api/tasks/{task_id}/")
+			// Use Authorization header to provide basic auth value.
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
 	Method("upload files", func() {
 		Description("загрузить файл с пользователями, прокси")
 

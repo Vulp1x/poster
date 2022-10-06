@@ -19,7 +19,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-const workersPerTask = 30
+const workersPerTask = 1
 
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")
@@ -43,6 +43,59 @@ type Store struct {
 	pushTimeout time.Duration
 	dbtxf       dbmodel.DBTXFunc
 	txf         dbmodel.TxFunc
+}
+
+func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image []byte) (domain.Task, error) {
+	tx, err := s.txf(ctx)
+	if err != nil {
+		return domain.Task{}, store.ErrTransactionFail
+	}
+
+	defer dbtx.RollbackUnlessCommitted(ctx, tx)
+
+	q := dbmodel.New(tx)
+
+	task, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Task{}, ErrTaskNotFound
+		}
+
+		return domain.Task{}, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
+	}
+
+	if task.Status == dbmodel.StartedTaskStatus {
+		return domain.Task{}, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DataUploadedTaskStatus, task.Status)
+	}
+
+	if title != nil {
+		task.Title = *title
+	}
+
+	if textTemplate != nil {
+		task.TextTemplate = *textTemplate
+	}
+
+	if image != nil {
+		task.Image = image
+	}
+
+	err = q.UpdateTask(ctx, dbmodel.UpdateTaskParams{
+		TextTemplate: task.TextTemplate,
+		Title:        task.Title,
+		Image:        task.Image,
+		ID:           taskID,
+	})
+	if err != nil {
+		return domain.Task{}, err
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return domain.Task{}, err
+	}
+
+	return domain.Task(task), nil
 }
 
 func (s *Store) ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error) {
@@ -308,7 +361,14 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 
 	logger.Infof(ctx, "going to use %d/%d bots for %d targets", neededBotsNum, len(bots), len(targets))
 
-	bots = bots[:neededBotsNum-1]
+	err = q.StartTaskByID(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to start task: %v", err)
+	}
+
+	if neededBotsNum < len(bots) {
+		bots = bots[:neededBotsNum]
+	}
 
 	taskCtx, taskCancel := context.WithCancel(ctx)
 	s.taskCancels[task.ID] = taskCancel

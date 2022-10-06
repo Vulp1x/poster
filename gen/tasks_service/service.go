@@ -18,6 +18,11 @@ import (
 type Service interface {
 	// создать драфт задачи
 	CreateTaskDraft(context.Context, *CreateTaskDraftPayload) (res string, err error)
+	// обновить информацию о задаче. Не меняет статус задачи, можно вызывать
+	// сколько угодно раз.
+	// Нельзя вызвать для задачи, которая уже выполняется, для этого надо сначала
+	// остановить выполнение.
+	UpdateTask(context.Context, *UpdateTaskPayload) (res *Task, err error)
 	// загрузить файл с пользователями, прокси
 	UploadFiles(context.Context, *UploadFilesPayload) (res []*UploadError, err error)
 	// присвоить ботам прокси
@@ -48,7 +53,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [8]string{"create task draft", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
+var MethodNames = [9]string{"create task draft", "update task", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -133,7 +138,7 @@ type TargetUserRecord struct {
 	LineNumber int `json:"line_number"`
 }
 
-// Task is the result type of the tasks_service service get task method.
+// Task is the result type of the tasks_service service update task method.
 type Task struct {
 	ID string
 	// описание под постом
@@ -164,6 +169,21 @@ type TaskFileNames struct {
 	ProxiesFilename string `json:"proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename string `json:"targets_filename"`
+}
+
+// UpdateTaskPayload is the payload type of the tasks_service service update
+// task method.
+type UpdateTaskPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи, которую хотим обновить
+	TaskID string `json:"task_id"`
+	// название задачи
+	Title *string
+	// шаблон для подписи под постом
+	TextTemplate *string `json:"text_template"`
+	// фотография для постов
+	PostImage *string `json:"post_image"`
 }
 
 type UploadError struct {

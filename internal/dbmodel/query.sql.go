@@ -34,7 +34,8 @@ func (q *Queries) AssignBotsToProxiesForTask(ctx context.Context, arg AssignBots
 
 const assignProxiesToBotsForTask = `-- name: AssignProxiesToBotsForTask :exec
 UPDATE bot_accounts
-set res_proxy = x.proxy
+set res_proxy = x.proxy,
+    status    = 2 -- ProxieAssignedBotStatus
 From (SELECT UNNEST($2::jsonb[]) as proxy,
              UNNEST($3::uuid[])      as id) x
 where bot_accounts.id = x.id
@@ -210,11 +211,13 @@ func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
 }
 
 const findProxiesForTask = `-- name: FindProxiesForTask :many
+
 select id, task_id, assigned_to, host, port, login, pass, type
 from proxies
 where task_id = $1
 `
 
+// ProxieAssignedBotStatus
 func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
 	rows, err := q.db.Query(ctx, findProxiesForTask, taskID)
 	if err != nil {
@@ -248,7 +251,7 @@ const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where task_id = $1
-  and status = 0
+  and status = 2
 `
 
 func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
@@ -498,29 +501,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const markBotAsCompleted = `-- name: MarkBotAsCompleted :exec
-update bot_accounts
-set status = 4
-where id = $1
-`
-
-func (q *Queries) MarkBotAsCompleted(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, markBotAsCompleted, id)
-	return err
-}
-
-const markTargetsAsNotified = `-- name: MarkTargetsAsNotified :exec
-update target_users
-set notified = true
-where task_id = $1
-  and status = 0
-`
-
-func (q *Queries) MarkTargetsAsNotified(ctx context.Context, taskID uuid.UUID) error {
-	_, err := q.db.Exec(ctx, markTargetsAsNotified, taskID)
-	return err
-}
-
 type SaveBotAccountsParams struct {
 	TaskID     uuid.UUID              `json:"task_id"`
 	Username   string                 `json:"username"`
@@ -601,6 +581,38 @@ func (q *Queries) SelectNow(ctx context.Context) error {
 	return err
 }
 
+const setBotStatus = `-- name: SetBotStatus :exec
+update bot_accounts
+set status = $1
+where id = $2
+`
+
+type SetBotStatusParams struct {
+	Status botStatus `json:"status"`
+	ID     uuid.UUID `json:"id"`
+}
+
+func (q *Queries) SetBotStatus(ctx context.Context, arg SetBotStatusParams) error {
+	_, err := q.db.Exec(ctx, setBotStatus, arg.Status, arg.ID)
+	return err
+}
+
+const setTargetsStatus = `-- name: SetTargetsStatus :exec
+update target_users
+set status = $1
+where id = ANY ($2::uuid[])
+`
+
+type SetTargetsStatusParams struct {
+	Status targetStatus `json:"status"`
+	Ids    []uuid.UUID  `json:"ids"`
+}
+
+func (q *Queries) SetTargetsStatus(ctx context.Context, arg SetTargetsStatusParams) error {
+	_, err := q.db.Exec(ctx, setTargetsStatus, arg.Status, arg.Ids)
+	return err
+}
+
 const startTaskByID = `-- name: StartTaskByID :exec
 update tasks
 set status     = 4,
@@ -611,6 +623,32 @@ where id = $1
 
 func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, startTaskByID, id)
+	return err
+}
+
+const updateTask = `-- name: UpdateTask :exec
+update tasks
+set text_template = $1,
+    title         = $2,
+    image         = $3,
+    updated_at    = now()
+where id = $4
+`
+
+type UpdateTaskParams struct {
+	TextTemplate string    `json:"text_template"`
+	Title        string    `json:"title"`
+	Image        []byte    `json:"image"`
+	ID           uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
+	_, err := q.db.Exec(ctx, updateTask,
+		arg.TextTemplate,
+		arg.Title,
+		arg.Image,
+		arg.ID,
+	)
 	return err
 }
 

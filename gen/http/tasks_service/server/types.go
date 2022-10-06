@@ -23,6 +23,17 @@ type CreateTaskDraftRequestBody struct {
 	PostImage *string `json:"post_image"`
 }
 
+// UpdateTaskRequestBody is the type of the "tasks_service" service "update
+// task" endpoint HTTP request body.
+type UpdateTaskRequestBody struct {
+	// название задачи
+	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	// шаблон для подписи под постом
+	TextTemplate *string `json:"text_template"`
+	// фотография для постов
+	PostImage *string `json:"post_image"`
+}
+
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
 // files" endpoint HTTP request body.
 type UploadFilesRequestBody struct {
@@ -33,6 +44,31 @@ type UploadFilesRequestBody struct {
 	Proxies []*ProxyRecordRequestBody `form:"proxies,omitempty" json:"proxies,omitempty" xml:"proxies,omitempty"`
 	// список аккаунтов, которым показать надо рекламу
 	Targets []*TargetUserRecordRequestBody `form:"targets,omitempty" json:"targets,omitempty" xml:"targets,omitempty"`
+}
+
+// UpdateTaskOKResponseBody is the type of the "tasks_service" service "update
+// task" endpoint HTTP response body.
+type UpdateTaskOKResponseBody struct {
+	ID string `form:"id" json:"id" xml:"id"`
+	// описание под постом
+	TextTemplate string `json:"text_template"`
+	// base64 строка картинки
+	Image  string `form:"image" json:"image" xml:"image"`
+	Status int    `form:"status" json:"status" xml:"status"`
+	// название задачи
+	Title string `form:"title" json:"title" xml:"title"`
+	// количество ботов в задаче
+	BotsNum int `json:"bots_num"`
+	// количество прокси в задаче
+	ProxiesNum int `json:"proxies_num"`
+	// количество целевых пользователей в задаче
+	TargetsNum int `json:"targets_num"`
+	// название файла, из которого брали ботов
+	BotsFilename *string `json:"bots_filename"`
+	// название файла, из которого брали прокси
+	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали целевых пользователей
+	TargetsFilename *string `json:"targets_filename"`
 }
 
 // UploadFilesResponseBody is the type of the "tasks_service" service "upload
@@ -135,6 +171,25 @@ type TargetUserRecordRequestBody struct {
 	LineNumber *int `json:"line_number"`
 }
 
+// NewUpdateTaskOKResponseBody builds the HTTP response body from the result of
+// the "update task" endpoint of the "tasks_service" service.
+func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBody {
+	body := &UpdateTaskOKResponseBody{
+		ID:              res.ID,
+		TextTemplate:    res.TextTemplate,
+		Image:           res.Image,
+		Status:          res.Status,
+		Title:           res.Title,
+		BotsNum:         res.BotsNum,
+		ProxiesNum:      res.ProxiesNum,
+		TargetsNum:      res.TargetsNum,
+		BotsFilename:    res.BotsFilename,
+		ProxiesFilename: res.ProxiesFilename,
+		TargetsFilename: res.TargetsFilename,
+	}
+	return body
+}
+
 // NewUploadFilesResponseBody builds the HTTP response body from the result of
 // the "upload files" endpoint of the "tasks_service" service.
 func NewUploadFilesResponseBody(res []*tasksservice.UploadError) UploadFilesResponseBody {
@@ -182,6 +237,20 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 		TextTemplate: *body.TextTemplate,
 		PostImage:    *body.PostImage,
 	}
+	v.Token = token
+
+	return v
+}
+
+// NewUpdateTaskPayload builds a tasks_service service update task endpoint
+// payload.
+func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token string) *tasksservice.UpdateTaskPayload {
+	v := &tasksservice.UpdateTaskPayload{
+		Title:        body.Title,
+		TextTemplate: body.TextTemplate,
+		PostImage:    body.PostImage,
+	}
+	v.TaskID = taskID
 	v.Token = token
 
 	return v

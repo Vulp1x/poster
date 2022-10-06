@@ -63,7 +63,8 @@ where task_id = $1;
 select *
 from bot_accounts
 where task_id = $1
-  and status = 0;
+  and status = 2;
+-- ProxieAssignedBotStatus
 
 -- name: FindProxiesForTask :many
 select *
@@ -82,6 +83,14 @@ update tasks
 set status     = $1,
     updated_at = now()
 where id = $2;
+
+-- name: UpdateTask :exec
+update tasks
+set text_template = $1,
+    title         = $2,
+    image         = $3,
+    updated_at    = now()
+where id = $4;
 
 -- name: SaveBotAccounts :copyfrom
 insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)
@@ -117,7 +126,8 @@ where id = $1;
 
 -- name: AssignProxiesToBotsForTask :exec
 UPDATE bot_accounts
-set res_proxy = x.proxy
+set res_proxy = x.proxy,
+    status    = 2 -- ProxieAssignedBotStatus
 From (SELECT UNNEST(sqlc.arg(proxies)::jsonb[]) as proxy,
              UNNEST(sqlc.arg(ids)::uuid[])      as id) x
 where bot_accounts.id = x.id
@@ -156,13 +166,12 @@ set status           = 2, --dbmodel.DataUploadedTaskStatus,
     targets_filename = $4
 where id = $1;
 
--- name: MarkBotAsCompleted :exec
+-- name: SetBotStatus :exec
 update bot_accounts
-set status = 4
-where id = $1;
+set status = $1
+where id = $2;
 
--- name: MarkTargetsAsNotified :exec
+-- name: SetTargetsStatus :exec
 update target_users
-set notified = true
-where task_id = $1
-  and status = 0;
+set status = $1
+where id = ANY (sqlc.arg('ids')::uuid[]);

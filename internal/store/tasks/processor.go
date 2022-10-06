@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
@@ -56,8 +57,29 @@ func (w *worker) run(ctx context.Context) {
 			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, postsPerBot*targetsPerPost)
 		}
 
-		var i int
-		var shouldBreak = false
+		err = w.cli.InitBot(ctx, botWithTargets.BotAccount)
+		if err != nil {
+			logger.Errorf(taskCtx, "failed to init bot: %v", err)
+
+			err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+			if err != nil {
+				logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+				continue
+			}
+		}
+
+		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.StartedBotStatus, ID: botWithTargets.ID})
+		if err != nil {
+			logger.Errorf(taskCtx, "failed to set bot status to 'started': %v", err)
+			continue
+		}
+
+		var (
+			i           int
+			shouldBreak = false
+			targetIds   []uuid.UUID
+		)
+
 		for i = 0; i < postsPerBot; i++ {
 			rightBorderOfTargets := (i + 1) * targetsPerPost
 			if rightBorderOfTargets >= targetsLen {
@@ -66,10 +88,23 @@ func (w *worker) run(ctx context.Context) {
 			}
 
 			targetsBatch := botWithTargets.Targets[i*targetsPerPost : rightBorderOfTargets]
+			targetIds = domain.Ids(targetsBatch)
 			caption := w.preparePostCaption(w.task.TextTemplate, targetsBatch)
+
 			err = w.cli.MakePost(taskCtx, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
+				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
+				if err != nil {
+					logger.Errorf(ctx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
+					break
+				}
+				break
+			}
+
+			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
+			if err != nil {
+				logger.Errorf(ctx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
 				break
 			}
 
@@ -86,16 +121,11 @@ func (w *worker) run(ctx context.Context) {
 			}
 		}
 
-		logger.Info(taskCtx, "make %d posts, saving results time elapsed: %s", i, time.Since(startTime))
+		logger.Info(taskCtx, "made %d posts, saving results time elapsed: %s", i, time.Since(startTime))
 
-		err = q.MarkBotAsCompleted(taskCtx, botWithTargets.ID)
+		err = q.SetBotStatus(taskCtx, dbmodel.SetBotStatusParams{Status: dbmodel.DoneBotStatus, ID: botWithTargets.ID})
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
-		}
-
-		err = q.MarkTargetsAsNotified(taskCtx, w.task.ID)
-		if err != nil {
-			logger.Errorf(taskCtx, "failed to mark targets as completed: %v", err)
 		}
 	}
 }

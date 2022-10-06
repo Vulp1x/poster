@@ -39,7 +39,7 @@ var image []byte
 func TestCreateDraftTask(t *testing.T) {
 	conf := &config.Config{}
 
-	err := conf.ParseConfiguration(true)
+	err := conf.ParseConfiguration("local")
 	if err != nil {
 		log.Fatal("Failed to parse configuration: ", err)
 	}

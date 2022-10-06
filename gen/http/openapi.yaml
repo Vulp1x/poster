@@ -276,6 +276,64 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
+    put:
+      tags:
+        - tasks_service
+      summary: update task tasks_service
+      description: |-
+        обновить информацию о задаче. Не меняет статус задачи, можно вызывать сколько угодно раз.
+        			Нельзя вызвать для задачи, которая уже выполняется, для этого надо сначала остановить выполнение.
+      operationId: tasks_service#update task
+      parameters:
+        - name: task_id
+          in: path
+          description: id задачи, которую хотим обновить
+          required: true
+          type: string
+        - name: Authorization
+          in: header
+          description: JWT used for authentication
+          required: true
+          type: string
+        - name: Update TaskRequestBody
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TasksServiceUpdateTaskRequestBody'
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/TasksServiceUpdateTaskOKResponseBody'
+            required:
+              - id
+              - text_template
+              - image
+              - status
+              - title
+              - bots_num
+              - proxies_num
+              - targets_num
+        "400":
+          description: Bad Request response.
+          schema:
+            type: string
+        "401":
+          description: Unauthorized response.
+          schema:
+            type: string
+        "404":
+          description: Not Found response.
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error response.
+          schema:
+            type: string
+      schemes:
+        - http
+      security:
+        - jwt_header_Authorization: []
   /api/tasks/{task_id}/assign:
     post:
       tags:
@@ -555,14 +613,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Expedita itaque sint dolore consequatur animi quae.
+        example: Nulla quasi ea.
       password:
         type: string
-        example: i3g
+        example: ug8
         minLength: 4
     example:
-      login: Dolores ab est exercitationem.
-      password: wmi
+      login: Suscipit et.
+      password: c4g
     required:
       - login
       - password
@@ -585,25 +643,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 4794403152647380107
+        example: 5240340533968572789
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Nam fugit expedita.
+          example: Autem quis.
         example:
-          - Et facilis.
-          - Hic quia.
-          - Labore quaerat.
+          - Numquam sit.
+          - Rerum recusandae.
+          - Dignissimos qui exercitationem ut est.
         minItems: 4
         maxItems: 4
     example:
-      line_number: 6990537284266622851
+      line_number: 5747118890365380068
       record:
-        - Et sit adipisci sed delectus est.
-        - Corporis molestiae praesentium odio dolorum.
-        - Voluptate est labore culpa reiciendis quos.
+        - Est aperiam quis.
+        - Magnam sunt.
+        - Omnis deleniti.
     required:
       - record
       - line_number
@@ -614,25 +672,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 5616388430136682553
+        example: 1608857132185623529
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Vel hic dicta.
+          example: Nostrum quos rerum voluptatibus adipisci.
         example:
-          - Eum nemo corrupti nihil et animi.
-          - Enim autem temporibus laborum.
-          - Assumenda quae non.
+          - Doloremque necessitatibus.
+          - Earum vel omnis.
+          - Molestiae quo quia consequatur et et hic.
         minItems: 4
         maxItems: 4
     example:
-      line_number: 6208885467495381145
+      line_number: 1586761469937398784
       record:
-        - Quasi consequatur nobis eligendi amet.
-        - Officiis quasi suscipit fuga aut laboriosam magni.
-        - Nobis eos et inventore officiis et.
+        - Perferendis nisi dolores ducimus hic.
+        - Eligendi adipisci provident tempore.
+        - Voluptatem ut ipsum.
     required:
       - record
       - line_number
@@ -643,23 +701,23 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 9068445744164594362
+        example: 3052175453916038798
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Et consectetur ea.
+          example: Atque asperiores distinctio.
         example:
-          - Exercitationem voluptate laudantium ullam sapiente dolores ut.
-          - Nulla et vitae nostrum.
+          - Sunt error dolor nesciunt modi labore et.
+          - Voluptates necessitatibus vel qui adipisci.
         minItems: 2
         maxItems: 2
     example:
-      line_number: 3500377481853496304
+      line_number: 8289093011222043323
       record:
-        - Quo non id quia sunt.
-        - Est eos ipsa.
+        - Unde recusandae consequatur id rerum aut autem.
+        - Eum ut magni nesciunt earum nesciunt cum.
     required:
       - record
       - line_number
@@ -670,19 +728,19 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Molestias asperiores voluptatibus asperiores fugiat ut.
+        example: Esse molestiae.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Minus doloremque architecto perferendis voluptas nam.
+        example: Quia et.
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Dolor tempora vel exercitationem.
+        example: Nihil eligendi natus suscipit omnis modi ea.
     example:
-      bots_filename: Recusandae voluptatem corrupti saepe et ipsam.
-      proxies_filename: Est sit temporibus officia.
-      targets_filename: Magnam voluptatem nesciunt quaerat quasi incidunt sed.
+      bots_filename: Fugit non nobis dolore.
+      proxies_filename: Cupiditate dolore laudantium.
+      targets_filename: Eligendi laboriosam blanditiis ratione libero.
     required:
       - bots_filename
       - proxies_filename
@@ -694,62 +752,62 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Sunt praesentium illo nesciunt ipsum.
+        example: Modi omnis non eaque similique dignissimos.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 771833186891704380
+        example: 4978632667445678154
         format: int64
       id:
         type: string
-        example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
+        example: 1576BB1F-D21C-05AD-6677-73725A387FA6
         format: uuid
       image:
         type: string
         description: base64 строка картинки
-        example: Est sint.
+        example: Impedit est voluptatibus nostrum.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Et doloremque.
+        example: Laudantium ut dolor saepe voluptas.
       proxies_num:
         type: integer
         description: количество прокси в задаче
-        example: 6433532278331309436
+        example: 3228510792422835933
         format: int64
       status:
         type: integer
-        example: 2710052909298745705
+        example: 3452088385289492698
         format: int64
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Vel quia architecto cum laboriosam sed.
+        example: Id qui vero consequuntur excepturi minus quis.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 6588462805128975712
+        example: 8110140598994464833
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Minus et id est accusamus neque.
+        example: Assumenda cum quo optio.
       title:
         type: string
         description: название задачи
-        example: Deleniti facere earum et.
+        example: Unde dolor asperiores sint aut.
     example:
-      bots_filename: Veritatis omnis temporibus commodi iure modi nobis.
-      bots_num: 7491896368455335607
-      id: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
-      image: Sint molestiae omnis ipsam distinctio.
-      proxies_filename: Ut ut unde autem repellendus recusandae laborum.
-      proxies_num: 2816365354175033132
-      status: 5287157276086305866
-      targets_filename: Qui molestias.
-      targets_num: 6587420114551613427
-      text_template: Quis reprehenderit sapiente.
-      title: Voluptatibus voluptatem.
+      bots_filename: Laudantium odio magni eveniet enim saepe deserunt.
+      bots_num: 8598950991266500765
+      id: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
+      image: Nihil ut.
+      proxies_filename: Ea fugit perspiciatis voluptatem.
+      proxies_num: 1128652508390503407
+      status: 799258171157068653
+      targets_filename: Maxime quasi quis aperiam vel odio.
+      targets_num: 6581575584124159322
+      text_template: Ullam necessitatibus aut et maxime sit.
+      title: Quos amet repellat explicabo voluptatibus et.
     required:
       - id
       - text_template
@@ -766,19 +824,19 @@ definitions:
       post_image:
         type: string
         description: фотография для постов
-        example: Dolore perferendis esse accusantium quo maxime facilis.
+        example: Omnis enim exercitationem saepe autem.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Esse molestiae placeat.
+        example: Ea ipsum perspiciatis.
       title:
         type: string
         description: название задачи
-        example: Nobis cupiditate consequatur ea atque.
+        example: Molestias praesentium adipisci unde molestiae alias ipsa.
     example:
-      post_image: Non omnis.
-      text_template: Dignissimos deleniti cum eaque.
-      title: Reprehenderit animi aliquid aliquid fuga.
+      post_image: Dignissimos at.
+      text_template: Saepe aut impedit vitae sequi nihil.
+      title: Officiis quibusdam distinctio.
     required:
       - title
       - text_template
@@ -790,62 +848,62 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Nihil expedita consequatur.
+        example: Ut dolor dolorum necessitatibus dolores nam.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 4048283407980412804
+        example: 2525926433998955261
         format: int64
       id:
         type: string
-        example: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+        example: 77DFBD55-EC3C-CF64-7021-5A80D932517B
         format: uuid
       image:
         type: string
         description: base64 строка картинки
-        example: Aut nihil iste qui.
+        example: Ut consequatur omnis beatae qui at aliquid.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Fugit quibusdam expedita et.
+        example: Tempore debitis.
       proxies_num:
         type: integer
         description: количество прокси в задаче
-        example: 4347010341549590437
+        example: 4061165753035191807
         format: int64
       status:
         type: integer
-        example: 5728205418193779270
+        example: 8871135944981799766
         format: int64
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Dolor doloremque.
+        example: Est sed natus.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 5009067573545138336
+        example: 8157270369546457403
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Consequatur ad architecto aliquid reprehenderit quas.
+        example: Quidem alias et.
       title:
         type: string
         description: название задачи
-        example: Magni beatae.
+        example: Quod non veritatis voluptate est at.
     example:
-      bots_filename: Eius ut placeat in et dolorem id.
-      bots_num: 6651546990893310746
-      id: A45D83CF-F038-77BB-220E-D79EFC31D198
-      image: Voluptas voluptates suscipit aut rem.
-      proxies_filename: Est commodi.
-      proxies_num: 4122403796436682398
-      status: 4675286422358908836
-      targets_filename: Rerum nihil explicabo ipsa autem est.
-      targets_num: 6910286739302548497
-      text_template: Porro sed deleniti quaerat iusto enim.
-      title: Eum ullam porro dolorem numquam rerum eveniet.
+      bots_filename: Ea pariatur quo aut amet.
+      bots_num: 1997779933851988567
+      id: 2AE5027E-EF4C-E00D-314E-1CB4449A11C0
+      image: Dolores ipsum tempora.
+      proxies_filename: Et nesciunt enim consequatur sequi.
+      proxies_num: 6336013228033513767
+      status: 6130348081785897756
+      targets_filename: Est aspernatur veniam maiores dolores iste quis.
+      targets_num: 3487610675980806121
+      text_template: Rerum asperiores fuga impedit dignissimos.
+      title: Nobis quod.
     required:
       - id
       - text_template
@@ -862,62 +920,62 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Est amet.
+        example: Ea sunt.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 8017620771025230595
+        example: 851103535845879719
         format: int64
       id:
         type: string
-        example: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+        example: AB12B85B-1864-53B4-4A92-3519B45D0D5E
         format: uuid
       image:
         type: string
         description: base64 строка картинки
-        example: Ut aut deserunt odio est deleniti.
+        example: Ex et qui dicta corrupti.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Nemo iure doloribus qui et iusto.
+        example: Sit accusamus animi perspiciatis quaerat in.
       proxies_num:
         type: integer
         description: количество прокси в задаче
-        example: 5983563087674780771
+        example: 8227751526445303624
         format: int64
       status:
         type: integer
-        example: 1698425623063791454
+        example: 1273834654415032745
         format: int64
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Ut et sed magni non aut.
+        example: Eveniet voluptates deserunt possimus nobis aut ipsa.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 3150175358273127548
+        example: 5591130216629414254
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Et id reprehenderit sed voluptates.
+        example: Omnis assumenda facere.
       title:
         type: string
         description: название задачи
-        example: Enim iste.
+        example: Incidunt cumque similique.
     example:
-      bots_filename: Molestias praesentium adipisci unde molestiae alias ipsa.
-      bots_num: 4543393855007519292
-      id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-      image: Nulla quasi ea.
-      proxies_filename: Ea ipsum perspiciatis.
-      proxies_num: 3795466691214555772
-      status: 2601017275452251526
-      targets_filename: Omnis enim exercitationem saepe autem.
-      targets_num: 6055384477394477428
-      text_template: Enim sit optio velit excepturi ut eligendi.
-      title: Et amet saepe suscipit et incidunt.
+      bots_filename: Quo nisi repellat.
+      bots_num: 1989083077293101348
+      id: 0E0CB887-B526-812D-F285-DE018C555BB8
+      image: Molestiae nihil velit modi.
+      proxies_filename: Rerum quas nemo dolores optio.
+      proxies_num: 1910013867088893732
+      status: 8415618029325840014
+      targets_filename: Nostrum fuga inventore ratione repellendus.
+      targets_num: 4835698328583107926
+      text_template: Et et rerum non.
+      title: Delectus quibusdam minus illo autem est nam.
     required:
       - id
       - text_template
@@ -934,62 +992,298 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Atque dolorem est dignissimos magni tenetur.
+        example: Qui dolores nihil.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 7021831119889669132
+        example: 3635164740673360479
         format: int64
       id:
         type: string
-        example: 95545D09-3153-0F17-09F7-7FEB1545D780
+        example: 233374F1-297F-8711-5FC3-4F6B3731AD63
         format: uuid
       image:
         type: string
         description: base64 строка картинки
-        example: Accusantium ut deserunt amet enim aliquam.
+        example: Fugiat deserunt qui.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Veritatis veniam tempore exercitationem aut.
+        example: Eos rerum amet maiores dolor.
       proxies_num:
         type: integer
         description: количество прокси в задаче
-        example: 8304552871006170733
+        example: 5322956294454124385
         format: int64
       status:
         type: integer
-        example: 495993541818847479
+        example: 7116964166890603422
         format: int64
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Deserunt in quis in optio.
+        example: Aliquam ut sit iure.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 1171031840493513408
+        example: 4286998808488244991
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Rem cumque et tempora voluptates.
+        example: Consequatur enim et ducimus et sit sint.
       title:
         type: string
         description: название задачи
-        example: Eius sunt et fuga.
+        example: Pariatur pariatur omnis veniam.
     example:
-      bots_filename: Modi consequatur repudiandae.
-      bots_num: 8455353471992146308
-      id: AC77D914-0A36-9917-2BA7-F519556A50B8
-      image: Dolor et cupiditate quia ipsum dolores eveniet.
-      proxies_filename: Tenetur voluptatem quia quis tempora odio itaque.
-      proxies_num: 8127493143572507368
-      status: 8860852516288004277
-      targets_filename: Rerum laboriosam.
-      targets_num: 375170386675792756
-      text_template: Id ut quo accusamus velit laboriosam quaerat.
-      title: Nisi et optio.
+      bots_filename: Aut distinctio architecto.
+      bots_num: 662055334449356145
+      id: A8E7C55C-B3EA-B228-EF84-9DB3D55D57A4
+      image: Aliquam illo iste.
+      proxies_filename: In iste dolorem fuga.
+      proxies_num: 3840744895866725147
+      status: 4187497416852408894
+      targets_filename: Et blanditiis explicabo ut tempora impedit eligendi.
+      targets_num: 6658612052984852724
+      text_template: Porro doloremque explicabo aut maiores aperiam.
+      title: Est suscipit sunt est est.
+    required:
+      - id
+      - text_template
+      - image
+      - status
+      - title
+      - bots_num
+      - proxies_num
+      - targets_num
+  TasksServiceUpdateTaskNotFoundResponseBody:
+    title: TasksServiceUpdateTaskNotFoundResponseBody
+    type: object
+    properties:
+      bots_filename:
+        type: string
+        description: название файла, из которого брали ботов
+        example: Deserunt in quis in optio.
+      bots_num:
+        type: integer
+        description: количество ботов в задаче
+        example: 1177638168310879553
+        format: int64
+      id:
+        type: string
+        example: AC77D914-0A36-9917-2BA7-F519556A50B8
+        format: uuid
+      image:
+        type: string
+        description: base64 строка картинки
+        example: Dolorem est.
+      proxies_filename:
+        type: string
+        description: название файла, из которого брали прокси
+        example: Voluptatem quidem reiciendis et.
+      proxies_num:
+        type: integer
+        description: количество прокси в задаче
+        example: 5588118948854483913
+        format: int64
+      status:
+        type: integer
+        example: 237248704141290412
+        format: int64
+      targets_filename:
+        type: string
+        description: название файла, из которого брали целевых пользователей
+        example: Reiciendis nesciunt.
+      targets_num:
+        type: integer
+        description: количество целевых пользователей в задаче
+        example: 4360680368803346438
+        format: int64
+      text_template:
+        type: string
+        description: описание под постом
+        example: Et fuga magnam cum nisi consequatur.
+      title:
+        type: string
+        description: название задачи
+        example: Tenetur provident veritatis veniam.
+    example:
+      bots_filename: Voluptatem quia.
+      bots_num: 2241381336173830235
+      id: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
+      image: Neque nisi et optio.
+      proxies_filename: Tempora odio itaque quia.
+      proxies_num: 4473273664011642138
+      status: 8455353471992146308
+      targets_filename: Laboriosam consequatur.
+      targets_num: 6677496498916126378
+      text_template: Dolor et cupiditate quia ipsum dolores eveniet.
+      title: Aut voluptates modi.
+    required:
+      - id
+      - text_template
+      - image
+      - status
+      - title
+      - bots_num
+      - proxies_num
+      - targets_num
+  TasksServiceUpdateTaskOKResponseBody:
+    title: TasksServiceUpdateTaskOKResponseBody
+    type: object
+    properties:
+      bots_filename:
+        type: string
+        description: название файла, из которого брали ботов
+        example: Reprehenderit omnis similique ratione.
+      bots_num:
+        type: integer
+        description: количество ботов в задаче
+        example: 5254051810112510094
+        format: int64
+      id:
+        type: string
+        example: A45D83CF-F038-77BB-220E-D79EFC31D198
+        format: uuid
+      image:
+        type: string
+        description: base64 строка картинки
+        example: Est aut facere nihil expedita consequatur quia.
+      proxies_filename:
+        type: string
+        description: название файла, из которого брали прокси
+        example: Voluptatem vero molestias.
+      proxies_num:
+        type: integer
+        description: количество прокси в задаче
+        example: 6667200416064889573
+        format: int64
+      status:
+        type: integer
+        example: 4564337280206112403
+        format: int64
+      targets_filename:
+        type: string
+        description: название файла, из которого брали целевых пользователей
+        example: Beatae vitae ea ipsam eligendi sint.
+      targets_num:
+        type: integer
+        description: количество целевых пользователей в задаче
+        example: 7285823840382042877
+        format: int64
+      text_template:
+        type: string
+        description: описание под постом
+        example: Magni beatae.
+      title:
+        type: string
+        description: название задачи
+        example: Expedita et sit dolor doloremque.
+    example:
+      bots_filename: Similique dolorem laborum id ipsam.
+      bots_num: 1854255130042004764
+      id: 95545D09-3153-0F17-09F7-7FEB1545D780
+      image: Eius ut placeat in et dolorem id.
+      proxies_filename: Omnis itaque vel laborum.
+      proxies_num: 2439339165701368065
+      status: 6483079746739342053
+      targets_filename: Ut voluptate expedita ipsa.
+      targets_num: 6247603399655523140
+      text_template: Numquam rerum eveniet voluptas perspiciatis dolore.
+      title: Commodi rerum rerum nihil explicabo.
+    required:
+      - id
+      - text_template
+      - image
+      - status
+      - title
+      - bots_num
+      - proxies_num
+      - targets_num
+  TasksServiceUpdateTaskRequestBody:
+    title: TasksServiceUpdateTaskRequestBody
+    type: object
+    properties:
+      post_image:
+        type: string
+        description: фотография для постов
+        example: Ex id corrupti non et aut.
+      text_template:
+        type: string
+        description: шаблон для подписи под постом
+        example: Nemo eius.
+      title:
+        type: string
+        description: название задачи
+        example: Et qui molestias dolorem.
+    example:
+      post_image: Nam debitis ea atque accusantium consequatur.
+      text_template: Quia aut et illum et ab.
+      title: Dolores et animi exercitationem.
+  TasksServiceUpdateTaskUnauthorizedResponseBody:
+    title: TasksServiceUpdateTaskUnauthorizedResponseBody
+    type: object
+    properties:
+      bots_filename:
+        type: string
+        description: название файла, из которого брали ботов
+        example: Ipsum minima.
+      bots_num:
+        type: integer
+        description: количество ботов в задаче
+        example: 1841503612694563468
+        format: int64
+      id:
+        type: string
+        example: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
+        format: uuid
+      image:
+        type: string
+        description: base64 строка картинки
+        example: Minus magnam.
+      proxies_filename:
+        type: string
+        description: название файла, из которого брали прокси
+        example: Doloremque eligendi.
+      proxies_num:
+        type: integer
+        description: количество прокси в задаче
+        example: 4331787499834944143
+        format: int64
+      status:
+        type: integer
+        example: 7804403382386560073
+        format: int64
+      targets_filename:
+        type: string
+        description: название файла, из которого брали целевых пользователей
+        example: Quia architecto cum.
+      targets_num:
+        type: integer
+        description: количество целевых пользователей в задаче
+        example: 6817953701298599542
+        format: int64
+      text_template:
+        type: string
+        description: описание под постом
+        example: Et id est accusamus neque nihil est.
+      title:
+        type: string
+        description: название задачи
+        example: Earum et occaecati officiis est provident.
+    example:
+      bots_filename: Libero aperiam veritatis omnis temporibus commodi.
+      bots_num: 7553850697723999286
+      id: 0C589E55-99C1-3ED8-809A-1463C91242B6
+      image: Sapiente repellendus sint.
+      proxies_filename: Modi nobis qui ut ut.
+      proxies_num: 2380694858472859706
+      status: 5853943472621719568
+      targets_filename: Autem repellendus recusandae.
+      targets_num: 7491896368455335607
+      text_template: Mollitia nemo quis.
+      title: Ipsam distinctio modi vero.
     required:
       - id
       - text_template
@@ -1009,26 +1303,16 @@ definitions:
           $ref: '#/definitions/BotAccountRecordRequestBody'
         description: список ботов
         example:
-          - line_number: 1530681320648418897
+          - line_number: 8239514253242831624
             record:
-              - Et ex ab laudantium.
-              - Quia accusamus laboriosam sit.
-              - Id nisi.
-          - line_number: 1530681320648418897
+              - Quae dolorem similique laudantium perspiciatis ea.
+              - Voluptatem odit accusamus officia ipsum et provident.
+              - Eius atque possimus.
+          - line_number: 8239514253242831624
             record:
-              - Et ex ab laudantium.
-              - Quia accusamus laboriosam sit.
-              - Id nisi.
-          - line_number: 1530681320648418897
-            record:
-              - Et ex ab laudantium.
-              - Quia accusamus laboriosam sit.
-              - Id nisi.
-          - line_number: 1530681320648418897
-            record:
-              - Et ex ab laudantium.
-              - Quia accusamus laboriosam sit.
-              - Id nisi.
+              - Quae dolorem similique laudantium perspiciatis ea.
+              - Voluptatem odit accusamus officia ipsum et provident.
+              - Eius atque possimus.
       filenames:
         $ref: '#/definitions/TaskFileNamesRequestBody'
       proxies:
@@ -1037,71 +1321,84 @@ definitions:
           $ref: '#/definitions/ProxyRecordRequestBody'
         description: список проксей для использования
         example:
-          - line_number: 5762439881369486609
+          - line_number: 7147097573259515456
             record:
-              - Vero id nostrum dolor itaque molestiae.
-              - Quae adipisci modi.
-              - Dignissimos nam quis quaerat exercitationem ut inventore.
-          - line_number: 5762439881369486609
+              - Officia inventore harum.
+              - Molestiae quam.
+              - Quas eum nulla.
+          - line_number: 7147097573259515456
             record:
-              - Vero id nostrum dolor itaque molestiae.
-              - Quae adipisci modi.
-              - Dignissimos nam quis quaerat exercitationem ut inventore.
+              - Officia inventore harum.
+              - Molestiae quam.
+              - Quas eum nulla.
       targets:
         type: array
         items:
           $ref: '#/definitions/TargetUserRecordRequestBody'
         description: список аккаунтов, которым показать надо рекламу
         example:
-          - line_number: 7457996689799145942
+          - line_number: 2791450974304943083
             record:
-              - Sit mollitia voluptatibus aperiam ut necessitatibus et.
-              - Fuga sit ipsam aliquam eveniet.
-          - line_number: 7457996689799145942
+              - Ut commodi inventore libero et accusantium commodi.
+              - Veniam qui.
+          - line_number: 2791450974304943083
             record:
-              - Sit mollitia voluptatibus aperiam ut necessitatibus et.
-              - Fuga sit ipsam aliquam eveniet.
+              - Ut commodi inventore libero et accusantium commodi.
+              - Veniam qui.
+          - line_number: 2791450974304943083
+            record:
+              - Ut commodi inventore libero et accusantium commodi.
+              - Veniam qui.
     example:
       bots:
-        - line_number: 1530681320648418897
+        - line_number: 8239514253242831624
           record:
-            - Et ex ab laudantium.
-            - Quia accusamus laboriosam sit.
-            - Id nisi.
-        - line_number: 1530681320648418897
+            - Quae dolorem similique laudantium perspiciatis ea.
+            - Voluptatem odit accusamus officia ipsum et provident.
+            - Eius atque possimus.
+        - line_number: 8239514253242831624
           record:
-            - Et ex ab laudantium.
-            - Quia accusamus laboriosam sit.
-            - Id nisi.
+            - Quae dolorem similique laudantium perspiciatis ea.
+            - Voluptatem odit accusamus officia ipsum et provident.
+            - Eius atque possimus.
       filenames:
-        bots_filename: Aliquid animi reiciendis magni.
-        proxies_filename: Modi quo repellat nam quasi velit.
-        targets_filename: Labore nihil.
+        bots_filename: Libero voluptas.
+        proxies_filename: Id voluptas dolores autem molestias.
+        targets_filename: Iusto temporibus quidem harum.
       proxies:
-        - line_number: 5762439881369486609
+        - line_number: 7147097573259515456
           record:
-            - Vero id nostrum dolor itaque molestiae.
-            - Quae adipisci modi.
-            - Dignissimos nam quis quaerat exercitationem ut inventore.
-        - line_number: 5762439881369486609
+            - Officia inventore harum.
+            - Molestiae quam.
+            - Quas eum nulla.
+        - line_number: 7147097573259515456
           record:
-            - Vero id nostrum dolor itaque molestiae.
-            - Quae adipisci modi.
-            - Dignissimos nam quis quaerat exercitationem ut inventore.
-        - line_number: 5762439881369486609
+            - Officia inventore harum.
+            - Molestiae quam.
+            - Quas eum nulla.
+        - line_number: 7147097573259515456
           record:
-            - Vero id nostrum dolor itaque molestiae.
-            - Quae adipisci modi.
-            - Dignissimos nam quis quaerat exercitationem ut inventore.
+            - Officia inventore harum.
+            - Molestiae quam.
+            - Quas eum nulla.
+        - line_number: 7147097573259515456
+          record:
+            - Officia inventore harum.
+            - Molestiae quam.
+            - Quas eum nulla.
       targets:
-        - line_number: 7457996689799145942
+        - line_number: 2791450974304943083
           record:
-            - Sit mollitia voluptatibus aperiam ut necessitatibus et.
-            - Fuga sit ipsam aliquam eveniet.
-        - line_number: 7457996689799145942
+            - Ut commodi inventore libero et accusantium commodi.
+            - Veniam qui.
+        - line_number: 2791450974304943083
           record:
-            - Sit mollitia voluptatibus aperiam ut necessitatibus et.
-            - Fuga sit ipsam aliquam eveniet.
+            - Ut commodi inventore libero et accusantium commodi.
+            - Veniam qui.
+        - line_number: 2791450974304943083
+          record:
+            - Ut commodi inventore libero et accusantium commodi.
+            - Veniam qui.
     required:
       - bots
       - proxies
@@ -1114,29 +1411,29 @@ definitions:
       input:
         type: string
         description: номер порта
-        example: Cum sint beatae commodi omnis.
+        example: Aperiam doloremque sint fuga.
       line:
         type: integer
-        example: 5855138995748008358
+        example: 660452727736148677
         format: int64
       reason:
         type: string
-        example: Voluptatum deserunt eius sapiente.
+        example: Earum nemo nihil blanditiis soluta neque.
       type:
         type: integer
         description: |2-
            1 - список ботов
               2 - список прокси
               3 - список получателей рекламы
-        example: 1
+        example: 2
         enum:
           - 1
           - 2
           - 3
     example:
-      input: Nam velit.
-      line: 2148235579425855091
-      reason: Ipsam a perferendis sit autem.
+      input: Repellendus ea animi aut.
+      line: 4306892553262694717
+      reason: Ducimus aut.
       type: 3
     required:
       - type

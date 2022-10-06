@@ -16,6 +16,11 @@ func CreateTaskDraftTasksServicePath() string {
 	return "/api/tasks/draft"
 }
 
+// UpdateTaskTasksServicePath returns the URL path to the tasks_service service update task HTTP endpoint.
+func UpdateTaskTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/", taskID)
+}
+
 // UploadFilesTasksServicePath returns the URL path to the tasks_service service upload files HTTP endpoint.
 func UploadFilesTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/upload", taskID)

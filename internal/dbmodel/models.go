@@ -52,13 +52,13 @@ type Proxy struct {
 }
 
 type TargetUser struct {
-	ID        uuid.UUID  `json:"id"`
-	TaskID    uuid.UUID  `json:"task_id"`
-	Username  string     `json:"username"`
-	UserID    int64      `json:"user_id"`
-	Status    int16      `json:"status"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	ID        uuid.UUID    `json:"id"`
+	TaskID    uuid.UUID    `json:"task_id"`
+	Username  string       `json:"username"`
+	UserID    int64        `json:"user_id"`
+	Status    targetStatus `json:"status"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt *time.Time   `json:"updated_at"`
 }
 
 type TargetUsersToTask struct {

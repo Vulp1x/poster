@@ -10,6 +10,22 @@ import (
 
 type Task dbmodel.Task
 
+func (t Task) ToProto() *tasksservice.Task {
+	return &tasksservice.Task{
+		ID:              t.ID.String(),
+		TextTemplate:    t.TextTemplate,
+		Image:           base64.StdEncoding.EncodeToString(t.Image),
+		Status:          int(t.Status),
+		Title:           t.Title,
+		BotsNum:         -1,
+		ProxiesNum:      -1,
+		TargetsNum:      -1,
+		BotsFilename:    t.BotsFilename,
+		ProxiesFilename: t.ProxiesFilename,
+		TargetsFilename: t.TargetsFilename,
+	}
+}
+
 type BotWithTargets struct {
 	BotAccount
 	Targets []dbmodel.TargetUser

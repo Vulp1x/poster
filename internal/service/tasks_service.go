@@ -16,6 +16,7 @@ import (
 
 type taskStore interface {
 	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error)
+	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image []byte) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
 	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
@@ -55,7 +56,7 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "failed to get user id from context: %v", err)
-		return "", tasksservice.InternalError("")
+		return "", tasksservice.InternalError(err.Error())
 	}
 
 	imageDecodedBytes, err := base64.StdEncoding.DecodeString(p.PostImage)
@@ -67,10 +68,47 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, imageDecodedBytes)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create task: %v", err)
-		return "", tasksservice.InternalError("")
+		return "", tasksservice.InternalError(err.Error())
 	}
 
 	return taskID.String(), nil
+}
+
+// UpdateTask обновляет информацию о задаче. Не меняет статус задачи, можно вызывать сколько угодно раз.
+// Нельзя вызвать для задачи, которая уже выполняется, для этого надо сначала остановить выполнение.
+func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.UpdateTaskPayload) (*tasksservice.Task, error) {
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	var imageDecodedBytes []byte
+	if p.PostImage != nil {
+		imageDecodedBytes, err = base64.StdEncoding.DecodeString(*p.PostImage)
+		if err != nil {
+			logger.Errorf(ctx, "failed to decode base 64 string: %v", err)
+			return nil, tasksservice.BadRequest("invalid image")
+		}
+	}
+
+	task, err := s.store.UpdateTask(ctx, taskID, p.Title, p.TextTemplate, imageDecodedBytes)
+	if err != nil {
+		logger.Errorf(ctx, "failed to update task: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return nil, tasksservice.BadRequest("invalid status")
+		}
+
+		return nil, tasksservice.InternalError(err.Error())
+	}
+
+	return task.ToProto(), nil
 }
 
 // StartTask начать выполнение задачи
@@ -83,10 +121,20 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 		return tasksservice.BadRequest("invalid task_id")
 	}
 
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
 	err = s.store.StartTask(ctx, taskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to start task: %v", err)
-		return tasksservice.InternalError("")
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return tasksservice.TaskNotFound("")
+		}
+
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return tasksservice.BadRequest("invalid status")
+		}
+
+		return tasksservice.InternalError(err.Error())
 	}
 
 	return nil
@@ -102,10 +150,12 @@ func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTas
 		return tasksservice.BadRequest("invalid task_id")
 	}
 
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
 	err = s.store.StopTask(ctx, taskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to stop task: %v", err)
-		return tasksservice.InternalError("")
+		return tasksservice.InternalError(err.Error())
 	}
 
 	return nil
@@ -131,7 +181,7 @@ func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskP
 			return nil, tasksservice.TaskNotFound("")
 		}
 
-		return nil, tasksservice.InternalError("")
+		return nil, tasksservice.InternalError(err.Error())
 	}
 
 	return task.ToProto(), nil
@@ -144,7 +194,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "failed to get user id from context: %v", err)
-		return nil, tasksservice.InternalError("")
+		return nil, tasksservice.InternalError(err.Error())
 	}
 
 	domainTasks, err := s.store.ListTasks(ctx, userID)
@@ -155,7 +205,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 			return nil, tasksservice.TaskNotFound("")
 		}
 
-		return nil, tasksservice.InternalError("")
+		return nil, tasksservice.InternalError(err.Error())
 	}
 
 	return domainTasks.ToProto(), nil
@@ -198,7 +248,7 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 			return uploadErrors, tasksservice.BadRequest("invalid task status")
 		}
 
-		return uploadErrors, tasksservice.InternalError("")
+		return uploadErrors, tasksservice.InternalError(err.Error())
 	}
 
 	return uploadErrors, nil
@@ -221,7 +271,7 @@ func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.As
 			return 0, tasksservice.BadRequest("invalid task status")
 		}
 
-		return 0, tasksservice.InternalError("")
+		return 0, tasksservice.InternalError(err.Error())
 	}
 
 	return botAccounts, nil
@@ -244,7 +294,7 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 			return tasksservice.TaskNotFound("")
 		}
 
-		return tasksservice.InternalError("")
+		return tasksservice.InternalError(err.Error())
 	}
 
 	return nil
