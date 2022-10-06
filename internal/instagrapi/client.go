@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/transport"
@@ -13,7 +14,7 @@ import (
 
 type Client struct {
 	cli              *http.Client
-	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response) error
+	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, d time.Duration) error
 }
 
 func NewClient() *Client {
@@ -22,22 +23,25 @@ func NewClient() *Client {
 
 // MakePost создает новый
 func (c *Client) MakePost(ctx context.Context, sessionID, caption string, image []byte) error {
-	buf, err := prepareUploadImageBody(image, sessionID, caption)
+	startedAt := time.Now()
+	buf, contentType, err := prepareUploadImageBody(image, sessionID, caption)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8000/auth/add", buf)
+	req, err := http.NewRequest("POST", "http://localhost:8000/photo/upload", buf)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
+
+	req.Header.Set("Content-Type", contentType)
 
 	resp, err := c.cli.Do(req)
 	if err != nil {
 		return err
 	}
 
-	err = c.saveResponseFunc(ctx, sessionID, resp)
+	err = c.saveResponseFunc(ctx, sessionID, resp, time.Since(startedAt))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
 	}
@@ -51,6 +55,7 @@ func (c *Client) MakePost(ctx context.Context, sessionID, caption string, image 
 
 // InitBot создает бота в instagrapi-rest, чтобы потом отправлять от его лица запросы
 func (c *Client) InitBot(ctx context.Context, bot domain.BotAccount) error {
+	startedAt := time.Now()
 	bodyBytes, err := prepareInitBody(bot)
 	if err != nil {
 		return err
@@ -66,7 +71,7 @@ func (c *Client) InitBot(ctx context.Context, bot domain.BotAccount) error {
 		return err
 	}
 
-	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp)
+	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp, time.Since(startedAt))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
 	}

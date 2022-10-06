@@ -107,7 +107,7 @@ func Test_worker_createPost(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &worker{
-				tasksQueue:     tt.fields.tasksQueue,
+				botsQueue:      tt.fields.tasksQueue,
 				dbtxf:          tt.fields.dbtxf,
 				cli:            tt.fields.cli,
 				generator:      tt.fields.generator,

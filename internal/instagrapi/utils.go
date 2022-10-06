@@ -27,7 +27,7 @@ func init() {
 	})
 }
 
-func saveResponse(ctx context.Context, sessionID string, resp *http.Response) error {
+func saveResponse(ctx context.Context, sessionID string, resp *http.Response, elapsed time.Duration) error {
 	startedAt := time.Now()
 	if resp == nil {
 		return fmt.Errorf("empty resp")
@@ -49,9 +49,10 @@ func saveResponse(ctx context.Context, sessionID string, resp *http.Response) er
 	}
 
 	fields := zap.Fields(
-		zap.String("session_id", sessionID),
+		zap.String("elapsed_time", elapsed.String()),
 		zap.Int("response_code", resp.StatusCode),
 		zap.Int64("response_len", resp.ContentLength),
+		zap.String("session_id", sessionID),
 		zap.ByteString("headers", headerBytes),
 		zap.ByteString("body", bodyBytes),
 	)

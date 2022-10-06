@@ -370,14 +370,15 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 		bots = bots[:neededBotsNum]
 	}
 
-	taskCtx, taskCancel := context.WithCancel(ctx)
+	// нужно отвязаться от ctx, так как он закенселится сразу после окончания запроса
+	taskCtx, taskCancel := context.WithCancel(logger.ToContext(context.Background(), logger.FromContext(ctx)))
 	s.taskCancels[task.ID] = taskCancel
 
 	botsChan := make(chan *domain.BotWithTargets, 20)
 
 	for i := 0; i < workersPerTask; i++ {
 		postingWorker := &worker{
-			tasksQueue:     botsChan,
+			botsQueue:      botsChan,
 			dbtxf:          s.dbtxf,
 			cli:            instagrapi.NewClient(),
 			task:           domain.Task(task),
@@ -388,7 +389,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 		go postingWorker.run(taskCtx)
 	}
 
-	go s.asyncPushBots(ctx, botsChan, bots, targets)
+	go s.asyncPushBots(taskCtx, botsChan, bots, targets)
 
 	return nil
 }
@@ -472,13 +473,15 @@ func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWith
 			allTargetsProcessed = true
 		}
 
-		botsChan <- &domain.BotWithTargets{
+		botWithTargets := &domain.BotWithTargets{
 			BotAccount: domain.BotAccount(bot),
 			Targets:    targets[i*postsPerBot*targetsPerPost : batchEnd],
 		}
+		botsChan <- botWithTargets
 
 		if allTargetsProcessed && i != len(bots)-1 {
 			logger.Warnf(ctx, "processed %d targets with %d batches, breaking", len(targets), i+1)
+			break
 		}
 	}
 

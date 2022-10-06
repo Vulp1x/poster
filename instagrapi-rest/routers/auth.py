@@ -133,8 +133,6 @@ async def auth_add(session_id: str = Body(...),
     cl.set_device(device_settings.as_dict())
     cl.set_uuids(uuids.as_dict())
 
-    print(cl.get_settings())
-
     result = cl.login_by_sessionid(session_id)
     if result:
         clients.set(cl)

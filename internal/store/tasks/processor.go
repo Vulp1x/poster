@@ -19,7 +19,7 @@ type instagrapiClient interface {
 }
 
 type worker struct {
-	tasksQueue     chan *domain.BotWithTargets
+	botsQueue      chan *domain.BotWithTargets
 	dbtxf          dbmodel.DBTXFunc
 	cli            instagrapiClient
 	task           domain.Task
@@ -37,7 +37,7 @@ func (w *worker) run(ctx context.Context) {
 	ctx = logger.WithKV(ctx, "processor_index", w.processorIndex)
 	q := dbmodel.New(w.dbtxf(ctx))
 	var err error
-	for botWithTargets := range w.tasksQueue {
+	for botWithTargets := range w.botsQueue {
 		select {
 		case <-ctx.Done():
 			logger.Infof(ctx, "exiting from worker by context done")
@@ -57,7 +57,7 @@ func (w *worker) run(ctx context.Context) {
 			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, postsPerBot*targetsPerPost)
 		}
 
-		err = w.cli.InitBot(ctx, botWithTargets.BotAccount)
+		err = w.cli.InitBot(taskCtx, botWithTargets.BotAccount)
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to init bot: %v", err)
 
@@ -96,7 +96,7 @@ func (w *worker) run(ctx context.Context) {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
 				if err != nil {
-					logger.Errorf(ctx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
+					logger.Errorf(taskCtx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
 					break
 				}
 				break
@@ -104,7 +104,7 @@ func (w *worker) run(ctx context.Context) {
 
 			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
 			if err != nil {
-				logger.Errorf(ctx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
+				logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
 				break
 			}
 
@@ -115,7 +115,7 @@ func (w *worker) run(ctx context.Context) {
 
 			select {
 			case <-ctx.Done():
-				logger.Warnf(ctx, "exiting from worker by context done, created %d posts", i)
+				logger.Warnf(taskCtx, "exiting from worker by context done, created %d posts", i)
 				return
 			case <-time.After(3 * time.Second):
 			}
@@ -128,6 +128,8 @@ func (w *worker) run(ctx context.Context) {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 		}
 	}
+
+	logger.Infof(ctx, "bots queue closed, stopping worker")
 }
 
 type APIResponse struct {
