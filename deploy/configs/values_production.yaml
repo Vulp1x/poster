@@ -12,6 +12,7 @@ logger:
 postgres:
   host: 65.109.30.237 # used for migrations
   port: 5432
+  migration_port: 5432
   user: docker
   password: dN5mYdDVKbuyq6ry
   database: insta_poster

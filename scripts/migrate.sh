@@ -15,14 +15,17 @@ if [ "${ENVIRONMENT}" = "local" ]; then
 else
   if [ "${ENVIRONMENT}" = "production" ]; then
     CONFIG_FILE="deploy/configs/values_production.yaml"
+  else
+    if [ "${ENVIRONMENT}" = "test" ]; then
+      CONFIG_FILE="deploy/configs/values_docker.yaml"
+    fi
   fi
 fi
-
 MIGRATION_DIR=$(bin/yq eval '.postgres.migrations*' "${CONFIG_FILE}")
 
 # билдим DB_DSN
-DB_HOST=$(bin/yq eval '.postgres.host' "${CONFIG_FILE}")
-DB_PORT=$(bin/yq eval '.postgres.port' "${CONFIG_FILE}")
+DB_HOST=$(bin/yq eval '.postgres.migration_host' "${CONFIG_FILE}")
+DB_PORT=$(bin/yq eval '.postgres.migration_port' "${CONFIG_FILE}")
 DB_USER=$(bin/yq eval '.postgres.user' "${CONFIG_FILE}")
 DB_PASSWORD=$(bin/yq eval '.postgres.password' "${CONFIG_FILE}")
 DB_NAME=$(bin/yq eval '.postgres.database' "${CONFIG_FILE}")

@@ -115,3 +115,9 @@ migrate-prod:
 .PHONY: migrate-local
 migrate-local:
 	 ENVIRONMENT=local scripts/migrate.sh
+
+
+.PHONY: migrate-test
+migrate-test:
+	 ENVIRONMENT=test scripts/migrate.sh
+

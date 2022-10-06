@@ -12,12 +12,13 @@ logger:
 postgres:
   host: localhost
   port: 5432
+  migration_host: localhost
+  migration_port: 5432
   user: postgres
   password: postgres
   database: insta_poster
   ssl mode: disable
   migrations dir: migrations
-  pg-dsn: "postgres://postgres@localhost:5432/insta_poster?sslmode=disable&timezone=utc"
 session:
   JWT signing key: "simple route is the best routing soft ever"
   token validness duration: 24h

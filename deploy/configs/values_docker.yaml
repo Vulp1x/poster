@@ -12,6 +12,8 @@ logger:
 postgres:
   host: postgres
   port: 5432
+  migration_host: localhost
+  migration_port: 5435
   user: postgres
   password: postgres
   database: insta_poster
