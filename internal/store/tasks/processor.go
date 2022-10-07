@@ -29,7 +29,7 @@ type worker struct {
 }
 
 const (
-	postsPerBot    = 15
+	postsPerBot    = 7
 	targetsPerPost = 15
 )
 
