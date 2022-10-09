@@ -217,7 +217,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 }
 
 func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) ([]*tasksservice.UploadError, error) {
-	logger.Debug(ctx, "starting UploadFile with payload %#v", p)
+	logger.Debug(ctx, "starting UploadFile with filenames %+v", p.Filenames)
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
