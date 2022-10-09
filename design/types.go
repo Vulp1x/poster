@@ -142,3 +142,14 @@ var TaskFilenames = Type("TaskFileNames", func() {
 
 	Required("bots_filename", "proxies_filename", "targets_filename")
 })
+
+var BotsProgress = Type("BotsProgress", func() {
+	Attribute("user_name", String, "имя пользователя бота", func() {
+		Meta("struct:tag:json", "user_name")
+	})
+	Attribute("posts_count", Int, "количество выложенных постов", func() {
+		Meta("struct:tag:json", "posts_count")
+	})
+
+	Required("user_name", "posts_count")
+})

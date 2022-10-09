@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
 	swagger "github.com/go-openapi/runtime/middleware"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	authservicesvr "github.com/inst-api/poster/gen/http/auth_service/server"
@@ -26,7 +25,7 @@ import (
 // URL. It shuts down the server if any error is received in the error channel.
 func handleHTTPServer(
 	ctx context.Context,
-	host, port string,
+	host, port, keyFile, certFile string,
 	authServiceEndpoints *authservice.Endpoints,
 	tasksServiceEndpoints *tasksservice.Endpoints,
 	wg *sync.WaitGroup,
@@ -114,12 +113,20 @@ func handleHTTPServer(
 	// 	Debug:            true,
 	// }))
 
-	router.Use(cors.AllowAll().Handler)
+	// router.Use(cors.AllowAll().Handler)
 
 	router.Mount("/", mux)
 
+	// // generate a `Certificate` struct
+	// cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	// if err != nil {
+	// 	logger.Fatalf(ctx, "failed to load certs: %v", err)
+	// }
+
 	// Start HTTP server using default configuration, change the code to
 	// configure the server as required by your service.
+	// srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router, TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}}}
+
 	srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router}
 	for _, m := range authServiceServer.Mounts {
 		logger.Infof(ctx, "HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)

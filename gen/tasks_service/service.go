@@ -35,6 +35,8 @@ type Service interface {
 	StopTask(context.Context, *StopTaskPayload) (err error)
 	// получить задачу по id
 	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
+	// получить статус выполнения задачи по id
+	GetProgress(context.Context, *GetProgressPayload) (res []*BotsProgress, err error)
 	// получить все задачи для текущего пользователя
 	ListTasks(context.Context, *ListTasksPayload) (res []*Task, err error)
 }
@@ -53,7 +55,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [9]string{"create task draft", "update task", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "list tasks"}
+var MethodNames = [10]string{"create task draft", "update task", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "get progress", "list tasks"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -68,6 +70,13 @@ type BotAccountRecord struct {
 	Record []string
 	// номер строки в исходном файле
 	LineNumber int `json:"line_number"`
+}
+
+type BotsProgress struct {
+	// имя пользователя бота
+	UserName string `json:"user_name"`
+	// количество выложенных постов
+	PostsCount int `json:"posts_count"`
 }
 
 // CreateTaskDraftPayload is the payload type of the tasks_service service
@@ -86,6 +95,15 @@ type CreateTaskDraftPayload struct {
 // ForceDeletePayload is the payload type of the tasks_service service force
 // delete method.
 type ForceDeletePayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
+// GetProgressPayload is the payload type of the tasks_service service get
+// progress method.
+type GetProgressPayload struct {
 	// JWT used for authentication
 	Token string
 	// id задачи

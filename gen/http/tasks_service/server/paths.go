@@ -51,6 +51,11 @@ func GetTaskTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/", taskID)
 }
 
+// GetProgressTasksServicePath returns the URL path to the tasks_service service get progress HTTP endpoint.
+func GetProgressTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/progress", taskID)
+}
+
 // ListTasksTasksServicePath returns the URL path to the tasks_service service list tasks HTTP endpoint.
 func ListTasksTasksServicePath() string {
 	return "/api/tasks/"

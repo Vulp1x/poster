@@ -776,6 +776,96 @@ func EncodeGetTaskError(encoder func(context.Context, http.ResponseWriter) goaht
 	}
 }
 
+// EncodeGetProgressResponse returns an encoder for responses returned by the
+// tasks_service get progress endpoint.
+func EncodeGetProgressResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.([]*tasksservice.BotsProgress)
+		enc := encoder(ctx, w)
+		body := NewGetProgressResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetProgressRequest returns a decoder for requests sent to the
+// tasks_service get progress endpoint.
+func DecodeGetProgressRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			taskID string
+			token  string
+			err    error
+
+			params = mux.Vars(r)
+		)
+		taskID = params["task_id"]
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetProgressPayload(taskID, token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeGetProgressError returns an encoder for errors returned by the get
+// progress tasks_service endpoint.
+func EncodeGetProgressError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeListTasksResponse returns an encoder for responses returned by the
 // tasks_service list tasks endpoint.
 func EncodeListTasksResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -927,6 +1017,17 @@ func marshalTasksserviceUploadErrorToUploadErrorResponse(v *tasksservice.UploadE
 		Line:   v.Line,
 		Input:  v.Input,
 		Reason: v.Reason,
+	}
+
+	return res
+}
+
+// marshalTasksserviceBotsProgressToBotsProgressResponse builds a value of type
+// *BotsProgressResponse from a value of type *tasksservice.BotsProgress.
+func marshalTasksserviceBotsProgressToBotsProgressResponse(v *tasksservice.BotsProgress) *BotsProgressResponse {
+	res := &BotsProgressResponse{
+		UserName:   v.UserName,
+		PostsCount: v.PostsCount,
 	}
 
 	return res

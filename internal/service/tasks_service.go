@@ -33,6 +33,11 @@ type tasksServicesrvc struct {
 	store taskStore
 }
 
+func (s *tasksServicesrvc) GetProgress(ctx context.Context, payload *tasksservice.GetProgressPayload) (res []*tasksservice.BotsProgress, err error) {
+	logger.Infof(ctx, "get progress of task %s", payload.TaskID)
+	return []*tasksservice.BotsProgress{{"bot's username", 0}}, nil
+}
+
 // NewTasksService returns the tasks_service service implementation.
 func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Service {
 	return &tasksServicesrvc{auth: auth, store: store}

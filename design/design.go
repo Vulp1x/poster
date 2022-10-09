@@ -365,6 +365,34 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
+	Method("get progress", func() {
+		Description("получить статус выполнения задачи по id")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("token", "task_id")
+		})
+
+		Result(ArrayOf(BotsProgress))
+
+		HTTP(func() {
+			GET("/api/tasks/{task_id}/progress")
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
 	Method("list tasks", func() {
 		Description("получить все задачи для текущего пользователя")
 

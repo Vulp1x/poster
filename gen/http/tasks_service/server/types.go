@@ -100,6 +100,10 @@ type GetTaskOKResponseBody struct {
 	TargetsFilename *string `json:"targets_filename"`
 }
 
+// GetProgressResponseBody is the type of the "tasks_service" service "get
+// progress" endpoint HTTP response body.
+type GetProgressResponseBody []*BotsProgressResponse
+
 // ListTasksResponseBody is the type of the "tasks_service" service "list
 // tasks" endpoint HTTP response body.
 type ListTasksResponseBody []*TaskResponse
@@ -114,6 +118,14 @@ type UploadErrorResponse struct {
 	// номер порта
 	Input  string `form:"input" json:"input" xml:"input"`
 	Reason string `form:"reason" json:"reason" xml:"reason"`
+}
+
+// BotsProgressResponse is used to define fields on response body types.
+type BotsProgressResponse struct {
+	// имя пользователя бота
+	UserName string `json:"user_name"`
+	// количество выложенных постов
+	PostsCount int `json:"posts_count"`
 }
 
 // TaskResponse is used to define fields on response body types.
@@ -215,6 +227,16 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		BotsFilename:    res.BotsFilename,
 		ProxiesFilename: res.ProxiesFilename,
 		TargetsFilename: res.TargetsFilename,
+	}
+	return body
+}
+
+// NewGetProgressResponseBody builds the HTTP response body from the result of
+// the "get progress" endpoint of the "tasks_service" service.
+func NewGetProgressResponseBody(res []*tasksservice.BotsProgress) GetProgressResponseBody {
+	body := make([]*BotsProgressResponse, len(res))
+	for i, val := range res {
+		body[i] = marshalTasksserviceBotsProgressToBotsProgressResponse(val)
 	}
 	return body
 }
@@ -321,6 +343,16 @@ func NewStopTaskPayload(taskID string, token string) *tasksservice.StopTaskPaylo
 // NewGetTaskPayload builds a tasks_service service get task endpoint payload.
 func NewGetTaskPayload(taskID string, token string) *tasksservice.GetTaskPayload {
 	v := &tasksservice.GetTaskPayload{}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
+// NewGetProgressPayload builds a tasks_service service get progress endpoint
+// payload.
+func NewGetProgressPayload(taskID string, token string) *tasksservice.GetProgressPayload {
+	v := &tasksservice.GetProgressPayload{}
 	v.TaskID = taskID
 	v.Token = token
 

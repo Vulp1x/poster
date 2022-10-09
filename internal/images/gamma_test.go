@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-//go:embed testdata/test_cat.jpeg
+//go:embed testdata/br77.jpg
 var testImageBytes []byte
 
 func TestNewGammaGenerator(t *testing.T) {

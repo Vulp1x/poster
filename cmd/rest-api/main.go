@@ -93,6 +93,8 @@ func main() {
 		ctx,
 		conf.Listen.BindIP,
 		conf.Listen.Port,
+		conf.Listen.KeyFile,
+		conf.Listen.CertFile,
 		authServiceEndpoints,
 		tasksServiceEndpoints,
 		&wg,

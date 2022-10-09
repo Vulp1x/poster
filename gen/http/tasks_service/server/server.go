@@ -28,6 +28,7 @@ type Server struct {
 	StartTask       http.Handler
 	StopTask        http.Handler
 	GetTask         http.Handler
+	GetProgress     http.Handler
 	ListTasks       http.Handler
 }
 
@@ -77,6 +78,7 @@ func New(
 			{"StartTask", "POST", "/api/tasks/{task_id}/start"},
 			{"StopTask", "POST", "/api/tasks/{task_id}/stop"},
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
+			{"GetProgress", "GET", "/api/tasks/{task_id}/progress"},
 			{"ListTasks", "GET", "/api/tasks/"},
 		},
 		CreateTaskDraft: NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
@@ -87,6 +89,7 @@ func New(
 		StartTask:       NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
 		StopTask:        NewStopTaskHandler(e.StopTask, mux, decoder, encoder, errhandler, formatter),
 		GetTask:         NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
+		GetProgress:     NewGetProgressHandler(e.GetProgress, mux, decoder, encoder, errhandler, formatter),
 		ListTasks:       NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
 	}
 }
@@ -104,6 +107,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.StartTask = m(s.StartTask)
 	s.StopTask = m(s.StopTask)
 	s.GetTask = m(s.GetTask)
+	s.GetProgress = m(s.GetProgress)
 	s.ListTasks = m(s.ListTasks)
 }
 
@@ -117,6 +121,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountStartTaskHandler(mux, h.StartTask)
 	MountStopTaskHandler(mux, h.StopTask)
 	MountGetTaskHandler(mux, h.GetTask)
+	MountGetProgressHandler(mux, h.GetProgress)
 	MountListTasksHandler(mux, h.ListTasks)
 }
 
@@ -512,6 +517,57 @@ func NewGetTaskHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "get task")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetProgressHandler configures the mux to serve the "tasks_service"
+// service "get progress" endpoint.
+func MountGetProgressHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/tasks/{task_id}/progress", f)
+}
+
+// NewGetProgressHandler creates a HTTP handler which loads the HTTP request
+// and calls the "tasks_service" service "get progress" endpoint.
+func NewGetProgressHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetProgressRequest(mux, decoder)
+		encodeResponse = EncodeGetProgressResponse(encoder)
+		encodeError    = EncodeGetProgressError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get progress")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

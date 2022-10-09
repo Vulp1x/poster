@@ -1,6 +1,8 @@
 listen:
   port: 8090
   bind_ip: 127.0.0.1
+  cert_file: 'localhost.crt'
+  key_file: 'localhost.key'
 logger:
   enable console: true
   console json format: true

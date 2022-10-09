@@ -24,6 +24,7 @@ type Endpoints struct {
 	StartTask       goa.Endpoint
 	StopTask        goa.Endpoint
 	GetTask         goa.Endpoint
+	GetProgress     goa.Endpoint
 	ListTasks       goa.Endpoint
 }
 
@@ -40,6 +41,7 @@ func NewEndpoints(s Service) *Endpoints {
 		StartTask:       NewStartTaskEndpoint(s, a.JWTAuth),
 		StopTask:        NewStopTaskEndpoint(s, a.JWTAuth),
 		GetTask:         NewGetTaskEndpoint(s, a.JWTAuth),
+		GetProgress:     NewGetProgressEndpoint(s, a.JWTAuth),
 		ListTasks:       NewListTasksEndpoint(s, a.JWTAuth),
 	}
 }
@@ -55,6 +57,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.StartTask = m(e.StartTask)
 	e.StopTask = m(e.StopTask)
 	e.GetTask = m(e.GetTask)
+	e.GetProgress = m(e.GetProgress)
 	e.ListTasks = m(e.ListTasks)
 }
 
@@ -207,6 +210,25 @@ func NewGetTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 			return nil, err
 		}
 		return s.GetTask(ctx, p)
+	}
+}
+
+// NewGetProgressEndpoint returns an endpoint function that calls the method
+// "get progress" of service "tasks_service".
+func NewGetProgressEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetProgressPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.GetProgress(ctx, p)
 	}
 }
 

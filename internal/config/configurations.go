@@ -32,8 +32,10 @@ type Config struct {
 
 // ServerConfig represents configuration of server location
 type ServerConfig struct {
-	BindIP string `yaml:"bind_ip"`
-	Port   string `yaml:"port"`
+	BindIP   string `yaml:"bind_ip"`
+	Port     string `yaml:"port"`
+	CertFile string `yaml:"cert_file"`
+	KeyFile  string `yaml:"key_file"`
 }
 
 // ParseConfiguration parses configuration from values_*.yaml
