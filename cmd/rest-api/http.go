@@ -129,10 +129,11 @@ func handleHTTPServer(
 	// configure the server as required by your service.
 
 	// Проверяем, доступен ли cert файл.
-	err := httpscerts.Check("cert.pem", "key.pem")
+	err := httpscerts.Check("deploy/cert.pem", "deploy/key.pem")
 	// Если он недоступен, то генерируем новый.
 	if err != nil {
-		err = httpscerts.Generate("cert.pem", "key.pem", "127.0.0.1:8090")
+		logger.Warn(ctx, "generating new cert")
+		err = httpscerts.Generate("deploy/cert.pem", "deploy/key.pem", "127.0.0.1:8090")
 		if err != nil {
 			logger.Fatalf(ctx, "ошибка: Не можем сгенерировать https сертификат.: %v", err)
 		}
@@ -156,7 +157,7 @@ func handleHTTPServer(
 		// Start HTTP server in a separate goroutine.
 		go func() {
 			logger.Infof(ctx, "HTTP server listening on %s:%s", host, port)
-			errc <- srv.ListenAndServeTLS("cert.pem", "key.pem")
+			errc <- srv.ListenAndServeTLS("deploy/cert.pem", "deploy/key.pem")
 		}()
 
 		<-ctx.Done()
