@@ -6,6 +6,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/gift v1.2.1
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/cors v1.2.1
 	github.com/go-openapi/runtime v0.24.1
 	github.com/gojuno/minimock/v3 v3.0.10
 	github.com/google/go-cmp v0.5.6

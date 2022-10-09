@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	swagger "github.com/go-openapi/runtime/middleware"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	authservicesvr "github.com/inst-api/poster/gen/http/auth_service/server"
@@ -114,7 +115,7 @@ func handleHTTPServer(
 	// 	Debug:            true,
 	// }))
 
-	// router.Use(cors.AllowAll().Handler)
+	router.Use(cors.AllowAll().Handler)
 
 	router.Mount("/", mux)
 
