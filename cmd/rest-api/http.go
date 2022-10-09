@@ -16,6 +16,7 @@ import (
 	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/internal/service/multipart"
 	"github.com/inst-api/poster/pkg/logger"
+	"github.com/kabukky/httpscerts"
 	goahttp "goa.design/goa/v3/http"
 	httpmdlwr "goa.design/goa/v3/http/middleware"
 	"goa.design/goa/v3/middleware"
@@ -125,6 +126,17 @@ func handleHTTPServer(
 
 	// Start HTTP server using default configuration, change the code to
 	// configure the server as required by your service.
+
+	// Проверяем, доступен ли cert файл.
+	err := httpscerts.Check("cert.pem", "key.pem")
+	// Если он недоступен, то генерируем новый.
+	if err != nil {
+		err = httpscerts.Generate("cert.pem", "key.pem", "127.0.0.1:8090")
+		if err != nil {
+			logger.Fatalf(ctx, "ошибка: Не можем сгенерировать https сертификат.: %v", err)
+		}
+	}
+
 	// srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router, TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}}}
 
 	srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router}
@@ -143,7 +155,7 @@ func handleHTTPServer(
 		// Start HTTP server in a separate goroutine.
 		go func() {
 			logger.Infof(ctx, "HTTP server listening on %s:%s", host, port)
-			errc <- srv.ListenAndServe()
+			errc <- srv.ListenAndServeTLS("cert.pem", "key.pem")
 		}()
 
 		<-ctx.Done()
