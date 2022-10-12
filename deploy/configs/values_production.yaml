@@ -10,7 +10,8 @@ logger:
   file level: debug
   file location: ./tmp/logs.log
 postgres:
-  host: 65.109.30.237 # used for migrations
+  host: 65.109.30.237
+  migration_host: 65.109.30.237
   port: 5432
   migration_port: 5432
   user: docker

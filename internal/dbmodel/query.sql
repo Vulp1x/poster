@@ -167,7 +167,7 @@ where id = $1;
 update bot_accounts
 set status = $1
 where id = $2;
-x
+
 -- name: SetBotPostsCount :exec
 update bot_accounts
 set status      = 4, -- dbmodel.DoneBotStatus
