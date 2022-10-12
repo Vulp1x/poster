@@ -147,7 +147,7 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const findBotsForTask = `-- name: FindBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where task_id = $1
 `
@@ -173,6 +173,7 @@ func (q *Queries) FindBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotA
 			&i.ResProxy,
 			&i.WorkProxy,
 			&i.Status,
+			&i.PostsCount,
 			&i.StartedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -248,7 +249,7 @@ func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]P
 }
 
 const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where task_id = $1
   and status = 2
@@ -275,6 +276,7 @@ func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([
 			&i.ResProxy,
 			&i.WorkProxy,
 			&i.Status,
+			&i.PostsCount,
 			&i.StartedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -452,7 +454,7 @@ func (q *Queries) ForceDeleteTaskByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const getBotByID = `-- name: GetBotByID :one
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where id = $1
 `
@@ -472,12 +474,45 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 		&i.ResProxy,
 		&i.WorkProxy,
 		&i.Status,
+		&i.PostsCount,
 		&i.StartedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const getTaskProgress = `-- name: GetTaskProgress :many
+select username, posts_count, status
+from bot_accounts
+where task_id = $1
+`
+
+type GetTaskProgressRow struct {
+	Username   string    `json:"username"`
+	PostsCount int16     `json:"posts_count"`
+	Status     botStatus `json:"status"`
+}
+
+func (q *Queries) GetTaskProgress(ctx context.Context, taskID uuid.UUID) ([]GetTaskProgressRow, error) {
+	rows, err := q.db.Query(ctx, getTaskProgress, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTaskProgressRow
+	for rows.Next() {
+		var i GetTaskProgressRow
+		if err := rows.Scan(&i.Username, &i.PostsCount, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserByID = `-- name: GetUserByID :one
@@ -570,15 +605,6 @@ func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (Se
 	var i SelectCountsForTaskRow
 	err := row.Scan(&i.ProxiesCount, &i.BotsCount, &i.TargetsCount)
 	return i, err
-}
-
-const selectNow = `-- name: SelectNow :exec
-SELECT now()
-`
-
-func (q *Queries) SelectNow(ctx context.Context) error {
-	_, err := q.db.Exec(ctx, selectNow)
-	return err
 }
 
 const setBotStatus = `-- name: SetBotStatus :exec

@@ -3,6 +3,7 @@ module github.com/inst-api/poster
 go 1.19
 
 require (
+	github.com/anthonynsimon/bild v0.13.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/gift v1.2.1
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -11,6 +12,7 @@ require (
 	github.com/gojuno/minimock/v3 v3.0.10
 	github.com/google/go-cmp v0.5.6
 	github.com/google/uuid v1.3.0
+	github.com/h2non/bimg v1.1.9
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/kabukky/httpscerts v0.0.0-20150320125433-617593d7dcb3

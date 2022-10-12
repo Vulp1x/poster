@@ -24,6 +24,7 @@ type taskStore interface {
 	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
 	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
 	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
+	TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error)
 }
 
 // tasks_service service example implementation.
@@ -31,11 +32,6 @@ type taskStore interface {
 type tasksServicesrvc struct {
 	auth  authservice.Auther
 	store taskStore
-}
-
-func (s *tasksServicesrvc) GetProgress(ctx context.Context, payload *tasksservice.GetProgressPayload) (res []*tasksservice.BotsProgress, err error) {
-	logger.Infof(ctx, "get progress of task %s", payload.TaskID)
-	return []*tasksservice.BotsProgress{{"bot's username", 0}}, nil
 }
 
 // NewTasksService returns the tasks_service service implementation.
@@ -303,4 +299,31 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 	}
 
 	return nil
+}
+
+func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetProgressPayload) ([]*tasksservice.BotsProgress, error) {
+	logger.Infof(ctx, "get progress of task %s", p.TaskID)
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	domainProgress, err := s.store.TaskProgress(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to get task progress: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return nil, tasksservice.BadRequest("invalid status")
+		}
+
+		return nil, tasksservice.InternalError(err.Error())
+	}
+
+	return domainProgress.ToProto(), nil
 }

@@ -1,6 +1,3 @@
--- name: SelectNow :exec
-SELECT now();
-
 -- name: GetUserByID :one
 SELECT *
 from users
@@ -175,3 +172,8 @@ where id = $2;
 update target_users
 set status = $1
 where id = ANY (sqlc.arg('ids')::uuid[]);
+
+-- name: GetTaskProgress :many
+select username, posts_count, status
+from bot_accounts
+where task_id = $1;

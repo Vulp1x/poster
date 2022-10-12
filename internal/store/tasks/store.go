@@ -45,6 +45,29 @@ type Store struct {
 	txf         dbmodel.TxFunc
 }
 
+func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	task, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.TaskProgress{}, ErrTaskNotFound
+		}
+	}
+
+	if task.Status != dbmodel.StartedTaskStatus && task.Status != dbmodel.DoneTaskStatus {
+		return domain.TaskProgress{}, fmt.Errorf("%w: expected statuses [%d, %d], got %d",
+			ErrTaskInvalidStatus, dbmodel.StartedTaskStatus, dbmodel.DoneTaskStatus, task.Status)
+	}
+
+	progress, err := q.GetTaskProgress(ctx, taskID)
+	if err != nil {
+		return domain.TaskProgress{}, err
+	}
+
+	return domain.TaskProgress(progress), nil
+}
+
 func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image []byte) (domain.Task, error) {
 	tx, err := s.txf(ctx)
 	if err != nil {

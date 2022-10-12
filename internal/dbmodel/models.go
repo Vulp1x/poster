@@ -23,6 +23,7 @@ type BotAccount struct {
 	ResProxy   *Proxy                 `json:"res_proxy"`
 	WorkProxy  *Proxy                 `json:"work_proxy"`
 	Status     botStatus              `json:"status"`
+	PostsCount int16                  `json:"posts_count"`
 	StartedAt  *time.Time             `json:"started_at"`
 	CreatedAt  time.Time              `json:"created_at"`
 	UpdatedAt  *time.Time             `json:"updated_at"`

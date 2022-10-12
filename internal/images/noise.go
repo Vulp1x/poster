@@ -5,6 +5,10 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"image/jpeg"
+
+	"github.com/disintegration/gift"
+	"github.com/inst-api/poster/pkg/logger"
 )
 
 func NewNoiseGenerator(imgBytes []byte, gamma float32) (Generator, error) {
@@ -13,26 +17,27 @@ func NewNoiseGenerator(imgBytes []byte, gamma float32) (Generator, error) {
 		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
 
-	return noiseGenerator{img: img, gammaCoef: gamma}, nil
+	return convolutionalGenerator{img: img, gammaCoef: gamma}, nil
 }
 
-type noiseGenerator struct {
+type convolutionalGenerator struct {
 	img       image.Image
 	gammaCoef float32
 }
 
-func (g noiseGenerator) Next(ctx context.Context) []byte {
-	// imageRect := g.img.Bounds().Size()
-	// // result := noise.Generate(imageRect.X, imageRect.Y, &noise.Options{Monochrome: false, NoiseFn: noise.Uniform})
-	//
-	// buf := &bytes.Buffer{}
-	//
-	// err := jpeg.Encode(buf, dst, nil)
-	// if err != nil {
-	// 	logger.Errorf(ctx, "failed to encode new image: %v", err)
-	// 	return nil
-	// }
-	//
-	// return buf.Bytes()
-	return nil
+func (g convolutionalGenerator) Next(ctx context.Context) []byte {
+	filter := gift.New(gift.Convolution([]float32{-1, 1, 2, 0, 0, 2, 1, 1, 2}, true, false, false, 0))
+
+	dst := image.NewRGBA(filter.Bounds(g.img.Bounds()))
+	filter.Draw(dst, g.img)
+
+	buf := &bytes.Buffer{}
+
+	err := jpeg.Encode(buf, dst, nil)
+	if err != nil {
+		logger.Errorf(ctx, "failed to encode new image: %v", err)
+		return nil
+	}
+
+	return buf.Bytes()
 }

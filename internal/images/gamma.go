@@ -56,13 +56,13 @@ type randomGammaGenerator struct {
 }
 
 func (g randomGammaGenerator) Next(ctx context.Context) []byte {
-	filter := gift.New(gift.Gamma(0.4 + rand.Float32()))
+	filter := gift.New(gift.Gamma(0.8 + rand.Float32()*0.6))
 	dst := image.NewRGBA(filter.Bounds(g.img.Bounds()))
 	filter.Draw(dst, g.img)
 
 	buf := &bytes.Buffer{}
 
-	err := jpeg.Encode(buf, dst, nil)
+	err := jpeg.Encode(buf, dst, &jpeg.Options{Quality: 60 + rand.Intn(40)})
 	if err != nil {
 		logger.Errorf(ctx, "failed to encode new image: %v", err)
 		return nil

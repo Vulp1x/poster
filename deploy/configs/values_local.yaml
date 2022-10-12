@@ -21,6 +21,8 @@ postgres:
   database: insta_poster
   ssl mode: disable
   migrations dir: migrations
+#  used for goose migrations
+  pg-dsn: "postgres://postgres@localhost:5432/insta_poster?sslmode=disable&timezone=utc"
 session:
   JWT signing key: "simple route is the best routing soft ever"
   token validness duration: 24h

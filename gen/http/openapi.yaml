@@ -719,16 +719,23 @@ definitions:
         description: количество выложенных постов
         example: 4772604901417637598
         format: int64
+      status:
+        type: integer
+        description: текущий статус бота, будут ли выкладываться посты
+        example: 4040606264707911954
+        format: int64
       user_name:
         type: string
         description: имя пользователя бота
         example: Id aliquid explicabo ut ratione nemo eius.
     example:
-      posts_count: 2917845156825342734
-      user_name: Earum qui quo quia similique.
+      posts_count: 7586996351065991454
+      status: 2879520445640348202
+      user_name: Qui quo quia similique sed.
     required:
       - user_name
       - posts_count
+      - status
   ProxyRecordRequestBody:
     title: ProxyRecordRequestBody
     type: object
@@ -816,11 +823,11 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Quia ut et perferendis aperiam.
+        example: Aliquid vitae et est voluptas cumque beatae.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 6719448899240189321
+        example: 1472528757686977445
         format: int64
       id:
         type: string
@@ -829,49 +836,49 @@ definitions:
       image:
         type: string
         description: base64 строка картинки
-        example: Animi delectus cumque cumque laborum.
+        example: Nesciunt dolorem tempora iste impedit ut quia.
       proxies_filename:
         type: string
         description: название файла, из которого брали прокси
-        example: Vitae et est voluptas cumque.
+        example: Eveniet quia non accusamus.
       proxies_num:
         type: integer
         description: количество прокси в задаче
-        example: 7560090567368727038
+        example: 6011784940720609305
         format: int64
       status:
         type: integer
-        example: 7997322694108575367
+        example: 1896966460369859399
         format: int64
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Eum eveniet quia.
+        example: Soluta architecto non.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 6985440661140676031
+        example: 1524613079930343096
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Quae et maiores.
+        example: Et maiores accusamus animi delectus cumque cumque.
       title:
         type: string
         description: название задачи
-        example: Tempora iste impedit ut quia illum.
+        example: Est rerum iure quia.
     example:
-      bots_filename: In odio ut qui quia animi et.
-      bots_num: 8148978437501562809
+      bots_filename: Quas est eius delectus dicta.
+      bots_num: 893306491790496901
       id: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
-      image: Praesentium consequatur et quis molestiae.
-      proxies_filename: Distinctio quaerat eligendi dolor eligendi.
-      proxies_num: 7743332367194583201
-      status: 6342108088750332793
-      targets_filename: Quas est eius delectus dicta.
-      targets_num: 331542322468794864
-      text_template: Maxime repellat vero mollitia.
-      title: Ut quis dolor.
+      image: Quis dolor aut dolore ut debitis in.
+      proxies_filename: Nesciunt totam in laudantium id.
+      proxies_num: 8120784584163413400
+      status: 619151380957864357
+      targets_filename: Sapiente est.
+      targets_num: 3700293281098366190
+      text_template: Et quis molestiae excepturi rerum.
+      title: Qui quia animi et saepe distinctio quaerat.
     required:
       - id
       - text_template

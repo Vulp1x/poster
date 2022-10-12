@@ -77,6 +77,8 @@ type BotsProgress struct {
 	UserName string `json:"user_name"`
 	// количество выложенных постов
 	PostsCount int `json:"posts_count"`
+	// текущий статус бота, будут ли выкладываться посты
+	Status int
 }
 
 // CreateTaskDraftPayload is the payload type of the tasks_service service

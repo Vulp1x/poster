@@ -126,6 +126,8 @@ type BotsProgressResponse struct {
 	UserName string `json:"user_name"`
 	// количество выложенных постов
 	PostsCount int `json:"posts_count"`
+	// текущий статус бота, будут ли выкладываться посты
+	Status int `form:"status" json:"status" xml:"status"`
 }
 
 // TaskResponse is used to define fields on response body types.

@@ -48,6 +48,7 @@ CREATE TABLE public.bot_accounts (
     res_proxy jsonb,
     work_proxy jsonb,
     status smallint NOT NULL,
+    posts_count smallint NOT NULL,
     started_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone,

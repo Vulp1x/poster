@@ -1028,6 +1028,7 @@ func marshalTasksserviceBotsProgressToBotsProgressResponse(v *tasksservice.BotsP
 	res := &BotsProgressResponse{
 		UserName:   v.UserName,
 		PostsCount: v.PostsCount,
+		Status:     v.Status,
 	}
 
 	return res
