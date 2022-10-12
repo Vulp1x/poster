@@ -75,9 +75,9 @@ func (w *worker) run(ctx context.Context) {
 		}
 
 		var (
-			i           int
-			shouldBreak = false
-			targetIds   []uuid.UUID
+			i, postsDone int
+			shouldBreak  = false
+			targetIds    []uuid.UUID
 		)
 
 		for i = 0; i < postsPerBot; i++ {
@@ -97,15 +97,17 @@ func (w *worker) run(ctx context.Context) {
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
 				if err != nil {
 					logger.Errorf(taskCtx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
-					break
 				}
-				break
+
+				continue
 			}
+
+			postsDone++
 
 			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
-				break
+				continue
 			}
 
 			// тегнули уже всех пользователей, больше постов не нужно
@@ -116,14 +118,18 @@ func (w *worker) run(ctx context.Context) {
 			select {
 			case <-ctx.Done():
 				logger.Warnf(taskCtx, "exiting from worker by context done, created %d posts", i)
+				err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
+				if err != nil {
+					logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
+				}
 				return
 			case <-time.After(3 * time.Second):
 			}
 		}
 
-		logger.Info(taskCtx, "made %d posts, saving results time elapsed: %s", i, time.Since(startTime))
+		logger.Infof(taskCtx, "made %d posts, saving results time elapsed: %s", postsDone, time.Since(startTime))
 
-		err = q.SetBotStatus(taskCtx, dbmodel.SetBotStatusParams{Status: dbmodel.DoneBotStatus, ID: botWithTargets.ID})
+		err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 		}

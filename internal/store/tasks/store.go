@@ -33,6 +33,7 @@ func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.T
 		pushTimeout: timeout,
 		dbtxf:       dbtxFunc,
 		txf:         txFunc,
+		taskMu:      &sync.Mutex{},
 	}
 }
 
@@ -65,7 +66,7 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.Task
 		return domain.TaskProgress{}, err
 	}
 
-	return domain.TaskProgress(progress), nil
+	return progress, nil
 }
 
 func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image []byte) (domain.Task, error) {
@@ -395,7 +396,9 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 
 	// нужно отвязаться от ctx, так как он закенселится сразу после окончания запроса
 	taskCtx, taskCancel := context.WithCancel(logger.ToContext(context.Background(), logger.FromContext(ctx)))
+	s.taskMu.Lock()
 	s.taskCancels[task.ID] = taskCancel
+	s.taskMu.Unlock()
 
 	botsChan := make(chan *domain.BotWithTargets, 20)
 
@@ -419,7 +422,9 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 
 func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	logger.Infof(ctx, "stopping task '%s'", taskID)
+	s.taskMu.Lock()
 	cancel, ok := s.taskCancels[taskID]
+	s.taskMu.Unlock()
 	if !ok {
 		return fmt.Errorf("failed to find task '%s' in tasks: %#v", taskID, s.taskCancels)
 	}
@@ -427,9 +432,8 @@ func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	cancel()
 
 	s.taskMu.Lock()
-	defer s.taskMu.Unlock()
-
 	delete(s.taskCancels, taskID)
+	s.taskMu.Unlock()
 
 	return nil
 }

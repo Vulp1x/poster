@@ -607,6 +607,23 @@ func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (Se
 	return i, err
 }
 
+const setBotPostsCount = `-- name: SetBotPostsCount :exec
+update bot_accounts
+set status      = 4, -- dbmodel.DoneBotStatus
+    posts_count = $1
+where id = $2
+`
+
+type SetBotPostsCountParams struct {
+	PostsCount int16     `json:"posts_count"`
+	ID         uuid.UUID `json:"id"`
+}
+
+func (q *Queries) SetBotPostsCount(ctx context.Context, arg SetBotPostsCountParams) error {
+	_, err := q.db.Exec(ctx, setBotPostsCount, arg.PostsCount, arg.ID)
+	return err
+}
+
 const setBotStatus = `-- name: SetBotStatus :exec
 update bot_accounts
 set status = $1

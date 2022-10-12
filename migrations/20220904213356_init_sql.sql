@@ -47,7 +47,7 @@ CREATE TABLE bot_accounts
     res_proxy   jsonb, -- резидентские прокси
     work_proxy  jsonb,
     status      smallint    not null,
-    posts_count smallint    not null,
+    posts_count smallint    not null default -1,
     started_at  timestamp,
     created_at  timestamp   not null default now(),
     updated_at  timestamp,
