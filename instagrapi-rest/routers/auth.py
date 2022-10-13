@@ -1,7 +1,8 @@
 import json
-from typing import Optional, Dict
-from fastapi import APIRouter, Depends, Form, Body
+from typing import Optional, Dict, List
 from dependencies import ClientStorage, get_clients
+from fastapi import APIRouter, Depends, Form, Body
+from loguru import logger
 from pydantic import BaseModel
 
 router = APIRouter(
@@ -69,7 +70,6 @@ async def auth_login(username: str = Form(...),
 """
 
 
-
 class DeviceSettings(BaseModel):
     app_version: str
     android_version: int
@@ -116,6 +116,7 @@ async def auth_add(session_id: str = Body(...),
                    proxy: Optional[str] = Body(""),
                    locale: Optional[str] = Body(""),
                    timezone: Optional[str] = Body(""),
+                   target_user_ids: List[int] = Body(None),
                    clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
@@ -134,10 +135,18 @@ async def auth_add(session_id: str = Body(...),
     cl.set_uuids(uuids.as_dict())
 
     result = cl.login_by_sessionid(session_id)
-    if result:
-        clients.set(cl)
-        return cl.sessionid
-    return result
+    if not result:
+        return result
+
+    clients.set(cl)
+
+    for i, user_id in enumerate(target_user_ids):
+        ok = cl.user_follow(user_id)
+        if not ok:
+            logger.warning(f"failed to follow user '{user_id}', followed {i} users, skipping other")
+            break
+
+    return cl.sessionid
 
 
 @router.post("/relogin")

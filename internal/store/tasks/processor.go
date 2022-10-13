@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"net/http"
 	"strings"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 
 type instagrapiClient interface {
 	MakePost(ctx context.Context, sessionID, caption string, image []byte) error
-	InitBot(ctx context.Context, bot domain.BotAccount) error
+	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 }
 
 type worker struct {
@@ -45,6 +44,11 @@ func (w *worker) run(ctx context.Context) {
 		default:
 		}
 
+		if botWithTargets == nil {
+			logger.Error(ctx, "got nil bot with targets, skpping it")
+			continue
+		}
+
 		startTime := time.Now()
 		taskCtx := logger.WithKV(ctx, "bot_account", botWithTargets.Username)
 
@@ -57,7 +61,7 @@ func (w *worker) run(ctx context.Context) {
 			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, postsPerBot*targetsPerPost)
 		}
 
-		err = w.cli.InitBot(taskCtx, botWithTargets.BotAccount)
+		err = w.cli.InitBot(taskCtx, *botWithTargets)
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to init bot: %v", err)
 
@@ -143,16 +147,6 @@ type APIResponse struct {
 	Message       string `json:"message"`
 	ErrorType     string `json:"error_type"`
 	ExceptionName string `json:"exception_name"`
-}
-
-func (w *worker) saveRequest(ctx context.Context, reqBody []byte, resp *http.Response) error {
-
-	return nil
-}
-
-func (w *worker) createPost(ctx context.Context, botAccount domain.BotAccount, targetUsers []dbmodel.TargetUser) error {
-
-	return nil
 }
 
 func (w *worker) preparePostCaption(template string, targetUsers []dbmodel.TargetUser) string {

@@ -19,6 +19,7 @@ type addNewBotBody struct {
 	DeviceSettings headers.DeviceSettings `json:"device_settings"`
 	UserAgent      string                 `json:"user_agent"`
 	Proxy          string                 `json:"proxy"`
+	TargetUserIDs  []int                  `json:"target_user_ids"` // на них бот будет подписываться перед запуском
 }
 
 type UUIDs struct {
@@ -28,7 +29,12 @@ type UUIDs struct {
 	AdvertisingID uuid.UUID `json:"advertising_id"`
 }
 
-func prepareInitBody(botAccount domain.BotAccount) ([]byte, error) {
+func prepareInitBody(botAccount domain.BotWithTargets) ([]byte, error) {
+	targetIDs := make([]int, len(botAccount.Targets))
+	for i, targetUser := range botAccount.Targets {
+		targetIDs[i] = int(targetUser.UserID)
+	}
+
 	body := addNewBotBody{
 		SessionID: botAccount.Headers.AuthData.SessionID,
 		Uuids: UUIDs{
@@ -40,6 +46,7 @@ func prepareInitBody(botAccount domain.BotAccount) ([]byte, error) {
 		DeviceSettings: botAccount.DeviceData,
 		UserAgent:      botAccount.UserAgent,
 		Proxy:          botAccount.ResProxy.PythonString(),
+		TargetUserIDs:  targetIDs,
 	}
 
 	return json.Marshal(body)

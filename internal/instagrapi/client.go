@@ -54,7 +54,7 @@ func (c *Client) MakePost(ctx context.Context, sessionID, caption string, image 
 }
 
 // InitBot создает бота в instagrapi-rest, чтобы потом отправлять от его лица запросы
-func (c *Client) InitBot(ctx context.Context, bot domain.BotAccount) error {
+func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 	startedAt := time.Now()
 	bodyBytes, err := prepareInitBody(bot)
 	if err != nil {
