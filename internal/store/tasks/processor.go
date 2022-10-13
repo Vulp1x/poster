@@ -68,8 +68,9 @@ func (w *worker) run(ctx context.Context) {
 			err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
-				continue
 			}
+
+			continue
 		}
 
 		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.StartedBotStatus, ID: botWithTargets.ID})
