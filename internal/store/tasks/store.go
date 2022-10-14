@@ -248,19 +248,19 @@ func (s *Store) ForceDelete(ctx context.Context, taskID uuid.UUID) error {
 	}
 	var deleteCount int64
 
-	deleteCount, err = q.ForceDeleteBotAccountsForTask(ctx, taskID)
-	if err != nil {
-		return fmt.Errorf("failed to delete bot accounts: %v", err)
-	}
-
-	logger.Infof(ctx, "deleted %d bot accounts", deleteCount)
-
 	deleteCount, err = q.ForceDeleteProxiesForTask(ctx, taskID)
 	if err != nil {
 		return fmt.Errorf("failed to delete proxies: %v", err)
 	}
 
 	logger.Infof(ctx, "deleted %d proxies", deleteCount)
+
+	deleteCount, err = q.ForceDeleteBotAccountsForTask(ctx, taskID)
+	if err != nil {
+		return fmt.Errorf("failed to delete bot accounts: %v", err)
+	}
+
+	logger.Infof(ctx, "deleted %d bot accounts", deleteCount)
 
 	deleteCount, err = q.ForceDeleteTargetUsersForTask(ctx, taskID)
 	if err != nil {

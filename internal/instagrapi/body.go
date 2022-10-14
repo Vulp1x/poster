@@ -52,7 +52,7 @@ func prepareInitBody(botAccount domain.BotWithTargets) ([]byte, error) {
 	return json.Marshal(body)
 }
 
-func prepareUploadImageBody(image []byte, sessionID string, caption string) (*bytes.Buffer, string, error) {
+func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string) (*bytes.Buffer, string, error) {
 	buf := bytes.NewBuffer(nil)
 	mpWriter := multipart.NewWriter(buf)
 
@@ -86,6 +86,16 @@ func prepareUploadImageBody(image []byte, sessionID string, caption string) (*by
 	}
 
 	_, err = captionWriter.Write([]byte(caption))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
+	}
+
+	cheapProxyWriter, err := mpWriter.CreateFormField("cheap_proxy")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field caption: %v", err)
+	}
+
+	_, err = cheapProxyWriter.Write([]byte(caption))
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
 	}

@@ -15,10 +15,8 @@ const (
 	CreatedBotStatus        botStatus = 1
 	ProxieAssignedBotStatus botStatus = 2
 	StartedBotStatus        botStatus = 3
-	// DoneBotStatus проставляется после того как все посты выложены
-	DoneBotStatus botStatus = 4
-	// FailBotStatus
-	FailBotStatus botStatus = 5
+	DoneBotStatus           botStatus = 4 // DoneBotStatus проставляется после того как все посты выложены
+	FailBotStatus           botStatus = 5 // FailBotStatus
 )
 
 type RequestHeaders struct {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -63,18 +63,19 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 			i++
 		}
 		sort.Strings(keys)
+
+		logDebugFields["content_length"] = byteCount(r.ContentLength)
 		logDebugFields["headers"] = keys
+		if r.ContentLength < 10000 {
+			// Request body
+			b, err := io.ReadAll(r.Body)
+			if err != nil {
+				b = []byte("failed to read body: " + err.Error())
+			}
 
-		// Request body
-		b, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			b = []byte("failed to read body: " + err.Error())
-		}
-
-		if len(b) > 0 {
 			logDebugFields["req_body"] = b
+			r.Body = io.NopCloser(bytes.NewBuffer(b))
 		}
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 
 		logCtx = logger.WithFields(logCtx, logDebugFields)
 	}
@@ -197,4 +198,18 @@ func Error(
 	logger.Errorf(r.Context(), msg, args...)
 
 	http.Error(w, http.StatusText(code), code)
+}
+
+func byteCount(b int64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
 }

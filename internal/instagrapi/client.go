@@ -22,9 +22,9 @@ func NewClient() *Client {
 }
 
 // MakePost создает новый
-func (c *Client) MakePost(ctx context.Context, sessionID, caption string, image []byte) error {
+func (c *Client) MakePost(ctx context.Context, bot domain.BotAccount, sessionID, caption string, image []byte) error {
 	startedAt := time.Now()
-	buf, contentType, err := prepareUploadImageBody(image, sessionID, caption)
+	buf, contentType, err := prepareUploadImageBody(image, sessionID, bot.WorkProxy.PythonString(), caption)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,13 @@
 import json
+import logging
+import time
 from typing import Optional, Dict, List
+
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, Body
-from loguru import logger
+from instagrapi.exceptions import ChallengeRequired
 from pydantic import BaseModel
+from starlette.responses import PlainTextResponse
 
 router = APIRouter(
     prefix="/auth",
@@ -11,37 +15,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-
-@router.post("/login")
-async def auth_login(username: str = Form(...),
-                     password: str = Form(...),
-                     verification_code: Optional[str] = Form(""),
-                     proxy: Optional[str] = Form(""),
-                     locale: Optional[str] = Form(""),
-                     timezone: Optional[str] = Form(""),
-                     clients: ClientStorage = Depends(get_clients)) -> str:
-    """Login by username and password with 2FA
-    """
-    cl = clients.client()
-    if proxy != "":
-        cl.set_proxy(proxy)
-
-    if locale != "":
-        cl.set_locale(locale)
-
-    if timezone != "":
-        cl.set_timezone_offset(timezone)
-
-    result = cl.login(
-        username,
-        password,
-        verification_code=verification_code
-    )
-    if result:
-        clients.set(cl)
-        return cl.sessionid
-    return result
-
+logger = logging.getLogger(__name__)
 
 """
 {
@@ -117,9 +91,10 @@ async def auth_add(session_id: str = Body(...),
                    locale: Optional[str] = Body(""),
                    timezone: Optional[str] = Body(""),
                    target_user_ids: List[int] = Body(None),
-                   clients: ClientStorage = Depends(get_clients)) -> str:
+                   clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
     """Login by username and password with 2FA
     """
+    global i
     cl = clients.client()
     if proxy != "":
         cl.set_proxy(proxy)
@@ -140,11 +115,18 @@ async def auth_add(session_id: str = Body(...),
 
     clients.set(cl)
 
-    for i, user_id in enumerate(target_user_ids):
-        ok = cl.user_follow(user_id)
-        if not ok:
-            logger.warning(f"failed to follow user '{user_id}', followed {i} users, skipping other")
-            break
+    try:
+        for i, user_id in enumerate(target_user_ids):
+            ok = cl.user_follow(user_id)
+            if not ok:
+                logger.warning(f"failed to follow user '{user_id}', followed {i} users, skipping other")
+                break
+            if i > 50:
+                break
+            time.sleep(2)
+    except ChallengeRequired:
+        return PlainTextResponse(status_code=400,
+                                 content=f"after {i} followers got challenge required from user {user_id}")
 
     return cl.sessionid
 

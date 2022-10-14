@@ -13,7 +13,7 @@ import (
 )
 
 type instagrapiClient interface {
-	MakePost(ctx context.Context, sessionID, caption string, image []byte) error
+	MakePost(ctx context.Context, bot domain.BotAccount, sessionID, caption string, image []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 }
 
@@ -96,7 +96,7 @@ func (w *worker) run(ctx context.Context) {
 			targetIds = domain.Ids(targetsBatch)
 			caption := w.preparePostCaption(w.task.TextTemplate, targetsBatch)
 
-			err = w.cli.MakePost(taskCtx, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
+			err = w.cli.MakePost(taskCtx, botWithTargets.BotAccount, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})

@@ -1,7 +1,9 @@
+import json
 from urllib import parse
+
 from instagrapi import Client
 from tinydb import TinyDB, Query
-import json
+
 
 class ClientStorage:
     db = TinyDB('./db.json')

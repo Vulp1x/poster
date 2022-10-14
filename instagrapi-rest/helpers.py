@@ -1,5 +1,11 @@
-import tempfile
 import os
+import tempfile
+import time
+from pathlib import Path
+
+from instagrapi import Client
+from instagrapi.exceptions import PhotoConfigureError
+from instagrapi.extractors import extract_media_v1
 from instagrapi.story import StoryBuilder
 
 
@@ -27,10 +33,26 @@ async def video_upload_story(cl, content, **kwargs):
         return cl.video_upload_to_story(video.path, **kwargs)
 
 
-async def photo_upload_post(cl, content, **kwargs):
+async def photo_upload_post(cl: Client, content, cheap_proxy: str, **kwargs):
     with tempfile.NamedTemporaryFile(suffix='.jpg') as fp:
         fp.write(content)
-        return cl.photo_upload(fp.name, **kwargs)
+
+        residential_proxy = cl.proxy
+        cl.set_proxy(cheap_proxy)
+        upload_id, width, height = cl.photo_rupload(Path(fp.name), kwargs['upload_id'])
+        cl.set_proxy(residential_proxy)
+        for attempt in range(10):
+            cl.logger.debug(f"Attempt #{attempt} to configure Photo: {fp.name}")
+            time.sleep(3)
+            data = cl.photo_configure(upload_id, width, height, kwargs['caption'], kwargs['usertags'],
+                                           kwargs['location'], extra_data=kwargs['extra_data'])
+            if data:
+                media = cl.last_json.get("media")
+                cl.expose()
+                return extract_media_v1(media)
+        raise PhotoConfigureError(
+            response=cl.last_response, **cl.last_json
+        )
 
 
 async def video_upload_post(cl, content, **kwargs):
