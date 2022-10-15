@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -13,18 +14,19 @@ import (
 )
 
 type instagrapiClient interface {
-	MakePost(ctx context.Context, bot domain.BotAccount, sessionID, caption string, image []byte) error
+	MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
+	CheckLandingAccount(ctx context.Context, sessionID, landingAccountUsername string) error
 }
 
 type worker struct {
-	botsQueue      chan *domain.BotWithTargets
-	dbtxf          dbmodel.DBTXFunc
-	cli            instagrapiClient
-	task           domain.Task
-	generator      images.Generator
-	processorIndex int64
-	captionFormat  string
+	botsQueue            chan *domain.BotWithTargets
+	dbtxf                dbmodel.DBTXFunc
+	cli                  instagrapiClient
+	task                 domain.Task
+	generator            images.Generator
+	processorIndex       int64
+	aliveLandingAccounts []string
 }
 
 const (
@@ -85,6 +87,17 @@ func (w *worker) run(ctx context.Context) {
 			targetIds    []uuid.UUID
 		)
 
+		cheapProxy := botWithTargets.ResProxy.PythonString()
+		if botWithTargets.WorkProxy == nil {
+			logger.Warnf(taskCtx, "bot has empty cheap proxy, so using residential for post upload")
+		}
+
+		landingAccount := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
+		if landingAccount == "" {
+			logger.Error(taskCtx, "failed to select alive landing account, returning from task")
+			return
+		}
+
 		for i = 0; i < postsPerBot; i++ {
 			rightBorderOfTargets := (i + 1) * targetsPerPost
 			if rightBorderOfTargets >= targetsLen {
@@ -94,9 +107,9 @@ func (w *worker) run(ctx context.Context) {
 
 			targetsBatch := botWithTargets.Targets[i*targetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
-			caption := w.preparePostCaption(w.task.TextTemplate, targetsBatch)
+			caption := w.preparePostCaption(w.task.TextTemplate, landingAccount, targetsBatch)
 
-			err = w.cli.MakePost(taskCtx, botWithTargets.BotAccount, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
+			err = w.cli.MakePost(taskCtx, cheapProxy, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
@@ -150,17 +163,43 @@ type APIResponse struct {
 	ExceptionName string `json:"exception_name"`
 }
 
-func (w *worker) preparePostCaption(template string, targetUsers []dbmodel.TargetUser) string {
+func (w *worker) preparePostCaption(template, landingAccount string, targetUsers []dbmodel.TargetUser) string {
 	b := strings.Builder{}
-	b.WriteString(template)
+	b.WriteString(strings.Replace(template, "@account", landingAccount, 1))
 
 	for _, user := range targetUsers {
+		b.WriteByte(' ')
 		b.WriteByte('@')
 		b.WriteString(user.Username)
-		b.WriteByte(' ')
 	}
 
 	return b.String()
+}
+
+func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAccount) string {
+	availableAccountsLen := len(w.aliveLandingAccounts)
+	if availableAccountsLen == 0 {
+		return ""
+	}
+	randIndex := rand.Intn(availableAccountsLen)
+	candidateAccount := w.aliveLandingAccounts[randIndex]
+
+	err := w.cli.CheckLandingAccount(ctx, bot.Headers.AuthData.SessionID, candidateAccount)
+	if err != nil {
+		logger.Warnf(ctx, "checking landing account '%s' got error: %v", candidateAccount, err)
+
+		if availableAccountsLen == 1 {
+			return ""
+		}
+
+		// удаляем этот аккаунт из списка и пробуем ещё раз
+		w.aliveLandingAccounts[randIndex] = w.aliveLandingAccounts[availableAccountsLen-1]
+		w.aliveLandingAccounts = w.aliveLandingAccounts[:availableAccountsLen-1]
+
+		return w.chooseAliveLandingAccount(ctx, bot)
+	}
+
+	return candidateAccount
 }
 
 // '{"upload_id":"1664888837874","xsharing_nonces":{},"status":"ok"}' webp

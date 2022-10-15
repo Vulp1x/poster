@@ -17,14 +17,39 @@ type Client struct {
 	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, d time.Duration) error
 }
 
+func (c *Client) CheckLandingAccount(ctx context.Context, sessionID, landingAccountUsername string) error {
+	startedAt := time.Now()
+	val := map[string][]string{
+		"sessionid": {sessionID},
+		"username":  {landingAccountUsername},
+		"use_cache": {"false"},
+	}
+
+	resp, err := c.cli.PostForm("http://localhost:8000/user/info_by_username", val)
+	if err != nil {
+		return err
+	}
+
+	err = c.saveResponseFunc(ctx, sessionID, resp, time.Since(startedAt))
+	if err != nil {
+		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
+	}
+
+	return nil
+}
+
 func NewClient() *Client {
 	return &Client{cli: transport.InitHTTPClient(), saveResponseFunc: saveResponse}
 }
 
 // MakePost создает новый
-func (c *Client) MakePost(ctx context.Context, bot domain.BotAccount, sessionID, caption string, image []byte) error {
+func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error {
 	startedAt := time.Now()
-	buf, contentType, err := prepareUploadImageBody(image, sessionID, bot.WorkProxy.PythonString(), caption)
+	buf, contentType, err := prepareUploadImageBody(image, sessionID, cheapProxy, caption)
 	if err != nil {
 		return err
 	}
