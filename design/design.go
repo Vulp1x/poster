@@ -120,12 +120,12 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "text_template")
 			})
 
-			Attribute("post_image", String, func() {
-				Description("фотография для постов")
-				Meta("struct:tag:json", "post_image")
+			Attribute("post_images", ArrayOf(String), func() {
+				Description("список фотографий для постов")
+				Meta("struct:tag:json", "post_images")
 			})
 
-			Required("token", "title", "text_template", "post_image")
+			Required("token", "title", "text_template", "post_images")
 		})
 
 		Result(String, func() {
@@ -167,9 +167,9 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "text_template")
 			})
 
-			Attribute("post_image", String, func() {
+			Attribute("post_images", ArrayOf(String), func() {
 				Description("фотография для постов")
-				Meta("struct:tag:json", "post_image")
+				Meta("struct:tag:json", "post_images")
 			})
 
 			Required("token", "task_id")
@@ -204,13 +204,23 @@ var _ = Service("tasks_service", func() {
 			Attribute("filenames", TaskFilenames)
 
 			Attribute("bots", ArrayOf(BotAccountRecord), "список ботов")
-			Attribute("proxies", ArrayOf(ProxyRecord), "список проксей для использования")
+			Attribute("residential_proxies", ArrayOf(ProxyRecord), "список проксей для использования")
+			Attribute("cheap_proxies", ArrayOf(ProxyRecord), "список дешёвых проксей для загрузки фото")
 			Attribute("targets", ArrayOf(TargetUserRecord), "список аккаунтов, которым показать надо рекламу")
 
-			Required("token", "task_id", "bots", "proxies", "targets", "filenames")
+			Required("token", "task_id", "bots", "residential_proxies", "cheap_proxies", "targets", "filenames")
 		})
 
-		Result(ArrayOf(UploadError))
+		Result(func() {
+			Attribute("upload_errors", ArrayOf(UploadError), func() {
+				Description("ошибки, которые возникли при загрузке файлов")
+				Meta("struct:tag:json", "upload_errors")
+			})
+
+			Attribute("status", TaskStatus)
+
+			Required("status", "upload_errors")
+		})
 
 		HTTP(func() {
 			POST("/api/tasks/{task_id}/upload")
@@ -240,9 +250,19 @@ var _ = Service("tasks_service", func() {
 			Required("token", "task_id")
 		})
 
-		Result(Int, "bots_number", func() {
-			Description("количество аккаунтов с проксями, которые будут использованы для текущей задачи")
-			Meta("struct:tag:json", "bots_number")
+		Result(func() {
+			Attribute("bots_number", Int, func() {
+				Description("количество аккаунтов с проксями, которые будут использованы для текущей задачи")
+				Meta("struct:tag:json", "bots_number")
+			})
+
+			Attribute("status", TaskStatus)
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("bots_number", "task_id", "status")
 		})
 
 		HTTP(func() {
@@ -301,6 +321,16 @@ var _ = Service("tasks_service", func() {
 			Required("token", "task_id")
 		})
 
+		Result(func() {
+			Attribute("status", TaskStatus)
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("task_id", "status")
+		})
+
 		HTTP(func() {
 			POST("/api/tasks/{task_id}/start")
 			Response(StatusOK)
@@ -326,6 +356,16 @@ var _ = Service("tasks_service", func() {
 			})
 
 			Required("token", "task_id")
+		})
+
+		Result(func() {
+			Attribute("status", TaskStatus)
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("task_id", "status")
 		})
 
 		HTTP(func() {

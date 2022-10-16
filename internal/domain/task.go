@@ -11,18 +11,23 @@ import (
 type Task dbmodel.Task
 
 func (t Task) ToProto() *tasksservice.Task {
+	images := make([]string, len(t.Images))
+	for i, image := range t.Images {
+		images[i] = base64.StdEncoding.EncodeToString(image)
+	}
 	return &tasksservice.Task{
-		ID:              t.ID.String(),
-		TextTemplate:    t.TextTemplate,
-		Image:           base64.StdEncoding.EncodeToString(t.Image),
-		Status:          int(t.Status),
-		Title:           t.Title,
-		BotsNum:         -1,
-		ProxiesNum:      -1,
-		TargetsNum:      -1,
-		BotsFilename:    t.BotsFilename,
-		ProxiesFilename: t.ProxiesFilename,
-		TargetsFilename: t.TargetsFilename,
+		ID:                         t.ID.String(),
+		TextTemplate:               t.TextTemplate,
+		Images:                     images,
+		Status:                     tasksservice.TaskStatus(t.Status),
+		Title:                      t.Title,
+		BotsNum:                    -1,
+		ProxiesNum:                 -1,
+		TargetsNum:                 -1,
+		BotsFilename:               t.BotsFilename,
+		CheapProxiesFilename:       t.CheapProxiesFilename,
+		ResidentialProxiesFilename: t.ResProxiesFilename,
+		TargetsFilename:            t.TargetsFilename,
 	}
 }
 
@@ -47,18 +52,23 @@ type TaskWithCounters struct {
 }
 
 func (t TaskWithCounters) ToProto() *tasksservice.Task {
+	images := make([]string, len(t.Images))
+	for i, image := range t.Images {
+		images[i] = base64.StdEncoding.EncodeToString(image)
+	}
 	return &tasksservice.Task{
-		ID:              t.ID.String(),
-		TextTemplate:    t.TextTemplate,
-		Image:           base64.StdEncoding.EncodeToString(t.Image),
-		Status:          int(t.Status),
-		Title:           t.Title,
-		BotsNum:         int(t.BotsCount),
-		ProxiesNum:      int(t.ProxiesCount),
-		TargetsNum:      int(t.TargetsCount),
-		BotsFilename:    t.BotsFilename,
-		ProxiesFilename: t.ProxiesFilename,
-		TargetsFilename: t.TargetsFilename,
+		ID:                         t.ID.String(),
+		TextTemplate:               t.TextTemplate,
+		Images:                     images,
+		Status:                     tasksservice.TaskStatus(t.Status),
+		Title:                      t.Title,
+		BotsNum:                    int(t.BotsCount),
+		ProxiesNum:                 int(t.ProxiesCount),
+		TargetsNum:                 int(t.TargetsCount),
+		BotsFilename:               t.BotsFilename,
+		CheapProxiesFilename:       t.CheapProxiesFilename,
+		ResidentialProxiesFilename: t.ResProxiesFilename,
+		TargetsFilename:            t.TargetsFilename,
 	}
 }
 

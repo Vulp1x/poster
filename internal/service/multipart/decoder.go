@@ -31,12 +31,18 @@ func TasksServiceUploadFileDecoderFunc(mr *multipart.Reader, p **tasksservice.Up
 				return fmt.Errorf("failed to read users list: %v", err)
 			}
 			payload.Filenames.BotsFilename = part.FileName()
-		case "proxies":
-			payload.Proxies, err = readProxiesList(ctx, part)
+		case "res_proxies":
+			payload.ResidentialProxies, err = readProxiesList(ctx, part)
 			if err != nil {
 				return fmt.Errorf("failed to read proxies list: %v", err)
 			}
-			payload.Filenames.ProxiesFilename = part.FileName()
+			payload.Filenames.ResidentialProxiesFilename = part.FileName()
+		case "cheap_proxies":
+			payload.CheapProxies, err = readProxiesList(ctx, part)
+			if err != nil {
+				return fmt.Errorf("failed to read proxies list: %v", err)
+			}
+			payload.Filenames.CheapProxiesFilename = part.FileName()
 		case "target_users":
 			payload.Targets, err = readTargetsList(ctx, part)
 			if err != nil {
@@ -46,7 +52,9 @@ func TasksServiceUploadFileDecoderFunc(mr *multipart.Reader, p **tasksservice.Up
 		}
 	}
 
-	logger.Infof(ctx, "read %d bots, %d proxies, %d targets", len(payload.Bots), len(payload.Proxies), len(payload.Targets))
+	logger.Infof(ctx, "read %d bots, %d residential proxies, %d cheap proxies, %d targets",
+		len(payload.Bots), len(payload.ResidentialProxies), len(payload.CheapProxies), len(payload.Targets),
+	)
 
 	*p = payload
 

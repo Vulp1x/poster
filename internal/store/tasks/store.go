@@ -69,7 +69,7 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.Task
 	return progress, nil
 }
 
-func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image []byte) (domain.Task, error) {
+func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image [][]byte) (domain.Task, error) {
 	tx, err := s.txf(ctx)
 	if err != nil {
 		return domain.Task{}, store.ErrTransactionFail
@@ -101,13 +101,13 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTem
 	}
 
 	if image != nil {
-		task.Image = image
+		task.Images = image
 	}
 
 	err = q.UpdateTask(ctx, dbmodel.UpdateTaskParams{
 		TextTemplate: task.TextTemplate,
 		Title:        task.Title,
-		Image:        task.Image,
+		Images:       task.Images,
 		ID:           taskID,
 	})
 	if err != nil {
@@ -319,10 +319,11 @@ func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts d
 	}
 
 	err = q.SaveUploadedDataToTask(ctx, dbmodel.SaveUploadedDataToTaskParams{
-		ID:              taskID,
-		BotsFilename:    &filenames.BotsFilename,
-		ProxiesFilename: &filenames.ProxiesFilename,
-		TargetsFilename: &filenames.TargetsFilename,
+		ID:                   taskID,
+		BotsFilename:         &filenames.BotsFilename,
+		ResProxiesFilename:   &filenames.ResidentialProxiesFilename,
+		CheapProxiesFilename: &filenames.CheapProxiesFilename,
+		TargetsFilename:      &filenames.TargetsFilename,
 	})
 	if err != nil {
 		return err
@@ -331,13 +332,13 @@ func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts d
 	return tx.Commit(ctx)
 }
 
-func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, image []byte) (uuid.UUID, error) {
+func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, images [][]byte) (uuid.UUID, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
 
 	taskID, err := q.CreateDraftTask(ctx, dbmodel.CreateDraftTaskParams{
 		ManagerID:    userID,
 		TextTemplate: textTemplate,
-		Image:        image,
+		Images:       images,
 		Title:        title,
 	})
 	if err != nil {
@@ -363,7 +364,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
 	}
 
-	imageGenerator, err := images.NewRandomGammaGenerator(task.Image)
+	imageGenerator, err := images.NewRandomGammaGenerator(task.Images)
 	if err != nil {
 		return err
 	}

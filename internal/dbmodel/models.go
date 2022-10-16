@@ -69,19 +69,26 @@ type TargetUsersToTask struct {
 }
 
 type Task struct {
-	ID              uuid.UUID  `json:"id"`
-	ManagerID       uuid.UUID  `json:"manager_id"`
-	TextTemplate    string     `json:"text_template"`
-	Image           []byte     `json:"image"`
-	Status          taskStatus `json:"status"`
-	Title           string     `json:"title"`
-	BotsFilename    *string    `json:"bots_filename"`
-	ProxiesFilename *string    `json:"proxies_filename"`
-	TargetsFilename *string    `json:"targets_filename"`
-	CreatedAt       time.Time  `json:"created_at"`
-	StartedAt       *time.Time `json:"started_at"`
-	UpdatedAt       *time.Time `json:"updated_at"`
-	DeletedAt       *time.Time `json:"deleted_at"`
+	ID                   uuid.UUID  `json:"id"`
+	ManagerID            uuid.UUID  `json:"manager_id"`
+	TextTemplate         string     `json:"text_template"`
+	LandingAccounts      []string   `json:"landing_accounts"`
+	AccountProfileImages [][]byte   `json:"account_profile_images"`
+	AccountNames         []string   `json:"account_names"`
+	AccountSurnames      []string   `json:"account_surnames"`
+	AccountUrls          []string   `json:"account_urls"`
+	Images               [][]byte   `json:"images"`
+	Status               taskStatus `json:"status"`
+	Title                string     `json:"title"`
+	BotsFilename         *string    `json:"bots_filename"`
+	CheapProxiesFilename *string    `json:"cheap_proxies_filename"`
+	ResProxiesFilename   *string    `json:"res_proxies_filename"`
+	TargetsFilename      *string    `json:"targets_filename"`
+	CreatedAt            time.Time  `json:"created_at"`
+	StartedAt            *time.Time `json:"started_at"`
+	StoppedAt            *time.Time `json:"stopped_at"`
+	UpdatedAt            *time.Time `json:"updated_at"`
+	DeletedAt            *time.Time `json:"deleted_at"`
 }
 
 type User struct {

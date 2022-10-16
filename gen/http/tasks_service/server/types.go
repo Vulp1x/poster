@@ -19,8 +19,8 @@ type CreateTaskDraftRequestBody struct {
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
-	// фотография для постов
-	PostImage *string `json:"post_image"`
+	// список фотографий для постов
+	PostImages []string `json:"post_images"`
 }
 
 // UpdateTaskRequestBody is the type of the "tasks_service" service "update
@@ -31,7 +31,7 @@ type UpdateTaskRequestBody struct {
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
 	// фотография для постов
-	PostImage *string `json:"post_image"`
+	PostImages []string `json:"post_images"`
 }
 
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
@@ -41,7 +41,9 @@ type UploadFilesRequestBody struct {
 	// список ботов
 	Bots []*BotAccountRecordRequestBody `form:"bots,omitempty" json:"bots,omitempty" xml:"bots,omitempty"`
 	// список проксей для использования
-	Proxies []*ProxyRecordRequestBody `form:"proxies,omitempty" json:"proxies,omitempty" xml:"proxies,omitempty"`
+	ResidentialProxies []*ProxyRecordRequestBody `form:"residential_proxies,omitempty" json:"residential_proxies,omitempty" xml:"residential_proxies,omitempty"`
+	// список дешёвых проксей для загрузки фото
+	CheapProxies []*ProxyRecordRequestBody `form:"cheap_proxies,omitempty" json:"cheap_proxies,omitempty" xml:"cheap_proxies,omitempty"`
 	// список аккаунтов, которым показать надо рекламу
 	Targets []*TargetUserRecordRequestBody `form:"targets,omitempty" json:"targets,omitempty" xml:"targets,omitempty"`
 }
@@ -52,9 +54,9 @@ type UpdateTaskOKResponseBody struct {
 	ID string `form:"id" json:"id" xml:"id"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// base64 строка картинки
-	Image  string `form:"image" json:"image" xml:"image"`
-	Status int    `form:"status" json:"status" xml:"status"`
+	// список base64 строк картинок
+	Images []string `form:"images" json:"images" xml:"images"`
+	Status int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -65,15 +67,48 @@ type UpdateTaskOKResponseBody struct {
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
 	BotsFilename *string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename *string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
 }
 
-// UploadFilesResponseBody is the type of the "tasks_service" service "upload
+// UploadFilesOKResponseBody is the type of the "tasks_service" service "upload
 // files" endpoint HTTP response body.
-type UploadFilesResponseBody []*UploadErrorResponse
+type UploadFilesOKResponseBody struct {
+	// ошибки, которые возникли при загрузке файлов
+	UploadErrors []*UploadErrorResponseBody `json:"upload_errors"`
+	Status       int                        `form:"status" json:"status" xml:"status"`
+}
+
+// AssignProxiesOKResponseBody is the type of the "tasks_service" service
+// "assign proxies" endpoint HTTP response body.
+type AssignProxiesOKResponseBody struct {
+	// количество аккаунтов с проксями, которые будут использованы для текущей
+	// задачи
+	BotsNumber int `json:"bots_number"`
+	Status     int `form:"status" json:"status" xml:"status"`
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
+// StartTaskOKResponseBody is the type of the "tasks_service" service "start
+// task" endpoint HTTP response body.
+type StartTaskOKResponseBody struct {
+	Status int `form:"status" json:"status" xml:"status"`
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
+// StopTaskOKResponseBody is the type of the "tasks_service" service "stop
+// task" endpoint HTTP response body.
+type StopTaskOKResponseBody struct {
+	Status int `form:"status" json:"status" xml:"status"`
+	// id задачи
+	TaskID string `json:"task_id"`
+}
 
 // GetTaskOKResponseBody is the type of the "tasks_service" service "get task"
 // endpoint HTTP response body.
@@ -81,9 +116,9 @@ type GetTaskOKResponseBody struct {
 	ID string `form:"id" json:"id" xml:"id"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// base64 строка картинки
-	Image  string `form:"image" json:"image" xml:"image"`
-	Status int    `form:"status" json:"status" xml:"status"`
+	// список base64 строк картинок
+	Images []string `form:"images" json:"images" xml:"images"`
+	Status int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -94,8 +129,10 @@ type GetTaskOKResponseBody struct {
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
 	BotsFilename *string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename *string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
 }
@@ -108,8 +145,8 @@ type GetProgressResponseBody []*BotsProgressResponse
 // tasks" endpoint HTTP response body.
 type ListTasksResponseBody []*TaskResponse
 
-// UploadErrorResponse is used to define fields on response body types.
-type UploadErrorResponse struct {
+// UploadErrorResponseBody is used to define fields on response body types.
+type UploadErrorResponseBody struct {
 	// 1 - список ботов
 	// 2 - список прокси
 	// 3 - список получателей рекламы
@@ -135,9 +172,9 @@ type TaskResponse struct {
 	ID string `form:"id" json:"id" xml:"id"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// base64 строка картинки
-	Image  string `form:"image" json:"image" xml:"image"`
-	Status int    `form:"status" json:"status" xml:"status"`
+	// список base64 строк картинок
+	Images []string `form:"images" json:"images" xml:"images"`
+	Status int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -148,8 +185,10 @@ type TaskResponse struct {
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
 	BotsFilename *string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename *string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
 }
@@ -158,8 +197,10 @@ type TaskResponse struct {
 type TaskFileNamesRequestBody struct {
 	// название файла, из которого брали ботов
 	BotsFilename *string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename *string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
 }
@@ -189,27 +230,69 @@ type TargetUserRecordRequestBody struct {
 // the "update task" endpoint of the "tasks_service" service.
 func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBody {
 	body := &UpdateTaskOKResponseBody{
-		ID:              res.ID,
-		TextTemplate:    res.TextTemplate,
-		Image:           res.Image,
-		Status:          res.Status,
-		Title:           res.Title,
-		BotsNum:         res.BotsNum,
-		ProxiesNum:      res.ProxiesNum,
-		TargetsNum:      res.TargetsNum,
-		BotsFilename:    res.BotsFilename,
-		ProxiesFilename: res.ProxiesFilename,
-		TargetsFilename: res.TargetsFilename,
+		ID:                         res.ID,
+		TextTemplate:               res.TextTemplate,
+		Status:                     int(res.Status),
+		Title:                      res.Title,
+		BotsNum:                    res.BotsNum,
+		ProxiesNum:                 res.ProxiesNum,
+		TargetsNum:                 res.TargetsNum,
+		BotsFilename:               res.BotsFilename,
+		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
+		CheapProxiesFilename:       res.CheapProxiesFilename,
+		TargetsFilename:            res.TargetsFilename,
+	}
+	if res.Images != nil {
+		body.Images = make([]string, len(res.Images))
+		for i, val := range res.Images {
+			body.Images[i] = val
+		}
 	}
 	return body
 }
 
-// NewUploadFilesResponseBody builds the HTTP response body from the result of
-// the "upload files" endpoint of the "tasks_service" service.
-func NewUploadFilesResponseBody(res []*tasksservice.UploadError) UploadFilesResponseBody {
-	body := make([]*UploadErrorResponse, len(res))
-	for i, val := range res {
-		body[i] = marshalTasksserviceUploadErrorToUploadErrorResponse(val)
+// NewUploadFilesOKResponseBody builds the HTTP response body from the result
+// of the "upload files" endpoint of the "tasks_service" service.
+func NewUploadFilesOKResponseBody(res *tasksservice.UploadFilesResult) *UploadFilesOKResponseBody {
+	body := &UploadFilesOKResponseBody{
+		Status: int(res.Status),
+	}
+	if res.UploadErrors != nil {
+		body.UploadErrors = make([]*UploadErrorResponseBody, len(res.UploadErrors))
+		for i, val := range res.UploadErrors {
+			body.UploadErrors[i] = marshalTasksserviceUploadErrorToUploadErrorResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewAssignProxiesOKResponseBody builds the HTTP response body from the result
+// of the "assign proxies" endpoint of the "tasks_service" service.
+func NewAssignProxiesOKResponseBody(res *tasksservice.AssignProxiesResult) *AssignProxiesOKResponseBody {
+	body := &AssignProxiesOKResponseBody{
+		BotsNumber: res.BotsNumber,
+		Status:     int(res.Status),
+		TaskID:     res.TaskID,
+	}
+	return body
+}
+
+// NewStartTaskOKResponseBody builds the HTTP response body from the result of
+// the "start task" endpoint of the "tasks_service" service.
+func NewStartTaskOKResponseBody(res *tasksservice.StartTaskResult) *StartTaskOKResponseBody {
+	body := &StartTaskOKResponseBody{
+		Status: int(res.Status),
+		TaskID: res.TaskID,
+	}
+	return body
+}
+
+// NewStopTaskOKResponseBody builds the HTTP response body from the result of
+// the "stop task" endpoint of the "tasks_service" service.
+func NewStopTaskOKResponseBody(res *tasksservice.StopTaskResult) *StopTaskOKResponseBody {
+	body := &StopTaskOKResponseBody{
+		Status: int(res.Status),
+		TaskID: res.TaskID,
 	}
 	return body
 }
@@ -218,17 +301,23 @@ func NewUploadFilesResponseBody(res []*tasksservice.UploadError) UploadFilesResp
 // the "get task" endpoint of the "tasks_service" service.
 func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 	body := &GetTaskOKResponseBody{
-		ID:              res.ID,
-		TextTemplate:    res.TextTemplate,
-		Image:           res.Image,
-		Status:          res.Status,
-		Title:           res.Title,
-		BotsNum:         res.BotsNum,
-		ProxiesNum:      res.ProxiesNum,
-		TargetsNum:      res.TargetsNum,
-		BotsFilename:    res.BotsFilename,
-		ProxiesFilename: res.ProxiesFilename,
-		TargetsFilename: res.TargetsFilename,
+		ID:                         res.ID,
+		TextTemplate:               res.TextTemplate,
+		Status:                     int(res.Status),
+		Title:                      res.Title,
+		BotsNum:                    res.BotsNum,
+		ProxiesNum:                 res.ProxiesNum,
+		TargetsNum:                 res.TargetsNum,
+		BotsFilename:               res.BotsFilename,
+		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
+		CheapProxiesFilename:       res.CheapProxiesFilename,
+		TargetsFilename:            res.TargetsFilename,
+	}
+	if res.Images != nil {
+		body.Images = make([]string, len(res.Images))
+		for i, val := range res.Images {
+			body.Images[i] = val
+		}
 	}
 	return body
 }
@@ -259,7 +348,10 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 	v := &tasksservice.CreateTaskDraftPayload{
 		Title:        *body.Title,
 		TextTemplate: *body.TextTemplate,
-		PostImage:    *body.PostImage,
+	}
+	v.PostImages = make([]string, len(body.PostImages))
+	for i, val := range body.PostImages {
+		v.PostImages[i] = val
 	}
 	v.Token = token
 
@@ -272,7 +364,12 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 	v := &tasksservice.UpdateTaskPayload{
 		Title:        body.Title,
 		TextTemplate: body.TextTemplate,
-		PostImage:    body.PostImage,
+	}
+	if body.PostImages != nil {
+		v.PostImages = make([]string, len(body.PostImages))
+		for i, val := range body.PostImages {
+			v.PostImages[i] = val
+		}
 	}
 	v.TaskID = taskID
 	v.Token = token
@@ -289,9 +386,13 @@ func NewUploadFilesPayload(body *UploadFilesRequestBody, taskID string, token st
 	for i, val := range body.Bots {
 		v.Bots[i] = unmarshalBotAccountRecordRequestBodyToTasksserviceBotAccountRecord(val)
 	}
-	v.Proxies = make([]*tasksservice.ProxyRecord, len(body.Proxies))
-	for i, val := range body.Proxies {
-		v.Proxies[i] = unmarshalProxyRecordRequestBodyToTasksserviceProxyRecord(val)
+	v.ResidentialProxies = make([]*tasksservice.ProxyRecord, len(body.ResidentialProxies))
+	for i, val := range body.ResidentialProxies {
+		v.ResidentialProxies[i] = unmarshalProxyRecordRequestBodyToTasksserviceProxyRecord(val)
+	}
+	v.CheapProxies = make([]*tasksservice.ProxyRecord, len(body.CheapProxies))
+	for i, val := range body.CheapProxies {
+		v.CheapProxies[i] = unmarshalProxyRecordRequestBodyToTasksserviceProxyRecord(val)
 	}
 	v.Targets = make([]*tasksservice.TargetUserRecord, len(body.Targets))
 	for i, val := range body.Targets {
@@ -379,8 +480,8 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 	if body.TextTemplate == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("text_template", "body"))
 	}
-	if body.PostImage == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("post_image", "body"))
+	if body.PostImages == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("post_images", "body"))
 	}
 	return
 }
@@ -391,8 +492,11 @@ func ValidateUploadFilesRequestBody(body *UploadFilesRequestBody) (err error) {
 	if body.Bots == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("bots", "body"))
 	}
-	if body.Proxies == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("proxies", "body"))
+	if body.ResidentialProxies == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("residential_proxies", "body"))
+	}
+	if body.CheapProxies == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("cheap_proxies", "body"))
 	}
 	if body.Targets == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("targets", "body"))
@@ -412,7 +516,14 @@ func ValidateUploadFilesRequestBody(body *UploadFilesRequestBody) (err error) {
 			}
 		}
 	}
-	for _, e := range body.Proxies {
+	for _, e := range body.ResidentialProxies {
+		if e != nil {
+			if err2 := ValidateProxyRecordRequestBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.CheapProxies {
 		if e != nil {
 			if err2 := ValidateProxyRecordRequestBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
@@ -435,8 +546,11 @@ func ValidateTaskFileNamesRequestBody(body *TaskFileNamesRequestBody) (err error
 	if body.BotsFilename == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("bots_filename", "body"))
 	}
-	if body.ProxiesFilename == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("proxies_filename", "body"))
+	if body.ResidentialProxiesFilename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("residential_proxies_filename", "body"))
+	}
+	if body.CheapProxiesFilename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("cheap_proxies_filename", "body"))
 	}
 	if body.TargetsFilename == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("targets_filename", "body"))

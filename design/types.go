@@ -91,6 +91,17 @@ var UploadError = Type("UploadError", func() {
 // 		"device", "model", "cpu", "version_code")
 // })
 
+// TaskStatus описывает статус задачи
+var TaskStatus = Type("TaskStatus", Int, func() {
+	Enum(1, 2, 3, 4, 5, 6)
+	Description(`1 - задача только создана, нужно загрузить список ботов, прокси и получателей
+	2- в задачу загрузили необходимые списки, нужно присвоить прокси для ботов
+	3- задача готова к запуску
+	4- задача запущена 
+	5 - задача остановлена
+	6 - задача завершена`)
+})
+
 // Task описывает рекламную кампанию
 var Task = Type("Task", func() {
 	Attribute("id", String, "", func() {
@@ -102,8 +113,8 @@ var Task = Type("Task", func() {
 		Description("описание под постом")
 	})
 
-	Attribute("image", String, "base64 строка картинки")
-	Attribute("status", Int)
+	Attribute("images", ArrayOf(String), "список base64 строк картинок")
+	Attribute("status", TaskStatus)
 	Attribute("title", String, "название задачи")
 
 	Attribute("bots_num", Int, "количество ботов в задаче", func() {
@@ -119,28 +130,36 @@ var Task = Type("Task", func() {
 	Attribute("bots_filename", String, "название файла, из которого брали ботов", func() {
 		Meta("struct:tag:json", "bots_filename")
 	})
-	Attribute("proxies_filename", String, "название файла, из которого брали прокси", func() {
-		Meta("struct:tag:json", "proxies_filename")
+	Attribute("residential_proxies_filename", String, "название файла, из которого брали резидентские прокси", func() {
+		Meta("struct:tag:json", "residential_proxies_filename")
+	})
+
+	Attribute("cheap_proxies_filename", String, "название файла, из которого брали дешёвые прокси", func() {
+		Meta("struct:tag:json", "cheap_proxies_filename")
 	})
 	Attribute("targets_filename", String, "название файла, из которого брали целевых пользователей", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("id", "text_template", "image", "status", "title", "bots_num", "proxies_num", "targets_num")
+	Required("id", "text_template", "images", "status", "title", "bots_num", "proxies_num", "targets_num")
 })
 
 var TaskFilenames = Type("TaskFileNames", func() {
 	Attribute("bots_filename", String, "название файла, из которого брали ботов", func() {
 		Meta("struct:tag:json", "bots_filename")
 	})
-	Attribute("proxies_filename", String, "название файла, из которого брали прокси", func() {
-		Meta("struct:tag:json", "proxies_filename")
+	Attribute("residential_proxies_filename", String, "название файла, из которого брали резидентские прокси", func() {
+		Meta("struct:tag:json", "residential_proxies_filename")
+	})
+
+	Attribute("cheap_proxies_filename", String, "название файла, из которого брали дешёвые прокси", func() {
+		Meta("struct:tag:json", "cheap_proxies_filename")
 	})
 	Attribute("targets_filename", String, "название файла, из которого брали целевых пользователей", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("bots_filename", "proxies_filename", "targets_filename")
+	Required("bots_filename", "residential_proxies_filename", "cheap_proxies_filename", "targets_filename")
 })
 
 var BotsProgress = Type("BotsProgress", func() {

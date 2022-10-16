@@ -94,7 +94,7 @@ func TestCreateDraftTask(t *testing.T) {
 		ID:           parsedID,
 		ManagerID:    managerID,
 		TextTemplate: textTemplate,
-		Image:        image,
+		Images:       [][]byte{image},
 		Status:       1,
 		Title:        title,
 	}

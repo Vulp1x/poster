@@ -171,7 +171,7 @@ func NewStartTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoin
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.StartTask(ctx, p)
+		return s.StartTask(ctx, p)
 	}
 }
 
@@ -190,7 +190,7 @@ func NewStopTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.StopTask(ctx, p)
+		return s.StopTask(ctx, p)
 	}
 }
 

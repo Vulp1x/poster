@@ -20,8 +20,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddManagerRequestBody'
             example:
-              login: Ad illo ratione rerum laborum.
-              password: 6v3
+              login: Fugit aspernatur sed culpa ut deleniti.
+              password: "489"
       responses:
         "200":
           description: OK response.
@@ -31,28 +31,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Sunt rerum saepe.
+                example: Sit autem beatae.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Tempora ea rerum atque tempora.
+                example: Assumenda et est veritatis et quasi.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Sit quia beatae quasi voluptatem sint.
+                example: Rerum qui quibusdam qui.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Molestiae aspernatur autem natus et qui.
+                example: Odio aspernatur vero voluptatem.
       security:
         - jwt_header_Authorization:
             - driver
@@ -84,21 +84,21 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Architecto deleniti quis quam.
+                example: Qui debitis.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Et sunt sit aut.
+                example: Dicta dignissimos at.
         "403":
           description: 'invalid-scopes: Forbidden response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Blanditiis molestias error.
+                example: Aut necessitatibus sint voluptatem dolorem nisi minus.
         "404":
           description: 'user not found: Not Found response.'
           content:
@@ -125,7 +125,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Dolor et et nesciunt cum molestias.
+                example: Laudantium est sed fugit ullam.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -136,14 +136,14 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Aut perspiciatis odio illo ducimus sed.
+                example: Quisquam laudantium exercitationem quia tempora quo fugiat.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Minus alias error adipisci est aliquam qui.
+                example: Labore minus dignissimos mollitia deserunt officiis minima.
       security:
         - jwt_header_Authorization:
             - driver
@@ -170,28 +170,28 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Et ut culpa cumque.
+                example: Autem voluptatem modi qui.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Culpa rem.
+                example: Ex dicta deserunt porro minima quis mollitia.
         "404":
           description: 'user not found: Not Found response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Atque in veniam dolore facilis necessitatibus.
+                example: Sit rerum dolor est dolores est porro.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Sint amet.
+                example: Explicabo iure dolores molestias qui.
       security:
         - basic_header_Authorization: []
   /api/tasks/:
@@ -211,80 +211,126 @@ paths:
                 items:
                   $ref: '#/components/schemas/Task'
                 example:
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
+                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
               example:
-                - bots_filename: Cum sint beatae commodi omnis.
-                  bots_num: 5267401957530983134
+                - bots_filename: Sapiente dolores ut error.
+                  bots_num: 1459990982376692356
+                  cheap_proxies_filename: Quas cumque quo non id.
                   id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  image: Aliquid fuga necessitatibus dignissimos deleniti.
-                  proxies_filename: Voluptatum deserunt eius sapiente.
-                  proxies_num: 7905713975101806099
-                  status: 9050133790756407575
-                  targets_filename: Incidunt dolores.
-                  targets_num: 5855138995748008358
-                  text_template: Aut reprehenderit animi.
-                  title: Qui non.
-                - bots_filename: Cum sint beatae commodi omnis.
-                  bots_num: 5267401957530983134
+                  images:
+                    - Officiis quasi suscipit fuga aut laboriosam magni.
+                    - Nobis eos et inventore officiis et.
+                  proxies_num: 2726492100345020995
+                  residential_proxies_filename: Et vitae.
+                  status: 2
+                  targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                  targets_num: 1038771339596380439
+                  text_template: Corporis quasi consequatur nobis eligendi.
+                  title: Exercitationem et consectetur ea possimus.
+                - bots_filename: Sapiente dolores ut error.
+                  bots_num: 1459990982376692356
+                  cheap_proxies_filename: Quas cumque quo non id.
                   id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  image: Aliquid fuga necessitatibus dignissimos deleniti.
-                  proxies_filename: Voluptatum deserunt eius sapiente.
-                  proxies_num: 7905713975101806099
-                  status: 9050133790756407575
-                  targets_filename: Incidunt dolores.
-                  targets_num: 5855138995748008358
-                  text_template: Aut reprehenderit animi.
-                  title: Qui non.
-                - bots_filename: Cum sint beatae commodi omnis.
-                  bots_num: 5267401957530983134
+                  images:
+                    - Officiis quasi suscipit fuga aut laboriosam magni.
+                    - Nobis eos et inventore officiis et.
+                  proxies_num: 2726492100345020995
+                  residential_proxies_filename: Et vitae.
+                  status: 2
+                  targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                  targets_num: 1038771339596380439
+                  text_template: Corporis quasi consequatur nobis eligendi.
+                  title: Exercitationem et consectetur ea possimus.
+                - bots_filename: Sapiente dolores ut error.
+                  bots_num: 1459990982376692356
+                  cheap_proxies_filename: Quas cumque quo non id.
                   id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  image: Aliquid fuga necessitatibus dignissimos deleniti.
-                  proxies_filename: Voluptatum deserunt eius sapiente.
-                  proxies_num: 7905713975101806099
-                  status: 9050133790756407575
-                  targets_filename: Incidunt dolores.
-                  targets_num: 5855138995748008358
-                  text_template: Aut reprehenderit animi.
-                  title: Qui non.
+                  images:
+                    - Officiis quasi suscipit fuga aut laboriosam magni.
+                    - Nobis eos et inventore officiis et.
+                  proxies_num: 2726492100345020995
+                  residential_proxies_filename: Et vitae.
+                  status: 2
+                  targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                  targets_num: 1038771339596380439
+                  text_template: Corporis quasi consequatur nobis eligendi.
+                  title: Exercitationem et consectetur ea possimus.
+                - bots_filename: Sapiente dolores ut error.
+                  bots_num: 1459990982376692356
+                  cheap_proxies_filename: Quas cumque quo non id.
+                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  images:
+                    - Officiis quasi suscipit fuga aut laboriosam magni.
+                    - Nobis eos et inventore officiis et.
+                  proxies_num: 2726492100345020995
+                  residential_proxies_filename: Et vitae.
+                  status: 2
+                  targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                  targets_num: 1038771339596380439
+                  text_template: Corporis quasi consequatur nobis eligendi.
+                  title: Exercitationem et consectetur ea possimus.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Quia inventore rerum qui quibusdam qui.
+                example: Nostrum labore ut occaecati doloremque explicabo libero.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -294,50 +340,48 @@ paths:
                 items:
                   $ref: '#/components/schemas/Task'
                 example:
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
         "404":
           description: 'task not found: Not Found response.'
           content:
@@ -347,39 +391,62 @@ paths:
                 items:
                   $ref: '#/components/schemas/Task'
                 example:
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
+                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
@@ -389,50 +456,48 @@ paths:
                 items:
                   $ref: '#/components/schemas/Task'
                 example:
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
+                  - bots_filename: Sapiente dolores ut error.
+                    bots_num: 1459990982376692356
+                    cheap_proxies_filename: Quas cumque quo non id.
                     id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
-                  - bots_filename: Cum sint beatae commodi omnis.
-                    bots_num: 5267401957530983134
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                    image: Aliquid fuga necessitatibus dignissimos deleniti.
-                    proxies_filename: Voluptatum deserunt eius sapiente.
-                    proxies_num: 7905713975101806099
-                    status: 9050133790756407575
-                    targets_filename: Incidunt dolores.
-                    targets_num: 5855138995748008358
-                    text_template: Aut reprehenderit animi.
-                    title: Qui non.
+                    images:
+                      - Officiis quasi suscipit fuga aut laboriosam magni.
+                      - Nobis eos et inventore officiis et.
+                    proxies_num: 2726492100345020995
+                    residential_proxies_filename: Et vitae.
+                    status: 2
+                    targets_filename: Sunt voluptatem est eos ipsa eos similique.
+                    targets_num: 1038771339596380439
+                    text_template: Corporis quasi consequatur nobis eligendi.
+                    title: Exercitationem et consectetur ea possimus.
       security:
         - jwt_header_Authorization:
             - driver
@@ -452,8 +517,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Fuga tempora sed voluptatem ut molestiae quia.
-          example: Ex pariatur quis quae voluptatibus odio nobis.
+            example: Qui repellat eum.
+          example: Id sapiente voluptatem.
       responses:
         "200":
           description: OK response.
@@ -462,24 +527,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
               example:
-                bots_filename: Sed incidunt nisi tempora enim.
-                bots_num: 112345310045291327
+                bots_filename: Itaque accusantium est eum.
+                bots_num: 3548697434644184845
+                cheap_proxies_filename: Voluptatem expedita itaque sint dolore consequatur animi.
                 id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                image: Fugit nihil inventore veritatis voluptatem.
-                proxies_filename: Maiores dicta deserunt quas doloremque repudiandae.
-                proxies_num: 4558317015290965205
-                status: 196138440299557045
-                targets_filename: Voluptatibus aliquid ipsam temporibus eius itaque reiciendis.
-                targets_num: 4653392116943388932
-                text_template: Id inventore et.
-                title: Rerum maiores nostrum ratione accusantium inventore.
+                images:
+                  - Iste voluptatem maiores praesentium iste ea facere.
+                  - Dolorem ut omnis voluptatem voluptas.
+                  - Blanditiis quia.
+                proxies_num: 2340005900305752846
+                residential_proxies_filename: Qui velit.
+                status: 3
+                targets_filename: Et modi vel ratione repellat dolores ab.
+                targets_num: 6753516344380367912
+                text_template: Necessitatibus qui ducimus.
+                title: Distinctio tenetur et quidem et quasi soluta.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Tempora voluptatem quisquam ut ea.
+                example: Culpa adipisci debitis explicabo fugiat.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -498,7 +567,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Maiores accusamus dolorem possimus provident sint voluptates.
+                example: Molestiae et.
       security:
         - jwt_header_Authorization:
             - driver
@@ -519,8 +588,8 @@ paths:
           schema:
             type: string
             description: id задачи, которую хотим обновить
-            example: Qui et.
-          example: In nesciunt ut.
+            example: Neque magni velit aut voluptatem.
+          example: Ipsum ad repellendus molestias corrupti.
       requestBody:
         required: true
         content:
@@ -528,9 +597,11 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateTaskRequestBody'
             example:
-              post_image: Qui exercitationem et mollitia.
-              text_template: Eveniet praesentium.
-              title: Necessitatibus et earum fuga sit ipsam.
+              post_images:
+                - Error dolorem et porro.
+                - Enim ea pariatur et.
+              text_template: Quasi commodi.
+              title: Mollitia vel incidunt sapiente temporibus.
       responses:
         "200":
           description: OK response.
@@ -539,24 +610,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
               example:
-                bots_filename: Dolorem et porro deleniti enim ea pariatur.
-                bots_num: 5537598350593640909
+                bots_filename: Quam beatae quas eum nulla aliquam.
+                bots_num: 8230758236837237837
+                cheap_proxies_filename: Inventore libero et accusantium commodi.
                 id: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
-                image: Molestiae est unde est adipisci.
-                proxies_filename: Velit unde dolorem fugiat vel libero.
-                proxies_num: 7232105117262478473
-                status: 852655666311626326
-                targets_filename: Vel eligendi.
-                targets_num: 8662854942370633267
-                text_template: Dolor autem.
-                title: Vel incidunt sapiente temporibus cumque quasi.
+                images:
+                  - Laudantium perspiciatis ea autem voluptatem.
+                  - Accusamus officia ipsum et provident omnis eius.
+                proxies_num: 3293339814049071845
+                residential_proxies_filename: Repellat ut.
+                status: 1
+                targets_filename: Veniam qui.
+                targets_num: 3061420658338084514
+                text_template: Vitae ut quae.
+                title: Deleniti quia sunt officia.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Autem quaerat rerum consequatur nostrum.
+                example: Soluta atque eligendi nemo sunt numquam enim.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -575,7 +649,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Et itaque pariatur et illum itaque officia.
+                example: Vel maiores cupiditate molestiae laudantium.
       security:
         - jwt_header_Authorization:
             - driver
@@ -595,53 +669,44 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Enim qui officia est earum ducimus.
-          example: Doloribus et facere similique eos voluptates.
+            example: Quos molestiae velit.
+          example: Sequi assumenda.
       responses:
         "200":
           description: OK response.
           content:
             application/json:
               schema:
-                type: integer
-                description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 9054544678714874960
-                format: int64
-              example: 9152231143065962117
+                $ref: '#/components/schemas/AssignProxiesOKResponseBody'
+              example:
+                bots_number: 7319450387844346941
+                status: 3
+                task_id: Nisi sapiente eos debitis in et ipsa.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
-                type: integer
-                description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 1976415649276574112
-                format: int64
+                $ref: '#/components/schemas/AssignProxiesOKResponseBody'
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
-                type: integer
-                description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 1602933122019755227
-                format: int64
+                $ref: '#/components/schemas/AssignProxiesOKResponseBody'
         "404":
           description: 'task not found: Not Found response.'
           content:
             application/json:
               schema:
-                type: integer
-                description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-                example: 5782067987925387064
-                format: int64
+                $ref: '#/components/schemas/AssignProxiesOKResponseBody'
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Repudiandae accusantium assumenda optio.
+                example: Ut laboriosam dolor voluptatum voluptatem dolorem laudantium.
       security:
         - jwt_header_Authorization:
             - driver
@@ -661,8 +726,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Natus tenetur tenetur ipsa.
-          example: Voluptatem fuga magnam veritatis minus et.
+            example: Dolorem explicabo quisquam nesciunt.
+          example: Est amet eveniet.
       responses:
         "200":
           description: OK response.
@@ -701,8 +766,8 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Soluta atque eligendi nemo sunt numquam enim.
-          example: Vel maiores cupiditate molestiae laudantium.
+            example: Soluta est nostrum impedit velit ipsam veniam.
+          example: Dolorem voluptatem dignissimos dolor quos sapiente earum.
       responses:
         "200":
           description: OK response.
@@ -713,32 +778,26 @@ paths:
                 items:
                   $ref: '#/components/schemas/BotsProgress'
                 example:
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
               example:
-                - posts_count: 620013996187731515
-                  status: 5145210576201577970
-                  user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                - posts_count: 620013996187731515
-                  status: 5145210576201577970
-                  user_name: Eligendi totam facilis quaerat voluptatem et dolore.
+                - posts_count: 8765348988324306753
+                  status: 1203444090590882102
+                  user_name: Autem mollitia molestias asperiores voluptatibus.
+                - posts_count: 8765348988324306753
+                  status: 1203444090590882102
+                  user_name: Autem mollitia molestias asperiores voluptatibus.
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Iusto vitae voluptatum.
+                example: Sapiente laboriosam inventore corporis.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -748,12 +807,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/BotsProgress'
                 example:
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
         "404":
           description: 'task not found: Not Found response.'
           content:
@@ -763,22 +828,25 @@ paths:
                 items:
                   $ref: '#/components/schemas/BotsProgress'
                 example:
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
-                  - posts_count: 620013996187731515
-                    status: 5145210576201577970
-                    user_name: Eligendi totam facilis quaerat voluptatem et dolore.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
+                  - posts_count: 8765348988324306753
+                    status: 1203444090590882102
+                    user_name: Autem mollitia molestias asperiores voluptatibus.
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Occaecati illum et laborum quos natus.
+                example: Non praesentium.
       security:
         - jwt_header_Authorization:
             - driver
@@ -798,30 +866,43 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Ut maiores omnis praesentium.
-          example: Veniam repellendus voluptate omnis et aut.
+            example: Assumenda eveniet eum.
+          example: Ducimus sit ipsa excepturi voluptatem dicta et.
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
+              example:
+                status: 4
+                task_id: Et ab quod et.
         "400":
           description: 'bad request: Bad Request response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "404":
           description: 'task not found: Not Found response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Non corrupti occaecati.
+                example: Sint aut dicta molestiae et eaque.
       security:
         - jwt_header_Authorization:
             - driver
@@ -841,30 +922,43 @@ paths:
           schema:
             type: string
             description: id задачи
-            example: Aut aliquid rem unde.
-          example: Repudiandae et amet enim aut doloremque.
+            example: Accusantium dolorem et non animi.
+          example: Quidem ad a nisi.
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
+              example:
+                status: 1
+                task_id: Voluptatem voluptas eos rerum maiores.
         "400":
           description: 'bad request: Bad Request response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "404":
           description: 'task not found: Not Found response.'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTaskOKResponseBody'
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Optio eaque est explicabo laudantium quod.
+                example: Aut voluptatem cumque.
       security:
         - jwt_header_Authorization:
             - driver
@@ -884,8 +978,8 @@ paths:
           schema:
             type: string
             description: id задачи, в которую загружаем пользователей/прокси
-            example: Quo dignissimos.
-          example: Fugit quia unde at dolorem.
+            example: Nostrum aut excepturi voluptatem.
+          example: Quia enim corrupti dolores corrupti ab ut.
       requestBody:
         required: true
         content:
@@ -894,134 +988,110 @@ paths:
               $ref: '#/components/schemas/UploadFilesRequestBody'
             example:
               bots:
-                - line_number: 2669733814448064186
+                - line_number: 7188064407310829327
                   record:
-                    - Omnis eius atque possimus deleniti.
-                    - Sunt officia inventore.
-                    - Et molestiae quam beatae quas eum.
-                - line_number: 2669733814448064186
+                    - Expedita architecto.
+                    - Alias blanditiis provident voluptatem.
+                    - Culpa voluptas delectus voluptatem eos iste et.
+                - line_number: 7188064407310829327
                   record:
-                    - Omnis eius atque possimus deleniti.
-                    - Sunt officia inventore.
-                    - Et molestiae quam beatae quas eum.
-                - line_number: 2669733814448064186
+                    - Expedita architecto.
+                    - Alias blanditiis provident voluptatem.
+                    - Culpa voluptas delectus voluptatem eos iste et.
+              cheap_proxies:
+                - line_number: 4162736507967949585
                   record:
-                    - Omnis eius atque possimus deleniti.
-                    - Sunt officia inventore.
-                    - Et molestiae quam beatae quas eum.
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
+                - line_number: 4162736507967949585
+                  record:
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
+                - line_number: 4162736507967949585
+                  record:
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
+                - line_number: 4162736507967949585
+                  record:
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
               filenames:
-                bots_filename: Ut quae dolorem similique.
-                proxies_filename: Perspiciatis ea autem.
-                targets_filename: Odit accusamus officia ipsum.
-              proxies:
-                - line_number: 2791450974304943083
+                bots_filename: Rerum et labore impedit repellat.
+                cheap_proxies_filename: Aut blanditiis dolore.
+                residential_proxies_filename: Accusamus dolor rerum est velit optio quod.
+                targets_filename: Perspiciatis non id.
+              residential_proxies:
+                - line_number: 4162736507967949585
                   record:
-                    - Repellat ut.
-                    - Inventore libero et accusantium commodi.
-                    - Veniam qui.
-                - line_number: 2791450974304943083
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
+                - line_number: 4162736507967949585
                   record:
-                    - Repellat ut.
-                    - Inventore libero et accusantium commodi.
-                    - Veniam qui.
-                - line_number: 2791450974304943083
-                  record:
-                    - Repellat ut.
-                    - Inventore libero et accusantium commodi.
-                    - Veniam qui.
-                - line_number: 2791450974304943083
-                  record:
-                    - Repellat ut.
-                    - Inventore libero et accusantium commodi.
-                    - Veniam qui.
+                    - Optio pariatur.
+                    - Aut nobis aut eum enim reprehenderit.
+                    - Reiciendis dicta quibusdam.
               targets:
-                - line_number: 4869887685049312467
+                - line_number: 7091889729056040715
                   record:
-                    - Porro sed.
-                    - Molestiae voluptatem.
-                - line_number: 4869887685049312467
+                    - Sit voluptatem.
+                    - Quo velit.
+                - line_number: 7091889729056040715
                   record:
-                    - Porro sed.
-                    - Molestiae voluptatem.
+                    - Sit voluptatem.
+                    - Quo velit.
       responses:
         "200":
           description: OK response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UploadError'
-                example:
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
+                $ref: '#/components/schemas/UploadFilesOKResponseBody'
               example:
-                - input: Non totam labore amet.
-                  line: 2244331639442316921
-                  reason: Iure praesentium nihil.
-                  type: 3
-                - input: Non totam labore amet.
-                  line: 2244331639442316921
-                  reason: Iure praesentium nihil.
-                  type: 3
+                status: 1
+                upload_errors:
+                  - input: Illo maiores dolorem quia eius.
+                    line: 764218983361883733
+                    reason: Et labore consequuntur explicabo perspiciatis et aut.
+                    type: 2
+                  - input: Illo maiores dolorem quia eius.
+                    line: 764218983361883733
+                    reason: Et labore consequuntur explicabo perspiciatis et aut.
+                    type: 2
+                  - input: Illo maiores dolorem quia eius.
+                    line: 764218983361883733
+                    reason: Et labore consequuntur explicabo perspiciatis et aut.
+                    type: 2
         "400":
           description: 'bad request: Bad Request response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Iusto nemo facilis dolore voluptatum ut labore.
+                example: Facilis cupiditate error ullam nobis laudantium cumque.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UploadError'
-                example:
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
+                $ref: '#/components/schemas/UploadFilesOKResponseBody'
         "404":
           description: 'task not found: Not Found response.'
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UploadError'
-                example:
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
-                  - input: Non totam labore amet.
-                    line: 2244331639442316921
-                    reason: Iure praesentium nihil.
-                    type: 3
+                $ref: '#/components/schemas/UploadFilesOKResponseBody'
         "500":
           description: 'internal error: Internal Server Error response.'
           content:
             application/json:
               schema:
                 type: string
-                example: Voluptate enim veniam doloribus enim.
+                example: Sunt quis veniam perferendis voluptatibus cumque neque.
       security:
         - jwt_header_Authorization:
             - driver
@@ -1040,9 +1110,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateTaskDraftRequestBody'
             example:
-              post_image: Nisi adipisci voluptatem natus.
-              text_template: Dolorem corporis fugit fugiat ex quisquam.
-              title: Ad et.
+              post_images:
+                - Maiores accusantium illum rem molestiae qui fugiat.
+                - Sint quos cupiditate porro voluptatum neque.
+                - Laboriosam minima eaque vero fugit occaecati voluptates.
+              text_template: Ipsa non nobis commodi iure unde fugiat.
+              title: Fuga excepturi non velit modi ut repellendus.
       responses:
         "200":
           description: OK response.
@@ -1060,7 +1133,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Non accusamus enim eligendi.
+                example: Autem in id.
         "401":
           description: 'unauthorized: Unauthorized response.'
           content:
@@ -1085,7 +1158,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: Consectetur ut.
+                example: Ut quisquam harum sed.
       security:
         - jwt_header_Authorization:
             - driver
@@ -1097,42 +1170,72 @@ components:
       properties:
         login:
           type: string
-          example: Ut aut et consequatur voluptas animi.
+          example: Laborum quos natus sunt et odit.
         password:
           type: string
-          example: "302"
+          example: 4d8
           minLength: 4
       example:
-        login: Quam dolorum.
-        password: cuw
+        login: Corrupti debitis.
+        password: ksy
       required:
         - login
         - password
+    AssignProxiesOKResponseBody:
+      type: object
+      properties:
+        bots_number:
+          type: integer
+          description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
+          example: 5792999140239809109
+          format: int64
+        status:
+          type: integer
+          example: 6
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+        task_id:
+          type: string
+          description: id задачи
+          example: Eius assumenda illum et soluta sed.
+      example:
+        bots_number: 7959412470966198756
+        status: 3
+        task_id: Soluta consequatur amet ut nulla sunt.
+      required:
+        - bots_number
+        - task_id
+        - status
     BotAccountRecord:
       type: object
       properties:
         line_number:
           type: integer
           description: номер строки в исходном файле
-          example: 8246247835237876880
+          example: 5070173858293710239
           format: int64
         record:
           type: array
           items:
             type: string
-            example: Totam et ut.
+            example: Corporis laborum aliquid tempore ut asperiores.
           example:
-            - Illum exercitationem.
-            - Qui molestiae nihil iusto eos qui et.
-            - Eos sed adipisci optio.
+            - Molestiae aut deserunt qui aut quia.
+            - Dolorem laborum tenetur alias exercitationem.
+            - Consequatur velit repellendus amet assumenda.
           minItems: 4
           maxItems: 4
       example:
-        line_number: 8931161136447120218
+        line_number: 7073881491676942604
         record:
-          - At quod eaque debitis veritatis.
-          - Qui optio consequatur facere inventore.
-          - Ut eius.
+          - Earum repellat placeat amet laboriosam.
+          - Nihil voluptas quo suscipit sapiente quod.
+          - Mollitia qui quia ab esse minus qui.
       required:
         - record
         - line_number
@@ -1142,21 +1245,21 @@ components:
         posts_count:
           type: integer
           description: количество выложенных постов
-          example: 5329623086597137214
+          example: 3035289289353475837
           format: int64
         status:
           type: integer
           description: текущий статус бота, будут ли выкладываться посты
-          example: 8410438612696031835
+          example: 7953491537372740014
           format: int64
         user_name:
           type: string
           description: имя пользователя бота
-          example: Repellat labore porro.
+          example: Voluptatem quis esse.
       example:
-        posts_count: 7593620480545554800
-        status: 5220630343066200485
-        user_name: Neque commodi.
+        posts_count: 8232573738333266522
+        status: 5682231658184460227
+        user_name: A et suscipit natus.
       required:
         - user_name
         - posts_count
@@ -1164,26 +1267,36 @@ components:
     CreateTaskDraftRequestBody:
       type: object
       properties:
-        post_image:
-          type: string
-          description: фотография для постов
-          example: Est vitae ut eveniet.
+        post_images:
+          type: array
+          items:
+            type: string
+            example: Eius dolores vel ut et et autem.
+          description: список фотографий для постов
+          example:
+            - Est id eum eum.
+            - Vel eaque a.
+            - Autem earum nam quia sint molestias minima.
+            - Quas quia.
         text_template:
           type: string
           description: шаблон для подписи под постом
-          example: Vel laborum natus dolores voluptatem necessitatibus sed.
+          example: Itaque et quod itaque.
         title:
           type: string
           description: название задачи
-          example: Eius quis et.
+          example: Consectetur voluptatem delectus architecto consectetur.
       example:
-        post_image: Eveniet molestias cumque dolores laboriosam aut cumque.
-        text_template: Voluptatem ea reiciendis ea nihil ut.
-        title: Sunt aliquam quibusdam.
+        post_images:
+          - Nihil non ut nostrum id veniam optio.
+          - Consequatur quasi.
+          - Nam aliquam ut sint nulla beatae quo.
+        text_template: Vel sunt est est fugit voluptatem ducimus.
+        title: Excepturi alias.
       required:
         - title
         - text_template
-        - post_image
+        - post_images
     Creds:
       type: object
       properties:
@@ -1195,72 +1308,116 @@ components:
         jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       required:
         - jwt
+    StartTaskOKResponseBody:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 4
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+        task_id:
+          type: string
+          description: id задачи
+          example: Facere voluptates.
+      example:
+        status: 1
+        task_id: Eum autem qui vero aut.
+      required:
+        - task_id
+        - status
     Task:
       type: object
       properties:
         bots_filename:
           type: string
           description: название файла, из которого брали ботов
-          example: Et quam earum blanditiis.
+          example: Voluptatem fuga magnam veritatis minus et.
         bots_num:
           type: integer
           description: количество ботов в задаче
-          example: 4784168656209870443
+          example: 7954352099011793520
           format: int64
+        cheap_proxies_filename:
+          type: string
+          description: название файла, из которого брали дешёвые прокси
+          example: Saepe sed velit molestias eaque et.
         id:
           type: string
           example: F25C441B-B3AA-5871-1077-53EACA084D5A
           format: uuid
-        image:
-          type: string
-          description: base64 строка картинки
-          example: Alias et culpa consequatur dolores.
-        proxies_filename:
-          type: string
-          description: название файла, из которого брали прокси
-          example: Sunt magnam incidunt voluptatibus.
+        images:
+          type: array
+          items:
+            type: string
+            example: Eos voluptates fugit repellendus debitis.
+          description: список base64 строк картинок
+          example:
+            - Suscipit deserunt quis omnis fuga eius.
+            - Natus quibusdam dolorem impedit.
+            - Dolores laboriosam omnis esse nulla.
         proxies_num:
           type: integer
           description: количество прокси в задаче
-          example: 5788420071222609504
+          example: 2370867379669687298
           format: int64
+        residential_proxies_filename:
+          type: string
+          description: название файла, из которого брали резидентские прокси
+          example: Eos et accusamus reiciendis dolores odio.
         status:
           type: integer
-          example: 7560710796736112312
-          format: int64
+          example: 6
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
         targets_filename:
           type: string
           description: название файла, из которого брали целевых пользователей
-          example: Non quidem saepe aut saepe.
+          example: Voluptas debitis porro.
         targets_num:
           type: integer
           description: количество целевых пользователей в задаче
-          example: 6277592296786217485
+          example: 6904862286561336856
           format: int64
         text_template:
           type: string
           description: описание под постом
-          example: Dolorum odio laborum.
+          example: Earum ducimus beatae doloribus et facere.
         title:
           type: string
           description: название задачи
-          example: Hic in.
+          example: Est mollitia voluptas natus.
       example:
-        bots_filename: Et possimus voluptatem assumenda nisi rerum est.
-        bots_num: 3827106222681637058
+        bots_filename: Pariatur quis quae voluptatibus odio nobis.
+        bots_num: 5555677952512627670
+        cheap_proxies_filename: Nihil earum pariatur maiores veritatis.
         id: E058AD50-5D7F-E9A8-E010-D33044724992
-        image: Quis reprehenderit quis eum ad porro sed.
-        proxies_filename: Et omnis dolor quia ea sed quia.
-        proxies_num: 3374323904394963977
-        status: 6432522886974044070
-        targets_filename: Voluptatem quasi qui dolor deleniti.
-        targets_num: 2012286125937945496
-        text_template: Reiciendis temporibus voluptas rerum explicabo quia numquam.
-        title: Nostrum exercitationem error.
+        images:
+          - Aut doloremque quo similique voluptas possimus.
+          - Quod vero est nihil repudiandae.
+          - Et qui quos sit tenetur vel.
+          - Qui delectus ut nobis.
+        proxies_num: 7121446963191413156
+        residential_proxies_filename: Praesentium molestiae delectus est eius dolor.
+        status: 5
+        targets_filename: Eveniet sit omnis quae perferendis.
+        targets_num: 3841965076680620214
+        text_template: Rerum repudiandae et.
+        title: Tempora sed voluptatem ut.
       required:
         - id
         - text_template
-        - image
+        - images
         - status
         - title
         - bots_num
@@ -1272,56 +1429,71 @@ components:
         bots_filename:
           type: string
           description: название файла, из которого брали ботов
-          example: Error voluptas nihil non quasi.
-        proxies_filename:
+          example: Et in dolores voluptas.
+        cheap_proxies_filename:
           type: string
-          description: название файла, из которого брали прокси
-          example: Modi aut qui impedit odio.
+          description: название файла, из которого брали дешёвые прокси
+          example: Reprehenderit quos ad sit.
+        residential_proxies_filename:
+          type: string
+          description: название файла, из которого брали резидентские прокси
+          example: Hic et.
         targets_filename:
           type: string
           description: название файла, из которого брали целевых пользователей
-          example: Incidunt reiciendis.
+          example: Voluptas quam quae cumque asperiores debitis voluptatum.
       example:
-        bots_filename: Aut ullam quis maiores.
-        proxies_filename: Fugiat vel nihil occaecati impedit repellat laudantium.
-        targets_filename: Culpa veritatis vitae voluptatem labore.
+        bots_filename: At nisi.
+        cheap_proxies_filename: Incidunt sed.
+        residential_proxies_filename: Sit eveniet dicta.
+        targets_filename: Aut nisi laboriosam.
       required:
         - bots_filename
-        - proxies_filename
+        - residential_proxies_filename
+        - cheap_proxies_filename
         - targets_filename
     UpdateTaskRequestBody:
       type: object
       properties:
-        post_image:
-          type: string
+        post_images:
+          type: array
+          items:
+            type: string
+            example: Eligendi corrupti soluta quis aut odit.
           description: фотография для постов
-          example: Officiis eos temporibus enim sequi dolorem.
+          example:
+            - Odit accusamus necessitatibus perferendis.
+            - Non atque nobis.
+            - Aut impedit.
         text_template:
           type: string
           description: шаблон для подписи под постом
-          example: Doloribus explicabo in.
+          example: Non quaerat dolore voluptas ipsa provident.
         title:
           type: string
           description: название задачи
-          example: Debitis voluptas incidunt.
+          example: Nihil corrupti quia fugit nesciunt ut.
       example:
-        post_image: Adipisci praesentium sint.
-        text_template: Nobis cumque deleniti accusamus est.
-        title: Earum non sequi quos.
+        post_images:
+          - Et unde eum quidem.
+          - Doloremque ipsa.
+          - Expedita ex atque doloribus et repudiandae dolor.
+        text_template: In nesciunt ut.
+        title: Ad ducimus explicabo error id qui et.
     UploadError:
       type: object
       properties:
         input:
           type: string
           description: номер порта
-          example: Velit molestiae consequatur occaecati libero.
+          example: Vero asperiores nihil aut accusantium.
         line:
           type: integer
-          example: 4455161378982152322
+          example: 3874200109581330893
           format: int64
         reason:
           type: string
-          example: Deserunt rerum ratione iure voluptatibus.
+          example: Magni et cupiditate et.
         type:
           type: integer
           description: |2-
@@ -1334,15 +1506,60 @@ components:
             - 2
             - 3
       example:
-        input: Quasi dolorum et.
-        line: 433613707292809257
-        reason: Ut vero.
+        input: Voluptatum eos voluptates quidem culpa nisi.
+        line: 6550530181255230839
+        reason: Omnis quod omnis.
         type: 3
       required:
         - type
         - line
         - input
         - reason
+    UploadFilesOKResponseBody:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+        upload_errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadError'
+          description: ошибки, которые возникли при загрузке файлов
+          example:
+            - input: Illo maiores dolorem quia eius.
+              line: 764218983361883733
+              reason: Et labore consequuntur explicabo perspiciatis et aut.
+              type: 2
+            - input: Illo maiores dolorem quia eius.
+              line: 764218983361883733
+              reason: Et labore consequuntur explicabo perspiciatis et aut.
+              type: 2
+      example:
+        status: 6
+        upload_errors:
+          - input: Illo maiores dolorem quia eius.
+            line: 764218983361883733
+            reason: Et labore consequuntur explicabo perspiciatis et aut.
+            type: 2
+          - input: Illo maiores dolorem quia eius.
+            line: 764218983361883733
+            reason: Et labore consequuntur explicabo perspiciatis et aut.
+            type: 2
+          - input: Illo maiores dolorem quia eius.
+            line: 764218983361883733
+            reason: Et labore consequuntur explicabo perspiciatis et aut.
+            type: 2
+      required:
+        - status
+        - upload_errors
     UploadFilesRequestBody:
       type: object
       properties:
@@ -1352,115 +1569,145 @@ components:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список ботов
           example:
-            - line_number: 2669733814448064186
+            - line_number: 7188064407310829327
               record:
-                - Omnis eius atque possimus deleniti.
-                - Sunt officia inventore.
-                - Et molestiae quam beatae quas eum.
-            - line_number: 2669733814448064186
+                - Expedita architecto.
+                - Alias blanditiis provident voluptatem.
+                - Culpa voluptas delectus voluptatem eos iste et.
+            - line_number: 7188064407310829327
               record:
-                - Omnis eius atque possimus deleniti.
-                - Sunt officia inventore.
-                - Et molestiae quam beatae quas eum.
-            - line_number: 2669733814448064186
+                - Expedita architecto.
+                - Alias blanditiis provident voluptatem.
+                - Culpa voluptas delectus voluptatem eos iste et.
+        cheap_proxies:
+          type: array
+          items:
+            $ref: '#/components/schemas/BotAccountRecord'
+          description: список дешёвых проксей для загрузки фото
+          example:
+            - line_number: 4162736507967949585
               record:
-                - Omnis eius atque possimus deleniti.
-                - Sunt officia inventore.
-                - Et molestiae quam beatae quas eum.
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
+            - line_number: 4162736507967949585
+              record:
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
+            - line_number: 4162736507967949585
+              record:
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
+            - line_number: 4162736507967949585
+              record:
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
         filenames:
           $ref: '#/components/schemas/TaskFileNames'
-        proxies:
+        residential_proxies:
           type: array
           items:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список проксей для использования
           example:
-            - line_number: 2791450974304943083
+            - line_number: 4162736507967949585
               record:
-                - Repellat ut.
-                - Inventore libero et accusantium commodi.
-                - Veniam qui.
-            - line_number: 2791450974304943083
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
+            - line_number: 4162736507967949585
               record:
-                - Repellat ut.
-                - Inventore libero et accusantium commodi.
-                - Veniam qui.
-            - line_number: 2791450974304943083
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
+            - line_number: 4162736507967949585
               record:
-                - Repellat ut.
-                - Inventore libero et accusantium commodi.
-                - Veniam qui.
-            - line_number: 2791450974304943083
-              record:
-                - Repellat ut.
-                - Inventore libero et accusantium commodi.
-                - Veniam qui.
+                - Optio pariatur.
+                - Aut nobis aut eum enim reprehenderit.
+                - Reiciendis dicta quibusdam.
         targets:
           type: array
           items:
             $ref: '#/components/schemas/BotAccountRecord'
           description: список аккаунтов, которым показать надо рекламу
           example:
-            - line_number: 4869887685049312467
+            - line_number: 7091889729056040715
               record:
-                - Porro sed.
-                - Molestiae voluptatem.
-            - line_number: 4869887685049312467
+                - Sit voluptatem.
+                - Quo velit.
+            - line_number: 7091889729056040715
               record:
-                - Porro sed.
-                - Molestiae voluptatem.
+                - Sit voluptatem.
+                - Quo velit.
+            - line_number: 7091889729056040715
+              record:
+                - Sit voluptatem.
+                - Quo velit.
       example:
         bots:
-          - line_number: 2669733814448064186
+          - line_number: 7188064407310829327
             record:
-              - Omnis eius atque possimus deleniti.
-              - Sunt officia inventore.
-              - Et molestiae quam beatae quas eum.
-          - line_number: 2669733814448064186
+              - Expedita architecto.
+              - Alias blanditiis provident voluptatem.
+              - Culpa voluptas delectus voluptatem eos iste et.
+          - line_number: 7188064407310829327
             record:
-              - Omnis eius atque possimus deleniti.
-              - Sunt officia inventore.
-              - Et molestiae quam beatae quas eum.
+              - Expedita architecto.
+              - Alias blanditiis provident voluptatem.
+              - Culpa voluptas delectus voluptatem eos iste et.
+        cheap_proxies:
+          - line_number: 4162736507967949585
+            record:
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
+          - line_number: 4162736507967949585
+            record:
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
         filenames:
-          bots_filename: Ut quae dolorem similique.
-          proxies_filename: Perspiciatis ea autem.
-          targets_filename: Odit accusamus officia ipsum.
-        proxies:
-          - line_number: 2791450974304943083
+          bots_filename: Rerum et labore impedit repellat.
+          cheap_proxies_filename: Aut blanditiis dolore.
+          residential_proxies_filename: Accusamus dolor rerum est velit optio quod.
+          targets_filename: Perspiciatis non id.
+        residential_proxies:
+          - line_number: 4162736507967949585
             record:
-              - Repellat ut.
-              - Inventore libero et accusantium commodi.
-              - Veniam qui.
-          - line_number: 2791450974304943083
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
+          - line_number: 4162736507967949585
             record:
-              - Repellat ut.
-              - Inventore libero et accusantium commodi.
-              - Veniam qui.
-          - line_number: 2791450974304943083
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
+          - line_number: 4162736507967949585
             record:
-              - Repellat ut.
-              - Inventore libero et accusantium commodi.
-              - Veniam qui.
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
+          - line_number: 4162736507967949585
+            record:
+              - Optio pariatur.
+              - Aut nobis aut eum enim reprehenderit.
+              - Reiciendis dicta quibusdam.
         targets:
-          - line_number: 4869887685049312467
+          - line_number: 7091889729056040715
             record:
-              - Porro sed.
-              - Molestiae voluptatem.
-          - line_number: 4869887685049312467
+              - Sit voluptatem.
+              - Quo velit.
+          - line_number: 7091889729056040715
             record:
-              - Porro sed.
-              - Molestiae voluptatem.
-          - line_number: 4869887685049312467
-            record:
-              - Porro sed.
-              - Molestiae voluptatem.
-          - line_number: 4869887685049312467
-            record:
-              - Porro sed.
-              - Molestiae voluptatem.
+              - Sit voluptatem.
+              - Quo velit.
       required:
         - bots
-        - proxies
+        - residential_proxies
+        - cheap_proxies
         - targets
         - filenames
   securitySchemes:

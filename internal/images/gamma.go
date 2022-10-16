@@ -42,23 +42,31 @@ func (g gammaGenerator) Next(ctx context.Context) []byte {
 	return buf.Bytes()
 }
 
-func NewRandomGammaGenerator(imgBytes []byte) (Generator, error) {
-	img, _, err := image.Decode(bytes.NewReader(imgBytes))
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode image: %v", err)
+// NewRandomGammaGenerator создает генератор на основе набора картинок.
+// Next применяет гамма коррекцию со случайной величиной к случайной картинки из набора
+func NewRandomGammaGenerator(imagesBytes [][]byte) (Generator, error) {
+	images := make([]image.Image, len(imagesBytes))
+	for i, imageBytes := range imagesBytes {
+		img, _, err := image.Decode(bytes.NewReader(imageBytes))
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode image: %v", err)
+		}
+
+		images[i] = img
 	}
 
-	return randomGammaGenerator{img: img}, nil
+	return randomGammaGenerator{images: images}, nil
 }
 
 type randomGammaGenerator struct {
-	img image.Image
+	images []image.Image
 }
 
 func (g randomGammaGenerator) Next(ctx context.Context) []byte {
+	randImage := g.images[rand.Intn(len(g.images)-1)]
 	filter := gift.New(gift.Gamma(0.8 + rand.Float32()*0.6))
-	dst := image.NewRGBA(filter.Bounds(g.img.Bounds()))
-	filter.Draw(dst, g.img)
+	dst := image.NewRGBA(filter.Bounds(randImage.Bounds()))
+	filter.Draw(dst, randImage)
 
 	buf := &bytes.Buffer{}
 

@@ -24,15 +24,15 @@ type Service interface {
 	// остановить выполнение.
 	UpdateTask(context.Context, *UpdateTaskPayload) (res *Task, err error)
 	// загрузить файл с пользователями, прокси
-	UploadFiles(context.Context, *UploadFilesPayload) (res []*UploadError, err error)
+	UploadFiles(context.Context, *UploadFilesPayload) (res *UploadFilesResult, err error)
 	// присвоить ботам прокси
-	AssignProxies(context.Context, *AssignProxiesPayload) (res int, err error)
+	AssignProxies(context.Context, *AssignProxiesPayload) (res *AssignProxiesResult, err error)
 	// удалить задачу и все связанные с ней сущности. Использовать только для тестов
 	ForceDelete(context.Context, *ForceDeletePayload) (err error)
 	// начать выполнение задачи
-	StartTask(context.Context, *StartTaskPayload) (err error)
+	StartTask(context.Context, *StartTaskPayload) (res *StartTaskResult, err error)
 	// остановить выполнение задачи
-	StopTask(context.Context, *StopTaskPayload) (err error)
+	StopTask(context.Context, *StopTaskPayload) (res *StopTaskResult, err error)
 	// получить задачу по id
 	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
 	// получить статус выполнения задачи по id
@@ -66,6 +66,17 @@ type AssignProxiesPayload struct {
 	TaskID string `json:"task_id"`
 }
 
+// AssignProxiesResult is the result type of the tasks_service service assign
+// proxies method.
+type AssignProxiesResult struct {
+	// количество аккаунтов с проксями, которые будут использованы для текущей
+	// задачи
+	BotsNumber int `json:"bots_number"`
+	Status     TaskStatus
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
 type BotAccountRecord struct {
 	Record []string
 	// номер строки в исходном файле
@@ -90,8 +101,8 @@ type CreateTaskDraftPayload struct {
 	Title string
 	// шаблон для подписи под постом
 	TextTemplate string `json:"text_template"`
-	// фотография для постов
-	PostImage string `json:"post_image"`
+	// список фотографий для постов
+	PostImages []string `json:"post_images"`
 }
 
 // ForceDeletePayload is the payload type of the tasks_service service force
@@ -143,11 +154,27 @@ type StartTaskPayload struct {
 	TaskID string `json:"task_id"`
 }
 
+// StartTaskResult is the result type of the tasks_service service start task
+// method.
+type StartTaskResult struct {
+	Status TaskStatus
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
 // StopTaskPayload is the payload type of the tasks_service service stop task
 // method.
 type StopTaskPayload struct {
 	// JWT used for authentication
 	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
+// StopTaskResult is the result type of the tasks_service service stop task
+// method.
+type StopTaskResult struct {
+	Status TaskStatus
 	// id задачи
 	TaskID string `json:"task_id"`
 }
@@ -163,9 +190,9 @@ type Task struct {
 	ID string
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// base64 строка картинки
-	Image  string
-	Status int
+	// список base64 строк картинок
+	Images []string
+	Status TaskStatus
 	// название задачи
 	Title string
 	// количество ботов в задаче
@@ -176,8 +203,10 @@ type Task struct {
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
 	BotsFilename *string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename *string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename *string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
 }
@@ -185,11 +214,21 @@ type Task struct {
 type TaskFileNames struct {
 	// название файла, из которого брали ботов
 	BotsFilename string `json:"bots_filename"`
-	// название файла, из которого брали прокси
-	ProxiesFilename string `json:"proxies_filename"`
+	// название файла, из которого брали резидентские прокси
+	ResidentialProxiesFilename string `json:"residential_proxies_filename"`
+	// название файла, из которого брали дешёвые прокси
+	CheapProxiesFilename string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename string `json:"targets_filename"`
 }
+
+// 1 - задача только создана, нужно загрузить список ботов, прокси и получателей
+// 2- в задачу загрузили необходимые списки, нужно присвоить прокси для ботов
+// 3- задача готова к запуску
+// 4- задача запущена
+// 5 - задача остановлена
+// 6 - задача завершена
+type TaskStatus int
 
 // UpdateTaskPayload is the payload type of the tasks_service service update
 // task method.
@@ -203,7 +242,7 @@ type UpdateTaskPayload struct {
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
 	// фотография для постов
-	PostImage *string `json:"post_image"`
+	PostImages []string `json:"post_images"`
 }
 
 type UploadError struct {
@@ -228,9 +267,19 @@ type UploadFilesPayload struct {
 	// список ботов
 	Bots []*BotAccountRecord
 	// список проксей для использования
-	Proxies []*ProxyRecord
+	ResidentialProxies []*ProxyRecord
+	// список дешёвых проксей для загрузки фото
+	CheapProxies []*ProxyRecord
 	// список аккаунтов, которым показать надо рекламу
 	Targets []*TargetUserRecord
+}
+
+// UploadFilesResult is the result type of the tasks_service service upload
+// files method.
+type UploadFilesResult struct {
+	// ошибки, которые возникли при загрузке файлов
+	UploadErrors []*UploadError `json:"upload_errors"`
+	Status       TaskStatus
 }
 
 // Invalid request

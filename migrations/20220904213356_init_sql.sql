@@ -19,19 +19,26 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE tasks
 (
-    id               uuid                     not null primary key default gen_random_uuid(),
-    manager_id       uuid                     not null references users,
-    text_template    text                     not null,
-    image            bytea                    not null,
-    status           smallint                 not null,
-    title            text                     not null,
-    bots_filename    text, -- название файла с ботами
-    proxies_filename text, -- название файла с прокси
-    targets_filename text, -- название файла с получателями
-    created_at       timestamp with time zone not null,
-    started_at       timestamp with time zone,
-    updated_at       timestamp with time zone,
-    deleted_at       timestamp with time zone
+    id                     uuid                     not null primary key default gen_random_uuid(),
+    manager_id             uuid                     not null references users,
+    text_template          text                     not null,
+    landing_accounts       text[]                   not null,
+    account_profile_images bytea[]                  not null, -- аватарки ботов
+    account_names          text[]                   not null, -- имена ботов
+    account_surnames       text[]                   not null, -- фамилии ботов
+    account_urls           text[]                   not null, -- ссылки в профилях ботов
+    images                 bytea[]                  not null,
+    status                 smallint                 not null,
+    title                  text                     not null,
+    bots_filename          text,                              -- название файла с ботами
+    cheap_proxies_filename text,                              -- название файла с дешёвыми прокси
+    res_proxies_filename   text,                              -- название файла с резидентскими прокси
+    targets_filename       text,                              -- название файла с получателями
+    created_at             timestamp with time zone not null,
+    started_at             timestamp with time zone,
+    stopped_at             timestamp with time zone,
+    updated_at             timestamp with time zone,
+    deleted_at             timestamp with time zone
 );
 
 CREATE TABLE bot_accounts

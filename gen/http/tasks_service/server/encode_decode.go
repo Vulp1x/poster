@@ -225,9 +225,9 @@ func EncodeUpdateTaskError(encoder func(context.Context, http.ResponseWriter) go
 // tasks_service upload files endpoint.
 func EncodeUploadFilesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.([]*tasksservice.UploadError)
+		res, _ := v.(*tasksservice.UploadFilesResult)
 		enc := encoder(ctx, w)
-		body := NewUploadFilesResponseBody(res)
+		body := NewUploadFilesOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
@@ -339,9 +339,9 @@ func EncodeUploadFilesError(encoder func(context.Context, http.ResponseWriter) g
 // tasks_service assign proxies endpoint.
 func EncodeAssignProxiesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(int)
+		res, _ := v.(*tasksservice.AssignProxiesResult)
 		enc := encoder(ctx, w)
-		body := res
+		body := NewAssignProxiesOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
@@ -516,8 +516,11 @@ func EncodeForceDeleteError(encoder func(context.Context, http.ResponseWriter) g
 // tasks_service start task endpoint.
 func EncodeStartTaskResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*tasksservice.StartTaskResult)
+		enc := encoder(ctx, w)
+		body := NewStartTaskOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -603,8 +606,11 @@ func EncodeStartTaskError(encoder func(context.Context, http.ResponseWriter) goa
 // tasks_service stop task endpoint.
 func EncodeStopTaskResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*tasksservice.StopTaskResult)
+		enc := encoder(ctx, w)
+		body := NewStopTaskOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -957,9 +963,10 @@ func EncodeListTasksError(encoder func(context.Context, http.ResponseWriter) goa
 // *TaskFileNamesRequestBody.
 func unmarshalTaskFileNamesRequestBodyToTasksserviceTaskFileNames(v *TaskFileNamesRequestBody) *tasksservice.TaskFileNames {
 	res := &tasksservice.TaskFileNames{
-		BotsFilename:    *v.BotsFilename,
-		ProxiesFilename: *v.ProxiesFilename,
-		TargetsFilename: *v.TargetsFilename,
+		BotsFilename:               *v.BotsFilename,
+		ResidentialProxiesFilename: *v.ResidentialProxiesFilename,
+		CheapProxiesFilename:       *v.CheapProxiesFilename,
+		TargetsFilename:            *v.TargetsFilename,
 	}
 
 	return res
@@ -1009,10 +1016,10 @@ func unmarshalTargetUserRecordRequestBodyToTasksserviceTargetUserRecord(v *Targe
 	return res
 }
 
-// marshalTasksserviceUploadErrorToUploadErrorResponse builds a value of type
-// *UploadErrorResponse from a value of type *tasksservice.UploadError.
-func marshalTasksserviceUploadErrorToUploadErrorResponse(v *tasksservice.UploadError) *UploadErrorResponse {
-	res := &UploadErrorResponse{
+// marshalTasksserviceUploadErrorToUploadErrorResponseBody builds a value of
+// type *UploadErrorResponseBody from a value of type *tasksservice.UploadError.
+func marshalTasksserviceUploadErrorToUploadErrorResponseBody(v *tasksservice.UploadError) *UploadErrorResponseBody {
+	res := &UploadErrorResponseBody{
 		Type:   v.Type,
 		Line:   v.Line,
 		Input:  v.Input,
@@ -1038,17 +1045,23 @@ func marshalTasksserviceBotsProgressToBotsProgressResponse(v *tasksservice.BotsP
 // from a value of type *tasksservice.Task.
 func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 	res := &TaskResponse{
-		ID:              v.ID,
-		TextTemplate:    v.TextTemplate,
-		Image:           v.Image,
-		Status:          v.Status,
-		Title:           v.Title,
-		BotsNum:         v.BotsNum,
-		ProxiesNum:      v.ProxiesNum,
-		TargetsNum:      v.TargetsNum,
-		BotsFilename:    v.BotsFilename,
-		ProxiesFilename: v.ProxiesFilename,
-		TargetsFilename: v.TargetsFilename,
+		ID:                         v.ID,
+		TextTemplate:               v.TextTemplate,
+		Status:                     int(v.Status),
+		Title:                      v.Title,
+		BotsNum:                    v.BotsNum,
+		ProxiesNum:                 v.ProxiesNum,
+		TargetsNum:                 v.TargetsNum,
+		BotsFilename:               v.BotsFilename,
+		ResidentialProxiesFilename: v.ResidentialProxiesFilename,
+		CheapProxiesFilename:       v.CheapProxiesFilename,
+		TargetsFilename:            v.TargetsFilename,
+	}
+	if v.Images != nil {
+		res.Images = make([]string, len(v.Images))
+		for i, val := range v.Images {
+			res.Images[i] = val
+		}
 	}
 
 	return res
