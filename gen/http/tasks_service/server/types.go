@@ -19,6 +19,14 @@ type CreateTaskDraftRequestBody struct {
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
 }
@@ -349,6 +357,22 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 		Title:        *body.Title,
 		TextTemplate: *body.TextTemplate,
 	}
+	v.LandingAccounts = make([]string, len(body.LandingAccounts))
+	for i, val := range body.LandingAccounts {
+		v.LandingAccounts[i] = val
+	}
+	v.BotNames = make([]string, len(body.BotNames))
+	for i, val := range body.BotNames {
+		v.BotNames[i] = val
+	}
+	v.BotLastNames = make([]string, len(body.BotLastNames))
+	for i, val := range body.BotLastNames {
+		v.BotLastNames[i] = val
+	}
+	v.BotImages = make([]string, len(body.BotImages))
+	for i, val := range body.BotImages {
+		v.BotImages[i] = val
+	}
 	v.PostImages = make([]string, len(body.PostImages))
 	for i, val := range body.PostImages {
 		v.PostImages[i] = val
@@ -482,6 +506,18 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 	}
 	if body.PostImages == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("post_images", "body"))
+	}
+	if body.LandingAccounts == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("landing_accounts", "body"))
+	}
+	if body.BotNames == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bot_names", "body"))
+	}
+	if body.BotLastNames == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bot_last_names", "body"))
+	}
+	if body.BotImages == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bot_images", "body"))
 	}
 	return
 }

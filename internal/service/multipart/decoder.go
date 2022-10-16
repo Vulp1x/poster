@@ -18,7 +18,7 @@ func TasksServiceUploadFileDecoderFunc(mr *multipart.Reader, p **tasksservice.Up
 
 	ctx := context.Background()
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 4; i++ {
 		part, err := mr.NextPart()
 		if err != nil {
 			return fmt.Errorf("failed to get next part: %v", err)
