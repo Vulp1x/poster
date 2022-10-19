@@ -20,7 +20,7 @@ type taskStore interface {
 	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
-	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
+	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, cheapProxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
 	ForceDelete(ctx context.Context, taskID uuid.UUID) error
 	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
 	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
@@ -242,8 +242,13 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 	logger.Infof(ctx, "got %d bots and %d errors from %d inputs", len(domainAccounts), previousLen, len(p.Bots))
 
 	domainProxies := domain.ParseProxies(p.ResidentialProxies, uploadErrors)
-	logger.Infof(ctx, "got %d proxies and %d errors from %d inputs",
+	logger.Infof(ctx, "got %d residential proxies and %d errors from %d inputs",
 		len(domainProxies), len(uploadErrors)-previousLen, len(p.ResidentialProxies),
+	)
+
+	cheapProxies := domain.ParseProxies(p.CheapProxies, uploadErrors)
+	logger.Infof(ctx, "got %d cheap proxies and %d errors from %d inputs",
+		len(cheapProxies), len(uploadErrors)-previousLen, len(p.CheapProxies),
 	)
 
 	previousLen = len(uploadErrors)
@@ -257,7 +262,7 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 		Status:       -1,
 	}
 
-	err = s.store.PrepareTask(ctx, taskID, domainAccounts, domainProxies, domainTargets, p.Filenames)
+	err = s.store.PrepareTask(ctx, taskID, domainAccounts, domainProxies, cheapProxies, domainTargets, p.Filenames)
 	if err != nil {
 		logger.Errorf(ctx, "failed to prepare task: %v", err)
 		if errors.Is(err, tasks.ErrTaskNotFound) {

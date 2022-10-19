@@ -3,7 +3,9 @@ package instagrapi
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -17,17 +19,17 @@ type Client struct {
 	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, d time.Duration) error
 }
 
-func (c *Client) CheckLandingAccount(ctx context.Context, sessionID, landingAccountUsername string) error {
+// CheckLandingAccounts проверяет все аккаунты, на которые ведем трафик, что они живы и у них в профиле есть ссылка
+func (c *Client) CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error) {
 	startedAt := time.Now()
 	val := map[string][]string{
 		"sessionid": {sessionID},
-		"username":  {landingAccountUsername},
-		"use_cache": {"false"},
+		"usernames": landingAccountUsernames,
 	}
 
-	resp, err := c.cli.PostForm("http://localhost:8000/user/info_by_username", val)
+	resp, err := c.cli.PostForm("http://localhost:8000/check/landings", val)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = c.saveResponseFunc(ctx, sessionID, resp, time.Since(startedAt))
@@ -36,10 +38,24 @@ func (c *Client) CheckLandingAccount(ctx context.Context, sessionID, landingAcco
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
+		return nil, fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
 	}
 
-	return nil
+	defer resp.Body.Close()
+
+	respBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read body bytes: %v", err)
+	}
+
+	var aliveLandings []string
+
+	err = json.Unmarshal(respBytes, &aliveLandings)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal alive landings: %v", err)
+	}
+
+	return aliveLandings, nil
 }
 
 func NewClient() *Client {

@@ -49,7 +49,7 @@ type Proxy struct {
 	Port       int32      `json:"port"`
 	Login      string     `json:"login"`
 	Pass       string     `json:"pass"`
-	Type       int16      `json:"type"`
+	Type       proxyType  `json:"type"`
 }
 
 type TargetUser struct {

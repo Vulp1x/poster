@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -34,6 +35,7 @@ func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.T
 		dbtxf:       dbtxFunc,
 		txf:         txFunc,
 		taskMu:      &sync.Mutex{},
+		instaClient: instagrapi.NewClient(),
 	}
 }
 
@@ -44,6 +46,7 @@ type Store struct {
 	pushTimeout time.Duration
 	dbtxf       dbmodel.DBTXFunc
 	txf         dbmodel.TxFunc
+	instaClient instagrapiClient
 }
 
 func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error) {
@@ -277,7 +280,14 @@ func (s *Store) ForceDelete(ctx context.Context, taskID uuid.UUID) error {
 	return tx.Commit(ctx)
 }
 
-func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error {
+func (s *Store) PrepareTask(
+	ctx context.Context,
+	taskID uuid.UUID,
+	botAccounts domain.BotAccounts,
+	residentialProxies, cheapProxies domain.Proxies,
+	targets domain.TargetUsers,
+	filenames *tasksservice.TaskFileNames,
+) error {
 	tx, err := s.txf(ctx)
 	if err != nil {
 		return store.ErrTransactionFail
@@ -306,8 +316,14 @@ func (s *Store) PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts d
 		return err
 	}
 
-	savedCount, err = q.SaveProxies(ctx, proxies.ToSaveParams(taskID))
-	logger.Infof(ctx, "saved %d proxies", savedCount)
+	savedCount, err = q.SaveProxies(ctx, residentialProxies.ToSaveParams(taskID, false))
+	logger.Infof(ctx, "saved %d residential proxies", savedCount)
+	if err != nil {
+		return err
+	}
+
+	savedCount, err = q.SaveProxies(ctx, cheapProxies.ToSaveParams(taskID, true))
+	logger.Infof(ctx, "saved %d cheap proxies", savedCount)
 	if err != nil {
 		return err
 	}
@@ -374,6 +390,10 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 		return fmt.Errorf("failed to find bots for task: %v", err)
 	}
 
+	if len(bots) == 0 {
+		return fmt.Errorf("no bots for task found: %v", err)
+	}
+
 	maximumTargetsNum := int32(len(bots) * postsPerBot * targetsPerPost)
 	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
 		TaskID: taskID, Limit: maximumTargetsNum,
@@ -386,13 +406,23 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 
 	logger.Infof(ctx, "going to use %d/%d bots for %d targets", neededBotsNum, len(bots), len(targets))
 
+	if neededBotsNum < len(bots) {
+		bots = bots[:neededBotsNum]
+	}
+
+	randomBot := bots[rand.Intn(len(bots)-1)]
+
+	aliveLandings, err := s.checkAliveLandingAccounts(ctx, randomBot, task.LandingAccounts)
+	if err != nil {
+		return fmt.Errorf("failed to check landing accounts with bot '%s': %v", randomBot.Username, err)
+	}
+
+	logger.Infof(ctx, "got alive landing accounts: %v", aliveLandings)
+	task.LandingAccounts = aliveLandings
+
 	err = q.StartTaskByID(ctx, taskID)
 	if err != nil {
 		return fmt.Errorf("failed to start task: %v", err)
-	}
-
-	if neededBotsNum < len(bots) {
-		bots = bots[:neededBotsNum]
 	}
 
 	// нужно отвязаться от ctx, так как он закенселится сразу после окончания запроса
@@ -419,6 +449,15 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) error {
 	go s.asyncPushBots(taskCtx, botsChan, bots, targets)
 
 	return nil
+}
+
+func (s *Store) checkAliveLandingAccounts(ctx context.Context, bot dbmodel.BotAccount, landingAccounts []string) ([]string, error) {
+	err := s.instaClient.InitBot(ctx, domain.BotWithTargets{BotAccount: domain.BotAccount(bot)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to init bot: %v", err)
+	}
+
+	return s.instaClient.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, landingAccounts)
 }
 
 func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {

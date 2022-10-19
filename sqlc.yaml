@@ -45,6 +45,10 @@ overrides:
     go_type:
       type: "targetStatus"
       import: ""
+  - column: "proxies.type"
+    go_type:
+      type: "proxyType"
+      import: ""
 
   - db_type: "pg_catalog.int2"
     nullable: true

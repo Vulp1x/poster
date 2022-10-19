@@ -5,6 +5,7 @@ from typing import Optional, Dict, List
 
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, Body
+from instagrapi import Client
 from instagrapi.exceptions import ChallengeRequired
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
@@ -90,11 +91,15 @@ async def auth_add(session_id: str = Body(...),
                    proxy: Optional[str] = Body(""),
                    locale: Optional[str] = Body(""),
                    timezone: Optional[str] = Body(""),
-                   target_user_ids: List[int] = Body(None),
                    clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
     """Login by username and password with 2FA
     """
-    global i
+    try:
+        cl = clients.get(session_id)
+        return cl.sessionid
+    except Exception:
+        pass
+
     cl = clients.client()
     if proxy != "":
         cl.set_proxy(proxy)
@@ -115,9 +120,24 @@ async def auth_add(session_id: str = Body(...),
 
     clients.set(cl)
 
+    return cl.sessionid
+
+
+@router.post("/follow_targets")
+async def auth_add(session_id: str = Body(...),
+                   target_user_ids: List[int] = Body(None),
+                   clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
+    cl: Client = clients.get(session_id)
+    i, user_id = -1, -1
+
+    followers = cl.user_following(str(cl.user_id), use_cache=False, amount=0)
     try:
         for i, user_id in enumerate(target_user_ids):
-            ok = cl.user_follow(user_id)
+            if user_id in followers:
+                logger.debug(f"bot is already a follower of {user_id}")
+                continue
+
+            ok = cl.user_follow(str(user_id))
             if not ok:
                 logger.warning(f"failed to follow user '{user_id}', followed {i} users, skipping other")
                 break
@@ -128,17 +148,7 @@ async def auth_add(session_id: str = Body(...),
         return PlainTextResponse(status_code=400,
                                  content=f"after {i} followers got challenge required from user {user_id}")
 
-    return cl.sessionid
-
-
-@router.post("/relogin")
-async def auth_relogin(sessionid: str = Form(...),
-                       clients: ClientStorage = Depends(get_clients)) -> str:
-    """Relogin by username and password (with clean cookies)
-    """
-    cl = clients.get(sessionid)
-    result = cl.relogin()
-    return result
+    return PlainTextResponse(content=f'got {i} followings')
 
 
 @router.get("/settings/get")

@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -16,17 +17,17 @@ import (
 type instagrapiClient interface {
 	MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
-	CheckLandingAccount(ctx context.Context, sessionID, landingAccountUsername string) error
+	CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error)
 }
 
 type worker struct {
-	botsQueue            chan *domain.BotWithTargets
-	dbtxf                dbmodel.DBTXFunc
-	cli                  instagrapiClient
-	task                 domain.Task
-	generator            images.Generator
-	processorIndex       int64
-	aliveLandingAccounts []string
+	botsQueue       chan *domain.BotWithTargets
+	dbtxf           dbmodel.DBTXFunc
+	cli             instagrapiClient
+	task            domain.Task
+	generator       images.Generator
+	processorIndex  int64
+	landingAccounts []string
 }
 
 const (
@@ -75,6 +76,11 @@ func (w *worker) run(ctx context.Context) {
 			continue
 		}
 
+		cheapProxy := botWithTargets.ResProxy.PythonString()
+		if botWithTargets.WorkProxy == nil {
+			logger.Warnf(taskCtx, "bot has empty cheap proxy, so using residential for post upload")
+		}
+
 		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.StartedBotStatus, ID: botWithTargets.ID})
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to set bot status to 'started': %v", err)
@@ -87,17 +93,6 @@ func (w *worker) run(ctx context.Context) {
 			targetIds    []uuid.UUID
 		)
 
-		cheapProxy := botWithTargets.ResProxy.PythonString()
-		if botWithTargets.WorkProxy == nil {
-			logger.Warnf(taskCtx, "bot has empty cheap proxy, so using residential for post upload")
-		}
-
-		landingAccount := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
-		if landingAccount == "" {
-			logger.Error(taskCtx, "failed to select alive landing account, returning from task")
-			return
-		}
-
 		for i = 0; i < postsPerBot; i++ {
 			rightBorderOfTargets := (i + 1) * targetsPerPost
 			if rightBorderOfTargets >= targetsLen {
@@ -107,6 +102,14 @@ func (w *worker) run(ctx context.Context) {
 
 			targetsBatch := botWithTargets.Targets[i*targetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
+
+			landingAccount, err := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
+			if err != nil {
+				logger.Errorf(taskCtx, "failed to select alive landing account: %v", err)
+
+				break
+			}
+
 			caption := w.preparePostCaption(w.task.TextTemplate, landingAccount, targetsBatch)
 
 			err = w.cli.MakePost(taskCtx, cheapProxy, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
@@ -176,30 +179,21 @@ func (w *worker) preparePostCaption(template, landingAccount string, targetUsers
 	return b.String()
 }
 
-func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAccount) string {
-	availableAccountsLen := len(w.aliveLandingAccounts)
-	if availableAccountsLen == 0 {
-		return ""
+func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAccount) (string, error) {
+	if len(w.landingAccounts) == 0 {
+		return "", fmt.Errorf("empty list of landing accounts")
 	}
-	randIndex := rand.Intn(availableAccountsLen)
-	candidateAccount := w.aliveLandingAccounts[randIndex]
 
-	err := w.cli.CheckLandingAccount(ctx, bot.Headers.AuthData.SessionID, candidateAccount)
+	aliveLandingAccounts, err := w.cli.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, w.landingAccounts)
 	if err != nil {
-		logger.Warnf(ctx, "checking landing account '%s' got error: %v", candidateAccount, err)
-
-		if availableAccountsLen == 1 {
-			return ""
-		}
-
-		// удаляем этот аккаунт из списка и пробуем ещё раз
-		w.aliveLandingAccounts[randIndex] = w.aliveLandingAccounts[availableAccountsLen-1]
-		w.aliveLandingAccounts = w.aliveLandingAccounts[:availableAccountsLen-1]
-
-		return w.chooseAliveLandingAccount(ctx, bot)
+		return "", err
 	}
 
-	return candidateAccount
+	if len(aliveLandingAccounts) == 0 {
+		return "", fmt.Errorf("all landing accounts are dead")
+	}
+
+	return aliveLandingAccounts[rand.Intn(len(aliveLandingAccounts)-1)], nil
 }
 
 // '{"upload_id":"1664888837874","xsharing_nonces":{},"status":"ok"}' webp

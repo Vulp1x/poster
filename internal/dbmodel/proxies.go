@@ -8,6 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type proxyType int16
+
+const (
+	// ResidentialProxyType резидентские прокси, большинство операций через них
+	ResidentialProxyType proxyType = 1
+	// CheapProxyType дешёвые прокси, используются для загрузок фотографий постов
+	CheapProxyType proxyType = 2
+)
+
 // Value is a implementation for driver.Valuer.
 func (p Proxy) Value() (driver.Value, error) {
 	bytes, err := json.Marshal(p)

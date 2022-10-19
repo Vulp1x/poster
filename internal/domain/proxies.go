@@ -10,9 +10,14 @@ import (
 
 type Proxies []Proxy
 
-func (p Proxies) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveProxiesParams {
+func (p Proxies) ToSaveParams(taskID uuid.UUID, isCheap bool) []dbmodel.SaveProxiesParams {
 	dbProxies := make([]dbmodel.SaveProxiesParams, 0, len(p))
 	uniqueMap := make(map[string]bool, len(p))
+
+	proxyType := dbmodel.ResidentialProxyType
+	if isCheap {
+		proxyType = dbmodel.CheapProxyType
+	}
 
 	for _, proxy := range p {
 		uniqueKey := proxy.Host + strconv.FormatInt(int64(proxy.Port), 10)
@@ -21,13 +26,14 @@ func (p Proxies) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveProxiesParams {
 			// прокси с таким username уже есть, пропускаем его
 			continue
 		}
+
 		dbProxies = append(dbProxies, dbmodel.SaveProxiesParams{
 			TaskID: taskID,
 			Host:   proxy.Host,
 			Port:   proxy.Port,
 			Login:  proxy.Login,
 			Pass:   proxy.Pass,
-			Type:   2,
+			Type:   proxyType,
 		})
 
 		uniqueMap[uniqueKey] = true
