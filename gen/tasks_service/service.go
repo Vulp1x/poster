@@ -109,6 +109,8 @@ type CreateTaskDraftPayload struct {
 	BotLastNames []string `json:"bot_last_names"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
 }
@@ -205,8 +207,10 @@ type Task struct {
 	Title string
 	// количество ботов в задаче
 	BotsNum int `json:"bots_num"`
-	// количество прокси в задаче
-	ProxiesNum int `json:"proxies_num"`
+	// количество резидентских прокси в задаче
+	ResidentialProxiesNum int `json:"residential_proxies_num"`
+	// количество дешёвых прокси в задаче
+	CheapProxiesNum int `json:"cheap_proxies_num"`
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов

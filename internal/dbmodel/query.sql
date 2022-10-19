@@ -25,8 +25,9 @@ SET deleted_at= now()
 where id = $1;
 
 -- name: CreateDraftTask :one
-insert into tasks(manager_id, text_template, title, landing_accounts, images, status, created_at)
-VALUES ($1, $2, $3, $4, $5, 1, now())
+insert into tasks(manager_id, text_template, title, landing_accounts, images, account_names, account_last_names,
+                  account_profile_images, account_urls, status, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, now())
 RETURNING id;
 
 -- name: FindTaskByID :one
@@ -151,9 +152,10 @@ where id = ANY ($1::uuid[])
 RETURNING 1;
 
 -- name: SelectCountsForTask :one
-select (select count(*) from proxies p where p.task_id = $1)      as proxies_count,
-       (select count(*) from bot_accounts b where b.task_id = $1) as bots_count,
-       (select count(*) from target_users t where t.task_id = $1) as targets_count;
+select (select count(*) from proxies p where p.task_id = $1 and p.type = 1) as residential_proxies_count,
+       (select count(*) from proxies p where p.task_id = $1 and p.type = 2) as cheap_proxies_count,
+       (select count(*) from bot_accounts b where b.task_id = $1)           as bots_count,
+       (select count(*) from target_users t where t.task_id = $1)           as targets_count;
 
 -- name: SaveUploadedDataToTask :exec
 update tasks

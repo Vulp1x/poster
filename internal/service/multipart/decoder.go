@@ -9,6 +9,13 @@ import (
 	"github.com/inst-api/poster/pkg/logger"
 )
 
+const (
+	botsPartName               = "bots"
+	residentialProxiesPartName = "res_proxies"
+	cheapProxiesPartName       = "cheap_proxies"
+	targetUsersPartName        = "target_users"
+)
+
 // TasksServiceUploadFileDecoderFunc implements the multipart decoder for
 // service "auth_service" endpoint "upload file". The decoder must populate the
 // argument p after encoding.
@@ -25,30 +32,33 @@ func TasksServiceUploadFileDecoderFunc(mr *multipart.Reader, p **tasksservice.Up
 		}
 
 		switch part.FormName() {
-		case "bots":
+		case botsPartName:
 			payload.Bots, err = readUsersList(ctx, part)
 			if err != nil {
 				return fmt.Errorf("failed to read users list: %v", err)
 			}
 			payload.Filenames.BotsFilename = part.FileName()
-		case "res_proxies":
+		case residentialProxiesPartName:
 			payload.ResidentialProxies, err = readProxiesList(ctx, part)
 			if err != nil {
 				return fmt.Errorf("failed to read proxies list: %v", err)
 			}
 			payload.Filenames.ResidentialProxiesFilename = part.FileName()
-		case "cheap_proxies":
+		case cheapProxiesPartName:
 			payload.CheapProxies, err = readProxiesList(ctx, part)
 			if err != nil {
 				return fmt.Errorf("failed to read proxies list: %v", err)
 			}
 			payload.Filenames.CheapProxiesFilename = part.FileName()
-		case "target_users":
+		case targetUsersPartName:
 			payload.Targets, err = readTargetsList(ctx, part)
 			if err != nil {
 				return fmt.Errorf("failed to read targets list: %v", err)
 			}
 			payload.Filenames.TargetsFilename = part.FileName()
+		default:
+			return fmt.Errorf("unknown part '%s' expected one of: [%s, %s, %s, %s]", part.FormName(),
+				botsPartName, residentialProxiesPartName, cheapProxiesPartName, targetUsersPartName)
 		}
 	}
 

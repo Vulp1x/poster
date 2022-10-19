@@ -54,17 +54,22 @@ func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProx
 }
 
 const createDraftTask = `-- name: CreateDraftTask :one
-insert into tasks(manager_id, text_template, title, landing_accounts, images, status, created_at)
-VALUES ($1, $2, $3, $4, $5, 1, now())
+insert into tasks(manager_id, text_template, title, landing_accounts, images, account_names, account_last_names,
+                  account_profile_images, account_urls, status, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, now())
 RETURNING id
 `
 
 type CreateDraftTaskParams struct {
-	ManagerID       uuid.UUID `json:"manager_id"`
-	TextTemplate    string    `json:"text_template"`
-	Title           string    `json:"title"`
-	LandingAccounts []string  `json:"landing_accounts"`
-	Images          [][]byte  `json:"images"`
+	ManagerID            uuid.UUID `json:"manager_id"`
+	TextTemplate         string    `json:"text_template"`
+	Title                string    `json:"title"`
+	LandingAccounts      []string  `json:"landing_accounts"`
+	Images               [][]byte  `json:"images"`
+	AccountNames         []string  `json:"account_names"`
+	AccountLastNames     []string  `json:"account_last_names"`
+	AccountProfileImages [][]byte  `json:"account_profile_images"`
+	AccountUrls          []string  `json:"account_urls"`
 }
 
 func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams) (uuid.UUID, error) {
@@ -74,6 +79,10 @@ func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams
 		arg.Title,
 		arg.LandingAccounts,
 		arg.Images,
+		arg.AccountNames,
+		arg.AccountLastNames,
+		arg.AccountProfileImages,
+		arg.AccountUrls,
 	)
 	var id uuid.UUID
 	err := row.Scan(&id)
@@ -608,21 +617,28 @@ func (q *Queries) SaveUploadedDataToTask(ctx context.Context, arg SaveUploadedDa
 }
 
 const selectCountsForTask = `-- name: SelectCountsForTask :one
-select (select count(*) from proxies p where p.task_id = $1)      as proxies_count,
-       (select count(*) from bot_accounts b where b.task_id = $1) as bots_count,
-       (select count(*) from target_users t where t.task_id = $1) as targets_count
+select (select count(*) from proxies p where p.task_id = $1 and p.type = 1) as residential_proxies_count,
+       (select count(*) from proxies p where p.task_id = $1 and p.type = 2) as cheap_proxies_count,
+       (select count(*) from bot_accounts b where b.task_id = $1)           as bots_count,
+       (select count(*) from target_users t where t.task_id = $1)           as targets_count
 `
 
 type SelectCountsForTaskRow struct {
-	ProxiesCount int64 `json:"proxies_count"`
-	BotsCount    int64 `json:"bots_count"`
-	TargetsCount int64 `json:"targets_count"`
+	ResidentialProxiesCount int64 `json:"residential_proxies_count"`
+	CheapProxiesCount       int64 `json:"cheap_proxies_count"`
+	BotsCount               int64 `json:"bots_count"`
+	TargetsCount            int64 `json:"targets_count"`
 }
 
 func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (SelectCountsForTaskRow, error) {
 	row := q.db.QueryRow(ctx, selectCountsForTask, taskID)
 	var i SelectCountsForTaskRow
-	err := row.Scan(&i.ProxiesCount, &i.BotsCount, &i.TargetsCount)
+	err := row.Scan(
+		&i.ResidentialProxiesCount,
+		&i.CheapProxiesCount,
+		&i.BotsCount,
+		&i.TargetsCount,
+	)
 	return i, err
 }
 

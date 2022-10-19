@@ -120,9 +120,13 @@ var Task = Type("Task", func() {
 	Attribute("bots_num", Int, "количество ботов в задаче", func() {
 		Meta("struct:tag:json", "bots_num")
 	})
-	Attribute("proxies_num", Int, "количество прокси в задаче", func() {
-		Meta("struct:tag:json", "proxies_num")
+	Attribute("residential_proxies_num", Int, "количество резидентских прокси в задаче", func() {
+		Meta("struct:tag:json", "residential_proxies_num")
 	})
+	Attribute("cheap_proxies_num", Int, "количество дешёвых прокси в задаче", func() {
+		Meta("struct:tag:json", "cheap_proxies_num")
+	})
+
 	Attribute("targets_num", Int, "количество целевых пользователей в задаче", func() {
 		Meta("struct:tag:json", "targets_num")
 	})
@@ -141,7 +145,7 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("id", "text_template", "images", "status", "title", "bots_num", "proxies_num", "targets_num")
+	Required("id", "text_template", "images", "status", "title", "bots_num", "residential_proxies_num", "cheap_proxies_num", "targets_num")
 })
 
 var TaskFilenames = Type("TaskFileNames", func() {

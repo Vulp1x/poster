@@ -27,6 +27,8 @@ type CreateTaskDraftRequestBody struct {
 	BotLastNames []string `json:"bot_last_names"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
 }
@@ -69,8 +71,10 @@ type UpdateTaskOKResponseBody struct {
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
 	BotsNum int `json:"bots_num"`
-	// количество прокси в задаче
-	ProxiesNum int `json:"proxies_num"`
+	// количество резидентских прокси в задаче
+	ResidentialProxiesNum int `json:"residential_proxies_num"`
+	// количество дешёвых прокси в задаче
+	CheapProxiesNum int `json:"cheap_proxies_num"`
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
@@ -131,8 +135,10 @@ type GetTaskOKResponseBody struct {
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
 	BotsNum int `json:"bots_num"`
-	// количество прокси в задаче
-	ProxiesNum int `json:"proxies_num"`
+	// количество резидентских прокси в задаче
+	ResidentialProxiesNum int `json:"residential_proxies_num"`
+	// количество дешёвых прокси в задаче
+	CheapProxiesNum int `json:"cheap_proxies_num"`
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
@@ -187,8 +193,10 @@ type TaskResponse struct {
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
 	BotsNum int `json:"bots_num"`
-	// количество прокси в задаче
-	ProxiesNum int `json:"proxies_num"`
+	// количество резидентских прокси в задаче
+	ResidentialProxiesNum int `json:"residential_proxies_num"`
+	// количество дешёвых прокси в задаче
+	CheapProxiesNum int `json:"cheap_proxies_num"`
 	// количество целевых пользователей в задаче
 	TargetsNum int `json:"targets_num"`
 	// название файла, из которого брали ботов
@@ -243,7 +251,8 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		Status:                     int(res.Status),
 		Title:                      res.Title,
 		BotsNum:                    res.BotsNum,
-		ProxiesNum:                 res.ProxiesNum,
+		ResidentialProxiesNum:      res.ResidentialProxiesNum,
+		CheapProxiesNum:            res.CheapProxiesNum,
 		TargetsNum:                 res.TargetsNum,
 		BotsFilename:               res.BotsFilename,
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
@@ -314,7 +323,8 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		Status:                     int(res.Status),
 		Title:                      res.Title,
 		BotsNum:                    res.BotsNum,
-		ProxiesNum:                 res.ProxiesNum,
+		ResidentialProxiesNum:      res.ResidentialProxiesNum,
+		CheapProxiesNum:            res.CheapProxiesNum,
 		TargetsNum:                 res.TargetsNum,
 		BotsFilename:               res.BotsFilename,
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
@@ -377,6 +387,12 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 		v.BotImages = make([]string, len(body.BotImages))
 		for i, val := range body.BotImages {
 			v.BotImages[i] = val
+		}
+	}
+	if body.BotUrls != nil {
+		v.BotUrls = make([]string, len(body.BotUrls))
+		for i, val := range body.BotUrls {
+			v.BotUrls[i] = val
 		}
 	}
 	v.PostImages = make([]string, len(body.PostImages))

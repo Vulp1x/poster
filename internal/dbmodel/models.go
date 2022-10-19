@@ -88,7 +88,7 @@ type Task struct {
 	StoppedAt            *time.Time `json:"stopped_at"`
 	UpdatedAt            *time.Time `json:"updated_at"`
 	DeletedAt            *time.Time `json:"deleted_at"`
-	AccountLastNames     *string    `json:"account_last_names"`
+	AccountLastNames     []string   `json:"account_last_names"`
 }
 
 type User struct {

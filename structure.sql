@@ -154,7 +154,7 @@ CREATE TABLE public.tasks (
     stopped_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
-    account_last_names text
+    account_last_names text[]
 );
 
 

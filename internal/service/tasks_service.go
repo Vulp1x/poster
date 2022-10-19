@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	authservice "github.com/inst-api/poster/gen/auth_service"
@@ -16,7 +17,7 @@ import (
 )
 
 type taskStore interface {
-	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte) (uuid.UUID, error)
+	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte, opts ...tasks.DraftOption) (uuid.UUID, error)
 	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
@@ -66,12 +67,28 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 		imageDecodedBytes, err := base64.StdEncoding.DecodeString(image)
 		if err != nil {
 			logger.Errorf(ctx, "failed to decode base 64 string: %v", err)
-			return "", tasksservice.BadRequest("invalid image")
+			return "", tasksservice.BadRequest(fmt.Sprintf("invalid %d post image", i+1))
 		}
 		imagesDecodedBytes[i] = imageDecodedBytes
 	}
 
-	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, p.LandingAccounts, imagesDecodedBytes)
+	var botProfileImages [][]byte
+	for i, image := range p.BotImages {
+		imageDecodedBytes, err := base64.StdEncoding.DecodeString(image)
+		if err != nil {
+			logger.Errorf(ctx, "failed to decode base 64 string: %v", err)
+			return "", tasksservice.BadRequest(fmt.Sprintf("invalid %d bot image", i+1))
+		}
+
+		botProfileImages = append(botProfileImages, imageDecodedBytes)
+	}
+
+	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, p.LandingAccounts, imagesDecodedBytes,
+		tasks.CreateDraftWithAccountNames(p.BotNames),
+		tasks.CreateDraftWithAccountLastNames(p.BotLastNames),
+		tasks.CreateDraftWithAccountProfileImages(botProfileImages),
+		tasks.CreateDraftWithAccountURLs(p.BotUrls),
+	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create task: %v", err)
 		return "", tasksservice.InternalError(err.Error())

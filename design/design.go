@@ -140,6 +140,11 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "bot_images")
 			})
 
+			Attribute("bot_urls", ArrayOf(String), func() {
+				Description("ссылки для описания у ботов")
+				Meta("struct:tag:json", "bot_images")
+			})
+
 			Attribute("post_images", ArrayOf(String), func() {
 				Description("список фотографий для постов")
 				Meta("struct:tag:json", "post_images")

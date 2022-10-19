@@ -121,3 +121,14 @@ migrate-local:
 migrate-test:
 	 ENVIRONMENT=test scripts/migrate.sh
 
+restart-test:
+	git pull && \
+	docker-compose down && \
+	docker-compose -f docker-compose-local.yml up --build --detach && \
+	sleep 30 &&\
+	make migrate-test
+
+hard-restart-test: drop-pgdata restart-test
+
+drop-pgdata:
+	rm -rf ./pgdata
