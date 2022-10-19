@@ -361,17 +361,23 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 	for i, val := range body.LandingAccounts {
 		v.LandingAccounts[i] = val
 	}
-	v.BotNames = make([]string, len(body.BotNames))
-	for i, val := range body.BotNames {
-		v.BotNames[i] = val
+	if body.BotNames != nil {
+		v.BotNames = make([]string, len(body.BotNames))
+		for i, val := range body.BotNames {
+			v.BotNames[i] = val
+		}
 	}
-	v.BotLastNames = make([]string, len(body.BotLastNames))
-	for i, val := range body.BotLastNames {
-		v.BotLastNames[i] = val
+	if body.BotLastNames != nil {
+		v.BotLastNames = make([]string, len(body.BotLastNames))
+		for i, val := range body.BotLastNames {
+			v.BotLastNames[i] = val
+		}
 	}
-	v.BotImages = make([]string, len(body.BotImages))
-	for i, val := range body.BotImages {
-		v.BotImages[i] = val
+	if body.BotImages != nil {
+		v.BotImages = make([]string, len(body.BotImages))
+		for i, val := range body.BotImages {
+			v.BotImages[i] = val
+		}
 	}
 	v.PostImages = make([]string, len(body.PostImages))
 	for i, val := range body.PostImages {
@@ -509,15 +515,6 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 	}
 	if body.LandingAccounts == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("landing_accounts", "body"))
-	}
-	if body.BotNames == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("bot_names", "body"))
-	}
-	if body.BotLastNames == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("bot_last_names", "body"))
-	}
-	if body.BotImages == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("bot_images", "body"))
 	}
 	return
 }

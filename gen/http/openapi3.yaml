@@ -1339,9 +1339,6 @@ components:
         - text_template
         - post_images
         - landing_accounts
-        - bot_names
-        - bot_last_names
-        - bot_images
     Creds:
       type: object
       properties:

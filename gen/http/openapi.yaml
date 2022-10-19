@@ -641,9 +641,6 @@ paths:
               - text_template
               - post_images
               - landing_accounts
-              - bot_names
-              - bot_last_names
-              - bot_images
       responses:
         "200":
           description: OK response.
@@ -1140,9 +1137,6 @@ definitions:
       - text_template
       - post_images
       - landing_accounts
-      - bot_names
-      - bot_last_names
-      - bot_images
   TasksServiceGetTaskNotFoundResponseBody:
     title: TasksServiceGetTaskNotFoundResponseBody
     type: object

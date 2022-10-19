@@ -145,9 +145,7 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "post_images")
 			})
 
-			Required("token", "title", "text_template", "post_images", "landing_accounts",
-				"bot_names", "bot_last_names", "bot_images",
-			)
+			Required("token", "title", "text_template", "post_images", "landing_accounts")
 		})
 
 		Result(String, func() {
