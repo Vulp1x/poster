@@ -16,7 +16,7 @@ import (
 )
 
 type taskStore interface {
-	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, images [][]byte) (uuid.UUID, error)
+	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte) (uuid.UUID, error)
 	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) error
 	StopTask(ctx context.Context, taskID uuid.UUID) error
@@ -71,7 +71,7 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 		imagesDecodedBytes[i] = imageDecodedBytes
 	}
 
-	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, imagesDecodedBytes)
+	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, p.LandingAccounts, imagesDecodedBytes)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create task: %v", err)
 		return "", tasksservice.InternalError(err.Error())

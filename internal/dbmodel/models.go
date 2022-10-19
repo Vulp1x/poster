@@ -75,7 +75,6 @@ type Task struct {
 	LandingAccounts      []string   `json:"landing_accounts"`
 	AccountProfileImages [][]byte   `json:"account_profile_images"`
 	AccountNames         []string   `json:"account_names"`
-	AccountSurnames      []string   `json:"account_surnames"`
 	AccountUrls          []string   `json:"account_urls"`
 	Images               [][]byte   `json:"images"`
 	Status               taskStatus `json:"status"`
@@ -89,6 +88,7 @@ type Task struct {
 	StoppedAt            *time.Time `json:"stopped_at"`
 	UpdatedAt            *time.Time `json:"updated_at"`
 	DeletedAt            *time.Time `json:"deleted_at"`
+	AccountLastNames     *string    `json:"account_last_names"`
 }
 
 type User struct {

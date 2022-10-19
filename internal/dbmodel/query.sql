@@ -25,8 +25,8 @@ SET deleted_at= now()
 where id = $1;
 
 -- name: CreateDraftTask :one
-insert into tasks(manager_id, text_template, title, images, status, created_at)
-VALUES ($1, $2, $3, $4, 1, now())
+insert into tasks(manager_id, text_template, title, landing_accounts, images, status, created_at)
+VALUES ($1, $2, $3, $4, $5, 1, now())
 RETURNING id;
 
 -- name: FindTaskByID :one
@@ -85,7 +85,7 @@ where id = $2;
 update tasks
 set text_template = $1,
     title         = $2,
-    images         = $3,
+    images        = $3,
     updated_at    = now()
 where id = $4;
 
@@ -157,11 +157,11 @@ select (select count(*) from proxies p where p.task_id = $1)      as proxies_cou
 
 -- name: SaveUploadedDataToTask :exec
 update tasks
-set status           = 2, --dbmodel.DataUploadedTaskStatus,
-    bots_filename    = $2,
-    res_proxies_filename = $3,
+set status                 = 2, --dbmodel.DataUploadedTaskStatus,
+    bots_filename          = $2,
+    res_proxies_filename   = $3,
     cheap_proxies_filename = $4,
-    targets_filename = $5
+    targets_filename       = $5
 where id = $1;
 
 -- name: SetBotStatus :exec

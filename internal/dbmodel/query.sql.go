@@ -54,16 +54,17 @@ func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProx
 }
 
 const createDraftTask = `-- name: CreateDraftTask :one
-insert into tasks(manager_id, text_template, title, images, status, created_at)
-VALUES ($1, $2, $3, $4, 1, now())
+insert into tasks(manager_id, text_template, title, landing_accounts, images, status, created_at)
+VALUES ($1, $2, $3, $4, $5, 1, now())
 RETURNING id
 `
 
 type CreateDraftTaskParams struct {
-	ManagerID    uuid.UUID `json:"manager_id"`
-	TextTemplate string    `json:"text_template"`
-	Title        string    `json:"title"`
-	Images       [][]byte  `json:"images"`
+	ManagerID       uuid.UUID `json:"manager_id"`
+	TextTemplate    string    `json:"text_template"`
+	Title           string    `json:"title"`
+	LandingAccounts []string  `json:"landing_accounts"`
+	Images          [][]byte  `json:"images"`
 }
 
 func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams) (uuid.UUID, error) {
@@ -71,6 +72,7 @@ func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams
 		arg.ManagerID,
 		arg.TextTemplate,
 		arg.Title,
+		arg.LandingAccounts,
 		arg.Images,
 	)
 	var id uuid.UUID
@@ -293,7 +295,7 @@ func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_surnames, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names
 from tasks
 where id = $1
 `
@@ -308,7 +310,6 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.LandingAccounts,
 		&i.AccountProfileImages,
 		&i.AccountNames,
-		&i.AccountSurnames,
 		&i.AccountUrls,
 		&i.Images,
 		&i.Status,
@@ -322,12 +323,13 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.StoppedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.AccountLastNames,
 	)
 	return i, err
 }
 
 const findTasksByManagerID = `-- name: FindTasksByManagerID :many
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_surnames, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names
 from tasks
 where manager_id = $1
 `
@@ -348,7 +350,6 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.LandingAccounts,
 			&i.AccountProfileImages,
 			&i.AccountNames,
-			&i.AccountSurnames,
 			&i.AccountUrls,
 			&i.Images,
 			&i.Status,
@@ -362,6 +363,7 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.StoppedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.AccountLastNames,
 		); err != nil {
 			return nil, err
 		}
@@ -578,11 +580,11 @@ type SaveTargetUsersParams struct {
 
 const saveUploadedDataToTask = `-- name: SaveUploadedDataToTask :exec
 update tasks
-set status           = 2, --dbmodel.DataUploadedTaskStatus,
-    bots_filename    = $2,
-    res_proxies_filename = $3,
+set status                 = 2, --dbmodel.DataUploadedTaskStatus,
+    bots_filename          = $2,
+    res_proxies_filename   = $3,
     cheap_proxies_filename = $4,
-    targets_filename = $5
+    targets_filename       = $5
 where id = $1
 `
 
@@ -690,7 +692,7 @@ const updateTask = `-- name: UpdateTask :exec
 update tasks
 set text_template = $1,
     title         = $2,
-    images         = $3,
+    images        = $3,
     updated_at    = now()
 where id = $4
 `

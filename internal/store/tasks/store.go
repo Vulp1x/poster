@@ -348,14 +348,15 @@ func (s *Store) PrepareTask(
 	return tx.Commit(ctx)
 }
 
-func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, images [][]byte) (uuid.UUID, error) {
+func (s *Store) CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte) (uuid.UUID, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
 
 	taskID, err := q.CreateDraftTask(ctx, dbmodel.CreateDraftTaskParams{
-		ManagerID:    userID,
-		TextTemplate: textTemplate,
-		Images:       images,
-		Title:        title,
+		ManagerID:       userID,
+		TextTemplate:    textTemplate,
+		LandingAccounts: accounts,
+		Images:          images,
+		Title:           title,
 	})
 	if err != nil {
 		return uuid.UUID{}, fmt.Errorf("failed to create task draft: %w", err)

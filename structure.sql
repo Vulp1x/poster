@@ -139,10 +139,9 @@ CREATE TABLE public.tasks (
     manager_id uuid NOT NULL,
     text_template text NOT NULL,
     landing_accounts text[] NOT NULL,
-    account_profile_images bytea[] NOT NULL,
-    account_names text[] NOT NULL,
-    account_surnames text[] NOT NULL,
-    account_urls text[] NOT NULL,
+    account_profile_images bytea[],
+    account_names text[],
+    account_urls text[],
     images bytea[] NOT NULL,
     status smallint NOT NULL,
     title text NOT NULL,
@@ -154,7 +153,8 @@ CREATE TABLE public.tasks (
     started_at timestamp with time zone,
     stopped_at timestamp with time zone,
     updated_at timestamp with time zone,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    account_last_names text
 );
 
 
