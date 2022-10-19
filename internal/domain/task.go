@@ -15,10 +15,17 @@ func (t Task) ToProto() *tasksservice.Task {
 	for i, image := range t.Images {
 		images[i] = base64.StdEncoding.EncodeToString(image)
 	}
+
+	botsProfileImages := make([]string, len(t.AccountProfileImages))
+	for i, image := range t.AccountProfileImages {
+		botsProfileImages[i] = base64.StdEncoding.EncodeToString(image)
+	}
+
 	return &tasksservice.Task{
 		ID:                         t.ID.String(),
 		TextTemplate:               t.TextTemplate,
-		Images:                     images,
+		PostImages:                 images,
+		BotsImages:                 botsProfileImages,
 		Status:                     tasksservice.TaskStatus(t.Status),
 		Title:                      t.Title,
 		BotsNum:                    -1,
@@ -57,10 +64,17 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 	for i, image := range t.Images {
 		images[i] = base64.StdEncoding.EncodeToString(image)
 	}
+
+	botsProfileImages := make([]string, len(t.AccountProfileImages))
+	for i, image := range t.AccountProfileImages {
+		botsProfileImages[i] = base64.StdEncoding.EncodeToString(image)
+	}
+
 	return &tasksservice.Task{
 		ID:                         t.ID.String(),
 		TextTemplate:               t.TextTemplate,
-		Images:                     images,
+		PostImages:                 images,
+		BotsImages:                 botsProfileImages,
 		Status:                     tasksservice.TaskStatus(t.Status),
 		Title:                      t.Title,
 		BotsNum:                    int(t.BotsCount),

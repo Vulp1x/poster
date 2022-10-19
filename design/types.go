@@ -113,7 +113,12 @@ var Task = Type("Task", func() {
 		Description("описание под постом")
 	})
 
-	Attribute("images", ArrayOf(String), "список base64 строк картинок")
+	Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
+		Meta("struct:tag:json", "post_images")
+	})
+	Attribute("bots_images", ArrayOf(String), "список base64 строк с фотографиями для ботов", func() {
+		Meta("struct:tag:json", "bots_images")
+	})
 	Attribute("status", TaskStatus)
 	Attribute("title", String, "название задачи")
 
@@ -145,7 +150,7 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("id", "text_template", "images", "status", "title", "bots_num", "residential_proxies_num", "cheap_proxies_num", "targets_num")
+	Required("id", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num", "cheap_proxies_num", "targets_num", "bots_images")
 })
 
 var TaskFilenames = Type("TaskFileNames", func() {
@@ -155,7 +160,6 @@ var TaskFilenames = Type("TaskFileNames", func() {
 	Attribute("residential_proxies_filename", String, "название файла, из которого брали резидентские прокси", func() {
 		Meta("struct:tag:json", "residential_proxies_filename")
 	})
-
 	Attribute("cheap_proxies_filename", String, "название файла, из которого брали дешёвые прокси", func() {
 		Meta("struct:tag:json", "cheap_proxies_filename")
 	})

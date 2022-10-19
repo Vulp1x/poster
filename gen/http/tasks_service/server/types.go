@@ -65,8 +65,10 @@ type UpdateTaskOKResponseBody struct {
 	// описание под постом
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
-	Images []string `form:"images" json:"images" xml:"images"`
-	Status int      `form:"status" json:"status" xml:"status"`
+	PostImages []string `json:"post_images"`
+	// список base64 строк с фотографиями для ботов
+	BotsImages []string `json:"bots_images"`
+	Status     int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -129,8 +131,10 @@ type GetTaskOKResponseBody struct {
 	// описание под постом
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
-	Images []string `form:"images" json:"images" xml:"images"`
-	Status int      `form:"status" json:"status" xml:"status"`
+	PostImages []string `json:"post_images"`
+	// список base64 строк с фотографиями для ботов
+	BotsImages []string `json:"bots_images"`
+	Status     int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -187,8 +191,10 @@ type TaskResponse struct {
 	// описание под постом
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
-	Images []string `form:"images" json:"images" xml:"images"`
-	Status int      `form:"status" json:"status" xml:"status"`
+	PostImages []string `json:"post_images"`
+	// список base64 строк с фотографиями для ботов
+	BotsImages []string `json:"bots_images"`
+	Status     int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -259,10 +265,16 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
 	}
-	if res.Images != nil {
-		body.Images = make([]string, len(res.Images))
-		for i, val := range res.Images {
-			body.Images[i] = val
+	if res.PostImages != nil {
+		body.PostImages = make([]string, len(res.PostImages))
+		for i, val := range res.PostImages {
+			body.PostImages[i] = val
+		}
+	}
+	if res.BotsImages != nil {
+		body.BotsImages = make([]string, len(res.BotsImages))
+		for i, val := range res.BotsImages {
+			body.BotsImages[i] = val
 		}
 	}
 	return body
@@ -331,10 +343,16 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
 	}
-	if res.Images != nil {
-		body.Images = make([]string, len(res.Images))
-		for i, val := range res.Images {
-			body.Images[i] = val
+	if res.PostImages != nil {
+		body.PostImages = make([]string, len(res.PostImages))
+		for i, val := range res.PostImages {
+			body.PostImages[i] = val
+		}
+	}
+	if res.BotsImages != nil {
+		body.BotsImages = make([]string, len(res.BotsImages))
+		for i, val := range res.BotsImages {
+			body.BotsImages[i] = val
 		}
 	}
 	return body

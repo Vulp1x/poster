@@ -70,7 +70,7 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.Task
 	return progress, nil
 }
 
-func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, image [][]byte) (domain.Task, error) {
+func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error) {
 	tx, err := s.txf(ctx)
 	if err != nil {
 		return domain.Task{}, store.ErrTransactionFail
@@ -101,8 +101,8 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTem
 		task.TextTemplate = *textTemplate
 	}
 
-	if image != nil {
-		task.Images = image
+	if images != nil {
+		task.Images = images
 	}
 
 	err = q.UpdateTask(ctx, dbmodel.UpdateTaskParams{

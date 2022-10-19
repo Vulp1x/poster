@@ -201,8 +201,10 @@ type Task struct {
 	// описание под постом
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
-	Images []string
-	Status TaskStatus
+	PostImages []string `json:"post_images"`
+	// список base64 строк с фотографиями для ботов
+	BotsImages []string `json:"bots_images"`
+	Status     TaskStatus
 	// название задачи
 	Title string
 	// количество ботов в задаче

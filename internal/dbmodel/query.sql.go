@@ -34,22 +34,30 @@ func (q *Queries) AssignBotsToProxiesForTask(ctx context.Context, arg AssignBots
 
 const assignProxiesToBotsForTask = `-- name: AssignProxiesToBotsForTask :exec
 UPDATE bot_accounts
-set res_proxy = x.proxy,
-    status    = 2 -- ProxieAssignedBotStatus
-From (SELECT UNNEST($2::jsonb[]) as proxy,
-             UNNEST($3::uuid[])      as id) x
+set res_proxy  = x.res_proxy,
+    work_proxy = x.cheap_proxy,
+    status     = 2 -- ProxieAssignedBotStatus
+From (SELECT UNNEST($2::jsonb[]) as res_proxy,
+             UNNEST($3::jsonb[])       as cheap_proxy,
+             UNNEST($4::uuid[])                  as id) x
 where bot_accounts.id = x.id
   AND task_id = $1
 `
 
 type AssignProxiesToBotsForTaskParams struct {
-	TaskID  uuid.UUID   `json:"task_id"`
-	Proxies []string    `json:"proxies"`
-	Ids     []uuid.UUID `json:"ids"`
+	TaskID             uuid.UUID   `json:"task_id"`
+	ResidentialProxies []string    `json:"residential_proxies"`
+	CheapProxies       []string    `json:"cheap_proxies"`
+	Ids                []uuid.UUID `json:"ids"`
 }
 
 func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProxiesToBotsForTaskParams) error {
-	_, err := q.db.Exec(ctx, assignProxiesToBotsForTask, arg.TaskID, arg.Proxies, arg.Ids)
+	_, err := q.db.Exec(ctx, assignProxiesToBotsForTask,
+		arg.TaskID,
+		arg.ResidentialProxies,
+		arg.CheapProxies,
+		arg.Ids,
+	)
 	return err
 }
 
@@ -222,16 +230,15 @@ func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
 	return i, err
 }
 
-const findProxiesForTask = `-- name: FindProxiesForTask :many
-
+const findCheapProxiesForTask = `-- name: FindCheapProxiesForTask :many
 select id, task_id, assigned_to, host, port, login, pass, type
 from proxies
 where task_id = $1
+  and type = 2
 `
 
-// ProxieAssignedBotStatus
-func (q *Queries) FindProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
-	rows, err := q.db.Query(ctx, findProxiesForTask, taskID)
+func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
+	rows, err := q.db.Query(ctx, findCheapProxiesForTask, taskID)
 	if err != nil {
 		return nil, err
 	}
@@ -292,6 +299,44 @@ func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findResidentialProxiesForTask = `-- name: FindResidentialProxiesForTask :many
+
+select id, task_id, assigned_to, host, port, login, pass, type
+from proxies
+where task_id = $1
+  and type = 1
+`
+
+// ProxieAssignedBotStatus
+func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
+	rows, err := q.db.Query(ctx, findResidentialProxiesForTask, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Proxy
+	for rows.Next() {
+		var i Proxy
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.AssignedTo,
+			&i.Host,
+			&i.Port,
+			&i.Login,
+			&i.Pass,
+			&i.Type,
 		); err != nil {
 			return nil, err
 		}

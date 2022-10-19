@@ -1058,10 +1058,16 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 		CheapProxiesFilename:       v.CheapProxiesFilename,
 		TargetsFilename:            v.TargetsFilename,
 	}
-	if v.Images != nil {
-		res.Images = make([]string, len(v.Images))
-		for i, val := range v.Images {
-			res.Images[i] = val
+	if v.PostImages != nil {
+		res.PostImages = make([]string, len(v.PostImages))
+		for i, val := range v.PostImages {
+			res.PostImages[i] = val
+		}
+	}
+	if v.BotsImages != nil {
+		res.BotsImages = make([]string, len(v.BotsImages))
+		for i, val := range v.BotsImages {
+			res.BotsImages[i] = val
 		}
 	}
 

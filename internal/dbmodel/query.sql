@@ -64,10 +64,18 @@ where task_id = $1
   and status = 2;
 -- ProxieAssignedBotStatus
 
--- name: FindProxiesForTask :many
+-- name: FindResidentialProxiesForTask :many
 select *
 from proxies
-where task_id = $1;
+where task_id = $1
+  and type = 1;
+
+-- name: FindCheapProxiesForTask :many
+select *
+from proxies
+where task_id = $1
+  and type = 2;
+
 
 -- name: FindUnprocessedTargetsForTask :many
 select *
@@ -124,10 +132,12 @@ where id = $1;
 
 -- name: AssignProxiesToBotsForTask :exec
 UPDATE bot_accounts
-set res_proxy = x.proxy,
-    status    = 2 -- ProxieAssignedBotStatus
-From (SELECT UNNEST(sqlc.arg(proxies)::jsonb[]) as proxy,
-             UNNEST(sqlc.arg(ids)::uuid[])      as id) x
+set res_proxy  = x.res_proxy,
+    work_proxy = x.cheap_proxy,
+    status     = 2 -- ProxieAssignedBotStatus
+From (SELECT UNNEST(sqlc.arg(residential_proxies)::jsonb[]) as res_proxy,
+             UNNEST(sqlc.arg(cheap_proxies)::jsonb[])       as cheap_proxy,
+             UNNEST(sqlc.arg(ids)::uuid[])                  as id) x
 where bot_accounts.id = x.id
   AND task_id = $1;
 

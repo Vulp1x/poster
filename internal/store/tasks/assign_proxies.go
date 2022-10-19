@@ -42,34 +42,49 @@ func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error
 		return 0, fmt.Errorf("failed to find bot accounts for task: %v", err)
 	}
 
-	proxies, err := q.FindProxiesForTask(ctx, taskID)
+	residentialProxies, err := q.FindResidentialProxiesForTask(ctx, taskID)
 	if err != nil {
 		return 0, fmt.Errorf("failed to find proxiesIds for task: %v", err)
 	}
 
-	// after deleting botAccounts and proxies would have same length
-	botAccounts, proxies, err = s.deleteUnnecessaryRows(ctx, tx, botAccounts, proxies)
+	cheapProxies, err := q.FindResidentialProxiesForTask(ctx, taskID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to find cheap proxies for task: %v", err)
+	}
+
+	// after deleting botAccounts and residentialProxies would have same length
+	botAccounts, residentialProxies, err = s.deleteUnnecessaryRows(ctx, tx, botAccounts, residentialProxies, cheapProxies)
 	if err != nil {
 		return 0, err
 	}
 
 	botIds := domain.Ids(botAccounts)
 	err = q.AssignProxiesToBotsForTask(ctx, dbmodel.AssignProxiesToBotsForTaskParams{
-		TaskID:  taskID,
-		Proxies: domain.Strings(proxies),
-		Ids:     botIds,
+		TaskID:             taskID,
+		ResidentialProxies: domain.Strings(residentialProxies),
+		CheapProxies:       domain.Strings(cheapProxies),
+		Ids:                botIds,
 	})
 	if err != nil {
-		return 0, fmt.Errorf("failed to set bot accounts proxy: %v", err)
+		return 0, fmt.Errorf("failed to set bot accounts cheap proxies: %v", err)
 	}
 
 	err = q.AssignBotsToProxiesForTask(ctx, dbmodel.AssignBotsToProxiesForTaskParams{
 		TaskID: taskID,
-		Ids:    domain.Ids(proxies),
+		Ids:    domain.Ids(residentialProxies),
 		BotIds: botIds,
 	})
 	if err != nil {
-		return 0, fmt.Errorf("failed to set bot accounts proxy: %v", err)
+		return 0, fmt.Errorf("failed to assign bot to residential proxies: %v", err)
+	}
+
+	err = q.AssignBotsToProxiesForTask(ctx, dbmodel.AssignBotsToProxiesForTaskParams{
+		TaskID: taskID,
+		Ids:    domain.Ids(cheapProxies),
+		BotIds: botIds,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("failed to assign bot to cheap proxies: %v", err)
 	}
 
 	err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{Status: dbmodel.ReadyTaskStatus, ID: taskID})
@@ -80,11 +95,16 @@ func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error
 	return len(botIds), tx.Commit(ctx)
 }
 
-func (s *Store) deleteUnnecessaryRows(ctx context.Context, tx dbmodel.Tx, accounts []dbmodel.BotAccount, proxies []dbmodel.Proxy) ([]dbmodel.BotAccount, []dbmodel.Proxy, error) {
+func (s *Store) deleteUnnecessaryRows(
+	ctx context.Context,
+	tx dbmodel.Tx,
+	accounts []dbmodel.BotAccount,
+	residentialProxies, cheapProxies []dbmodel.Proxy,
+) ([]dbmodel.BotAccount, []dbmodel.Proxy, error) {
 	q := dbmodel.New(tx)
 
-	accountsLen, proxiesLen := len(accounts), len(proxies)
-	logger.Infof(ctx, "got %d accounts and %d proxies", accountsLen, proxiesLen)
+	accountsLen, proxiesLen := len(accounts), min(len(residentialProxies), len(cheapProxies))
+	logger.Infof(ctx, "got %d accounts and %d residentialProxies", accountsLen, proxiesLen)
 
 	var remainRows = min(accountsLen, proxiesLen)
 
@@ -92,18 +112,23 @@ func (s *Store) deleteUnnecessaryRows(ctx context.Context, tx dbmodel.Tx, accoun
 	case accountsLen < proxiesLen:
 		// надо удалить лишние прокси из задачи
 
-		rowsToDelete := accountsLen - proxiesLen
-		deletedRowsCount, err := q.DeleteProxiesForTask(ctx, proxiesLastIds(proxies, rowsToDelete))
+		rowsToDelete := 2*accountsLen - len(residentialProxies) - len(cheapProxies)
+		deletedResidentialProxiesCount, err := q.DeleteProxiesForTask(ctx, proxiesLastIds(residentialProxies, rowsToDelete))
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to delete proxies: %v", err)
+			return nil, nil, fmt.Errorf("failed to delete residentialProxies: %v", err)
 		}
 
-		if int(deletedRowsCount) != rowsToDelete {
-			return nil, nil, fmt.Errorf("wanted to delete %d proxies, deleted %d", rowsToDelete, deletedRowsCount)
+		deletedCheapProxiesCount, err := q.DeleteProxiesForTask(ctx, proxiesLastIds(cheapProxies, rowsToDelete))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to delete residentialProxies: %v", err)
+		}
+
+		if int(deletedResidentialProxiesCount+deletedCheapProxiesCount) != rowsToDelete {
+			return nil, nil, fmt.Errorf("wanted to delete %d residentialProxies, deleted %d", rowsToDelete, deletedResidentialProxiesCount)
 		}
 
 	case accountsLen == proxiesLen:
-		return accounts, proxies, nil
+		return accounts, residentialProxies, nil
 
 	case accountsLen > proxiesLen:
 		// надо удалить лишних ботов из задачи
@@ -119,7 +144,7 @@ func (s *Store) deleteUnnecessaryRows(ctx context.Context, tx dbmodel.Tx, accoun
 		}
 	}
 
-	return accounts[:remainRows], proxies[:remainRows], nil
+	return accounts[:remainRows], residentialProxies[:remainRows], nil
 }
 
 // accountsLastIds возвращает список из rowsToDelete последних айдишников
