@@ -40,8 +40,18 @@ type UpdateTaskRequestBody struct {
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
-	// фотография для постов
-	PostImages []string `json:"post_images"`
+	// список фотографий для постов
+	PostImages []string `json:"post_images,post_images"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
 }
 
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
@@ -433,6 +443,36 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 		v.PostImages = make([]string, len(body.PostImages))
 		for i, val := range body.PostImages {
 			v.PostImages[i] = val
+		}
+	}
+	if body.LandingAccounts != nil {
+		v.LandingAccounts = make([]string, len(body.LandingAccounts))
+		for i, val := range body.LandingAccounts {
+			v.LandingAccounts[i] = val
+		}
+	}
+	if body.BotNames != nil {
+		v.BotNames = make([]string, len(body.BotNames))
+		for i, val := range body.BotNames {
+			v.BotNames[i] = val
+		}
+	}
+	if body.BotLastNames != nil {
+		v.BotLastNames = make([]string, len(body.BotLastNames))
+		for i, val := range body.BotLastNames {
+			v.BotLastNames[i] = val
+		}
+	}
+	if body.BotImages != nil {
+		v.BotImages = make([]string, len(body.BotImages))
+		for i, val := range body.BotImages {
+			v.BotImages[i] = val
+		}
+	}
+	if body.BotUrls != nil {
+		v.BotUrls = make([]string, len(body.BotUrls))
+		for i, val := range body.BotUrls {
+			v.BotUrls[i] = val
 		}
 	}
 	v.TaskID = taskID

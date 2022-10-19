@@ -197,6 +197,36 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "post_images")
 			})
 
+			Attribute("landing_accounts", ArrayOf(String), func() {
+				Description("имена аккаунтов, на которых ведем трафик")
+				Meta("struct:tag:json", "landing_accounts")
+			})
+
+			Attribute("bot_names", ArrayOf(String), func() {
+				Description("имена для аккаунтов-ботов")
+				Meta("struct:tag:json", "bot_names")
+			})
+
+			Attribute("bot_last_names", ArrayOf(String), func() {
+				Description("фамилии для аккаунтов-ботов")
+				Meta("struct:tag:json", "bot_last_names")
+			})
+
+			Attribute("bot_images", ArrayOf(String), func() {
+				Description("аватарки для ботов")
+				Meta("struct:tag:json", "bot_images")
+			})
+
+			Attribute("bot_urls", ArrayOf(String), func() {
+				Description("ссылки для описания у ботов")
+				Meta("struct:tag:json", "bot_images")
+			})
+
+			Attribute("post_images", ArrayOf(String), func() {
+				Description("список фотографий для постов")
+				Meta("struct:tag:json", "post_images")
+			})
+
 			Required("token", "task_id")
 		})
 

@@ -255,8 +255,18 @@ type UpdateTaskPayload struct {
 	Title *string
 	// шаблон для подписи под постом
 	TextTemplate *string `json:"text_template"`
-	// фотография для постов
-	PostImages []string `json:"post_images"`
+	// список фотографий для постов
+	PostImages []string `json:"post_images,post_images"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
 }
 
 type UploadError struct {

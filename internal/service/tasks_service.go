@@ -219,7 +219,7 @@ func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskP
 	return task.ToProto(), nil
 }
 
-// получить все задачи для текущего пользователя
+// ListTasks получить все задачи для текущего пользователя
 func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTasksPayload) ([]*tasksservice.Task, error) {
 	logger.Debug(ctx, "starting ListTasks with payload %#v", p)
 
