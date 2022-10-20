@@ -34,7 +34,7 @@ async def user_followers(sessionid: str = Form(...),
 
     for username in usernames:
         try:
-            user: User = cl.user_info_by_username(username)
+            user: User = cl.user_info_by_username_v1(username)
         except UserNotFound:
             logger.warning(f" checking landing account {username}: no client with this user name, skipping it")
             continue

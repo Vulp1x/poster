@@ -86,16 +86,18 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 
 type TaskProgress []dbmodel.GetTaskProgressRow
 
-func (p TaskProgress) ToProto() []*tasksservice.BotsProgress {
-	protos := make([]*tasksservice.BotsProgress, len(p))
+func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
+	// protos := make([]*tasksservice.BotsProgress, len(p))
+	//
+	// for i, row := range p {
+	// 	protos[i] = &tasksservice.BotsProgress{
+	// 		UserName:   row.Username,
+	// 		PostsCount: int(row.PostsCount),
+	// 		Status:     int(row.Status),
+	// 	}
+	// }
+	//
+	// return protos
 
-	for i, row := range p {
-		protos[i] = &tasksservice.BotsProgress{
-			UserName:   row.Username,
-			PostsCount: int(row.PostsCount),
-			Status:     int(row.Status),
-		}
-	}
-
-	return protos
+	return nil
 }

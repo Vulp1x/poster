@@ -92,11 +92,16 @@ where id = $2;
 
 -- name: UpdateTask :exec
 update tasks
-set text_template = $1,
-    title         = $2,
-    images        = $3,
-    updated_at    = now()
-where id = $4;
+set text_template          = $1,
+    title                  = $2,
+    images                 = $3,
+    account_names          = $4,
+    account_last_names     = $5,
+    account_urls           = $6,
+    account_profile_images = $7,
+    landing_accounts       = $8,
+    updated_at             = now()
+where id = $9;
 
 -- name: SaveBotAccounts :copyfrom
 insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)

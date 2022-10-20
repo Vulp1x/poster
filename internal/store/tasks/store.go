@@ -70,7 +70,7 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.Task
 	return progress, nil
 }
 
-func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error) {
+func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...UpdateOption) (domain.Task, error) {
 	tx, err := s.txf(ctx)
 	if err != nil {
 		return domain.Task{}, store.ErrTransactionFail
@@ -93,23 +93,20 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTem
 		return domain.Task{}, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DataUploadedTaskStatus, task.Status)
 	}
 
-	if title != nil {
-		task.Title = *title
-	}
-
-	if textTemplate != nil {
-		task.TextTemplate = *textTemplate
-	}
-
-	if images != nil {
-		task.Images = images
+	for _, opt := range opts {
+		opt(&task)
 	}
 
 	err = q.UpdateTask(ctx, dbmodel.UpdateTaskParams{
-		TextTemplate: task.TextTemplate,
-		Title:        task.Title,
-		Images:       task.Images,
-		ID:           taskID,
+		TextTemplate:         task.TextTemplate,
+		Title:                task.Title,
+		Images:               task.Images,
+		AccountNames:         task.AccountNames,
+		AccountLastNames:     task.AccountLastNames,
+		AccountUrls:          task.AccountUrls,
+		AccountProfileImages: task.AccountProfileImages,
+		LandingAccounts:      task.LandingAccounts,
+		ID:                   taskID,
 	})
 	if err != nil {
 		return domain.Task{}, err
@@ -296,4 +293,71 @@ func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	s.taskMu.Unlock()
 
 	return nil
+}
+
+// UpdateOption позволяет добавить опциональные поля для создания драфтовой задачи
+type UpdateOption func(params *dbmodel.Task)
+
+func WithBotNamesUpdateOption(names []string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(names) != 0 {
+			task.AccountNames = names
+		}
+	}
+}
+
+func WithBotLasNamesUpdateOption(lastNames []string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(lastNames) != 0 {
+			task.AccountLastNames = lastNames
+		}
+	}
+}
+
+func WithBotURLsUpdateOption(urls []string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(urls) != 0 {
+			task.AccountUrls = urls
+		}
+	}
+}
+
+func WithBotImagesUpdateOption(images [][]byte) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(images) != 0 {
+			task.AccountProfileImages = images
+		}
+	}
+}
+
+func WithImagesUpdateOption(images [][]byte) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(images) != 0 {
+			task.Images = images
+		}
+	}
+}
+
+func WithLandingAccountsUpdateOption(landingAccounts []string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if len(landingAccounts) != 0 {
+			task.LandingAccounts = landingAccounts
+		}
+	}
+}
+
+func WithTextTemplateUpdateOption(template *string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if template != nil {
+			task.TextTemplate = *template
+		}
+	}
+}
+
+func WithTitleUpdateOption(title *string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if title != nil {
+			task.Title = *title
+		}
+	}
 }

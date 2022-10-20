@@ -183,9 +183,19 @@ type GetTaskOKResponseBody struct {
 	TargetsFilename *string `json:"targets_filename"`
 }
 
-// GetProgressResponseBody is the type of the "tasks_service" service "get
+// GetProgressOKResponseBody is the type of the "tasks_service" service "get
 // progress" endpoint HTTP response body.
-type GetProgressResponseBody []*BotsProgressResponse
+type GetProgressOKResponseBody struct {
+	// результат работы по каждому боту, ключ- имя бота
+	BotsProgresses map[string]*BotsProgressResponseBody `json:"bots_progresses"`
+	// количество аккаунтов, которых упомянули в постах
+	TargetsNotified int `json:"targets_notified"`
+	// количество аккаунтов, которых не получилось упомянуть, при перезапуске
+	// задачи будут использованы заново
+	TargetsFailed int `json:"targets_failed"`
+	// количество аккаунтов, которых не выбрали для постов
+	TargetsWaiting int `json:"targets_waiting"`
+}
 
 // ListTasksResponseBody is the type of the "tasks_service" service "list
 // tasks" endpoint HTTP response body.
@@ -203,8 +213,8 @@ type UploadErrorResponseBody struct {
 	Reason string `form:"reason" json:"reason" xml:"reason"`
 }
 
-// BotsProgressResponse is used to define fields on response body types.
-type BotsProgressResponse struct {
+// BotsProgressResponseBody is used to define fields on response body types.
+type BotsProgressResponseBody struct {
 	// имя пользователя бота
 	UserName string `json:"user_name"`
 	// количество выложенных постов
@@ -448,12 +458,20 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 	return body
 }
 
-// NewGetProgressResponseBody builds the HTTP response body from the result of
-// the "get progress" endpoint of the "tasks_service" service.
-func NewGetProgressResponseBody(res []*tasksservice.BotsProgress) GetProgressResponseBody {
-	body := make([]*BotsProgressResponse, len(res))
-	for i, val := range res {
-		body[i] = marshalTasksserviceBotsProgressToBotsProgressResponse(val)
+// NewGetProgressOKResponseBody builds the HTTP response body from the result
+// of the "get progress" endpoint of the "tasks_service" service.
+func NewGetProgressOKResponseBody(res *tasksservice.TaskProgress) *GetProgressOKResponseBody {
+	body := &GetProgressOKResponseBody{
+		TargetsNotified: res.TargetsNotified,
+		TargetsFailed:   res.TargetsFailed,
+		TargetsWaiting:  res.TargetsWaiting,
+	}
+	if res.BotsProgresses != nil {
+		body.BotsProgresses = make(map[string]*BotsProgressResponseBody, len(res.BotsProgresses))
+		for key, val := range res.BotsProgresses {
+			tk := key
+			body.BotsProgresses[tk] = marshalTasksserviceBotsProgressToBotsProgressResponseBody(val)
+		}
 	}
 	return body
 }

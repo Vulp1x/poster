@@ -175,7 +175,29 @@ var BotsProgress = Type("BotsProgress", func() {
 	Attribute("posts_count", Int, "количество выложенных постов", func() {
 		Meta("struct:tag:json", "posts_count")
 	})
+
 	Attribute("status", Int, "текущий статус бота, будут ли выкладываться посты")
 
 	Required("user_name", "posts_count", "status")
+})
+
+var TaskProgress = Type("TaskProgress", func() {
+	Attribute("bots_progresses", MapOf(String, BotsProgress), func() {
+		Description("результат работы по каждому боту, ключ- имя бота")
+		Meta("struct:tag:json", "bots_progresses")
+	})
+
+	Attribute("targets_notified", Int, "количество аккаунтов, которых упомянули в постах", func() {
+		Meta("struct:tag:json", "targets_notified")
+	})
+	Attribute("targets_failed", Int, "количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново", func() {
+		Meta("struct:tag:json", "targets_failed")
+	})
+
+	Attribute("targets_waiting", Int, "количество аккаунтов, которых не выбрали для постов", func() {
+		Meta("struct:tag:json", "targets_waiting")
+	})
+
+	Required("bots_progresses", "targets_notified", "targets_failed", "targets_waiting")
+
 })

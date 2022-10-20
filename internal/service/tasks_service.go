@@ -18,7 +18,7 @@ import (
 
 type taskStore interface {
 	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte, opts ...tasks.DraftOption) (uuid.UUID, error)
-	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error)
+	UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...tasks.UpdateOption) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error)
 	StopTask(ctx context.Context, taskID uuid.UUID) error
 	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, cheapProxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
@@ -108,7 +108,7 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 
 	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
-	var imagesDecodedBytes [][]byte
+	var postImagesDecodedBytes [][]byte
 
 	for _, image := range p.PostImages {
 		imageDecodedBytes, err := base64.StdEncoding.DecodeString(image)
@@ -117,10 +117,31 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 			return nil, tasksservice.BadRequest("invalid image")
 		}
 
-		imagesDecodedBytes = append(imagesDecodedBytes, imageDecodedBytes)
+		postImagesDecodedBytes = append(postImagesDecodedBytes, imageDecodedBytes)
 	}
 
-	task, err := s.store.UpdateTask(ctx, taskID, p.Title, p.TextTemplate, imagesDecodedBytes)
+	var botImagesDecodedBytes [][]byte
+
+	for _, image := range p.BotImages {
+		imageDecodedBytes, err := base64.StdEncoding.DecodeString(image)
+		if err != nil {
+			logger.Errorf(ctx, "failed to decode base 64 string: %v", err)
+			return nil, tasksservice.BadRequest("invalid image")
+		}
+
+		botImagesDecodedBytes = append(botImagesDecodedBytes, imageDecodedBytes)
+	}
+
+	task, err := s.store.UpdateTask(ctx, taskID,
+		tasks.WithImagesUpdateOption(postImagesDecodedBytes),
+		tasks.WithTextTemplateUpdateOption(p.TextTemplate),
+		tasks.WithBotImagesUpdateOption(botImagesDecodedBytes),
+		tasks.WithBotLasNamesUpdateOption(p.BotLastNames),
+		tasks.WithBotNamesUpdateOption(p.BotNames),
+		tasks.WithBotURLsUpdateOption(p.BotUrls),
+		tasks.WithLandingAccountsUpdateOption(p.LandingAccounts),
+		tasks.WithTitleUpdateOption(p.Title),
+	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to update task: %v", err)
 		if errors.Is(err, tasks.ErrTaskNotFound) {
@@ -349,7 +370,7 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 	return nil
 }
 
-func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetProgressPayload) ([]*tasksservice.BotsProgress, error) {
+func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetProgressPayload) (*tasksservice.TaskProgress, error) {
 	logger.Infof(ctx, "get progress of task %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {

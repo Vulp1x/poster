@@ -786,9 +786,9 @@ func EncodeGetTaskError(encoder func(context.Context, http.ResponseWriter) goaht
 // tasks_service get progress endpoint.
 func EncodeGetProgressResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.([]*tasksservice.BotsProgress)
+		res, _ := v.(*tasksservice.TaskProgress)
 		enc := encoder(ctx, w)
-		body := NewGetProgressResponseBody(res)
+		body := NewGetProgressOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
@@ -1029,10 +1029,11 @@ func marshalTasksserviceUploadErrorToUploadErrorResponseBody(v *tasksservice.Upl
 	return res
 }
 
-// marshalTasksserviceBotsProgressToBotsProgressResponse builds a value of type
-// *BotsProgressResponse from a value of type *tasksservice.BotsProgress.
-func marshalTasksserviceBotsProgressToBotsProgressResponse(v *tasksservice.BotsProgress) *BotsProgressResponse {
-	res := &BotsProgressResponse{
+// marshalTasksserviceBotsProgressToBotsProgressResponseBody builds a value of
+// type *BotsProgressResponseBody from a value of type
+// *tasksservice.BotsProgress.
+func marshalTasksserviceBotsProgressToBotsProgressResponseBody(v *tasksservice.BotsProgress) *BotsProgressResponseBody {
+	res := &BotsProgressResponseBody{
 		UserName:   v.UserName,
 		PostsCount: v.PostsCount,
 		Status:     v.Status,

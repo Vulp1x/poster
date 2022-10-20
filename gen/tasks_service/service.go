@@ -36,7 +36,7 @@ type Service interface {
 	// получить задачу по id
 	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
 	// получить статус выполнения задачи по id
-	GetProgress(context.Context, *GetProgressPayload) (res []*BotsProgress, err error)
+	GetProgress(context.Context, *GetProgressPayload) (res *TaskProgress, err error)
 	// получить все задачи для текущего пользователя
 	ListTasks(context.Context, *ListTasksPayload) (res []*Task, err error)
 }
@@ -244,6 +244,20 @@ type TaskFileNames struct {
 	CheapProxiesFilename string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename string `json:"targets_filename"`
+}
+
+// TaskProgress is the result type of the tasks_service service get progress
+// method.
+type TaskProgress struct {
+	// результат работы по каждому боту, ключ- имя бота
+	BotsProgresses map[string]*BotsProgress `json:"bots_progresses"`
+	// количество аккаунтов, которых упомянули в постах
+	TargetsNotified int `json:"targets_notified"`
+	// количество аккаунтов, которых не получилось упомянуть, при перезапуске
+	// задачи будут использованы заново
+	TargetsFailed int `json:"targets_failed"`
+	// количество аккаунтов, которых не выбрали для постов
+	TargetsWaiting int `json:"targets_waiting"`
 }
 
 // 1 - задача только создана, нужно загрузить список ботов, прокси и получателей

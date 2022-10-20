@@ -751,18 +751,28 @@ func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) error {
 
 const updateTask = `-- name: UpdateTask :exec
 update tasks
-set text_template = $1,
-    title         = $2,
-    images        = $3,
-    updated_at    = now()
-where id = $4
+set text_template          = $1,
+    title                  = $2,
+    images                 = $3,
+    account_names          = $4,
+    account_last_names     = $5,
+    account_urls           = $6,
+    account_profile_images = $7,
+    landing_accounts       = $8,
+    updated_at             = now()
+where id = $9
 `
 
 type UpdateTaskParams struct {
-	TextTemplate string    `json:"text_template"`
-	Title        string    `json:"title"`
-	Images       [][]byte  `json:"images"`
-	ID           uuid.UUID `json:"id"`
+	TextTemplate         string    `json:"text_template"`
+	Title                string    `json:"title"`
+	Images               [][]byte  `json:"images"`
+	AccountNames         []string  `json:"account_names"`
+	AccountLastNames     []string  `json:"account_last_names"`
+	AccountUrls          []string  `json:"account_urls"`
+	AccountProfileImages [][]byte  `json:"account_profile_images"`
+	LandingAccounts      []string  `json:"landing_accounts"`
+	ID                   uuid.UUID `json:"id"`
 }
 
 func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
@@ -770,6 +780,11 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
 		arg.TextTemplate,
 		arg.Title,
 		arg.Images,
+		arg.AccountNames,
+		arg.AccountLastNames,
+		arg.AccountUrls,
+		arg.AccountProfileImages,
+		arg.LandingAccounts,
 		arg.ID,
 	)
 	return err

@@ -483,7 +483,7 @@ var _ = Service("tasks_service", func() {
 			Required("token", "task_id")
 		})
 
-		Result(ArrayOf(BotsProgress))
+		Result(TaskProgress)
 
 		HTTP(func() {
 			GET("/api/tasks/{task_id}/progress")

@@ -132,11 +132,13 @@ async def auth_add(session_id: str = Body(...),
     followers = cl.user_following(str(cl.user_id), use_cache=False, amount=0)
     followed_count = 0
 
-    logger.info(f"from {len(target_user_ids)} target ids got {len(set(target_user_ids))} unique")
+    if len(followers) > 50:
+        logger.info(f"already got {len(followers)} followers, skipping others")
+        return PlainTextResponse(content=f'got {len(followers)} followings')
 
     for i, user_id in enumerate(target_user_ids):
         if followers.get(str(user_id), None) is not None:
-            logger.debug(f"bot is already a follower of {user_id}")
+            logger.info(f"bot is already a follower of {user_id}")
             followed_count += 1
             continue
 
