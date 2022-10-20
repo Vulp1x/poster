@@ -51,7 +51,7 @@ type UpdateTaskRequestBody struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 }
 
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
@@ -85,7 +85,7 @@ type UpdateTaskOKResponseBody struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
@@ -161,7 +161,7 @@ type GetTaskOKResponseBody struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
@@ -239,7 +239,7 @@ type TaskResponse struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`

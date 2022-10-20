@@ -113,7 +113,7 @@ var Task = Type("Task", func() {
 
 	Attribute("bot_urls", ArrayOf(String), func() {
 		Description("ссылки для описания у ботов")
-		Meta("struct:tag:json", "bot_images")
+		Meta("struct:tag:json", "bot_urls")
 	})
 	Attribute("status", TaskStatus)
 	Attribute("title", String, "название задачи")

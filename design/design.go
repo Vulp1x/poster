@@ -219,7 +219,7 @@ var _ = Service("tasks_service", func() {
 
 			Attribute("bot_urls", ArrayOf(String), func() {
 				Description("ссылки для описания у ботов")
-				Meta("struct:tag:json", "bot_images")
+				Meta("struct:tag:json", "bot_urls")
 			})
 
 			Attribute("post_images", ArrayOf(String), func() {

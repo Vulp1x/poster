@@ -213,7 +213,7 @@ type Task struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 	Status  TaskStatus
 	// название задачи
 	Title string
@@ -290,7 +290,7 @@ type UpdateTaskPayload struct {
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
-	BotUrls []string `json:"bot_images"`
+	BotUrls []string `json:"bot_urls"`
 }
 
 type UploadError struct {
