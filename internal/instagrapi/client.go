@@ -16,7 +16,11 @@ import (
 
 type Client struct {
 	cli              *http.Client
-	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, d time.Duration) error
+	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, opts ...SaveResponseOption) error
+}
+
+func NewClient() *Client {
+	return &Client{cli: transport.InitHTTPClient(), saveResponseFunc: saveResponse}
 }
 
 // CheckLandingAccounts проверяет все аккаунты, на которые ведем трафик, что они живы и у них в профиле есть ссылка
@@ -27,12 +31,12 @@ func (c *Client) CheckLandingAccounts(ctx context.Context, sessionID string, lan
 		"usernames": landingAccountUsernames,
 	}
 
-	resp, err := c.cli.PostForm("http://localhost:8000/check/landings", val)
+	resp, err := c.cli.PostForm("http://localhost:8000/user/check/landings", val)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.saveResponseFunc(ctx, sessionID, resp, time.Since(startedAt))
+	err = c.saveResponseFunc(ctx, sessionID, resp, WithElapsedTime(time.Since(startedAt)), WithReuseResponseBody(true))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
 	}
@@ -58,10 +62,6 @@ func (c *Client) CheckLandingAccounts(ctx context.Context, sessionID string, lan
 	return aliveLandings, nil
 }
 
-func NewClient() *Client {
-	return &Client{cli: transport.InitHTTPClient(), saveResponseFunc: saveResponse}
-}
-
 // MakePost создает новый
 func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error {
 	startedAt := time.Now()
@@ -82,7 +82,7 @@ func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption st
 		return err
 	}
 
-	err = c.saveResponseFunc(ctx, sessionID, resp, time.Since(startedAt))
+	err = c.saveResponseFunc(ctx, sessionID, resp, WithElapsedTime(time.Since(startedAt)))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
 	}
@@ -112,7 +112,39 @@ func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 		return err
 	}
 
-	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp, time.Since(startedAt))
+	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp, WithElapsedTime(time.Since(startedAt)))
+	if err != nil {
+		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
+	}
+
+	return nil
+}
+
+// FollowTargets подписывается на все аккаунты из списка
+func (c *Client) FollowTargets(ctx context.Context, bot domain.BotWithTargets) error {
+	startedAt := time.Now()
+	bodyBytes, err := prepareFollowTargetsBody(bot)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", "http://localhost:8000/auth/follow_targets", bytes.NewReader(bodyBytes))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	resp, err := c.cli.Do(req)
+	if err != nil {
+		return err
+	}
+
+	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp,
+		WithElapsedTime(time.Since(startedAt)),
+	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
 	}

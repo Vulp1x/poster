@@ -18,6 +18,7 @@ type instagrapiClient interface {
 	MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 	CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error)
+	FollowTargets(ctx context.Context, bot domain.BotWithTargets) error
 }
 
 type worker struct {
@@ -76,9 +77,22 @@ func (w *worker) run(ctx context.Context) {
 			continue
 		}
 
+		err = w.cli.FollowTargets(taskCtx, *botWithTargets)
+		if err != nil {
+			logger.Errorf(taskCtx, "failed to follow targets: %v", err)
+
+			err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+			if err != nil {
+				logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+			}
+
+			continue
+		}
+
 		cheapProxy := botWithTargets.ResProxy.PythonString()
 		if botWithTargets.WorkProxy == nil {
 			logger.Warnf(taskCtx, "bot has empty cheap proxy, so using residential for post upload")
+			cheapProxy = botWithTargets.WorkProxy.PythonString()
 		}
 
 		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.StartedBotStatus, ID: botWithTargets.ID})
@@ -191,6 +205,12 @@ func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAc
 
 	if len(aliveLandingAccounts) == 0 {
 		return "", fmt.Errorf("all landing accounts are dead")
+	}
+
+	w.landingAccounts = aliveLandingAccounts
+
+	if len(aliveLandingAccounts) == 1 {
+		return aliveLandingAccounts[0], err
 	}
 
 	return aliveLandingAccounts[rand.Intn(len(aliveLandingAccounts)-1)], nil

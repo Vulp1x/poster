@@ -1064,10 +1064,34 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 			res.PostImages[i] = val
 		}
 	}
-	if v.BotsImages != nil {
-		res.BotsImages = make([]string, len(v.BotsImages))
-		for i, val := range v.BotsImages {
-			res.BotsImages[i] = val
+	if v.LandingAccounts != nil {
+		res.LandingAccounts = make([]string, len(v.LandingAccounts))
+		for i, val := range v.LandingAccounts {
+			res.LandingAccounts[i] = val
+		}
+	}
+	if v.BotNames != nil {
+		res.BotNames = make([]string, len(v.BotNames))
+		for i, val := range v.BotNames {
+			res.BotNames[i] = val
+		}
+	}
+	if v.BotLastNames != nil {
+		res.BotLastNames = make([]string, len(v.BotLastNames))
+		for i, val := range v.BotLastNames {
+			res.BotLastNames[i] = val
+		}
+	}
+	if v.BotImages != nil {
+		res.BotImages = make([]string, len(v.BotImages))
+		for i, val := range v.BotImages {
+			res.BotImages[i] = val
+		}
+	}
+	if v.BotUrls != nil {
+		res.BotUrls = make([]string, len(v.BotUrls))
+		for i, val := range v.BotUrls {
+			res.BotUrls[i] = val
 		}
 	}
 

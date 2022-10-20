@@ -128,27 +128,40 @@ async def auth_add(session_id: str = Body(...),
                    target_user_ids: List[int] = Body(None),
                    clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
     cl: Client = clients.get(session_id)
-    i, user_id = -1, -1
 
     followers = cl.user_following(str(cl.user_id), use_cache=False, amount=0)
-    try:
-        for i, user_id in enumerate(target_user_ids):
-            if user_id in followers:
-                logger.debug(f"bot is already a follower of {user_id}")
-                continue
+    followed_count = 0
 
+    logger.info(f"from {len(target_user_ids)} target ids got {len(set(target_user_ids))} unique")
+
+    for i, user_id in enumerate(target_user_ids):
+        if followers.get(str(user_id), None) is not None:
+            logger.debug(f"bot is already a follower of {user_id}")
+            followed_count += 1
+            continue
+
+        try:
             ok = cl.user_follow(str(user_id))
-            if not ok:
-                logger.warning(f"failed to follow user '{user_id}', followed {i} users, skipping other")
-                break
-            if i > 50:
-                break
-            time.sleep(2)
-    except ChallengeRequired:
-        return PlainTextResponse(status_code=400,
-                                 content=f"after {i} followers got challenge required from user {user_id}")
+            logger.debug(f"user  {user_id}:  {ok}")
 
-    return PlainTextResponse(content=f'got {i} followings')
+        except ChallengeRequired:
+            return PlainTextResponse(status_code=400,
+                                     content=f"after {i} followers got challenge required from user {user_id}")
+        except Exception as e:
+            logger.warning(f"got exception {e} when attempted to follow user {user_id}")
+            continue
+
+        if not ok:
+            logger.warning(
+                f"failed to follow user '{user_id}', followed {followed_count}/{i} users, skipping it")
+            continue
+        followed_count += 1
+
+        if followed_count > 70:
+            break
+        # time.sleep(2)
+
+    return PlainTextResponse(content=f'got {followed_count} followings')
 
 
 @router.get("/settings/get")

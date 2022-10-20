@@ -9,6 +9,6 @@ func InitHTTPClient() *http.Client {
 
 	return &http.Client{
 		Transport: &loggingRoundTripper{Proxied: http.DefaultTransport},
-		Timeout:   50 * time.Second,
+		Timeout:   200 * time.Second,
 	}
 }

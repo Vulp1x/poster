@@ -19,7 +19,7 @@ import (
 type taskStore interface {
 	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte, opts ...tasks.DraftOption) (uuid.UUID, error)
 	UpdateTask(ctx context.Context, taskID uuid.UUID, title, textTemplate *string, images [][]byte) (domain.Task, error)
-	StartTask(ctx context.Context, taskID uuid.UUID) error
+	StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error)
 	StopTask(ctx context.Context, taskID uuid.UUID) error
 	PrepareTask(ctx context.Context, taskID uuid.UUID, botAccounts domain.BotAccounts, proxies domain.Proxies, cheapProxies domain.Proxies, targets domain.TargetUsers, filenames *tasksservice.TaskFileNames) error
 	ForceDelete(ctx context.Context, taskID uuid.UUID) error
@@ -149,7 +149,7 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 
 	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
-	err = s.store.StartTask(ctx, taskID)
+	landingAccounts, err := s.store.StartTask(ctx, taskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to start task: %v", err)
 		if errors.Is(err, tasks.ErrTaskNotFound) {
@@ -164,8 +164,9 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 	}
 
 	return &tasksservice.StartTaskResult{
-		Status: tasksservice.TaskStatus(dbmodel.StartedTaskStatus),
-		TaskID: taskID.String(),
+		Status:          tasksservice.TaskStatus(dbmodel.StartedTaskStatus),
+		TaskID:          taskID.String(),
+		LandingAccounts: landingAccounts,
 	}, nil
 }
 

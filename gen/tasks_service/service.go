@@ -170,6 +170,8 @@ type StartTaskResult struct {
 	Status TaskStatus
 	// id задачи
 	TaskID string `json:"task_id"`
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
 }
 
 // StopTaskPayload is the payload type of the tasks_service service stop task
@@ -202,9 +204,17 @@ type Task struct {
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
-	// список base64 строк с фотографиями для ботов
-	BotsImages []string `json:"bots_images"`
-	Status     TaskStatus
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
+	Status  TaskStatus
 	// название задачи
 	Title string
 	// количество ботов в задаче

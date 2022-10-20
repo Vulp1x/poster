@@ -25,7 +25,11 @@ func (t Task) ToProto() *tasksservice.Task {
 		ID:                         t.ID.String(),
 		TextTemplate:               t.TextTemplate,
 		PostImages:                 images,
-		BotsImages:                 botsProfileImages,
+		LandingAccounts:            t.LandingAccounts,
+		BotNames:                   t.AccountNames,
+		BotLastNames:               t.AccountLastNames,
+		BotImages:                  botsProfileImages,
+		BotUrls:                    t.AccountUrls,
 		Status:                     tasksservice.TaskStatus(t.Status),
 		Title:                      t.Title,
 		BotsNum:                    -1,
@@ -33,8 +37,8 @@ func (t Task) ToProto() *tasksservice.Task {
 		CheapProxiesNum:            -1,
 		TargetsNum:                 -1,
 		BotsFilename:               t.BotsFilename,
-		CheapProxiesFilename:       t.CheapProxiesFilename,
 		ResidentialProxiesFilename: t.ResProxiesFilename,
+		CheapProxiesFilename:       t.CheapProxiesFilename,
 		TargetsFilename:            t.TargetsFilename,
 	}
 }
@@ -70,22 +74,14 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 		botsProfileImages[i] = base64.StdEncoding.EncodeToString(image)
 	}
 
-	return &tasksservice.Task{
-		ID:                         t.ID.String(),
-		TextTemplate:               t.TextTemplate,
-		PostImages:                 images,
-		BotsImages:                 botsProfileImages,
-		Status:                     tasksservice.TaskStatus(t.Status),
-		Title:                      t.Title,
-		BotsNum:                    int(t.BotsCount),
-		ResidentialProxiesNum:      int(t.ResidentialProxiesCount),
-		CheapProxiesNum:            int(t.CheapProxiesCount),
-		TargetsNum:                 int(t.TargetsCount),
-		BotsFilename:               t.BotsFilename,
-		CheapProxiesFilename:       t.CheapProxiesFilename,
-		ResidentialProxiesFilename: t.ResProxiesFilename,
-		TargetsFilename:            t.TargetsFilename,
-	}
+	task := Task(t.Task).ToProto()
+
+	task.BotsNum = int(t.BotsCount)
+	task.ResidentialProxiesNum = int(t.ResidentialProxiesCount)
+	task.CheapProxiesNum = int(t.CheapProxiesCount)
+	task.TargetsNum = int(t.TargetsCount)
+
+	return task
 }
 
 type TaskProgress []dbmodel.GetTaskProgressRow

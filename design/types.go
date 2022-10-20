@@ -65,32 +65,6 @@ var UploadError = Type("UploadError", func() {
 	Required("type", "line", "input", "reason")
 })
 
-//
-// // DeviceSettings defines device headers
-// var DeviceSettings = Type("DeviceSettings", func() {
-// 	Attribute("app_version", String, "app version", func() {
-// 		Meta("struct:tag:json", "app_version")
-// 	})
-// 	Attribute("android_version", Int, "android_version", func() {
-// 		Meta("struct:tag:json", "android_version")
-// 	})
-// 	Attribute("android_release", String, "user agent header", func() {
-// 		Meta("struct:tag:json", "android_release")
-// 	})
-// 	Attribute("dpi", String)
-// 	Attribute("resolution", String)
-// 	Attribute("manufacturer", String)
-// 	Attribute("device", String)
-// 	Attribute("model", String)
-// 	Attribute("cpu", String)
-// 	Attribute("version_code", String, "version", func() {
-// 		Meta("struct:tag:json", "version_code")
-// 	})
-//
-// 	Required("app_version", "android_version", "android_release", "dpi", "resolution", "manufacturer",
-// 		"device", "model", "cpu", "version_code")
-// })
-
 // TaskStatus описывает статус задачи
 var TaskStatus = Type("TaskStatus", Int, func() {
 	Enum(1, 2, 3, 4, 5, 6)
@@ -116,8 +90,30 @@ var Task = Type("Task", func() {
 	Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
 		Meta("struct:tag:json", "post_images")
 	})
-	Attribute("bots_images", ArrayOf(String), "список base64 строк с фотографиями для ботов", func() {
-		Meta("struct:tag:json", "bots_images")
+
+	Attribute("landing_accounts", ArrayOf(String), func() {
+		Description("имена аккаунтов, на которых ведем трафик")
+		Meta("struct:tag:json", "landing_accounts")
+	})
+
+	Attribute("bot_names", ArrayOf(String), func() {
+		Description("имена для аккаунтов-ботов")
+		Meta("struct:tag:json", "bot_names")
+	})
+
+	Attribute("bot_last_names", ArrayOf(String), func() {
+		Description("фамилии для аккаунтов-ботов")
+		Meta("struct:tag:json", "bot_last_names")
+	})
+
+	Attribute("bot_images", ArrayOf(String), func() {
+		Description("аватарки для ботов")
+		Meta("struct:tag:json", "bot_images")
+	})
+
+	Attribute("bot_urls", ArrayOf(String), func() {
+		Description("ссылки для описания у ботов")
+		Meta("struct:tag:json", "bot_images")
 	})
 	Attribute("status", TaskStatus)
 	Attribute("title", String, "название задачи")
@@ -150,7 +146,9 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
-	Required("id", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num", "cheap_proxies_num", "targets_num", "bots_images")
+	Required("id", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num",
+		"cheap_proxies_num", "targets_num", "bot_images", "landing_accounts", "bot_names", "bot_last_names", "bot_urls",
+	)
 })
 
 var TaskFilenames = Type("TaskFileNames", func() {

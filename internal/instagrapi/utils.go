@@ -1,6 +1,7 @@
 package instagrapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -27,7 +28,12 @@ func init() {
 	})
 }
 
-func saveResponse(ctx context.Context, sessionID string, resp *http.Response, elapsed time.Duration) error {
+func saveResponse(ctx context.Context, sessionID string, resp *http.Response, opts ...SaveResponseOption) error {
+	var cfg saveResponseConfig
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
 	startedAt := time.Now()
 	if resp == nil {
 		return fmt.Errorf("empty resp")
@@ -48,8 +54,17 @@ func saveResponse(ctx context.Context, sessionID string, resp *http.Response, el
 		logger.Errorf(ctx, "failed to close response body: %v", err)
 	}
 
-	fields := zap.Fields(
-		zap.String("elapsed_time", elapsed.String()),
+	var fields []zap.Field
+
+	if cfg.elapsed != nil {
+		fields = append(fields, zap.String("elapsed_time", cfg.elapsed.String()))
+	}
+
+	if cfg.reuseBody {
+		resp.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+	}
+
+	fields = append(fields,
 		zap.Int("response_code", resp.StatusCode),
 		zap.Int64("response_len", resp.ContentLength),
 		zap.String("session_id", sessionID),
@@ -62,9 +77,28 @@ func saveResponse(ctx context.Context, sessionID string, resp *http.Response, el
 		accessLogFile,
 		zap.WithCaller(true),
 		zap.AddCallerSkip(1),
-		fields,
+		zap.Fields(fields...),
 	)
 
 	log.Infof("saving response from instagrapi, saving took %s", time.Since(startedAt))
 	return nil
+}
+
+type saveResponseConfig struct {
+	elapsed   *time.Duration
+	reuseBody bool // Нужно ли перезаписать resp.Body, чтобы потом использовать ещё раз
+}
+
+type SaveResponseOption func(config *saveResponseConfig)
+
+func WithElapsedTime(duration time.Duration) SaveResponseOption {
+	return func(config *saveResponseConfig) {
+		config.elapsed = &duration
+	}
+}
+
+func WithReuseResponseBody(reuseBody bool) SaveResponseOption {
+	return func(config *saveResponseConfig) {
+		config.reuseBody = reuseBody
+	}
 }

@@ -63,7 +63,11 @@ type randomGammaGenerator struct {
 }
 
 func (g randomGammaGenerator) Next(ctx context.Context) []byte {
-	randImage := g.images[rand.Intn(len(g.images)-1)]
+	randImage := g.images[0]
+	if len(g.images) > 1 {
+		randImage = g.images[rand.Intn(len(g.images)-1)]
+	}
+
 	filter := gift.New(gift.Gamma(0.8 + rand.Float32()*0.6))
 	dst := image.NewRGBA(filter.Bounds(randImage.Bounds()))
 	filter.Draw(dst, randImage)

@@ -44,8 +44,7 @@ async def photo_upload_post(cl: Client, content, cheap_proxy: str, **kwargs):
         for attempt in range(10):
             cl.logger.debug(f"Attempt #{attempt} to configure Photo: {fp.name}")
             time.sleep(3)
-            data = cl.photo_configure(upload_id, width, height, kwargs['caption'], kwargs['usertags'],
-                                           kwargs['location'], extra_data=kwargs['extra_data'])
+            data = cl.photo_configure(upload_id, width, height, kwargs['caption'], kwargs['usertags'])
             if data:
                 media = cl.last_json.get("media")
                 cl.expose()

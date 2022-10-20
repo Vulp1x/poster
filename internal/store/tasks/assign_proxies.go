@@ -47,7 +47,7 @@ func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error
 		return 0, fmt.Errorf("failed to find proxiesIds for task: %v", err)
 	}
 
-	cheapProxies, err := q.FindResidentialProxiesForTask(ctx, taskID)
+	cheapProxies, err := q.FindCheapProxiesForTask(ctx, taskID)
 	if err != nil {
 		return 0, fmt.Errorf("failed to find cheap proxies for task: %v", err)
 	}

@@ -383,7 +383,12 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
-			Required("task_id", "status")
+			Attribute("landing_accounts", ArrayOf(String), func() {
+				Description("имена живых аккаунтов, на которых ведем трафик")
+				Meta("struct:tag:json", "landing_accounts")
+			})
+
+			Required("task_id", "status", "landing_accounts")
 		})
 
 		HTTP(func() {

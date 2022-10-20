@@ -76,9 +76,17 @@ type UpdateTaskOKResponseBody struct {
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
-	// список base64 строк с фотографиями для ботов
-	BotsImages []string `json:"bots_images"`
-	Status     int      `form:"status" json:"status" xml:"status"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
+	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -124,6 +132,8 @@ type StartTaskOKResponseBody struct {
 	Status int `form:"status" json:"status" xml:"status"`
 	// id задачи
 	TaskID string `json:"task_id"`
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
 }
 
 // StopTaskOKResponseBody is the type of the "tasks_service" service "stop
@@ -142,9 +152,17 @@ type GetTaskOKResponseBody struct {
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
-	// список base64 строк с фотографиями для ботов
-	BotsImages []string `json:"bots_images"`
-	Status     int      `form:"status" json:"status" xml:"status"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
+	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -202,9 +220,17 @@ type TaskResponse struct {
 	TextTemplate string `json:"text_template"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
-	// список base64 строк с фотографиями для ботов
-	BotsImages []string `json:"bots_images"`
-	Status     int      `form:"status" json:"status" xml:"status"`
+	// имена аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+	// имена для аккаунтов-ботов
+	BotNames []string `json:"bot_names"`
+	// фамилии для аккаунтов-ботов
+	BotLastNames []string `json:"bot_last_names"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+	// ссылки для описания у ботов
+	BotUrls []string `json:"bot_images"`
+	Status  int      `form:"status" json:"status" xml:"status"`
 	// название задачи
 	Title string `form:"title" json:"title" xml:"title"`
 	// количество ботов в задаче
@@ -281,10 +307,34 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 			body.PostImages[i] = val
 		}
 	}
-	if res.BotsImages != nil {
-		body.BotsImages = make([]string, len(res.BotsImages))
-		for i, val := range res.BotsImages {
-			body.BotsImages[i] = val
+	if res.LandingAccounts != nil {
+		body.LandingAccounts = make([]string, len(res.LandingAccounts))
+		for i, val := range res.LandingAccounts {
+			body.LandingAccounts[i] = val
+		}
+	}
+	if res.BotNames != nil {
+		body.BotNames = make([]string, len(res.BotNames))
+		for i, val := range res.BotNames {
+			body.BotNames[i] = val
+		}
+	}
+	if res.BotLastNames != nil {
+		body.BotLastNames = make([]string, len(res.BotLastNames))
+		for i, val := range res.BotLastNames {
+			body.BotLastNames[i] = val
+		}
+	}
+	if res.BotImages != nil {
+		body.BotImages = make([]string, len(res.BotImages))
+		for i, val := range res.BotImages {
+			body.BotImages[i] = val
+		}
+	}
+	if res.BotUrls != nil {
+		body.BotUrls = make([]string, len(res.BotUrls))
+		for i, val := range res.BotUrls {
+			body.BotUrls[i] = val
 		}
 	}
 	return body
@@ -323,6 +373,12 @@ func NewStartTaskOKResponseBody(res *tasksservice.StartTaskResult) *StartTaskOKR
 		Status: int(res.Status),
 		TaskID: res.TaskID,
 	}
+	if res.LandingAccounts != nil {
+		body.LandingAccounts = make([]string, len(res.LandingAccounts))
+		for i, val := range res.LandingAccounts {
+			body.LandingAccounts[i] = val
+		}
+	}
 	return body
 }
 
@@ -359,10 +415,34 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 			body.PostImages[i] = val
 		}
 	}
-	if res.BotsImages != nil {
-		body.BotsImages = make([]string, len(res.BotsImages))
-		for i, val := range res.BotsImages {
-			body.BotsImages[i] = val
+	if res.LandingAccounts != nil {
+		body.LandingAccounts = make([]string, len(res.LandingAccounts))
+		for i, val := range res.LandingAccounts {
+			body.LandingAccounts[i] = val
+		}
+	}
+	if res.BotNames != nil {
+		body.BotNames = make([]string, len(res.BotNames))
+		for i, val := range res.BotNames {
+			body.BotNames[i] = val
+		}
+	}
+	if res.BotLastNames != nil {
+		body.BotLastNames = make([]string, len(res.BotLastNames))
+		for i, val := range res.BotLastNames {
+			body.BotLastNames[i] = val
+		}
+	}
+	if res.BotImages != nil {
+		body.BotImages = make([]string, len(res.BotImages))
+		for i, val := range res.BotImages {
+			body.BotImages[i] = val
+		}
+	}
+	if res.BotUrls != nil {
+		body.BotUrls = make([]string, len(res.BotUrls))
+		for i, val := range res.BotUrls {
+			body.BotUrls[i] = val
 		}
 	}
 	return body
