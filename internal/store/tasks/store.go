@@ -62,12 +62,17 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.Task
 			ErrTaskInvalidStatus, dbmodel.StartedTaskStatus, dbmodel.DoneTaskStatus, task.Status)
 	}
 
-	progress, err := q.GetTaskProgress(ctx, taskID)
+	progress, err := q.GetBotsProgress(ctx, taskID)
 	if err != nil {
 		return domain.TaskProgress{}, err
 	}
 
-	return progress, nil
+	targetCounters, err := q.GetTaskTargetsCount(ctx, taskID)
+	if err != nil {
+		return domain.TaskProgress{}, fmt.Errorf("failed to get target counters: %v", err)
+	}
+
+	return domain.TaskProgress{BotsProgress: progress, TargetCounters: targetCounters}, nil
 }
 
 func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...UpdateOption) (domain.Task, error) {

@@ -553,27 +553,27 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 	return i, err
 }
 
-const getTaskProgress = `-- name: GetTaskProgress :many
+const getBotsProgress = `-- name: GetBotsProgress :many
 select username, posts_count, status
 from bot_accounts
 where task_id = $1
 `
 
-type GetTaskProgressRow struct {
+type GetBotsProgressRow struct {
 	Username   string    `json:"username"`
 	PostsCount int16     `json:"posts_count"`
 	Status     botStatus `json:"status"`
 }
 
-func (q *Queries) GetTaskProgress(ctx context.Context, taskID uuid.UUID) ([]GetTaskProgressRow, error) {
-	rows, err := q.db.Query(ctx, getTaskProgress, taskID)
+func (q *Queries) GetBotsProgress(ctx context.Context, taskID uuid.UUID) ([]GetBotsProgressRow, error) {
+	rows, err := q.db.Query(ctx, getBotsProgress, taskID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetTaskProgressRow
+	var items []GetBotsProgressRow
 	for rows.Next() {
-		var i GetTaskProgressRow
+		var i GetBotsProgressRow
 		if err := rows.Scan(&i.Username, &i.PostsCount, &i.Status); err != nil {
 			return nil, err
 		}
@@ -583,6 +583,25 @@ func (q *Queries) GetTaskProgress(ctx context.Context, taskID uuid.UUID) ([]GetT
 		return nil, err
 	}
 	return items, nil
+}
+
+const getTaskTargetsCount = `-- name: GetTaskTargetsCount :one
+select (select count(*) from target_users t where t.task_id = $1 and t.status = 1) as unused_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 3) as failed_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 4) as notified_targets
+`
+
+type GetTaskTargetsCountRow struct {
+	UnusedTargets   int64 `json:"unused_targets"`
+	FailedTargets   int64 `json:"failed_targets"`
+	NotifiedTargets int64 `json:"notified_targets"`
+}
+
+func (q *Queries) GetTaskTargetsCount(ctx context.Context, taskID uuid.UUID) (GetTaskTargetsCountRow, error) {
+	row := q.db.QueryRow(ctx, getTaskTargetsCount, taskID)
+	var i GetTaskTargetsCountRow
+	err := row.Scan(&i.UnusedTargets, &i.FailedTargets, &i.NotifiedTargets)
+	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one

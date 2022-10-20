@@ -22,6 +22,7 @@ func (t TargetUsers) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveTargetUsersPar
 			TaskID:   taskID,
 			Username: target.Username,
 			UserID:   target.UserID,
+			// Status:   dbmodel.UnusedTargetStatus,
 		})
 
 		uniqueMap[target.UserID] = struct{}{}

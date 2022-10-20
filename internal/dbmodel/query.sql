@@ -197,7 +197,19 @@ update target_users
 set status = $1
 where id = ANY (sqlc.arg('ids')::uuid[]);
 
--- name: GetTaskProgress :many
+-- name: GetBotsProgress :many
 select username, posts_count, status
 from bot_accounts
 where task_id = $1;
+
+-- name: GetTaskTargetsCount :one
+select (select count(*) from target_users t where t.task_id = $1 and t.status = 1) as unused_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 3) as failed_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 4) as notified_targets;
+
+
+-- -- name: GetTaskTargetsCount :many
+-- select status, count(*)
+-- from target_users
+-- where task_id = $1
+-- group by status;

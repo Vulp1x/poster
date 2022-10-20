@@ -84,20 +84,25 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 	return task
 }
 
-type TaskProgress []dbmodel.GetTaskProgressRow
+type TaskProgress struct {
+	BotsProgress   []dbmodel.GetBotsProgressRow
+	TargetCounters dbmodel.GetTaskTargetsCountRow
+}
 
 func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
-	// protos := make([]*tasksservice.BotsProgress, len(p))
-	//
-	// for i, row := range p {
-	// 	protos[i] = &tasksservice.BotsProgress{
-	// 		UserName:   row.Username,
-	// 		PostsCount: int(row.PostsCount),
-	// 		Status:     int(row.Status),
-	// 	}
-	// }
-	//
-	// return protos
+	botsMap := make(map[string]*tasksservice.BotsProgress, len(p.BotsProgress))
+	for _, progress := range p.BotsProgress {
+		botsMap[progress.Username] = &tasksservice.BotsProgress{
+			UserName:   progress.Username,
+			PostsCount: int(progress.PostsCount),
+			Status:     int(progress.Status),
+		}
+	}
 
-	return nil
+	return &tasksservice.TaskProgress{
+		BotsProgresses:  botsMap,
+		TargetsNotified: int(p.TargetCounters.NotifiedTargets),
+		TargetsFailed:   int(p.TargetCounters.FailedTargets),
+		TargetsWaiting:  int(p.TargetCounters.UnusedTargets),
+	}
 }
