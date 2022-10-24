@@ -94,6 +94,38 @@ func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption st
 	return nil
 }
 
+// EditProfile редактирует профиль бота
+func (c *Client) EditProfile(ctx context.Context, fullName, sessionID string, image []byte) error {
+	startedAt := time.Now()
+	buf, contentType, err := prepareEditProfileBody(image, sessionID, fullName)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", "http://localhost:8000/user/edit_profile", buf)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	req.Header.Set("Content-Type", contentType)
+
+	resp, err := c.cli.Do(req)
+	if err != nil {
+		return err
+	}
+
+	err = c.saveResponseFunc(ctx, sessionID, resp, WithElapsedTime(time.Since(startedAt)))
+	if err != nil {
+		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
+	}
+
+	return nil
+}
+
 // InitBot создает бота в instagrapi-rest, чтобы потом отправлять от его лица запросы
 func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 	startedAt := time.Now()

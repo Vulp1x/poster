@@ -124,3 +124,49 @@ func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string)
 
 	return buf, mpWriter.FormDataContentType(), nil
 }
+
+func prepareEditProfileBody(image []byte, sessionID, fullName string) (*bytes.Buffer, string, error) {
+	buf := bytes.NewBuffer(nil)
+	mpWriter := multipart.NewWriter(buf)
+
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="IMG_%04d.jpeg"`, rand.Intn(10000)))
+	h.Set("Content-Type", "image/jpeg")
+
+	fileForm, err := mpWriter.CreatePart(h)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create new multipart file part: %v", err)
+	}
+
+	_, err = fileForm.Write(image)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write image to file: %v", err)
+	}
+
+	sessionWriter, err := mpWriter.CreateFormField("sessionid")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field sessionid: %v", err)
+	}
+
+	_, err = sessionWriter.Write([]byte(sessionID))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write session id part: %v", err)
+	}
+
+	captionWriter, err := mpWriter.CreateFormField("full_name")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field fullName: %v", err)
+	}
+
+	_, err = captionWriter.Write([]byte(fullName))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write fullName id part: %v", err)
+	}
+
+	err = mpWriter.Close()
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to close multi-part writer: %v", err)
+	}
+
+	return buf, mpWriter.FormDataContentType(), nil
+}

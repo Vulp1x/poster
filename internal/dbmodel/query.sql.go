@@ -433,7 +433,7 @@ const findUnprocessedTargetsForTask = `-- name: FindUnprocessedTargetsForTask :m
 select id, task_id, username, user_id, status, created_at, updated_at
 from target_users
 where task_id = $1
-  AND status = 0
+  AND status = 1
 limit $2
 `
 

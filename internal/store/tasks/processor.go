@@ -3,7 +3,6 @@ package tasks
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -19,16 +18,16 @@ type instagrapiClient interface {
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 	CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error)
 	FollowTargets(ctx context.Context, bot domain.BotWithTargets) error
+	EditProfile(ctx context.Context, fullName, sessionID string, image []byte) error
 }
 
 type worker struct {
-	botsQueue       chan *domain.BotWithTargets
-	dbtxf           dbmodel.DBTXFunc
-	cli             instagrapiClient
-	task            domain.Task
-	generator       images.Generator
-	processorIndex  int64
-	landingAccounts []string
+	botsQueue      chan *domain.BotWithTargets
+	dbtxf          dbmodel.DBTXFunc
+	cli            instagrapiClient
+	task           domain.Task
+	generator      images.Generator
+	processorIndex int64
 }
 
 const (
@@ -77,17 +76,29 @@ func (w *worker) run(ctx context.Context) {
 			continue
 		}
 
-		err = w.cli.FollowTargets(taskCtx, *botWithTargets)
-		if err != nil {
-			logger.Errorf(taskCtx, "failed to follow targets: %v", err)
-
-			err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+		if len(w.task.AccountProfileImages) > 0 {
+			err = w.cli.EditProfile(
+				taskCtx,
+				"",
+				botWithTargets.Headers.AuthData.SessionID,
+				domain.RandomFromSlice(w.task.AccountProfileImages),
+			)
 			if err != nil {
-				logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+				logger.Errorf(taskCtx, "failed to edit profile: %v", err)
 			}
-
-			continue
 		}
+
+		// err = w.cli.FollowTargets(taskCtx, *botWithTargets)
+		// if err != nil {
+		// 	logger.Errorf(taskCtx, "failed to follow targets: %v", err)
+
+		// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+		// if err != nil {
+		// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+		// }
+		//
+		// continue
+		// }
 
 		cheapProxy := botWithTargets.ResProxy.PythonString()
 		if botWithTargets.WorkProxy == nil {
@@ -182,7 +193,7 @@ type APIResponse struct {
 
 func (w *worker) preparePostCaption(template, landingAccount string, targetUsers []dbmodel.TargetUser) string {
 	b := strings.Builder{}
-	b.WriteString(strings.Replace(template, "@account", landingAccount, 1))
+	b.WriteString(strings.Replace(template, landingAccountPlaceholder, "@"+landingAccount, 1))
 
 	for _, user := range targetUsers {
 		b.WriteByte(' ')
@@ -194,11 +205,11 @@ func (w *worker) preparePostCaption(template, landingAccount string, targetUsers
 }
 
 func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAccount) (string, error) {
-	if len(w.landingAccounts) == 0 {
+	if len(w.task.LandingAccounts) == 0 {
 		return "", fmt.Errorf("empty list of landing accounts")
 	}
 
-	aliveLandingAccounts, err := w.cli.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, w.landingAccounts)
+	aliveLandingAccounts, err := w.cli.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, w.task.LandingAccounts)
 	if err != nil {
 		return "", err
 	}
@@ -207,13 +218,9 @@ func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAc
 		return "", fmt.Errorf("all landing accounts are dead")
 	}
 
-	w.landingAccounts = aliveLandingAccounts
+	w.task.LandingAccounts = aliveLandingAccounts
 
-	if len(aliveLandingAccounts) == 1 {
-		return aliveLandingAccounts[0], err
-	}
-
-	return aliveLandingAccounts[rand.Intn(len(aliveLandingAccounts)-1)], nil
+	return domain.RandomFromSlice(aliveLandingAccounts), nil
 }
 
 // '{"upload_id":"1664888837874","xsharing_nonces":{},"status":"ok"}' webp

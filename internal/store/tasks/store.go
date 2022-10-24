@@ -23,6 +23,7 @@ const workersPerTask = 1
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")
 
+// ErrTaskInvalidStatus переход по статусам не возможен
 var ErrTaskInvalidStatus = errors.New("invalid task status")
 
 func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc) *Store {

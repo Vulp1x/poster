@@ -9,6 +9,7 @@ import (
 	"math/rand"
 
 	"github.com/disintegration/gift"
+	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
@@ -63,10 +64,7 @@ type randomGammaGenerator struct {
 }
 
 func (g randomGammaGenerator) Next(ctx context.Context) []byte {
-	randImage := g.images[0]
-	if len(g.images) > 1 {
-		randImage = g.images[rand.Intn(len(g.images)-1)]
-	}
+	randImage := domain.RandomFromSlice(g.images)
 
 	filter := gift.New(gift.Gamma(0.8 + rand.Float32()*0.6))
 	dst := image.NewRGBA(filter.Bounds(randImage.Bounds()))

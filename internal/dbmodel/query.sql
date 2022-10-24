@@ -81,7 +81,7 @@ where task_id = $1
 select *
 from target_users
 where task_id = $1
-  AND status = 0
+  AND status = 1
 limit $2;
 
 -- name: UpdateTaskStatus :exec

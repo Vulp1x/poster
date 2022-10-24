@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 from typing import Optional, Dict, List
 
 from dependencies import ClientStorage, get_clients
@@ -159,7 +158,7 @@ async def auth_add(session_id: str = Body(...),
             continue
         followed_count += 1
 
-        if followed_count > 70:
+        if followed_count >= 25:
             break
         # time.sleep(2)
 

@@ -177,8 +177,10 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 			return nil, tasksservice.TaskNotFound("")
 		}
 
-		if errors.Is(err, tasks.ErrTaskInvalidStatus) {
-			return nil, tasksservice.BadRequest("invalid status")
+		if errors.Is(err, tasks.ErrTaskInvalidStatus) ||
+			errors.Is(err, tasks.ErrTaskWithEmptyPostImages) ||
+			errors.Is(err, tasks.ErrTaskInvalidTextTemplate) {
+			return nil, tasksservice.BadRequest(err.Error())
 		}
 
 		return nil, tasksservice.InternalError(err.Error())

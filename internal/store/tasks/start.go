@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,6 +16,15 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+const landingAccountPlaceholder = "@account"
+
+// ErrTaskInvalidTextTemplate у задачи нет фотографий для постов
+var ErrTaskInvalidTextTemplate = errors.New("task doesn't have landing account placeholder in text tamplate")
+
+// ErrTaskWithEmptyPostImages у задачи нет фотографий для постов
+var ErrTaskWithEmptyPostImages = errors.New("task doesn't have post images")
+
+// StartTask начинает выполнение задачи
 func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
 
@@ -30,6 +39,14 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 	if task.Status != dbmodel.ReadyTaskStatus {
 		return nil, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
+	}
+
+	if len(task.Images) == 0 {
+		return nil, ErrTaskWithEmptyPostImages
+	}
+
+	if !strings.Contains(task.TextTemplate, landingAccountPlaceholder) {
+		return nil, ErrTaskInvalidTextTemplate
 	}
 
 	imageGenerator, err := images.NewRandomGammaGenerator(task.Images)
@@ -50,7 +67,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
 		TaskID: taskID, Limit: maximumTargetsNum,
 	})
-	if err != nil {
+	if err != nil || len(targets) == 0 {
 		return nil, fmt.Errorf("failed to find targets for task: %v", err)
 	}
 
@@ -62,10 +79,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		bots = bots[:neededBotsNum]
 	}
 
-	randomBot := bots[0]
-	if len(bots) > 1 {
-		randomBot = bots[rand.Intn(len(bots)-1)]
-	}
+	randomBot := domain.RandomFromSlice(bots)
 
 	aliveLandings, err := s.checkAliveLandingAccounts(ctx, randomBot, task.LandingAccounts)
 	if err != nil {
@@ -90,13 +104,12 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 	for i := 0; i < workersPerTask; i++ {
 		postingWorker := &worker{
-			botsQueue:       botsChan,
-			dbtxf:           s.dbtxf,
-			cli:             instagrapi.NewClient(),
-			task:            domain.Task(task),
-			generator:       imageGenerator,
-			processorIndex:  int64(i),
-			landingAccounts: task.LandingAccounts,
+			botsQueue:      botsChan,
+			dbtxf:          s.dbtxf,
+			cli:            instagrapi.NewClient(),
+			task:           domain.Task(task),
+			generator:      imageGenerator,
+			processorIndex: int64(i),
 		}
 
 		go postingWorker.run(taskCtx)

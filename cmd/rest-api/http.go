@@ -55,7 +55,6 @@ func handleHTTPServer(
 
 	mux.Handle("GET", "/docs", swagger.SwaggerUI(opts, nil).ServeHTTP)
 
-	mux.Handle("GET", "/images/{imageID}.jpeg", http.FileServer(http.Dir("./cdn")).ServeHTTP)
 	// Wrap the endpoints with the transport specific layers. The generated
 	// server packages contains code generated from the design which maps
 	// the service input and output data structures to HTTP requests and
@@ -77,12 +76,6 @@ func handleHTTPServer(
 
 		tasksServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
 		tasksServiceServer.Use(httpmdlwr.RequestID())
-		//
-		// locationsServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
-		// locationsServiceServer.Use(httpmdlwr.RequestID())
-		//
-		// adminServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
-		// adminServiceServer.Use(httpmdlwr.RequestID())
 
 		if debug {
 			// authServiceServer.Use(httpmdlwr.RequestLoggerWithDebug(mux, os.Stdout))
@@ -117,28 +110,6 @@ func handleHTTPServer(
 	router.Use(cors.AllowAll().Handler)
 
 	router.Mount("/", mux)
-
-	// // generate a `Certificate` struct
-	// cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	// if err != nil {
-	// 	logger.Fatalf(ctx, "failed to load certs: %v", err)
-	// }
-
-	// Start HTTP server using default configuration, change the code to
-	// configure the server as required by your service.
-
-	// Проверяем, доступен ли cert файл.
-	// err := httpscerts.Check("deploy/cert.pem", "deploy/key.pem")
-	// // Если он недоступен, то генерируем новый.
-	// if err != nil {
-	// 	logger.Warn(ctx, "generating new cert")
-	// 	err = httpscerts.Generate("deploy/cert.pem", "deploy/key.pem", "127.0.0.1:8090")
-	// 	if err != nil {
-	// 		logger.Fatalf(ctx, "ошибка: Не можем сгенерировать https сертификат.: %v", err)
-	// 	}
-	// }
-
-	// srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router, TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}}}
 
 	srv := &http.Server{Addr: fmt.Sprintf("%s:%s", host, port), Handler: router}
 	for _, m := range authServiceServer.Mounts {
