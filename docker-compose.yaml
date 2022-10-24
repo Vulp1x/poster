@@ -48,7 +48,8 @@ services:
       - "8000:8000"
     volumes:
       - ./instagrapi-rest:/app
-
+    networks:
+      - ompnw
 
 
 volumes:
