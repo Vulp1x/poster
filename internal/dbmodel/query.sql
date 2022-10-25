@@ -90,18 +90,25 @@ set status     = $1,
     updated_at = now()
 where id = $2;
 
--- name: UpdateTask :exec
+-- name: UpdateTask :one
 update tasks
-set text_template          = $1,
-    title                  = $2,
-    images                 = $3,
-    account_names          = $4,
-    account_last_names     = $5,
-    account_urls           = $6,
-    account_profile_images = $7,
-    landing_accounts       = $8,
-    updated_at             = now()
-where id = $9;
+set text_template            = $1,
+    title                    = $2,
+    images                   = $3,
+    account_names            = $4,
+    account_last_names       = $5,
+    account_urls             = $6,
+    account_profile_images   = $7,
+    landing_accounts         = $8,
+    follow_targets           = $9,
+    need_photo_tags          = $10,
+    per_post_sleep_seconds   =$11,
+    photo_tags_delay_seconds = $12,
+    posts_per_bot            = $13,
+    targets_per_post         = $14,
+    updated_at               = now()
+where id = $15
+returning *;
 
 -- name: SaveBotAccounts :copyfrom
 insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)

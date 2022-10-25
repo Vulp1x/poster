@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import Optional, Dict, List
 
 from dependencies import ClientStorage, get_clients
@@ -87,7 +88,7 @@ async def auth_add(session_id: str = Body(...),
                    uuids: Uuids = Body(None),
                    device_settings: Optional[DeviceSettings] = Body(None),
                    user_agent: str = Body(...),
-                   proxy: Optional[str] = Body(""),
+                   proxy: str = Body(""),
                    locale: Optional[str] = Body(""),
                    timezone: Optional[str] = Body(""),
                    clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
@@ -96,12 +97,11 @@ async def auth_add(session_id: str = Body(...),
     try:
         cl = clients.get(session_id)
         return cl.sessionid
-    except Exception:
+    except Exception as e:
+        logger.warning(e)
         pass
 
-    cl = clients.client()
-    if proxy != "":
-        cl.set_proxy(proxy)
+    cl = clients.client(proxy=proxy)
 
     if locale != "":
         cl.set_locale(locale)
@@ -140,6 +140,8 @@ async def auth_add(session_id: str = Body(...),
             logger.info(f"bot is already a follower of {user_id}")
             followed_count += 1
             continue
+
+        time.sleep(2)
 
         try:
             ok = cl.user_follow(str(user_id))

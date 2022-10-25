@@ -154,7 +154,13 @@ CREATE TABLE public.tasks (
     stopped_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
-    account_last_names text[]
+    account_last_names text[],
+    follow_targets boolean DEFAULT false NOT NULL,
+    need_photo_tags boolean DEFAULT false NOT NULL,
+    per_post_sleep_seconds integer DEFAULT 0 NOT NULL,
+    photo_tags_delay_seconds integer DEFAULT 0 NOT NULL,
+    posts_per_bot integer DEFAULT 0 NOT NULL,
+    targets_per_post integer DEFAULT 0 NOT NULL
 );
 
 

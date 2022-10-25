@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.post("/check/landings", response_model=List[str])
-async def user_followers(sessionid: str = Form(...),
+async def check_landings(sessionid: str = Form(...),
                          usernames: List[str] = Form(...),
                          clients: ClientStorage = Depends(get_clients)) -> JSONResponse:
     """Get user's followers
