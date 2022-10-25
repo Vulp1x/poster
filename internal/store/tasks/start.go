@@ -11,7 +11,6 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
-	"github.com/inst-api/poster/internal/instagrapi"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/jackc/pgx/v4"
 )
@@ -106,7 +105,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		postingWorker := &worker{
 			botsQueue:      botsChan,
 			dbtxf:          s.dbtxf,
-			cli:            instagrapi.NewClient(),
+			cli:            s.instaClient,
 			task:           domain.Task(task),
 			generator:      imageGenerator,
 			processorIndex: int64(i),

@@ -53,7 +53,8 @@ bin-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.2.0 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/kyleconroy/sqlc/cmd/sqlc@v1.15.0 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/goresed/goresed/cmd/goresed@v0.2.3 && \
-	GOBIN=$(LOCAL_BIN) go install github.com/mikefarah/yq/v4@v4.22.1
+	GOBIN=$(LOCAL_BIN) go install github.com/mikefarah/yq/v4@v4.22.1 && \
+	GOBIN=$(LOCAL_BIN) go install github.com/go-delve/delve/cmd/dlv@v1.9.1
 
 
 

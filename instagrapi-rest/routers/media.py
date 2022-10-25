@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, Body
 
 from typing import List, Dict, Optional
 
@@ -76,12 +76,12 @@ async def media_delete(sessionid: str = Form(...),
 
 
 @router.post("/edit", response_model=Dict)
-async def media_edit(sessionid: str = Form(...),
-                     media_id: str = Form(...),
-                     caption: str = Form(...),
-                     title: Optional[str] = Form(""),
-                     usertags: Optional[List[Usertag]] = Form([]),
-                     location: Optional[Location] = Form(None),
+async def media_edit(sessionid: str = Body(...),
+                     media_id: str = Body(...),
+                     caption: str = Body(...),
+                     title: Optional[str] = Body(""),
+                     usertags: Optional[List[Usertag]] = Body([]),
+                     location: Optional[Location] = Body(None),
                      clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Edit caption for media
     """

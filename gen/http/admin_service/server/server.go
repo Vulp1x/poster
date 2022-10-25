@@ -56,8 +56,8 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"AddManager", "POST", "/api/admin/driver"},
-			{"DropManager", "DELETE", "/api/admin/driver/{manager_id}"},
+			{"AddManager", "POST", "/api/admin/driver/"},
+			{"DropManager", "DELETE", "/api/admin/driver/{manager_id}/"},
 		},
 		AddManager:  NewAddManagerHandler(e.AddManager, mux, decoder, encoder, errhandler, formatter),
 		DropManager: NewDropManagerHandler(e.DropManager, mux, decoder, encoder, errhandler, formatter),
@@ -93,7 +93,7 @@ func MountAddManagerHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/admin/driver", f)
+	mux.Handle("POST", "/api/admin/driver/", f)
 }
 
 // NewAddManagerHandler creates a HTTP handler which loads the HTTP request and
@@ -144,7 +144,7 @@ func MountDropManagerHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/api/admin/driver/{manager_id}", f)
+	mux.Handle("DELETE", "/api/admin/driver/{manager_id}/", f)
 }
 
 // NewDropManagerHandler creates a HTTP handler which loads the HTTP request

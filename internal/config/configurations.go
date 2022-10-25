@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/inst-api/poster/internal/instagrapi"
 	"github.com/inst-api/poster/internal/postgres"
 	"github.com/inst-api/poster/internal/sessions"
 	"github.com/inst-api/poster/pkg/logger"
@@ -24,10 +25,11 @@ const (
 
 // Config represents application configuration.
 type Config struct {
-	Listen   ServerConfig
-	Logger   logger.Configuration   `yaml:"logger"`
-	Postgres postgres.Configuration `yaml:"postgres"`
-	Security sessions.Configuration `yaml:"session"`
+	Listen     ServerConfig
+	Logger     logger.Configuration     `yaml:"logger"`
+	Postgres   postgres.Configuration   `yaml:"postgres"`
+	Security   sessions.Configuration   `yaml:"session"`
+	Instagrapi instagrapi.Configuration `yaml:"instagrapi"`
 }
 
 // ServerConfig represents configuration of server location

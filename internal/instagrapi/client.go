@@ -17,10 +17,11 @@ import (
 type Client struct {
 	cli              *http.Client
 	saveResponseFunc func(ctx context.Context, sessionID string, response *http.Response, opts ...SaveResponseOption) error
+	host             string
 }
 
-func NewClient() *Client {
-	return &Client{cli: transport.InitHTTPClient(), saveResponseFunc: saveResponse}
+func NewClient(host string) *Client {
+	return &Client{cli: transport.InitHTTPClient(), saveResponseFunc: saveResponse, host: host}
 }
 
 // CheckLandingAccounts проверяет все аккаунты, на которые ведем трафик, что они живы и у них в профиле есть ссылка
@@ -31,7 +32,7 @@ func (c *Client) CheckLandingAccounts(ctx context.Context, sessionID string, lan
 		"usernames": landingAccountUsernames,
 	}
 
-	resp, err := c.cli.PostForm("http://0.0.0.0:8000/user/check/landings", val)
+	resp, err := c.cli.PostForm(c.host+"/user/check/landings", val)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +71,7 @@ func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption st
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "http://0.0.0.0:8000/photo/upload", buf)
+	req, err := http.NewRequest("POST", c.host+"/photo/upload", buf)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -102,7 +103,7 @@ func (c *Client) EditProfile(ctx context.Context, fullName, sessionID string, im
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "http://0.0.0.0:8000/user/edit_profile", buf)
+	req, err := http.NewRequest("POST", c.host+"/user/edit_profile", buf)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -134,7 +135,7 @@ func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "http://0.0.0.0:8000/auth/add", bytes.NewReader(bodyBytes))
+	req, err := http.NewRequest("POST", c.host+"/auth/add", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -164,7 +165,7 @@ func (c *Client) FollowTargets(ctx context.Context, bot domain.BotWithTargets) e
 		return err
 	}
 
-	req, err := http.NewRequest("POST", "http://0.0.0.0:8000/auth/follow_targets", bytes.NewReader(bodyBytes))
+	req, err := http.NewRequest("POST", c.host+"/auth/follow_targets", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}

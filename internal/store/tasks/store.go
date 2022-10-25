@@ -26,7 +26,7 @@ var ErrTaskNotFound = errors.New("task not found")
 // ErrTaskInvalidStatus переход по статусам не возможен
 var ErrTaskInvalidStatus = errors.New("invalid task status")
 
-func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc) *Store {
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string) *Store {
 	return &Store{
 		tasksChan:   make(chan domain.Task, 10),
 		taskCancels: make(map[uuid.UUID]func()),
@@ -34,7 +34,7 @@ func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.T
 		dbtxf:       dbtxFunc,
 		txf:         txFunc,
 		taskMu:      &sync.Mutex{},
-		instaClient: instagrapi.NewClient(),
+		instaClient: instagrapi.NewClient(instagrapiHost),
 	}
 }
 

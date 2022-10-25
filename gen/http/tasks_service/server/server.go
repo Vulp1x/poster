@@ -70,15 +70,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"CreateTaskDraft", "POST", "/api/tasks/draft"},
+			{"CreateTaskDraft", "POST", "/api/tasks/draft/"},
 			{"UpdateTask", "PUT", "/api/tasks/{task_id}/"},
-			{"UploadFiles", "POST", "/api/tasks/{task_id}/upload"},
-			{"AssignProxies", "POST", "/api/tasks/{task_id}/assign"},
-			{"ForceDelete", "DELETE", "/api/tasks/{task_id}/force"},
-			{"StartTask", "POST", "/api/tasks/{task_id}/start"},
-			{"StopTask", "POST", "/api/tasks/{task_id}/stop"},
+			{"UploadFiles", "POST", "/api/tasks/{task_id}/upload/"},
+			{"AssignProxies", "POST", "/api/tasks/{task_id}/assign/"},
+			{"ForceDelete", "DELETE", "/api/tasks/{task_id}/force/"},
+			{"StartTask", "POST", "/api/tasks/{task_id}/start/"},
+			{"StopTask", "POST", "/api/tasks/{task_id}/stop/"},
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
-			{"GetProgress", "GET", "/api/tasks/{task_id}/progress"},
+			{"GetProgress", "GET", "/api/tasks/{task_id}/progress/"},
 			{"ListTasks", "GET", "/api/tasks/"},
 		},
 		CreateTaskDraft: NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
@@ -139,7 +139,7 @@ func MountCreateTaskDraftHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/draft", f)
+	mux.Handle("POST", "/api/tasks/draft/", f)
 }
 
 // NewCreateTaskDraftHandler creates a HTTP handler which loads the HTTP
@@ -241,7 +241,7 @@ func MountUploadFilesHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/{task_id}/upload", f)
+	mux.Handle("POST", "/api/tasks/{task_id}/upload/", f)
 }
 
 // NewUploadFilesHandler creates a HTTP handler which loads the HTTP request
@@ -292,7 +292,7 @@ func MountAssignProxiesHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/{task_id}/assign", f)
+	mux.Handle("POST", "/api/tasks/{task_id}/assign/", f)
 }
 
 // NewAssignProxiesHandler creates a HTTP handler which loads the HTTP request
@@ -343,7 +343,7 @@ func MountForceDeleteHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/api/tasks/{task_id}/force", f)
+	mux.Handle("DELETE", "/api/tasks/{task_id}/force/", f)
 }
 
 // NewForceDeleteHandler creates a HTTP handler which loads the HTTP request
@@ -394,7 +394,7 @@ func MountStartTaskHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/{task_id}/start", f)
+	mux.Handle("POST", "/api/tasks/{task_id}/start/", f)
 }
 
 // NewStartTaskHandler creates a HTTP handler which loads the HTTP request and
@@ -445,7 +445,7 @@ func MountStopTaskHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/tasks/{task_id}/stop", f)
+	mux.Handle("POST", "/api/tasks/{task_id}/stop/", f)
 }
 
 // NewStopTaskHandler creates a HTTP handler which loads the HTTP request and
@@ -547,7 +547,7 @@ func MountGetProgressHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/api/tasks/{task_id}/progress", f)
+	mux.Handle("GET", "/api/tasks/{task_id}/progress/", f)
 }
 
 // NewGetProgressHandler creates a HTTP handler which loads the HTTP request

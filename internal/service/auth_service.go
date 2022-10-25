@@ -36,7 +36,6 @@ type AuthServicesrvc struct {
 
 // NewAuthService returns the auth_service service implementation.
 func NewAuthService(userStore userStore, cfg sessions.Configuration) *AuthServicesrvc {
-
 	return &AuthServicesrvc{securityCfg: cfg, store: userStore}
 }
 

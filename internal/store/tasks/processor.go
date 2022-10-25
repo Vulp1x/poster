@@ -88,17 +88,17 @@ func (w *worker) run(ctx context.Context) {
 			}
 		}
 
-		// err = w.cli.FollowTargets(taskCtx, *botWithTargets)
-		// if err != nil {
-		// 	logger.Errorf(taskCtx, "failed to follow targets: %v", err)
+		err = w.cli.FollowTargets(taskCtx, *botWithTargets)
+		if err != nil {
+			logger.Errorf(taskCtx, "failed to follow targets: %v", err)
 
-		// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
-		// if err != nil {
-		// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
-		// }
-		//
-		// continue
-		// }
+			// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+			// if err != nil {
+			// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+			// }
+			//
+			// continue
+		}
 
 		cheapProxy := botWithTargets.ResProxy.PythonString()
 		if botWithTargets.WorkProxy == nil {
@@ -110,6 +110,13 @@ func (w *worker) run(ctx context.Context) {
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to set bot status to 'started': %v", err)
 			continue
+		}
+
+		landingAccount, err := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
+		if err != nil {
+			logger.Errorf(taskCtx, "failed to select alive landing account: %v", err)
+
+			break
 		}
 
 		var (
@@ -127,13 +134,6 @@ func (w *worker) run(ctx context.Context) {
 
 			targetsBatch := botWithTargets.Targets[i*targetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
-
-			landingAccount, err := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
-			if err != nil {
-				logger.Errorf(taskCtx, "failed to select alive landing account: %v", err)
-
-				break
-			}
 
 			caption := w.preparePostCaption(w.task.TextTemplate, landingAccount, targetsBatch)
 
@@ -179,6 +179,7 @@ func (w *worker) run(ctx context.Context) {
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 		}
+
 	}
 
 	logger.Infof(ctx, "bots queue closed, stopping worker")

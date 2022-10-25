@@ -6,7 +6,7 @@ servers:
   - url: /
     description: Default server for rest-api
 paths:
-  /api/admin/driver:
+  /api/admin/driver/:
     post:
       tags:
         - admin_service
@@ -57,7 +57,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/admin/driver/{manager_id}:
+  /api/admin/driver/{manager_id}/:
     delete:
       tags:
         - admin_service
@@ -970,7 +970,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/assign:
+  /api/tasks/{task_id}/assign/:
     post:
       tags:
         - tasks_service
@@ -1027,7 +1027,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/force:
+  /api/tasks/{task_id}/force/:
     delete:
       tags:
         - tasks_service
@@ -1067,7 +1067,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/progress:
+  /api/tasks/{task_id}/progress/:
     get:
       tags:
         - tasks_service
@@ -1134,7 +1134,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/start:
+  /api/tasks/{task_id}/start/:
     post:
       tags:
         - tasks_service
@@ -1193,7 +1193,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/stop:
+  /api/tasks/{task_id}/stop/:
     post:
       tags:
         - tasks_service
@@ -1249,7 +1249,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/{task_id}/upload:
+  /api/tasks/{task_id}/upload/:
     post:
       tags:
         - tasks_service
@@ -1390,7 +1390,7 @@ paths:
         - jwt_header_Authorization:
             - driver
             - admin
-  /api/tasks/draft:
+  /api/tasks/draft/:
     post:
       tags:
         - tasks_service

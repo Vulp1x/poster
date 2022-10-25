@@ -159,7 +159,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/draft")
+			POST("/api/tasks/draft/")
 			// Use Authorization header to provide basic auth value.
 			Response(StatusOK)
 			Response(StatusNotFound)
@@ -278,7 +278,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/{task_id}/upload")
+			POST("/api/tasks/{task_id}/upload/")
 			MultipartRequest()
 			// Use Authorization header to provide basic auth value.
 			Response(StatusOK)
@@ -321,7 +321,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/{task_id}/assign")
+			POST("/api/tasks/{task_id}/assign/")
 			Response(StatusOK)
 			Response(StatusBadRequest)
 			Response(StatusNotFound)
@@ -348,7 +348,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			DELETE("/api/tasks/{task_id}/force")
+			DELETE("/api/tasks/{task_id}/force/")
 			Response(StatusOK)
 			Response(StatusBadRequest)
 			Response(StatusNotFound)
@@ -392,7 +392,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/{task_id}/start")
+			POST("/api/tasks/{task_id}/start/")
 			Response(StatusOK)
 			Response(StatusBadRequest)
 			Response(StatusNotFound)
@@ -429,7 +429,7 @@ var _ = Service("tasks_service", func() {
 		})
 
 		HTTP(func() {
-			POST("/api/tasks/{task_id}/stop")
+			POST("/api/tasks/{task_id}/stop/")
 			Response(StatusOK)
 			Response(StatusBadRequest)
 			Response(StatusNotFound)
@@ -486,7 +486,7 @@ var _ = Service("tasks_service", func() {
 		Result(TaskProgress)
 
 		HTTP(func() {
-			GET("/api/tasks/{task_id}/progress")
+			GET("/api/tasks/{task_id}/progress/")
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response(StatusUnauthorized)
@@ -555,7 +555,7 @@ var _ = Service("admin_service", func() {
 		Error("invalid-scopes", String, "Token scopes are invalid")
 
 		HTTP(func() {
-			POST("api/admin/driver")
+			POST("api/admin/driver/")
 			Response(StatusOK)
 			Response("invalid-scopes", StatusForbidden)
 		})
@@ -585,7 +585,7 @@ var _ = Service("admin_service", func() {
 		Error("invalid-scopes", String, "Token scopes are invalid")
 
 		HTTP(func() {
-			DELETE("api/admin/driver/{manager_id}")
+			DELETE("api/admin/driver/{manager_id}/")
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response("invalid-scopes", StatusForbidden)

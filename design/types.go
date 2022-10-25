@@ -198,6 +198,10 @@ var TaskProgress = Type("TaskProgress", func() {
 		Meta("struct:tag:json", "targets_waiting")
 	})
 
+	Attribute("targets_waiting", Int, "количество аккаунтов, которых не выбрали для постов", func() {
+		Meta("struct:tag:json", "targets_waiting")
+	})
+
 	Required("bots_progresses", "targets_notified", "targets_failed", "targets_waiting")
 
 })

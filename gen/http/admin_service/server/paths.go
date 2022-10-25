@@ -13,10 +13,10 @@ import (
 
 // AddManagerAdminServicePath returns the URL path to the admin_service service add_manager HTTP endpoint.
 func AddManagerAdminServicePath() string {
-	return "/api/admin/driver"
+	return "/api/admin/driver/"
 }
 
 // DropManagerAdminServicePath returns the URL path to the admin_service service drop_manager HTTP endpoint.
 func DropManagerAdminServicePath(managerID string) string {
-	return fmt.Sprintf("/api/admin/driver/%v", managerID)
+	return fmt.Sprintf("/api/admin/driver/%v/", managerID)
 }

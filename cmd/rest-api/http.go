@@ -62,9 +62,6 @@ func handleHTTPServer(
 	var (
 		authServiceServer  *authservicesvr.Server
 		tasksServiceServer *tasksservicesvr.Server
-		// routesServiceServer    *routesservicesvr.Server
-		// locationsServiceServer *locationsservicesvr.Server
-		// adminServiceServer     *adminservicesvr.Server
 	)
 	{
 		eh := errorHandler()

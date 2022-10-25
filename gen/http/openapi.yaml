@@ -12,7 +12,7 @@ produces:
   - application/xml
   - application/gob
 paths:
-  /api/admin/driver:
+  /api/admin/driver/:
     post:
       tags:
         - admin_service
@@ -60,7 +60,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/admin/driver/{manager_id}:
+  /api/admin/driver/{manager_id}/:
     delete:
       tags:
         - admin_service
@@ -346,7 +346,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/assign:
+  /api/tasks/{task_id}/assign/:
     post:
       tags:
         - tasks_service
@@ -393,7 +393,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/force:
+  /api/tasks/{task_id}/force/:
     delete:
       tags:
         - tasks_service
@@ -434,7 +434,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/progress:
+  /api/tasks/{task_id}/progress/:
     get:
       tags:
         - tasks_service
@@ -482,7 +482,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/start:
+  /api/tasks/{task_id}/start/:
     post:
       tags:
         - tasks_service
@@ -529,7 +529,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/stop:
+  /api/tasks/{task_id}/stop/:
     post:
       tags:
         - tasks_service
@@ -575,7 +575,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/{task_id}/upload:
+  /api/tasks/{task_id}/upload/:
     post:
       tags:
         - tasks_service
@@ -634,7 +634,7 @@ paths:
         - http
       security:
         - jwt_header_Authorization: []
-  /api/tasks/draft:
+  /api/tasks/draft/:
     post:
       tags:
         - tasks_service

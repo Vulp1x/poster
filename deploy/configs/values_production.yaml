@@ -20,6 +20,8 @@ postgres:
   ssl mode: disable
   migrations dir: migrations
   pg-dsn: "postgres://docker:dN5mYdDVKbuyq6ry@postgres:5432/insta_poster?sslmode=disable&timezone=utc"
+instagrapi:
+  hostname: 'http://api:8000'
 session:
   JWT signing key: "simple route is the best routing soft ever"
   token validness duration: 24h
