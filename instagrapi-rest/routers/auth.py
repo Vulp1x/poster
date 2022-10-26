@@ -101,7 +101,7 @@ async def auth_add(session_id: str = Body(...),
         logger.warning(e)
         pass
 
-    cl = clients.client(proxy=proxy)
+    cl: Client = clients.client(proxy)
 
     if locale != "":
         cl.set_locale(locale)
@@ -175,21 +175,21 @@ async def settings_get(sessionid: str,
     cl = clients.get(sessionid)
     return cl.get_settings()
 
-
-@router.post("/settings/set")
-async def settings_set(settings: str = Form(...),
-                       sessionid: Optional[str] = Form(""),
-                       clients: ClientStorage = Depends(get_clients)) -> str:
-    """Set client's settings
-    """
-    if sessionid != "":
-        cl = clients.get(sessionid)
-    else:
-        cl = clients.client()
-    cl.set_settings(json.loads(settings))
-    cl.expose()
-    clients.set(cl)
-    return cl.sessionid
+#
+# @router.post("/settings/set")
+# async def settings_set(settings: str = Form(...),
+#                        sessionid: Optional[str] = Form(""),
+#                        clients: ClientStorage = Depends(get_clients)) -> str:
+#     """Set client's settings
+#     """
+#     if sessionid != "":
+#         cl = clients.get(sessionid)
+#     else:
+#         cl = clients.client()
+#     cl.set_settings(json.loads(settings))
+#     cl.expose()
+#     clients.set(cl)
+#     return cl.sessionid
 
 
 @router.get("/timeline_feed")

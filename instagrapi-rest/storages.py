@@ -8,7 +8,7 @@ from tinydb import TinyDB, Query
 class ClientStorage:
     db = TinyDB('./db.json')
 
-    def client(self):
+    def client(self, proxy: str):
         """Get new client (helper)
         """
         cl = Client()
