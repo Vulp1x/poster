@@ -1,10 +1,11 @@
 # Custom Logger Using Loguru
 
+import json
 import logging
 import sys
 from pathlib import Path
+
 from loguru import logger
-import json
 
 
 class InterceptHandler(logging.Handler):
@@ -23,14 +24,14 @@ class InterceptHandler(logging.Handler):
         except AttributeError:
             level = self.loglevel_mapping[record.levelno]
 
-        frame, depth = logging.currentframe(), 2
-        while frame.f_code.co_filename == logging.__file__:
-            frame = frame.f_back
-            depth += 1
+        # frame, depth = logging.currentframe(), 2
+        # while frame.f_code.co_filename == logging.__file__:
+        #     frame = frame.f_back
+        #     depth += 1
 
         log = logger.bind(request_id='app')
         log.opt(
-            depth=depth,
+            depth=4,
             exception=record.exc_info
         ).log(level, record.getMessage())
 
@@ -49,6 +50,7 @@ class CustomizeLogger:
             rotation=logging_config.get('rotation'),
             format=logging_config.get('format')
         )
+
         return logger
 
     @classmethod
@@ -63,8 +65,8 @@ class CustomizeLogger:
         logger.add(
             sys.stdout,
             enqueue=True,
-            backtrace=True,
-            level=level.upper(),
+            backtrace=False,
+            level='TRACE',
             format=format
         )
         logger.add(
@@ -76,16 +78,19 @@ class CustomizeLogger:
             level=level.upper(),
             format=format
         )
-        logging.basicConfig(handlers=[InterceptHandler()], level=0)
+        logging.basicConfig(handlers=[InterceptHandler()], level=10, force=True)
         logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
-        for _log in ['uvicorn',
-                     'uvicorn.error',
-                     'fastapi'
-                     ]:
+
+        # _logger = logging.getLogger('public_request')
+        # _logger.setLevel('ERROR')
+        _logger = logging.getLogger('public_request')
+        _logger.handlers = [InterceptHandler()]
+
+        for _log in ['uvicorn', 'uvicorn.error']:
             _logger = logging.getLogger(_log)
             _logger.handlers = [InterceptHandler()]
 
-        return logger.bind(request_id=None, method=None)
+        return logger.bind(method=None, user_id=None)
 
     @classmethod
     def load_logging_config(cls, config_path):

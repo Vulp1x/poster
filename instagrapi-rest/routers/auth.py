@@ -1,10 +1,13 @@
-import json
 import logging
 import time
+from pathlib import Path
 from typing import Optional, Dict, List
 
+# noinspection PyUnresolvedReferences
+from custom_logging import CustomizeLogger
+# noinspection PyUnresolvedReferences
 from dependencies import ClientStorage, get_clients
-from fastapi import APIRouter, Depends, Form, Body
+from fastapi import APIRouter, Depends, Body
 from instagrapi import Client
 from instagrapi.exceptions import ChallengeRequired
 from pydantic import BaseModel
@@ -16,7 +19,8 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-logger = logging.getLogger(__name__)
+config_path = Path(__file__).parent.with_name("logging_config.json")
+logger = CustomizeLogger.make_logger(config_path)
 
 """
 {
@@ -96,7 +100,7 @@ async def auth_add(session_id: str = Body(...),
     """
     try:
         cl = clients.get(session_id)
-        return cl.sessionid
+        return PlainTextResponse(cl.sessionid)
     except Exception as e:
         logger.warning(e)
         pass
@@ -115,11 +119,11 @@ async def auth_add(session_id: str = Body(...),
 
     result = cl.login_by_sessionid(session_id)
     if not result:
-        return result
+        return PlainTextResponse(result)
 
     clients.set(cl)
 
-    return cl.sessionid
+    return PlainTextResponse(cl.sessionid)
 
 
 @router.post("/follow_targets")
@@ -174,6 +178,7 @@ async def settings_get(sessionid: str,
     """
     cl = clients.get(sessionid)
     return cl.get_settings()
+
 
 #
 # @router.post("/settings/set")

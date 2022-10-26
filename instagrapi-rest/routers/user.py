@@ -1,9 +1,11 @@
-import logging
 import tempfile
 from pathlib import Path
 from typing import List, Optional
 
 import instagrapi.exceptions
+# noinspection PyUnresolvedReferences
+from custom_logging import CustomizeLogger
+# noinspection PyUnresolvedReferences
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from instagrapi import Client
@@ -19,7 +21,8 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-logger = logging.getLogger(__name__)
+config_path = Path(__file__).parent.with_name("logging_config.json")
+logger = CustomizeLogger.make_logger(config_path)
 
 
 @router.post("/check/landings", response_model=List[str])
@@ -38,18 +41,20 @@ async def check_landings(sessionid: str = Form(...),
     if len(usernames) == 1:
         usernames = usernames[0].split(',')
 
-    for username in usernames:
-        try:
-            user: User = cl.user_info_by_username_v1(username)
-        except UserNotFound:
-            logger.warning(f" checking landing account {username}: no client with this user name, skipping it")
-            continue
+    # log_: loguru.Logger = logging.getLogger("private_request")
+    with logger.contextualize(user_id=cl.user_id):
+        for username in usernames:
+            try:
+                user: User = cl.user_info_by_username_v1(username)
+            except UserNotFound:
+                logger.warning(f" checking landing account {username}: no client with this user name, skipping it")
+                continue
 
-        if not user.external_url:
-            logger.warning(f" checking landing account {username}: got empty external link ")
-            continue
+            if not user.external_url:
+                logger.warning(f" checking landing account {username}: got empty external link ")
+                continue
 
-        checked_landing_accounts.append(user.username)
+            checked_landing_accounts.append(user.username)
 
     return JSONResponse(checked_landing_accounts)
 

@@ -17,7 +17,6 @@ idna==3.4
 imageio==2.9.0
 imageio-ffmpeg==0.4.7
 iniconfig==1.1.1
-instagrapi==1.16.29
 ipdb==0.13.9
 ipython==8.5.0
 jedi==0.18.1
@@ -38,7 +37,7 @@ pudb==2021.1
 pure-eval==0.2.2
 py==1.11.0
 pycryptodomex==3.15.0
-pydantic==1.9.2
+pydantic==1.10.2
 Pygments==2.13.0
 pyparsing==3.0.9
 PySocks==1.7.1

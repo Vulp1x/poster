@@ -1,11 +1,13 @@
+import uuid
 from pathlib import Path
 
 import pkg_resources
 import uvicorn
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.openapi.utils import get_openapi
+from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
+from starlette.types import Message
 
 from custom_logging import CustomizeLogger
 from routers import (
@@ -14,21 +16,76 @@ from routers import (
     insights
 )
 
+
+# sys.tracebacklimit = 6
+
+
+async def set_body(request: Request, body: bytes):
+    async def receive() -> Message:
+        return {"type": "http.request", "body": body}
+
+    request._receive = receive
+
+
+async def get_body(request: Request) -> bytes:
+    body = await request.body()
+    await set_body(request, body)
+
+    return body
+
+
+async def logging_dependency(request: Request):
+    logger.debug(f"{request.method} {request.url} started")
+    # logger.debug(f"{request.method} {request.url} body: {await get_body(request)}")
+
+
 config_path = Path(__file__).with_name("logging_config.json")
 
 app = FastAPI()
 logger = CustomizeLogger.make_logger(config_path)
 app.logger = logger
-app.include_router(auth.router)
-app.include_router(media.router)
-app.include_router(video.router)
-app.include_router(photo.router)
-app.include_router(user.router)
-app.include_router(igtv.router)
-app.include_router(clip.router)
-app.include_router(album.router)
-app.include_router(story.router)
-app.include_router(insights.router)
+app.include_router(auth.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(media.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(video.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(photo.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(user.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(igtv.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(clip.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(album.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(story.router, dependencies=[Depends(logging_dependency)])
+
+app.include_router(insights.router, dependencies=[Depends(logging_dependency)])
+
+
+@app.middleware("http")
+async def request_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID")
+    if request_id is None:
+        request_id = str(uuid.uuid4())
+
+    with logger.contextualize(request_id=request_id):
+        try:
+            response = await call_next(request)
+            response.headers["X-Request-ID"] = request_id
+            return response
+
+        except Exception as ex:
+            logger.exception(f"Request failed: {ex}")
+            response = JSONResponse({
+                "detail": str(ex),
+                "exc_type": str(type(ex).__name__)
+            }, status_code=500)
+
+            response.headers["X-Request-ID"] = request_id
+            return response
 
 
 @app.get("/", tags=["system"], summary="Redirect to /docs")
@@ -50,12 +107,12 @@ async def version():
     return versions
 
 
-@app.exception_handler(Exception)
-async def handle_exception(request, exc: Exception):
-    return JSONResponse({
-        "detail": str(exc),
-        "exc_type": str(type(exc).__name__)
-    }, status_code=500)
+# @app.exception_handler(Exception)
+# async def handle_exception(request, exc: Exception):
+#     return JSONResponse({
+#         "detail": str(exc),
+#         "exc_type": str(type(exc).__name__)
+#     }, status_code=500)
 
 
 def custom_openapi():

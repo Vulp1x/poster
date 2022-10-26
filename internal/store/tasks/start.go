@@ -30,6 +30,9 @@ var ErrTaskWithEmptyTargetsPerPost = errors.New("task have 0 targets per post")
 // ErrTaskWithEmptyPostsPerBot у задачи нет фотографий для постов
 var ErrTaskWithEmptyPostsPerBot = errors.New("task have 0 posts per bot")
 
+// ErrTaskWithEmptyLandingAccounts у задачи нет фотографий для постов
+var ErrTaskWithEmptyLandingAccounts = errors.New("task have 0 landing accounts")
+
 // StartTask начинает выполнение задачи
 func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
@@ -142,6 +145,10 @@ func validateTaskBeforeStart(task dbmodel.Task) error {
 
 	if task.PostsPerBot == 0 {
 		return ErrTaskWithEmptyPostsPerBot
+	}
+
+	if len(task.LandingAccounts) == 0 {
+		return ErrTaskWithEmptyLandingAccounts
 	}
 
 	return nil

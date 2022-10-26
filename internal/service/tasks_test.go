@@ -65,14 +65,14 @@ func TestCreateDraftTask(t *testing.T) {
 		logger.Fatalf(ctx, "Failed to connect to database: %v", err)
 	}
 
-	store := tasks.NewStore(5*time.Second, dbTXFunc, nil)
+	store := tasks.NewStore(5*time.Second, dbTXFunc, nil, "")
 
 	service := NewTasksService(nil, store)
 
 	taskID, err := service.CreateTaskDraft(ctx, &tasksservice.CreateTaskDraftPayload{
 		Title:        title,
 		TextTemplate: textTemplate,
-		PostImage:    base64.StdEncoding.EncodeToString(image),
+		PostImages:   []string{base64.StdEncoding.EncodeToString(image)},
 	})
 	if err != nil {
 		t.Fatalf("failed to create task draft: %v", err)

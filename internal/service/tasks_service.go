@@ -187,6 +187,7 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 			errors.Is(err, tasks.ErrTaskWithEmptyPostImages) ||
 			errors.Is(err, tasks.ErrTaskWithEmptyPostsPerBot) ||
 			errors.Is(err, tasks.ErrTaskWithEmptyTargetsPerPost) ||
+			errors.Is(err, tasks.ErrTaskWithEmptyLandingAccounts) ||
 			errors.Is(err, tasks.ErrTaskInvalidTextTemplate) {
 			return nil, tasksservice.BadRequest(err.Error())
 		}

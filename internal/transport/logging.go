@@ -5,8 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/inst-api/poster/pkg/logger"
 )
+
+const requestIDHeaderKey = "X-Request-ID"
 
 var elapsedTimeKey = ctxKey("elapsed_time")
 
@@ -24,7 +27,11 @@ type loggingRoundTripper struct {
 func (lrt loggingRoundTripper) RoundTrip(req *http.Request) (res *http.Response, e error) {
 	// Do "before sending requests" actions here.
 	ctx := req.Context()
-	logger.Infof(ctx, "sending request to %s", req.URL)
+	if req.Header.Get(requestIDHeaderKey) == "" {
+		req.Header.Set(requestIDHeaderKey, uuid.NewString())
+	}
+
+	logger.Infof(ctx, "sending request to %s, request_id: '%s'", req.URL, req.Header.Get(requestIDHeaderKey))
 	startedAt := time.Now()
 
 	// Send the request, get the response (or the error)
