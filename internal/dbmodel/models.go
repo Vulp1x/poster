@@ -69,26 +69,32 @@ type TargetUsersToTask struct {
 }
 
 type Task struct {
-	ID                   uuid.UUID  `json:"id"`
-	ManagerID            uuid.UUID  `json:"manager_id"`
-	TextTemplate         string     `json:"text_template"`
-	LandingAccounts      []string   `json:"landing_accounts"`
-	AccountProfileImages [][]byte   `json:"account_profile_images"`
-	AccountNames         []string   `json:"account_names"`
-	AccountUrls          []string   `json:"account_urls"`
-	Images               [][]byte   `json:"images"`
-	Status               taskStatus `json:"status"`
-	Title                string     `json:"title"`
-	BotsFilename         *string    `json:"bots_filename"`
-	CheapProxiesFilename *string    `json:"cheap_proxies_filename"`
-	ResProxiesFilename   *string    `json:"res_proxies_filename"`
-	TargetsFilename      *string    `json:"targets_filename"`
-	CreatedAt            time.Time  `json:"created_at"`
-	StartedAt            *time.Time `json:"started_at"`
-	StoppedAt            *time.Time `json:"stopped_at"`
-	UpdatedAt            *time.Time `json:"updated_at"`
-	DeletedAt            *time.Time `json:"deleted_at"`
-	AccountLastNames     []string   `json:"account_last_names"`
+	ID                    uuid.UUID  `json:"id"`
+	ManagerID             uuid.UUID  `json:"manager_id"`
+	TextTemplate          string     `json:"text_template"`
+	LandingAccounts       []string   `json:"landing_accounts"`
+	AccountProfileImages  [][]byte   `json:"account_profile_images"`
+	AccountNames          []string   `json:"account_names"`
+	AccountUrls           []string   `json:"account_urls"`
+	Images                [][]byte   `json:"images"`
+	Status                taskStatus `json:"status"`
+	Title                 string     `json:"title"`
+	BotsFilename          *string    `json:"bots_filename"`
+	CheapProxiesFilename  *string    `json:"cheap_proxies_filename"`
+	ResProxiesFilename    *string    `json:"res_proxies_filename"`
+	TargetsFilename       *string    `json:"targets_filename"`
+	CreatedAt             time.Time  `json:"created_at"`
+	StartedAt             *time.Time `json:"started_at"`
+	StoppedAt             *time.Time `json:"stopped_at"`
+	UpdatedAt             *time.Time `json:"updated_at"`
+	DeletedAt             *time.Time `json:"deleted_at"`
+	AccountLastNames      []string   `json:"account_last_names"`
+	FollowTargets         bool       `json:"follow_targets"`
+	NeedPhotoTags         bool       `json:"need_photo_tags"`
+	PerPostSleepSeconds   int32      `json:"per_post_sleep_seconds"`
+	PhotoTagsDelaySeconds int32      `json:"photo_tags_delay_seconds"`
+	PostsPerBot           int32      `json:"posts_per_bot"`
+	TargetsPerPost        int32      `json:"targets_per_post"`
 }
 
 type User struct {

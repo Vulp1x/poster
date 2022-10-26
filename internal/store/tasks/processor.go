@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,17 +29,15 @@ type worker struct {
 	task           domain.Task
 	generator      images.Generator
 	processorIndex int64
+	wg             *sync.WaitGroup
 }
 
-const (
-	postsPerBot    = 7
-	targetsPerPost = 15
-)
-
 func (w *worker) run(ctx context.Context) {
+	defer w.wg.Done()
 	ctx = logger.WithKV(ctx, "processor_index", w.processorIndex)
 	q := dbmodel.New(w.dbtxf(ctx))
 	var err error
+
 	for botWithTargets := range w.botsQueue {
 		select {
 		case <-ctx.Done():
@@ -59,9 +58,9 @@ func (w *worker) run(ctx context.Context) {
 
 		err = nil
 
-		targetsLen := len(botWithTargets.Targets)
-		if targetsLen != postsPerBot*targetsPerPost {
-			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, postsPerBot*targetsPerPost)
+		targetsLen := int32(len(botWithTargets.Targets))
+		if targetsLen != w.task.PostsPerBot*w.task.TargetsPerPost {
+			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, w.task.PostsPerBot*w.task.TargetsPerPost)
 		}
 
 		err = w.cli.InitBot(taskCtx, *botWithTargets)
@@ -88,21 +87,25 @@ func (w *worker) run(ctx context.Context) {
 			}
 		}
 
-		err = w.cli.FollowTargets(taskCtx, *botWithTargets)
-		if err != nil {
-			logger.Errorf(taskCtx, "failed to follow targets: %v", err)
+		if w.task.FollowTargets {
+			err = w.cli.FollowTargets(taskCtx, *botWithTargets)
+			if err != nil {
+				logger.Errorf(taskCtx, "failed to follow targets: %v", err)
 
-			// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
-			// if err != nil {
-			// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
-			// }
-			//
-			// continue
+				// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
+				// if err != nil {
+				// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
+				// }
+				//
+				// continue
+			}
 		}
 
-		cheapProxy := botWithTargets.ResProxy.PythonString()
+		var cheapProxy string
 		if botWithTargets.WorkProxy == nil {
 			logger.Warnf(taskCtx, "bot has empty cheap proxy, so using residential for post upload")
+			cheapProxy = botWithTargets.ResProxy.PythonString()
+		} else {
 			cheapProxy = botWithTargets.WorkProxy.PythonString()
 		}
 
@@ -120,19 +123,19 @@ func (w *worker) run(ctx context.Context) {
 		}
 
 		var (
-			i, postsDone int
+			i, postsDone int32
 			shouldBreak  = false
 			targetIds    []uuid.UUID
 		)
 
-		for i = 0; i < postsPerBot; i++ {
-			rightBorderOfTargets := (i + 1) * targetsPerPost
+		for i = 0; i < w.task.PostsPerBot; i++ {
+			rightBorderOfTargets := (i + 1) * w.task.TargetsPerPost
 			if rightBorderOfTargets >= targetsLen {
 				rightBorderOfTargets = targetsLen - 1
 				shouldBreak = true
 			}
 
-			targetsBatch := botWithTargets.Targets[i*targetsPerPost : rightBorderOfTargets]
+			targetsBatch := botWithTargets.Targets[i*w.task.TargetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
 
 			caption := w.preparePostCaption(w.task.TextTemplate, landingAccount, targetsBatch)
@@ -169,7 +172,7 @@ func (w *worker) run(ctx context.Context) {
 					logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 				}
 				return
-			case <-time.After(3 * time.Second):
+			case <-time.After(time.Duration(w.task.PerPostSleepSeconds) * time.Second):
 			}
 		}
 
@@ -179,7 +182,6 @@ func (w *worker) run(ctx context.Context) {
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 		}
-
 	}
 
 	logger.Infof(ctx, "bots queue closed, stopping worker")

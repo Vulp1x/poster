@@ -1058,6 +1058,12 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 		ResidentialProxiesFilename: v.ResidentialProxiesFilename,
 		CheapProxiesFilename:       v.CheapProxiesFilename,
 		TargetsFilename:            v.TargetsFilename,
+		FollowTargets:              v.FollowTargets,
+		NeedPhotoTags:              v.NeedPhotoTags,
+		PerPostSleepSeconds:        v.PerPostSleepSeconds,
+		PhotoTagsDelaySeconds:      v.PhotoTagsDelaySeconds,
+		PostsPerBot:                v.PostsPerBot,
+		TargetsPerPost:             v.TargetsPerPost,
 	}
 	if v.PostImages != nil {
 		res.PostImages = make([]string, len(v.PostImages))

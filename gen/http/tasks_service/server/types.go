@@ -52,6 +52,18 @@ type UpdateTaskRequestBody struct {
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets *bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags *bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds *uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds *uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot *uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost *uint `json:"targets_per_post"`
 }
 
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
@@ -105,6 +117,18 @@ type UpdateTaskOKResponseBody struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost uint `json:"targets_per_post"`
 }
 
 // UploadFilesOKResponseBody is the type of the "tasks_service" service "upload
@@ -181,6 +205,18 @@ type GetTaskOKResponseBody struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost uint `json:"targets_per_post"`
 }
 
 // GetProgressOKResponseBody is the type of the "tasks_service" service "get
@@ -194,7 +230,9 @@ type GetProgressOKResponseBody struct {
 	// задачи будут использованы заново
 	TargetsFailed int `json:"targets_failed"`
 	// количество аккаунтов, которых не выбрали для постов
-	TargetsWaiting int `json:"targets_waiting"`
+	TargetsWaiting int `json:"targets_waiting,targets_waiting"`
+	// закончена ли задача
+	Done bool `form:"done" json:"done" xml:"done"`
 }
 
 // ListTasksResponseBody is the type of the "tasks_service" service "list
@@ -259,6 +297,18 @@ type TaskResponse struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost uint `json:"targets_per_post"`
 }
 
 // TaskFileNamesRequestBody is used to define fields on request body types.
@@ -310,6 +360,12 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
+		FollowTargets:              res.FollowTargets,
+		NeedPhotoTags:              res.NeedPhotoTags,
+		PerPostSleepSeconds:        res.PerPostSleepSeconds,
+		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
+		PostsPerBot:                res.PostsPerBot,
+		TargetsPerPost:             res.TargetsPerPost,
 	}
 	if res.PostImages != nil {
 		body.PostImages = make([]string, len(res.PostImages))
@@ -418,6 +474,12 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
+		FollowTargets:              res.FollowTargets,
+		NeedPhotoTags:              res.NeedPhotoTags,
+		PerPostSleepSeconds:        res.PerPostSleepSeconds,
+		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
+		PostsPerBot:                res.PostsPerBot,
+		TargetsPerPost:             res.TargetsPerPost,
 	}
 	if res.PostImages != nil {
 		body.PostImages = make([]string, len(res.PostImages))
@@ -465,6 +527,7 @@ func NewGetProgressOKResponseBody(res *tasksservice.TaskProgress) *GetProgressOK
 		TargetsNotified: res.TargetsNotified,
 		TargetsFailed:   res.TargetsFailed,
 		TargetsWaiting:  res.TargetsWaiting,
+		Done:            res.Done,
 	}
 	if res.BotsProgresses != nil {
 		body.BotsProgresses = make(map[string]*BotsProgressResponseBody, len(res.BotsProgresses))
@@ -534,8 +597,14 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 // payload.
 func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token string) *tasksservice.UpdateTaskPayload {
 	v := &tasksservice.UpdateTaskPayload{
-		Title:        body.Title,
-		TextTemplate: body.TextTemplate,
+		Title:                 body.Title,
+		TextTemplate:          body.TextTemplate,
+		FollowTargets:         body.FollowTargets,
+		NeedPhotoTags:         body.NeedPhotoTags,
+		PerPostSleepSeconds:   body.PerPostSleepSeconds,
+		PhotoTagsDelaySeconds: body.PhotoTagsDelaySeconds,
+		PostsPerBot:           body.PostsPerBot,
+		TargetsPerPost:        body.TargetsPerPost,
 	}
 	if body.PostImages != nil {
 		v.PostImages = make([]string, len(body.PostImages))

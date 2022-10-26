@@ -40,6 +40,12 @@ func (t Task) ToProto() *tasksservice.Task {
 		ResidentialProxiesFilename: t.ResProxiesFilename,
 		CheapProxiesFilename:       t.CheapProxiesFilename,
 		TargetsFilename:            t.TargetsFilename,
+		FollowTargets:              t.FollowTargets,
+		NeedPhotoTags:              t.NeedPhotoTags,
+		PerPostSleepSeconds:        uint(t.PerPostSleepSeconds),
+		PhotoTagsDelaySeconds:      uint(t.PhotoTagsDelaySeconds),
+		PostsPerBot:                uint(t.PostsPerBot),
+		TargetsPerPost:             uint(t.TargetsPerPost),
 	}
 }
 
@@ -87,6 +93,7 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 type TaskProgress struct {
 	BotsProgress   []dbmodel.GetBotsProgressRow
 	TargetCounters dbmodel.GetTaskTargetsCountRow
+	Done           bool
 }
 
 func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
@@ -104,5 +111,6 @@ func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
 		TargetsNotified: int(p.TargetCounters.NotifiedTargets),
 		TargetsFailed:   int(p.TargetCounters.FailedTargets),
 		TargetsWaiting:  int(p.TargetCounters.UnusedTargets),
+		Done:            p.Done,
 	}
 }

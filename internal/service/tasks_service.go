@@ -141,6 +141,12 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 		tasks.WithBotURLsUpdateOption(p.BotUrls),
 		tasks.WithLandingAccountsUpdateOption(p.LandingAccounts),
 		tasks.WithTitleUpdateOption(p.Title),
+		tasks.WithFollowTargets(p.FollowTargets),
+		tasks.WithNeedPhotoTags(p.NeedPhotoTags),
+		tasks.WithPerPostSleepSeconds(p.PerPostSleepSeconds),
+		tasks.WithPhotoTagsDelaySeconds(p.PhotoTagsDelaySeconds),
+		tasks.WithPostsPerBot(p.PostsPerBot),
+		tasks.WithTargetsPerPost(p.TargetsPerPost),
 	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to update task: %v", err)
@@ -179,6 +185,8 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 
 		if errors.Is(err, tasks.ErrTaskInvalidStatus) ||
 			errors.Is(err, tasks.ErrTaskWithEmptyPostImages) ||
+			errors.Is(err, tasks.ErrTaskWithEmptyPostsPerBot) ||
+			errors.Is(err, tasks.ErrTaskWithEmptyTargetsPerPost) ||
 			errors.Is(err, tasks.ErrTaskInvalidTextTemplate) {
 			return nil, tasksservice.BadRequest(err.Error())
 		}

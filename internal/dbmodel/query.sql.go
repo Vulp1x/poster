@@ -349,7 +349,7 @@ func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
 from tasks
 where id = $1
 `
@@ -378,12 +378,18 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.AccountLastNames,
+		&i.FollowTargets,
+		&i.NeedPhotoTags,
+		&i.PerPostSleepSeconds,
+		&i.PhotoTagsDelaySeconds,
+		&i.PostsPerBot,
+		&i.TargetsPerPost,
 	)
 	return i, err
 }
 
 const findTasksByManagerID = `-- name: FindTasksByManagerID :many
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
 from tasks
 where manager_id = $1
 `
@@ -418,6 +424,12 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.AccountLastNames,
+			&i.FollowTargets,
+			&i.NeedPhotoTags,
+			&i.PerPostSleepSeconds,
+			&i.PhotoTagsDelaySeconds,
+			&i.PostsPerBot,
+			&i.TargetsPerPost,
 		); err != nil {
 			return nil, err
 		}
@@ -768,34 +780,47 @@ func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const updateTask = `-- name: UpdateTask :exec
+const updateTask = `-- name: UpdateTask :one
 update tasks
-set text_template          = $1,
-    title                  = $2,
-    images                 = $3,
-    account_names          = $4,
-    account_last_names     = $5,
-    account_urls           = $6,
-    account_profile_images = $7,
-    landing_accounts       = $8,
-    updated_at             = now()
-where id = $9
+set text_template            = $1,
+    title                    = $2,
+    images                   = $3,
+    account_names            = $4,
+    account_last_names       = $5,
+    account_urls             = $6,
+    account_profile_images   = $7,
+    landing_accounts         = $8,
+    follow_targets           = $9,
+    need_photo_tags          = $10,
+    per_post_sleep_seconds   =$11,
+    photo_tags_delay_seconds = $12,
+    posts_per_bot            = $13,
+    targets_per_post         = $14,
+    updated_at               = now()
+where id = $15
+returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
 `
 
 type UpdateTaskParams struct {
-	TextTemplate         string    `json:"text_template"`
-	Title                string    `json:"title"`
-	Images               [][]byte  `json:"images"`
-	AccountNames         []string  `json:"account_names"`
-	AccountLastNames     []string  `json:"account_last_names"`
-	AccountUrls          []string  `json:"account_urls"`
-	AccountProfileImages [][]byte  `json:"account_profile_images"`
-	LandingAccounts      []string  `json:"landing_accounts"`
-	ID                   uuid.UUID `json:"id"`
+	TextTemplate          string    `json:"text_template"`
+	Title                 string    `json:"title"`
+	Images                [][]byte  `json:"images"`
+	AccountNames          []string  `json:"account_names"`
+	AccountLastNames      []string  `json:"account_last_names"`
+	AccountUrls           []string  `json:"account_urls"`
+	AccountProfileImages  [][]byte  `json:"account_profile_images"`
+	LandingAccounts       []string  `json:"landing_accounts"`
+	FollowTargets         bool      `json:"follow_targets"`
+	NeedPhotoTags         bool      `json:"need_photo_tags"`
+	PerPostSleepSeconds   int32     `json:"per_post_sleep_seconds"`
+	PhotoTagsDelaySeconds int32     `json:"photo_tags_delay_seconds"`
+	PostsPerBot           int32     `json:"posts_per_bot"`
+	TargetsPerPost        int32     `json:"targets_per_post"`
+	ID                    uuid.UUID `json:"id"`
 }
 
-func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
-	_, err := q.db.Exec(ctx, updateTask,
+func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
+	row := q.db.QueryRow(ctx, updateTask,
 		arg.TextTemplate,
 		arg.Title,
 		arg.Images,
@@ -804,9 +829,44 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) error {
 		arg.AccountUrls,
 		arg.AccountProfileImages,
 		arg.LandingAccounts,
+		arg.FollowTargets,
+		arg.NeedPhotoTags,
+		arg.PerPostSleepSeconds,
+		arg.PhotoTagsDelaySeconds,
+		arg.PostsPerBot,
+		arg.TargetsPerPost,
 		arg.ID,
 	)
-	return err
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.ManagerID,
+		&i.TextTemplate,
+		&i.LandingAccounts,
+		&i.AccountProfileImages,
+		&i.AccountNames,
+		&i.AccountUrls,
+		&i.Images,
+		&i.Status,
+		&i.Title,
+		&i.BotsFilename,
+		&i.CheapProxiesFilename,
+		&i.ResProxiesFilename,
+		&i.TargetsFilename,
+		&i.CreatedAt,
+		&i.StartedAt,
+		&i.StoppedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AccountLastNames,
+		&i.FollowTargets,
+		&i.NeedPhotoTags,
+		&i.PerPostSleepSeconds,
+		&i.PhotoTagsDelaySeconds,
+		&i.PostsPerBot,
+		&i.TargetsPerPost,
+	)
+	return i, err
 }
 
 const updateTaskStatus = `-- name: UpdateTaskStatus :exec

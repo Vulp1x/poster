@@ -82,4 +82,5 @@ func (c *Config) Default() {
 	c.Logger.Default()
 	c.Postgres.Default()
 	c.Security.Default()
+	c.Instagrapi.Default()
 }

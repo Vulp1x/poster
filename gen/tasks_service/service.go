@@ -233,6 +233,18 @@ type Task struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost uint `json:"targets_per_post"`
 }
 
 type TaskFileNames struct {
@@ -257,7 +269,9 @@ type TaskProgress struct {
 	// задачи будут использованы заново
 	TargetsFailed int `json:"targets_failed"`
 	// количество аккаунтов, которых не выбрали для постов
-	TargetsWaiting int `json:"targets_waiting"`
+	TargetsWaiting int `json:"targets_waiting,targets_waiting"`
+	// закончена ли задача
+	Done bool
 }
 
 // 1 - задача только создана, нужно загрузить список ботов, прокси и получателей
@@ -291,6 +305,18 @@ type UpdateTaskPayload struct {
 	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
+	// нужно ли подписываться на аккаунты
+	FollowTargets *bool `json:"follow_targets"`
+	// делать отметки на фотографии
+	NeedPhotoTags *bool `json:"need_photo_tags"`
+	// делать отметки на фотографии
+	PerPostSleepSeconds *uint `json:"per_post_sleep_seconds"`
+	// задержка перед проставлением отметок
+	PhotoTagsDelaySeconds *uint `json:"photo_tags_delay_seconds"`
+	// количество постов для каждого бота
+	PostsPerBot *uint `json:"posts_per_bot"`
+	// количество упоминаний под каждым постом
+	TargetsPerPost *uint `json:"targets_per_post"`
 }
 
 type UploadError struct {

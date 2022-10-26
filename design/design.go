@@ -227,6 +227,36 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "post_images")
 			})
 
+			Attribute("follow_targets", Boolean, func() {
+				Description("нужно ли подписываться на аккаунты")
+				Meta("struct:tag:json", "follow_targets")
+			})
+
+			Attribute("need_photo_tags", Boolean, func() {
+				Description("делать отметки на фотографии")
+				Meta("struct:tag:json", "need_photo_tags")
+			})
+
+			Attribute("per_post_sleep_seconds", UInt, func() {
+				Description("делать отметки на фотографии")
+				Meta("struct:tag:json", "per_post_sleep_seconds")
+			})
+
+			Attribute("photo_tags_delay_seconds", UInt, func() {
+				Description("задержка перед проставлением отметок")
+				Meta("struct:tag:json", "photo_tags_delay_seconds")
+			})
+
+			Attribute("posts_per_bot", UInt, func() {
+				Description("количество постов для каждого бота")
+				Meta("struct:tag:json", "posts_per_bot")
+			})
+
+			Attribute("targets_per_post", UInt, func() {
+				Description("количество упоминаний под каждым постом")
+				Meta("struct:tag:json", "targets_per_post")
+			})
+
 			Required("token", "task_id")
 		})
 

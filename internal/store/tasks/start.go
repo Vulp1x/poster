@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,12 @@ var ErrTaskInvalidTextTemplate = errors.New("task doesn't have landing account p
 // ErrTaskWithEmptyPostImages у задачи нет фотографий для постов
 var ErrTaskWithEmptyPostImages = errors.New("task doesn't have post images")
 
+// ErrTaskWithEmptyTargetsPerPost у задачи нет фотографий для постов
+var ErrTaskWithEmptyTargetsPerPost = errors.New("task have 0 targets per post")
+
+// ErrTaskWithEmptyPostsPerBot у задачи нет фотографий для постов
+var ErrTaskWithEmptyPostsPerBot = errors.New("task have 0 posts per bot")
+
 // StartTask начинает выполнение задачи
 func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
@@ -36,16 +43,8 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
 	}
 
-	if task.Status != dbmodel.ReadyTaskStatus {
-		return nil, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
-	}
-
-	if len(task.Images) == 0 {
-		return nil, ErrTaskWithEmptyPostImages
-	}
-
-	if !strings.Contains(task.TextTemplate, landingAccountPlaceholder) {
-		return nil, ErrTaskInvalidTextTemplate
+	if err = validateTaskBeforeStart(task); err != nil {
+		return nil, err
 	}
 
 	imageGenerator, err := images.NewRandomGammaGenerator(task.Images)
@@ -62,7 +61,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("no bots for task found: %v", err)
 	}
 
-	maximumTargetsNum := int32(len(bots) * postsPerBot * targetsPerPost)
+	maximumTargetsNum := int32(len(bots)) * task.PostsPerBot * task.TargetsPerPost
 	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
 		TaskID: taskID, Limit: maximumTargetsNum,
 	})
@@ -70,11 +69,11 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("failed to find targets for task: %v", err)
 	}
 
-	neededBotsNum := len(targets) / (postsPerBot * targetsPerPost)
+	neededBotsNum := int32(len(targets)) / (task.PostsPerBot * task.TargetsPerPost)
 
 	logger.Infof(ctx, "going to use %d/%d bots for %d targets", neededBotsNum, len(bots), len(targets))
 
-	if neededBotsNum < len(bots) {
+	if neededBotsNum < int32(len(bots)) {
 		bots = bots[:neededBotsNum]
 	}
 
@@ -101,6 +100,8 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 	botsChan := make(chan *domain.BotWithTargets, 20)
 
+	wg := &sync.WaitGroup{}
+
 	for i := 0; i < workersPerTask; i++ {
 		postingWorker := &worker{
 			botsQueue:      botsChan,
@@ -109,26 +110,53 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 			task:           domain.Task(task),
 			generator:      imageGenerator,
 			processorIndex: int64(i),
+			wg:             wg,
 		}
 
 		go postingWorker.run(taskCtx)
 	}
 
-	go s.asyncPushBots(taskCtx, botsChan, bots, targets)
+	wg.Add(workersPerTask)
+
+	go s.asyncPushBots(taskCtx, q, task, botsChan, bots, targets, wg)
 
 	return aliveLandings, nil
+}
+
+func validateTaskBeforeStart(task dbmodel.Task) error {
+	if task.Status != dbmodel.ReadyTaskStatus {
+		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
+	}
+
+	if len(task.Images) == 0 {
+		return ErrTaskWithEmptyPostImages
+	}
+
+	if !strings.Contains(task.TextTemplate, landingAccountPlaceholder) {
+		return ErrTaskInvalidTextTemplate
+	}
+
+	if task.TargetsPerPost == 0 {
+		return ErrTaskWithEmptyTargetsPerPost
+	}
+
+	if task.PostsPerBot == 0 {
+		return ErrTaskWithEmptyPostsPerBot
+	}
+
+	return nil
 }
 
 func (s *Store) checkAliveLandingAccounts(ctx context.Context, bot dbmodel.BotAccount, landingAccounts []string) ([]string, error) {
 	err := s.instaClient.InitBot(ctx, domain.BotWithTargets{BotAccount: domain.BotAccount(bot)})
 	if err != nil {
-		return nil, fmt.Errorf("failed to init bot: %v", err)
+		return nil, fmt.Errorf("failed to init bot when checking alive accounts: %v", err)
 	}
 
 	return s.instaClient.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, landingAccounts)
 }
 
-func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWithTargets, bots []dbmodel.BotAccount, targets []dbmodel.TargetUser) {
+func (s *Store) asyncPushBots(ctx context.Context, q *dbmodel.Queries, task dbmodel.Task, botsChan chan *domain.BotWithTargets, bots []dbmodel.BotAccount, targets []dbmodel.TargetUser, wg *sync.WaitGroup) {
 	startedAt := time.Now()
 
 	var batchEnd int
@@ -142,7 +170,9 @@ func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWith
 		default:
 		}
 
-		batchEnd = (i + 1) * postsPerBot * targetsPerPost
+		targetsPerPost := int(task.PostsPerBot * task.TargetsPerPost)
+
+		batchEnd = (i + 1) * targetsPerPost
 		if batchEnd > len(targets) {
 			batchEnd = len(targets) - 1
 			allTargetsProcessed = true
@@ -150,7 +180,7 @@ func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWith
 
 		botWithTargets := &domain.BotWithTargets{
 			BotAccount: domain.BotAccount(bot),
-			Targets:    targets[i*postsPerBot*targetsPerPost : batchEnd],
+			Targets:    targets[i*targetsPerPost : batchEnd],
 		}
 		botsChan <- botWithTargets
 
@@ -162,4 +192,15 @@ func (s *Store) asyncPushBots(ctx context.Context, botsChan chan *domain.BotWith
 
 	logger.Infof(ctx, "pushed all bots in %s: closing chan", time.Since(startedAt))
 	close(botsChan)
+
+	wg.Wait()
+
+	logger.Infof(ctx, "all workers done in %s: setting task status to done ", time.Since(startedAt))
+	err := q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
+		Status: dbmodel.DoneTaskStatus,
+		ID:     task.ID,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "failed to set task status to done: %v", err)
+	}
 }
