@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +14,9 @@ import (
 	"github.com/inst-api/poster/internal/transport"
 	"github.com/inst-api/poster/pkg/logger"
 )
+
+// ErrBotIsBlocked аккаунт заблокирован
+var ErrBotIsBlocked = errors.New("bot account is blocked")
 
 type Client struct {
 	cli              *http.Client
@@ -148,6 +152,10 @@ func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 	err = c.saveResponseFunc(ctx, bot.Headers.AuthData.SessionID, resp, WithElapsedTime(time.Since(startedAt)))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return ErrBotIsBlocked
 	}
 
 	if resp.StatusCode != http.StatusOK {

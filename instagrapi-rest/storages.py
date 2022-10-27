@@ -27,9 +27,10 @@ class ClientStorage:
         key = parse.unquote(sessionid.strip(" \""))
         try:
             settings = json.loads(self.db.search(Query().sessionid == key)[0]['settings'])
-            cl = Client(settings=settings, proxy=settings['proxy'])
+            cl = Client(settings=settings, proxy=settings['proxy'], logger=logger)
             cl.username = settings.get('username', 'username_not_set')
             cl.request_logger = logger
+
             cl.get_timeline_feed()
             return cl
         except IndexError:

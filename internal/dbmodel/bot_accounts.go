@@ -17,6 +17,8 @@ const (
 	StartedBotStatus        botStatus = 3
 	DoneBotStatus           botStatus = 4 // DoneBotStatus проставляется после того как все посты выложены
 	FailBotStatus           botStatus = 5 // FailBotStatus
+	// BlockedBotStatus бот заблокирован
+	BlockedBotStatus botStatus = 6
 )
 
 type RequestHeaders struct {

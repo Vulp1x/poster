@@ -12,6 +12,7 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
+	"github.com/inst-api/poster/internal/instagrapi"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/jackc/pgx/v4"
 )
@@ -61,15 +62,29 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 	}
 
 	if len(bots) == 0 {
-		return nil, fmt.Errorf("no bots for task found: %v", err)
+		err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{Status: dbmodel.DoneTaskStatus, ID: task.ID})
+		if err != nil {
+			return nil, fmt.Errorf("failed to set task status to done: %v", err)
+		}
+
+		return nil, fmt.Errorf(" в задаче нет ботов, готовых к работе")
 	}
 
 	maximumTargetsNum := int32(len(bots)) * task.PostsPerBot * task.TargetsPerPost
 	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
 		TaskID: taskID, Limit: maximumTargetsNum,
 	})
-	if err != nil || len(targets) == 0 {
+	if err != nil {
 		return nil, fmt.Errorf("failed to find targets for task: %v", err)
+	}
+
+	if len(targets) == 0 {
+		err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{Status: dbmodel.DoneTaskStatus, ID: task.ID})
+		if err != nil {
+			return nil, fmt.Errorf("failed to set task status to done: %v", err)
+		}
+
+		return nil, fmt.Errorf("в задаче нет неоповещенных целей")
 	}
 
 	neededBotsNum := int32(len(targets)) / (task.PostsPerBot * task.TargetsPerPost)
@@ -84,6 +99,15 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 	aliveLandings, err := s.checkAliveLandingAccounts(ctx, randomBot, task.LandingAccounts)
 	if err != nil {
+		if errors.Is(err, instagrapi.ErrBotIsBlocked) {
+			err2 := q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.BlockedBotStatus, ID: randomBot.ID})
+			if err2 != nil {
+				logger.Errorf(ctx, "failed to set bot status to blocked: %v", err)
+			}
+
+			return nil, fmt.Errorf("аккаунт '%s' для проверки лендингов был заблокирован, попробуйте ещё раз", randomBot.Username)
+		}
+
 		return nil, fmt.Errorf("failed to check landing accounts with bot '%s': %v", randomBot.Username, err)
 	}
 
@@ -157,7 +181,7 @@ func validateTaskBeforeStart(task dbmodel.Task) error {
 func (s *Store) checkAliveLandingAccounts(ctx context.Context, bot dbmodel.BotAccount, landingAccounts []string) ([]string, error) {
 	err := s.instaClient.InitBot(ctx, domain.BotWithTargets{BotAccount: domain.BotAccount(bot)})
 	if err != nil {
-		return nil, fmt.Errorf("failed to init bot when checking alive accounts: %v", err)
+		return nil, fmt.Errorf("failed to init bot when checking alive accounts: %w", err)
 	}
 
 	return s.instaClient.CheckLandingAccounts(ctx, bot.Headers.AuthData.SessionID, landingAccounts)

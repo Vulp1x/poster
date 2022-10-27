@@ -1,4 +1,3 @@
-import logging
 import time
 from pathlib import Path
 from typing import Optional, Dict, List
@@ -101,6 +100,9 @@ async def auth_add(session_id: str = Body(...),
     try:
         cl = clients.get(session_id)
         return PlainTextResponse(cl.sessionid)
+    except ChallengeRequired as ex:
+        return PlainTextResponse("account is blocked", status_code=400)
+
     except Exception as e:
         logger.warning(e)
         pass
