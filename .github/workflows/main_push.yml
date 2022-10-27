@@ -5,49 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  check:
-    name: Check changed files
-    outputs:
-      api_service: ${{ steps.check_files.outputs.api_service }}
-      note_service: ${{ steps.check_files.outputs.note_service }}
-      category_service: ${{ steps.check_files.outputs.category_service }}
-      file_service: ${{ steps.check_files.outputs.file_service }}
-      tag_service: ${{ steps.check_files.outputs.tag_service }}
-      user_service: ${{ steps.check_files.outputs.user_service }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-
-      - name: check modified files
-        id: check_files
-        run: |
-          echo "=============== list modified files ==============="
-          git diff --name-only HEAD^ HEAD
-          echo "========== check paths of modified files =========="
-          git diff --name-only HEAD^ HEAD > files.txt
-          while IFS= read -r file; do
-            echo $file
-            if [[ $file == api_service/* ]]; then
-              echo "::set-output name=api_service::true"
-            elif [[ $file == note_service/* ]]; then
-              echo "::set-output name=note_service::true"
-            elif [[ $file == category_service/* ]]; then
-              echo "::set-output name=category_service::true"
-            elif [[ $file == file_service/* ]]; then
-              echo "::set-output name=file_service::true"
-            elif [[ $file == tag_service/* ]]; then
-              echo "::set-output name=tag_service::true"
-            elif [[ $file == user_service/* ]]; then
-              echo "::set-output name=user_service::true"
-            else
-              echo "file does not belong to any service"
-            fi
-          done < files.txt
-  api_service:
-    needs: check
+  publish-poster:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -67,13 +25,31 @@ jobs:
           push: true
           tags: ghcr.io/inst-api/poster:latest
 
+  publish-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish to Registry inst-api
         uses: docker/build-push-action@v3
         with:
           context: ./instagrapi-rest
           push: true
           tags: ghcr.io/inst-api/poster.python-api:latest
-
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - publish-poster
+      - publish-api
+    steps:
       - name: Execute remote ssh command using key
         uses: appleboy/ssh-action@master
         with:
