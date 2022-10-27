@@ -123,9 +123,12 @@ func (l *DebugStructuredLoggerEntry) Write(status, bytesWriten int, header http.
 
 	ww, ok := extra.(*responseDupper)
 	if ok {
-		fields["resp_body"] = ww.Buffer.String()
 		fields["resp_elapsed_ms"] = float64(time.Since(ww.startedAt).Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond)
 		fields["resp_headers"] = header
+	}
+
+	if ww.Buffer.Len() < 10000 {
+		fields["resp_body"] = ww.Buffer.String()
 	}
 
 	l.ctx = logger.WithFields(l.ctx, fields)

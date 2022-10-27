@@ -17,7 +17,7 @@ class ClientStorage:
     def client(self, proxy: str):
         """Get new client (helper)
         """
-        cl = Client()
+        cl = Client(proxy=proxy)
         cl.request_timeout = 0.1
         return cl
 

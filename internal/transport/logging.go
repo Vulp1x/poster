@@ -42,7 +42,9 @@ func (lrt loggingRoundTripper) RoundTrip(req *http.Request) (res *http.Response,
 		statusCode = res.StatusCode
 	}
 
-	logger.Infof(ctx, "got response in %s, status code: %d", time.Since(startedAt), statusCode)
+	logger.Infof(ctx, "got response in %s, status code: %d, request_id: '%s'",
+		time.Since(startedAt), statusCode, req.Header.Get(requestIDHeaderKey),
+	)
 
 	return
 }
