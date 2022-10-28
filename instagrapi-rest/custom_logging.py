@@ -5,6 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
+import loguru
 from loguru import logger
 
 
@@ -39,7 +40,7 @@ class InterceptHandler(logging.Handler):
 class CustomizeLogger:
 
     @classmethod
-    def make_logger(cls, config_path: Path):
+    def make_logger(cls, config_path: Path) -> "loguru.Logger":
         config = cls.load_logging_config(config_path)
         logging_config = config.get('logger')
 
@@ -62,12 +63,16 @@ class CustomizeLogger:
                           format: str
                           ):
         logger.remove()
+
+        def not_too_long(record: "loguru.Record") -> bool:
+            return len(record.get('message')) < 1000
+
         logger.add(
             sys.stdout,
             enqueue=True,
             backtrace=False,
             level='TRACE',
-            format=format
+            format=format, filter=not_too_long,
         )
         logger.add(
             str(filepath),

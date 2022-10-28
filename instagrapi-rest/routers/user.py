@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import instagrapi.exceptions
+import loguru
 # noinspection PyUnresolvedReferences
 from custom_logging import CustomizeLogger
 # noinspection PyUnresolvedReferences
@@ -22,7 +23,7 @@ router = APIRouter(
 )
 
 config_path = Path(__file__).parent.with_name("logging_config.json")
-logger = CustomizeLogger.make_logger(config_path)
+logger: "loguru.Logger" = CustomizeLogger.make_logger(config_path)
 
 
 @router.post("/check/landings", response_model=List[str])

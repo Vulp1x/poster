@@ -35,7 +35,7 @@ async def get_body(request: Request) -> bytes:
 
 
 async def logging_dependency(request: Request):
-    logger.debug(f"{request.method} {request.url} started")
+    logger.debug(f"{request.method} {request.url} started, {await request.form()}")
     # logger.debug(f"{request.method} {request.url} body: {await get_body(request)}")
 
 

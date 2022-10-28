@@ -1,6 +1,8 @@
 package images
 
-import "context"
+import (
+	"context"
+)
 
 func NewDummyGenerator(img []byte) Generator {
 	return dummyGenerator{img: img}

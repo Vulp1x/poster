@@ -1,6 +1,8 @@
 package images
 
-import "context"
+import (
+	"context"
+)
 
 // Generator создает новую уникальную картинку из оригинала
 type Generator interface {

@@ -69,7 +69,7 @@ func prepareFollowTargetsBody(botAccount domain.BotWithTargets) ([]byte, error) 
 	return json.Marshal(body)
 }
 
-func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string) (*bytes.Buffer, string, error) {
+func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string, tags []UserTag) (*bytes.Buffer, string, error) {
 	buf := bytes.NewBuffer(nil)
 	mpWriter := multipart.NewWriter(buf)
 
@@ -115,6 +115,23 @@ func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string)
 	_, err = cheapProxyWriter.Write([]byte(cheapProxy))
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
+	}
+
+	if len(tags) != 0 {
+		userTagsWriter, err := mpWriter.CreateFormField("usertags")
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to create form field caption: %v", err)
+		}
+
+		userTagsBytes, err := json.Marshal(tags)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to marshal user tags: %v", err)
+		}
+
+		_, err = userTagsWriter.Write(userTagsBytes)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
+		}
 	}
 
 	err = mpWriter.Close()

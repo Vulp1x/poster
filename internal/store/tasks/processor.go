@@ -2,8 +2,8 @@ package tasks
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -11,11 +11,12 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
+	"github.com/inst-api/poster/internal/instagrapi"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
 type instagrapiClient interface {
-	MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error
+	MakePost(ctx context.Context, task domain.Task, landingAccount string, sessionID string, cheapProxy string, targets []dbmodel.TargetUser, postImage []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 	CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error)
 	FollowTargets(ctx context.Context, bot domain.BotWithTargets) error
@@ -91,13 +92,6 @@ func (w *worker) run(ctx context.Context) {
 			err = w.cli.FollowTargets(taskCtx, *botWithTargets)
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to follow targets: %v", err)
-
-				// err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.FailBotStatus, ID: botWithTargets.ID})
-				// if err != nil {
-				// 	logger.Errorf(taskCtx, "failed to set bot status to 'failed': %v", err)
-				// }
-				//
-				// continue
 			}
 		}
 
@@ -115,8 +109,8 @@ func (w *worker) run(ctx context.Context) {
 			continue
 		}
 
-		landingAccount, err := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
-		if err != nil {
+		landingAccount, err2 := w.chooseAliveLandingAccount(taskCtx, botWithTargets.BotAccount)
+		if err2 != nil {
 			logger.Errorf(taskCtx, "failed to select alive landing account: %v", err)
 
 			break
@@ -138,14 +132,21 @@ func (w *worker) run(ctx context.Context) {
 			targetsBatch := botWithTargets.Targets[i*w.task.TargetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
 
-			caption := w.preparePostCaption(w.task.TextTemplate, landingAccount, targetsBatch)
-
-			err = w.cli.MakePost(taskCtx, cheapProxy, botWithTargets.Headers.AuthData.SessionID, caption, w.generator.Next(taskCtx))
+			err = w.cli.MakePost(taskCtx, w.task, landingAccount, botWithTargets.Headers.AuthData.SessionID, cheapProxy, targetsBatch, w.generator.Next(taskCtx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
 				if err != nil {
 					logger.Errorf(taskCtx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
+				}
+
+				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
+				if err != nil {
+					logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
+				}
+
+				if errors.Is(err, instagrapi.ErrBotIsBlocked) {
+					break
 				}
 
 				continue
@@ -156,7 +157,6 @@ func (w *worker) run(ctx context.Context) {
 			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
-				continue
 			}
 
 			// тегнули уже всех пользователей, больше постов не нужно
@@ -192,19 +192,6 @@ type APIResponse struct {
 	Message       string `json:"message"`
 	ErrorType     string `json:"error_type"`
 	ExceptionName string `json:"exception_name"`
-}
-
-func (w *worker) preparePostCaption(template, landingAccount string, targetUsers []dbmodel.TargetUser) string {
-	b := strings.Builder{}
-	b.WriteString(strings.Replace(template, landingAccountPlaceholder, "@"+landingAccount, 1))
-
-	for _, user := range targetUsers {
-		b.WriteByte(' ')
-		b.WriteByte('@')
-		b.WriteString(user.Username)
-	}
-
-	return b.String()
 }
 
 func (w *worker) chooseAliveLandingAccount(ctx context.Context, bot domain.BotAccount) (string, error) {

@@ -111,7 +111,7 @@ func TestNewRandomGammaGenerator(t *testing.T) {
 	for i, tt := range tests {
 		i := i
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewRandomGammaGenerator(tt.args.imgBytes)
+			got, err := NewRandomGammaGenerator([][]byte{tt.args.imgBytes})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewGammaGenerator() error = %v, wantErr %v", err, tt.wantErr)
 				return

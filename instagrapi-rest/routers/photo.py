@@ -1,18 +1,25 @@
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
+import instagrapi.exceptions
+import loguru
 import requests
+# noinspection PyUnresolvedReferences
+from custom_logging import CustomizeLogger
+# noinspection PyUnresolvedReferences
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, File, UploadFile, Form
-from fastapi.responses import FileResponse
-from helpers import photo_upload_story_as_video, photo_upload_story_as_photo, photo_upload_post
+# noinspection PyUnresolvedReferences
+from helpers import photo_upload_post
 from instagrapi.types import (
-    Story, StoryHashtag, StoryLink,
-    StoryLocation, StoryMention, StorySticker,
     Media, Location, Usertag
 )
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, ValidationError
+from starlette.responses import PlainTextResponse
+
+config_path = Path(__file__).parent.with_name("logging_config.json")
+logger: "loguru.Logger" = CustomizeLogger.make_logger(config_path)
 
 router = APIRouter(
     prefix="/photo",
@@ -21,125 +28,33 @@ router = APIRouter(
 )
 
 
-@router.post("/upload_to_story", response_model=Story)
-async def photo_upload_to_story(sessionid: str = Form(...),
-                                file: UploadFile = File(...),
-                                as_video: Optional[bool] = Form(False),
-                                caption: Optional[str] = Form(""),
-                                mentions: Optional[List[StoryMention]] = Form([]),
-                                locations: Optional[List[StoryLocation]] = Form([]),
-                                links: Optional[List[StoryLink]] = Form([]),
-                                hashtags: Optional[List[StoryHashtag]] = Form([]),
-                                stickers: Optional[List[StorySticker]] = Form([]),
-                                clients: ClientStorage = Depends(get_clients)
-                                ) -> Story:
-    """Upload photo to story
-    """
-    cl = clients.get(sessionid)
-    content = await file.read()
-    if as_video:
-        return await photo_upload_story_as_video(
-            cl, content, caption=caption,
-            mentions=mentions,
-            links=links,
-            hashtags=hashtags,
-            locations=locations,
-            stickers=stickers)
-    else:
-        return await photo_upload_story_as_photo(
-            cl, content, caption=caption,
-            mentions=mentions,
-            links=links,
-            hashtags=hashtags,
-            locations=locations,
-            stickers=stickers)
-
-
-@router.post("/upload_to_story/by_url", response_model=Story)
-async def photo_upload_to_story_by_url(sessionid: str = Form(...),
-                                       url: AnyHttpUrl = Form(...),
-                                       as_video: Optional[bool] = Form(False),
-                                       caption: Optional[str] = Form(""),
-                                       mentions: Optional[List[StoryMention]] = Form([]),
-                                       locations: Optional[List[StoryLocation]] = Form([]),
-                                       links: Optional[List[StoryLink]] = Form([]),
-                                       hashtags: Optional[List[StoryHashtag]] = Form([]),
-                                       stickers: Optional[List[StorySticker]] = Form([]),
-                                       clients: ClientStorage = Depends(get_clients)
-                                       ) -> Story:
-    """Upload photo to story by URL to file
-    """
-    cl = clients.get(sessionid)
-    content = requests.get(url).content
-    if as_video:
-        return await photo_upload_story_as_video(
-            cl, content, caption=caption,
-            mentions=mentions,
-            links=links,
-            hashtags=hashtags,
-            locations=locations,
-            stickers=stickers)
-    else:
-        return await photo_upload_story_as_photo(
-            cl, content, caption=caption,
-            mentions=mentions,
-            links=links,
-            hashtags=hashtags,
-            locations=locations,
-            stickers=stickers)
-
-
-@router.post("/download")
-async def photo_download(sessionid: str = Form(...),
-                         media_pk: int = Form(...),
-                         folder: Optional[Path] = Form(""),
-                         returnFile: Optional[bool] = Form(True),
-                         clients: ClientStorage = Depends(get_clients)):
-    """Download photo using media pk
-    """
-    cl = clients.get(sessionid)
-    result = cl.photo_download(media_pk, folder)
-    if returnFile:
-        return FileResponse(result)
-    else:
-        return result
-
-
-@router.post("/download/by_url")
-async def photo_download_by_url(sessionid: str = Form(...),
-                                url: str = Form(...),
-                                filename: Optional[str] = Form(""),
-                                folder: Optional[Path] = Form(""),
-                                returnFile: Optional[bool] = Form(True),
-                                clients: ClientStorage = Depends(get_clients)):
-    """Download photo using URL
-    """
-    cl = clients.get(sessionid)
-    result = cl.photo_download_by_url(url, filename, folder)
-    if returnFile:
-        return FileResponse(result)
-    else:
-        return result
-
-
 @router.post("/upload", response_model=Media)
 async def photo_upload(sessionid: str = Form(...),
                        file: UploadFile = File(...),
                        caption: str = Form(...),
                        upload_id: Optional[str] = Form(""),
-                       usertags: Optional[List[str]] = Form([]),
+                       usertags: Optional[str] = Form([]),
                        cheap_proxy: str = Form(""),
                        # location: Optional[Location] = Form(None),
                        clients: ClientStorage = Depends(get_clients)
-                       ) -> Media:
+                       ) -> Union[PlainTextResponse, Media]:
     """Upload photo and configure to feed
     """
-    cl = clients.get(sessionid)
+    try:
+        cl = clients.get(sessionid)
+    except instagrapi.exceptions.ChallengeRequired as ex:
+        return PlainTextResponse(content="challenge required at start", status_code=400)
 
     usernames_tags = []
-    for usertag in usertags:
-        usertag_json = json.loads(usertag)
-        usernames_tags.append(Usertag(user=usertag_json['user'], x=usertag_json['x'], y=usertag_json['y']))
+
+    if usertags is not None and usertags != "":
+        try:
+            usertags_json = json.loads(usertags)
+            for usertag in usertags_json:
+                usernames_tags.append(Usertag(user=usertag.get('user'), x=usertag.get('x'), y=usertag.get('y')))
+        except ValidationError as ex:
+            logger.exception(ex)
+            return PlainTextResponse(content=ex, status_code=400)
 
     content = await file.read()
     return await photo_upload_post(

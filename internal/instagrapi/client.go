@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/transport"
 	"github.com/inst-api/poster/pkg/logger"
@@ -17,6 +19,8 @@ import (
 
 // ErrBotIsBlocked аккаунт заблокирован
 var ErrBotIsBlocked = errors.New("bot account is blocked")
+
+const landingAccountPlaceholder = "@account"
 
 type Client struct {
 	cli              *http.Client
@@ -68,9 +72,26 @@ func (c *Client) CheckLandingAccounts(ctx context.Context, sessionID string, lan
 }
 
 // MakePost создает новый
-func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption string, image []byte) error {
+func (c *Client) MakePost(
+	ctx context.Context,
+	task domain.Task,
+	landingAccount, sessionID, cheapProxy string,
+	targets []dbmodel.TargetUser,
+	postImage []byte,
+) error {
 	startedAt := time.Now()
-	buf, contentType, err := prepareUploadImageBody(image, sessionID, cheapProxy, caption)
+
+	var userTags []UserTag
+	var caption string
+
+	if task.NeedPhotoTags {
+		caption = c.preparePostCaption(task.TextTemplate, landingAccount, targets[:len(targets)/2])
+		userTags = prepareUserTags(targets[len(targets)/2:])
+	} else {
+		caption = c.preparePostCaption(task.TextTemplate, landingAccount, targets)
+	}
+
+	buf, contentType, err := prepareUploadImageBody(postImage, sessionID, cheapProxy, caption, userTags)
 	if err != nil {
 		return err
 	}
@@ -90,6 +111,10 @@ func (c *Client) MakePost(ctx context.Context, cheapProxy, sessionID, caption st
 	err = c.saveResponseFunc(ctx, sessionID, resp, WithElapsedTime(time.Since(startedAt)))
 	if err != nil {
 		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return ErrBotIsBlocked
 	}
 
 	if resp.StatusCode != http.StatusOK {
@@ -195,4 +220,17 @@ func (c *Client) FollowTargets(ctx context.Context, bot domain.BotWithTargets) e
 	}
 
 	return nil
+}
+
+func (c *Client) preparePostCaption(template, landingAccount string, targetUsers []dbmodel.TargetUser) string {
+	b := strings.Builder{}
+	b.WriteString(strings.Replace(template, landingAccountPlaceholder, "@"+landingAccount, 1))
+
+	for _, user := range targetUsers {
+		b.WriteByte(' ')
+		b.WriteByte('@')
+		b.WriteString(user.Username)
+	}
+
+	return b.String()
 }
