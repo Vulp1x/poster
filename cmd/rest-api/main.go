@@ -11,15 +11,20 @@ import (
 	"syscall"
 	"time"
 
+	adminservice "github.com/inst-api/poster/gen/admin_service"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/config"
+	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/internal/postgres"
 	"github.com/inst-api/poster/internal/service"
 	"github.com/inst-api/poster/internal/store"
+	"github.com/inst-api/poster/internal/store/bots"
 	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/internal/store/users"
 	"github.com/inst-api/poster/pkg/logger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -65,14 +70,28 @@ func main() {
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
 	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname)
+	botsStore := bots.NewStore(dbTXFunc, txFunc)
 
 	// Initialize the services.
 	authServiceSvc := service.NewAuthService(userStore, conf.Security)
 	tasksService := service.NewTasksService(authServiceSvc, taskStore)
 
+	conn, err := grpc.DialContext(
+		ctx,
+		conf.Listen.ParserURL,
+		grpc.WithUnaryInterceptor(mw.UnaryClientLog()),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		logger.Fatalf(ctx, "failed to connect to parser: %v", err)
+	}
+
+	adminsService := service.NewAdminService(authServiceSvc, userStore, botsStore, conn)
+
 	// potentially running in different processes.
 	authServiceEndpoints := authservice.NewEndpoints(authServiceSvc)
 	tasksServiceEndpoints := tasksservice.NewEndpoints(tasksService)
+	adminsServiceEndpoints := adminservice.NewEndpoints(adminsService)
 
 	// Create channel used by both the signal handler and server goroutines
 	// to notify the main goroutine when to stop the server.
@@ -97,6 +116,7 @@ func main() {
 		conf.Listen.CertFile,
 		authServiceEndpoints,
 		tasksServiceEndpoints,
+		adminsServiceEndpoints,
 		&wg,
 		errc,
 		*debugFlag,

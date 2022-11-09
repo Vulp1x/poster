@@ -1,6 +1,7 @@
 listen:
   port: 8090
   bind_ip: 0.0.0.0
+  parser_url: parser:9091
 logger:
   enable console: true
   console json format: true

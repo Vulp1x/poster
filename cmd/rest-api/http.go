@@ -10,7 +10,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	swagger "github.com/go-openapi/runtime/middleware"
+	adminservice "github.com/inst-api/poster/gen/admin_service"
 	authservice "github.com/inst-api/poster/gen/auth_service"
+	adminservicesvr "github.com/inst-api/poster/gen/http/admin_service/server"
 	authservicesvr "github.com/inst-api/poster/gen/http/auth_service/server"
 	tasksservicesvr "github.com/inst-api/poster/gen/http/tasks_service/server"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
@@ -29,6 +31,7 @@ func handleHTTPServer(
 	host, port, keyFile, certFile string,
 	authServiceEndpoints *authservice.Endpoints,
 	tasksServiceEndpoints *tasksservice.Endpoints,
+	adminServiceEndpoints *adminservice.Endpoints,
 	wg *sync.WaitGroup,
 	errc chan error,
 	debug bool,
@@ -62,17 +65,22 @@ func handleHTTPServer(
 	var (
 		authServiceServer  *authservicesvr.Server
 		tasksServiceServer *tasksservicesvr.Server
+		adminServiceServer *adminservicesvr.Server
 	)
 	{
 		eh := errorHandler()
 		authServiceServer = authservicesvr.New(authServiceEndpoints, mux, dec, enc, eh, nil)
 		tasksServiceServer = tasksservicesvr.New(tasksServiceEndpoints, mux, dec, enc, eh, nil, multipart.TasksServiceUploadFileDecoderFunc)
+		adminServiceServer = adminservicesvr.New(adminServiceEndpoints, mux, dec, enc, eh, nil)
 
 		authServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
 		authServiceServer.Use(httpmdlwr.RequestID())
 
 		tasksServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
 		tasksServiceServer.Use(httpmdlwr.RequestID())
+
+		adminServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))
+		adminServiceServer.Use(httpmdlwr.RequestID())
 
 		if debug {
 			// authServiceServer.Use(httpmdlwr.RequestLoggerWithDebug(mux, os.Stdout))
@@ -90,6 +98,7 @@ func handleHTTPServer(
 	// Configure the mux.
 	authservicesvr.Mount(mux, authServiceServer)
 	tasksservicesvr.Mount(mux, tasksServiceServer)
+	adminservicesvr.Mount(mux, adminServiceServer)
 
 	router := chi.NewRouter()
 	// router.Use(cors.Handler(cors.Options{
@@ -114,6 +123,10 @@ func handleHTTPServer(
 	}
 
 	for _, m := range tasksServiceServer.Mounts {
+		logger.Infof(ctx, "HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+
+	for _, m := range adminServiceServer.Mounts {
 		logger.Infof(ctx, "HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 

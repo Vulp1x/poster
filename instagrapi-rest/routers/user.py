@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import instagrapi.exceptions
 import loguru
@@ -11,6 +11,7 @@ from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from instagrapi import Client
 from instagrapi.exceptions import UserNotFound
+from instagrapi.extractors import extract_user_short
 from instagrapi.types import (
     User
 )
@@ -87,3 +88,39 @@ async def edit_profile(sessionid: str = Form(...),
         with tempfile.NamedTemporaryFile(suffix='.jpg') as fp:
             fp.write(content)
             cl.account_change_picture(Path(fp.name))
+
+
+@router.post("/similar", response_model=List[User])
+async def similar(sessionid: str = Form(...),
+                  user_id: int = Form(...),
+                  clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[User]]:
+    """Get user's followers
+    """
+    try:
+        cl: Client = clients.get(sessionid)
+    except instagrapi.exceptions.ChallengeRequired:
+        return PlainTextResponse(status_code=400,
+                                 content=f"required challenge on init")
+
+    # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
+
+    # data = cl.private_request("users/403353154/info/?include_suggested_users=true")
+
+    suggested_users = cl.private_request("discover/chaining/", params={"target_id": user_id})
+    extracted_users = [extract_user_short(user) for user in suggested_users.get('users', [])]
+
+    logger.info(f'got {len(extracted_users)} similar accounts')
+
+    similar_bloggers: List[User] = []
+
+    for i, user in enumerate(extracted_users):
+        if i > 1:
+            break
+
+        try:
+            user_info = cl.user_info(user.pk)
+            similar_bloggers.append(user_info)
+        except Exception as e:
+            logger.warning(f"got exception {e} when tried to get info about user {user}")
+
+    return similar_bloggers

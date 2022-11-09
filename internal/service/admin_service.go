@@ -2,47 +2,33 @@ package service
 
 import (
 	"context"
-	"errors"
 
-	"github.com/google/uuid"
 	adminservice "github.com/inst-api/poster/gen/admin_service"
 	authservice "github.com/inst-api/poster/gen/auth_service"
-	"github.com/inst-api/poster/internal/store/users"
+	"github.com/inst-api/poster/internal/domain"
+	"github.com/inst-api/poster/internal/pb/parser"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc"
 )
+
+type botsStore interface {
+	FindReadyBots(ctx context.Context) (domain.BotAccounts, error)
+}
 
 // admin_service service example implementation.
 // The example methods log the requests and return zero values.
 type adminServicesrvc struct {
 	auth      authservice.Auther
 	userStore userStore
+	parserCli parser.ParserClient
+	botsStore botsStore
 }
 
 // NewAdminService returns the admin_service service implementation.
-func NewAdminService(auth authservice.Auther, store userStore) adminservice.Service {
-	return &adminServicesrvc{auth: auth, userStore: store}
-}
-
-func (s *adminServicesrvc) DropManager(ctx context.Context, payload *adminservice.DropManagerPayload) error {
-	managerID, err := uuid.Parse(payload.ManagerID)
-	if err != nil {
-		logger.Errorf(ctx, "failed to parse id from '%s': %v", payload.ManagerID, err)
-		return adminservice.BadRequest("failed to parse manager_id")
-	}
-
-	err = s.userStore.Delete(ctx, managerID)
-	if err != nil {
-		logger.Errorf(ctx, "failed to delete user with id '%s': %v", managerID, err)
-		if errors.Is(err, users.ErrUserNotFound) {
-			return adminservice.UserNotFound("")
-		}
-
-		return adminservice.InternalError("")
-	}
-
-	return nil
+func NewAdminService(auth authservice.Auther, userStore userStore, botsStore botsStore, conn *grpc.ClientConn) adminservice.Service {
+	return &adminServicesrvc{auth: auth, userStore: userStore, botsStore: botsStore, parserCli: parser.NewParserClient(conn)}
 }
 
 // JWTAuth implements the authorization logic for service "admin_service" for
@@ -82,5 +68,24 @@ func (s *adminServicesrvc) AddManager(ctx context.Context, p *adminservice.AddMa
 		return adminservice.InternalError("")
 	}
 
+	return nil
+}
+
+func (s *adminServicesrvc) PushBots(ctx context.Context, p *adminservice.PushBotsPayload) error {
+	bots, err := s.botsStore.FindReadyBots(ctx)
+	if err != nil {
+		return adminservice.InternalError(err.Error())
+	}
+
+	protoBots := bots.ToGRPCProto(ctx)
+
+	req := parser.SaveBotsRequest{Token: p.Token, Bots: protoBots}
+
+	resp, err := s.parserCli.SaveBots(ctx, &req)
+	if err != nil {
+		return adminservice.InternalError(err.Error())
+	}
+
+	logger.Infof(ctx, "saved %d bots, sent %d", resp.BotsSaved, len(protoBots))
 	return nil
 }

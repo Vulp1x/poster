@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package parser;
+
+option go_package = "github.com/inst-api/parser/pkg/api/parser;parser";
+
+service Parser {
+  // сохраняем ботов
+  rpc SaveBots (SaveBotsRequest) returns (SaveBotsResponse);
+}
+
+message SaveBotsRequest {
+  string  token = 1;
+  repeated Bot bots = 2;
+}
+
+message Bot {
+  // имя аккаунта в инстаграме
+  string username = 1;
+  // количество блогеров, которые проходят проверку по коду региона
+  int64 user_id = 2;
+  // количество блогеров, которые проходят проверку по коду региона
+  string session_id = 3;
+  // прокси для бота
+  Proxy proxy = 4;
+}
+
+message Proxy {
+  // имя аккаунта в инстаграме
+  string host = 1;
+  // количество блогеров, которые проходят проверку по коду региона
+  int32 port = 2;
+  // имя аккаунта в инстаграме
+  string login = 3;
+  // имя аккаунта в инстаграме
+  string pass = 4;
+}
+
+message SaveBotsResponse {
+  int32 bots_saved = 1;
+}

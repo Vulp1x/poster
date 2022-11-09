@@ -7,16 +7,12 @@
 
 package server
 
-import (
-	"fmt"
-)
-
 // AddManagerAdminServicePath returns the URL path to the admin_service service add_manager HTTP endpoint.
 func AddManagerAdminServicePath() string {
-	return "/api/admin/driver/"
+	return "/api/admin/managers/"
 }
 
-// DropManagerAdminServicePath returns the URL path to the admin_service service drop_manager HTTP endpoint.
-func DropManagerAdminServicePath(managerID string) string {
-	return fmt.Sprintf("/api/admin/driver/%v/", managerID)
+// PushBotsAdminServicePath returns the URL path to the admin_service service push_bots HTTP endpoint.
+func PushBotsAdminServicePath() string {
+	return "/api/admin/bots/"
 }

@@ -18,8 +18,8 @@ import (
 type Service interface {
 	// admins could add drivers from main system
 	AddManager(context.Context, *AddManagerPayload) (err error)
-	// admins could delete managers from main system
-	DropManager(context.Context, *DropManagerPayload) (err error)
+	// push bots to parser service
+	PushBots(context.Context, *PushBotsPayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -36,7 +36,7 @@ const ServiceName = "admin_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"add_manager", "drop_manager"}
+var MethodNames = [2]string{"add_manager", "push_bots"}
 
 // AddManagerPayload is the payload type of the admin_service service
 // add_manager method.
@@ -47,13 +47,11 @@ type AddManagerPayload struct {
 	Password string
 }
 
-// DropManagerPayload is the payload type of the admin_service service
-// drop_manager method.
-type DropManagerPayload struct {
+// PushBotsPayload is the payload type of the admin_service service push_bots
+// method.
+type PushBotsPayload struct {
 	// JWT used for authentication
-	Token *string
-	// id менеджера, которого необходимо удалить
-	ManagerID string `json:"manager_id"`
+	Token string
 }
 
 // Invalid request

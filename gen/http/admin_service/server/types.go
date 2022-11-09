@@ -33,11 +33,9 @@ func NewAddManagerPayload(body *AddManagerRequestBody, token *string) *adminserv
 	return v
 }
 
-// NewDropManagerPayload builds a admin_service service drop_manager endpoint
-// payload.
-func NewDropManagerPayload(managerID string, token *string) *adminservice.DropManagerPayload {
-	v := &adminservice.DropManagerPayload{}
-	v.ManagerID = managerID
+// NewPushBotsPayload builds a admin_service service push_bots endpoint payload.
+func NewPushBotsPayload(token string) *adminservice.PushBotsPayload {
+	v := &adminservice.PushBotsPayload{}
 	v.Token = token
 
 	return v

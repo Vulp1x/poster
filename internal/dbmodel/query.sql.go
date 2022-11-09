@@ -266,6 +266,57 @@ func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID)
 	return items, nil
 }
 
+const findReadyBots = `-- name: FindReadyBots :many
+
+
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
+from bot_accounts
+where (res_proxy is not null or work_proxy is not null)
+  and status in (2, 4)
+`
+
+// -- name: GetTaskTargetsCount :many
+// select status, count(*)
+// from target_users
+// where task_id = $1
+// group by status;
+func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
+	rows, err := q.db.Query(ctx, findReadyBots)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BotAccount
+	for rows.Next() {
+		var i BotAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.Password,
+			&i.UserAgent,
+			&i.DeviceData,
+			&i.Session,
+			&i.Headers,
+			&i.ResProxy,
+			&i.WorkProxy,
+			&i.Status,
+			&i.PostsCount,
+			&i.StartedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
 from bot_accounts

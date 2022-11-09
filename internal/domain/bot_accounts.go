@@ -1,8 +1,13 @@
 package domain
 
 import (
+	"context"
+	"strconv"
+
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
+	"github.com/inst-api/poster/internal/pb/parser"
+	"github.com/inst-api/poster/pkg/logger"
 )
 
 type BotAccounts []BotAccount
@@ -34,6 +39,41 @@ func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsPar
 	}
 
 	return dbBots
+}
+
+func (b BotAccounts) ToGRPCProto(ctx context.Context) []*parser.Bot {
+	protoBots := make([]*parser.Bot, 0, len(b))
+
+	for _, botAccount := range b {
+		userID, err := strconv.ParseInt(botAccount.Headers.DsUserID, 10, 64)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse user id from '%s': %v", botAccount.Headers.DsUserID, err)
+			continue
+		}
+
+		proxy := botAccount.ResProxy
+		if proxy == nil {
+			proxy = botAccount.WorkProxy
+		}
+
+		if proxy == nil {
+			continue
+		}
+
+		protoBots = append(protoBots, &parser.Bot{
+			Username:  botAccount.Username,
+			UserId:    userID,
+			SessionId: botAccount.Headers.AuthData.SessionID,
+			Proxy: &parser.Proxy{
+				Host:  proxy.Host,
+				Port:  proxy.Port,
+				Login: proxy.Login,
+				Pass:  proxy.Pass,
+			},
+		})
+	}
+
+	return protoBots
 }
 
 // Ids возвращает список айдишников аккаунтов

@@ -116,52 +116,44 @@ func EncodeAddManagerError(encoder func(context.Context, http.ResponseWriter) go
 	}
 }
 
-// EncodeDropManagerResponse returns an encoder for responses returned by the
-// admin_service drop_manager endpoint.
-func EncodeDropManagerResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodePushBotsResponse returns an encoder for responses returned by the
+// admin_service push_bots endpoint.
+func EncodePushBotsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}
 }
 
-// DecodeDropManagerRequest returns a decoder for requests sent to the
-// admin_service drop_manager endpoint.
-func DecodeDropManagerRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodePushBotsRequest returns a decoder for requests sent to the
+// admin_service push_bots endpoint.
+func DecodePushBotsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			managerID string
-			token     *string
-			err       error
-
-			params = mux.Vars(r)
+			token string
+			err   error
 		)
-		managerID = params["manager_id"]
-		err = goa.MergeErrors(err, goa.ValidateFormat("managerID", managerID, goa.FormatUUID))
-
-		tokenRaw := r.Header.Get("Authorization")
-		if tokenRaw != "" {
-			token = &tokenRaw
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
 		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDropManagerPayload(managerID, token)
-		if payload.Token != nil {
-			if strings.Contains(*payload.Token, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.Token, " ", 2)[1]
-				payload.Token = &cred
-			}
+		payload := NewPushBotsPayload(token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
 		}
 
 		return payload, nil
 	}
 }
 
-// EncodeDropManagerError returns an encoder for errors returned by the
-// drop_manager admin_service endpoint.
-func EncodeDropManagerError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodePushBotsError returns an encoder for errors returned by the push_bots
+// admin_service endpoint.
+func EncodePushBotsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en ErrorNamer

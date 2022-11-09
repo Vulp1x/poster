@@ -220,3 +220,10 @@ select (select count(*) from target_users t where t.task_id = $1 and t.status = 
 -- from target_users
 -- where task_id = $1
 -- group by status;
+
+
+-- name: FindReadyBots :many
+select *
+from bot_accounts
+where (res_proxy is not null or work_proxy is not null)
+  and status in (2, 4);

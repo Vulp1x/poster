@@ -585,14 +585,14 @@ var _ = Service("admin_service", func() {
 		Error("invalid-scopes", String, "Token scopes are invalid")
 
 		HTTP(func() {
-			POST("api/admin/driver/")
+			POST("api/admin/managers/")
 			Response(StatusOK)
 			Response("invalid-scopes", StatusForbidden)
 		})
 	})
 
-	Method("drop_manager", func() {
-		Description("admins could delete managers from main system")
+	Method("push_bots", func() {
+		Description("push bots to parser service")
 
 		Security(JWTAuth, func() { // Use JWT to auth requests to this endpoint.
 			Scope("admin") // Enforce presence of "api:write" scope in JWT claims.
@@ -603,19 +603,13 @@ var _ = Service("admin_service", func() {
 				Description("JWT used for authentication")
 			})
 
-			Field(2, "manager_id", String, func() {
-				Description("id менеджера, которого необходимо удалить")
-				Format(FormatUUID)
-				Meta("struct:tag:json", "manager_id")
-			})
-
-			Required("manager_id")
+			Required("token")
 		})
 
 		Error("invalid-scopes", String, "Token scopes are invalid")
 
 		HTTP(func() {
-			DELETE("api/admin/driver/{manager_id}/")
+			POST("api/admin/bots/")
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response("invalid-scopes", StatusForbidden)

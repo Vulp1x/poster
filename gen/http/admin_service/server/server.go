@@ -18,9 +18,9 @@ import (
 
 // Server lists the admin_service service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	AddManager  http.Handler
-	DropManager http.Handler
+	Mounts     []*MountPoint
+	AddManager http.Handler
+	PushBots   http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -56,11 +56,11 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"AddManager", "POST", "/api/admin/driver/"},
-			{"DropManager", "DELETE", "/api/admin/driver/{manager_id}/"},
+			{"AddManager", "POST", "/api/admin/managers/"},
+			{"PushBots", "POST", "/api/admin/bots/"},
 		},
-		AddManager:  NewAddManagerHandler(e.AddManager, mux, decoder, encoder, errhandler, formatter),
-		DropManager: NewDropManagerHandler(e.DropManager, mux, decoder, encoder, errhandler, formatter),
+		AddManager: NewAddManagerHandler(e.AddManager, mux, decoder, encoder, errhandler, formatter),
+		PushBots:   NewPushBotsHandler(e.PushBots, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -70,13 +70,13 @@ func (s *Server) Service() string { return "admin_service" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.AddManager = m(s.AddManager)
-	s.DropManager = m(s.DropManager)
+	s.PushBots = m(s.PushBots)
 }
 
 // Mount configures the mux to serve the admin_service endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddManagerHandler(mux, h.AddManager)
-	MountDropManagerHandler(mux, h.DropManager)
+	MountPushBotsHandler(mux, h.PushBots)
 }
 
 // Mount configures the mux to serve the admin_service endpoints.
@@ -93,7 +93,7 @@ func MountAddManagerHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/api/admin/driver/", f)
+	mux.Handle("POST", "/api/admin/managers/", f)
 }
 
 // NewAddManagerHandler creates a HTTP handler which loads the HTTP request and
@@ -135,21 +135,21 @@ func NewAddManagerHandler(
 	})
 }
 
-// MountDropManagerHandler configures the mux to serve the "admin_service"
-// service "drop_manager" endpoint.
-func MountDropManagerHandler(mux goahttp.Muxer, h http.Handler) {
+// MountPushBotsHandler configures the mux to serve the "admin_service" service
+// "push_bots" endpoint.
+func MountPushBotsHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/api/admin/driver/{manager_id}/", f)
+	mux.Handle("POST", "/api/admin/bots/", f)
 }
 
-// NewDropManagerHandler creates a HTTP handler which loads the HTTP request
-// and calls the "admin_service" service "drop_manager" endpoint.
-func NewDropManagerHandler(
+// NewPushBotsHandler creates a HTTP handler which loads the HTTP request and
+// calls the "admin_service" service "push_bots" endpoint.
+func NewPushBotsHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -158,13 +158,13 @@ func NewDropManagerHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeDropManagerRequest(mux, decoder)
-		encodeResponse = EncodeDropManagerResponse(encoder)
-		encodeError    = EncodeDropManagerError(encoder, formatter)
+		decodeRequest  = DecodePushBotsRequest(mux, decoder)
+		encodeResponse = EncodePushBotsResponse(encoder)
+		encodeError    = EncodePushBotsError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "drop_manager")
+		ctx = context.WithValue(ctx, goa.MethodKey, "push_bots")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "admin_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

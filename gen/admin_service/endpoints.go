@@ -16,8 +16,8 @@ import (
 
 // Endpoints wraps the "admin_service" service endpoints.
 type Endpoints struct {
-	AddManager  goa.Endpoint
-	DropManager goa.Endpoint
+	AddManager goa.Endpoint
+	PushBots   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "admin_service" service with endpoints.
@@ -25,8 +25,8 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		AddManager:  NewAddManagerEndpoint(s, a.JWTAuth),
-		DropManager: NewDropManagerEndpoint(s, a.JWTAuth),
+		AddManager: NewAddManagerEndpoint(s, a.JWTAuth),
+		PushBots:   NewPushBotsEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -34,7 +34,7 @@ func NewEndpoints(s Service) *Endpoints {
 // endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.AddManager = m(e.AddManager)
-	e.DropManager = m(e.DropManager)
+	e.PushBots = m(e.PushBots)
 }
 
 // NewAddManagerEndpoint returns an endpoint function that calls the method
@@ -60,25 +60,21 @@ func NewAddManagerEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 	}
 }
 
-// NewDropManagerEndpoint returns an endpoint function that calls the method
-// "drop_manager" of service "admin_service".
-func NewDropManagerEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+// NewPushBotsEndpoint returns an endpoint function that calls the method
+// "push_bots" of service "admin_service".
+func NewPushBotsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*DropManagerPayload)
+		p := req.(*PushBotsPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"driver", "admin"},
 			RequiredScopes: []string{"admin"},
 		}
-		var token string
-		if p.Token != nil {
-			token = *p.Token
-		}
-		ctx, err = authJWTFn(ctx, token, &sc)
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.DropManager(ctx, p)
+		return nil, s.PushBots(ctx, p)
 	}
 }

@@ -1,0 +1,35 @@
+version: v1beta1
+build:
+  # More info: https://docs.buf.build/build-configuration/#roots
+  roots:
+    - api
+
+# More info: https://docs.buf.build/lint-overview/
+# For simplification purposes you can use the following config:
+# lint:
+#   use:
+#     - MINIMAL
+#   except:
+#     - PACKAGE_DIRECTORY_MATCH
+#   ignore:
+#     - github.com
+
+lint:
+  use:
+    - PACKAGE_AFFINITY # checks that you defined packages and options correctly
+    - PACKAGE_SAME_DIRECTORY # checks that all files with a given package are in the same directory
+    - DIRECTORY_SAME_PACKAGE # checks that all files in a given directory are in the same package
+    - SENSIBLE # checks minimal required security in modern Protobuf
+  except:
+    - PACKAGE_DIRECTORY_MATCH
+  rpc_allow_same_request_response: false
+  rpc_allow_google_protobuf_empty_requests: true
+  rpc_allow_google_protobuf_empty_responses: true
+
+# More info: https://docs.buf.build/breaking-overview/
+breaking:
+  use:
+    - FILE
+  ignore:
+    - github.com
+  ignore_unstable_packages: true
