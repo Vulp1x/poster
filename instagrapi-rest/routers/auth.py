@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 
 # noinspection PyUnresolvedReferences
 from custom_logging import CustomizeLogger
@@ -8,7 +8,7 @@ from custom_logging import CustomizeLogger
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Body
 from instagrapi import Client
-from instagrapi.exceptions import ChallengeRequired
+from instagrapi.exceptions import ChallengeRequired, LoginRequired
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
 
@@ -100,8 +100,8 @@ async def auth_add(session_id: str = Body(...),
     try:
         cl = clients.get(session_id)
         return PlainTextResponse(cl.sessionid)
-    except ChallengeRequired as ex:
-        return PlainTextResponse("account is blocked", status_code=400)
+    except ChallengeRequired or LoginRequired as ex:
+        return PlainTextResponse(f"account is blocked: {ex}", status_code=400)
 
     except Exception as e:
         logger.warning(e)
@@ -175,11 +175,17 @@ async def auth_add(session_id: str = Body(...),
 
 @router.get("/settings/get")
 async def settings_get(sessionid: str,
-                       clients: ClientStorage = Depends(get_clients)) -> Dict:
+                       clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, Dict]:
     """Get client's settings
     """
-    cl = clients.get(sessionid)
-    return cl.get_settings()
+
+    try:
+        cl: Client = clients.get(sessionid)
+    except ChallengeRequired as e:
+        return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
+
+    settings = cl.get_settings()
+    return settings
 
 
 #
@@ -201,8 +207,13 @@ async def settings_get(sessionid: str,
 
 @router.get("/timeline_feed")
 async def timeline_feed(sessionid: str,
-                        clients: ClientStorage = Depends(get_clients)) -> Dict:
+                        clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, Dict]:
     """Get your timeline feed
     """
-    cl = clients.get(sessionid)
-    return cl.get_timeline_feed()
+    cl: Client = clients.get(sessionid)
+    try:
+        cl.get_timeline_feed()
+    except ChallengeRequired as e:
+        return PlainTextResponse(status_code=400, content=f'bot {cl.username} is blocked')
+
+    return

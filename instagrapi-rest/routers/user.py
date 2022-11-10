@@ -1,5 +1,7 @@
+import random
 import tempfile
 from pathlib import Path
+from time import sleep
 from typing import List, Optional, Union
 
 import instagrapi.exceptions
@@ -13,7 +15,7 @@ from instagrapi import Client
 from instagrapi.exceptions import UserNotFound
 from instagrapi.extractors import extract_user_short
 from instagrapi.types import (
-    User
+    User, UserShort
 )
 from starlette.responses import JSONResponse, PlainTextResponse
 
@@ -90,10 +92,10 @@ async def edit_profile(sessionid: str = Form(...),
             cl.account_change_picture(Path(fp.name))
 
 
-@router.post("/similar", response_model=List[User])
-async def similar(sessionid: str = Form(...),
-                  user_id: int = Form(...),
-                  clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[User]]:
+@router.post("/similar/full", response_model=List[User])
+async def similar_full(sessionid: str = Form(...),
+                       username: str = Form(...),
+                       clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[User]]:
     """Get user's followers
     """
     try:
@@ -106,21 +108,78 @@ async def similar(sessionid: str = Form(...),
 
     # data = cl.private_request("users/403353154/info/?include_suggested_users=true")
 
-    suggested_users = cl.private_request("discover/chaining/", params={"target_id": user_id})
+    similar_bloggers: List[User] = []
+
+    try:
+        blogger = cl.user_info_by_username_v1(username)
+        similar_bloggers.append(blogger)
+
+    except Exception as e:
+        return PlainTextResponse(status_code=404, content=f'blogger {username} not found: {e}')
+
+    suggested_users = cl.private_request("discover/chaining/", params={"target_id": blogger.pk})
     extracted_users = [extract_user_short(user) for user in suggested_users.get('users', [])]
 
     logger.info(f'got {len(extracted_users)} similar accounts')
 
-    similar_bloggers: List[User] = []
-
     for i, user in enumerate(extracted_users):
-        if i > 1:
+        if i > 30:
             break
+        sleep(20 + random.randint(0, 15))
 
         try:
             user_info = cl.user_info(user.pk)
             similar_bloggers.append(user_info)
         except Exception as e:
             logger.warning(f"got exception {e} when tried to get info about user {user}")
+            break
+
+    logger.info(f'returning {len(similar_bloggers) - 1} similar accounts')
 
     return similar_bloggers
+
+
+@router.post("/similar", response_model=List[UserShort])
+async def similar(sessionid: str = Form(...),
+                  username: str = Form(...),
+                  clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[UserShort]]:
+    """Get user's followers
+    """
+    try:
+        cl: Client = clients.get(sessionid)
+    except instagrapi.exceptions.ChallengeRequired:
+        return PlainTextResponse(status_code=400,
+                                 content=f"required challenge on init")
+
+    # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
+
+    # data = cl.private_request("users/403353154/info/?include_suggested_users=true")
+
+    similar_bloggers: List[UserShort] = []
+    blogger: Optional[UserShort] = None
+
+    try:
+        bloggers: List[UserShort] = cl.search_users_v1(username, 30)
+        for blogger_ in bloggers:
+            if blogger_.username == username:
+                blogger = blogger_
+                break
+
+        if not blogger:
+            blogger_full = cl.user_info_by_username_v1(username)
+            blogger = extract_user_short(
+                dict(pk=blogger_full.pk, username=blogger_full.username, full_name=blogger_full.full_name,
+                     is_private=blogger_full.is_private, is_verified=blogger_full.is_verified))
+
+        similar_bloggers.append(blogger)
+
+
+    except Exception as e:
+        return PlainTextResponse(status_code=404, content=f'blogger {username} not found: {e}')
+
+    suggested_users = cl.private_request("discover/chaining/", params={"target_id": blogger.pk})
+    extracted_users = [extract_user_short(user) for user in suggested_users.get('users', [])]
+
+    logger.info(f'got {len(extracted_users)} similar accounts')
+
+    return extracted_users

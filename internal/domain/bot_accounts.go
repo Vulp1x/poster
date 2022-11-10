@@ -45,7 +45,7 @@ func (b BotAccounts) ToGRPCProto(ctx context.Context) []*parser.Bot {
 	protoBots := make([]*parser.Bot, 0, len(b))
 
 	for _, botAccount := range b {
-		userID, err := strconv.ParseInt(botAccount.Headers.DsUserID, 10, 64)
+		userID, err := strconv.ParseInt(botAccount.Headers.AuthData.DsUserID, 10, 64)
 		if err != nil {
 			logger.Errorf(ctx, "failed to parse user id from '%s': %v", botAccount.Headers.DsUserID, err)
 			continue
