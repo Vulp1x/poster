@@ -7,6 +7,8 @@ import (
 
 var _ = API("rest-api", func() {
 	Title("REST api for simple route app")
+	HTTP(func() {
+	})
 })
 
 // JWTAuth defines a security scheme that uses JWT tokens.
@@ -150,7 +152,9 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "post_images")
 			})
 
-			Required("token", "title", "text_template", "post_images", "landing_accounts")
+			Attribute("type", TaskType)
+
+			Required("token", "title", "text_template", "post_images", "landing_accounts", "type")
 		})
 
 		Result(String, func() {
@@ -264,6 +268,44 @@ var _ = Service("tasks_service", func() {
 
 		HTTP(func() {
 			PUT("/api/tasks/{task_id}/")
+			// Use Authorization header to provide basic auth value.
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
+	Method("upload video", func() {
+		Description("загрузить файл с пользователями, прокси")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи, в которую загружаем пользователей/прокси")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("filename", String, "не нужно присылать руками, подставится автоматом")
+
+			Attribute("video", Bytes)
+
+			Required("token", "task_id", "video")
+		})
+
+		Result(func() {
+			Attribute("status", TaskStatus)
+
+			Required("status")
+		})
+
+		HTTP(func() {
+			POST("/api/tasks/{task_id}/upload/video/")
+			MultipartRequest()
 			// Use Authorization header to provide basic auth value.
 			Response(StatusOK)
 			Response(StatusNotFound)

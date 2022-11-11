@@ -26,6 +26,9 @@ var ErrTaskNotFound = errors.New("task not found")
 // ErrTaskInvalidStatus переход по статусам не возможен
 var ErrTaskInvalidStatus = errors.New("invalid task status")
 
+// ErrUnexpectedTaskType ожидали другой тип таски
+var ErrUnexpectedTaskType = errors.New("unexpected task type")
+
 func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string) *Store {
 	return &Store{
 		tasksChan:   make(chan domain.Task, 10),

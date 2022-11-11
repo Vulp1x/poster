@@ -76,19 +76,24 @@ var TaskStatus = Type("TaskStatus", Int, func() {
 	6 - задача завершена`)
 })
 
+// TaskType описывает тип задачи (фотографии или рилсы)
+var TaskType = Type("TaskType", Int, func() {
+	Enum(1, 2)
+	Description(`1 - загружаем изображения
+	2- загружаем видео в рилсы`)
+})
+
 // Task описывает рекламную кампанию
 var Task = Type("Task", func() {
 	Attribute("id", String, "", func() {
 		Format(FormatUUID)
 	})
 
+	Attribute("type", TaskType)
+
 	Attribute("text_template", String, func() {
 		Meta("struct:tag:json", "text_template")
 		Description("описание под постом")
-	})
-
-	Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
-		Meta("struct:tag:json", "post_images")
 	})
 
 	Attribute("landing_accounts", ArrayOf(String), func() {
@@ -104,11 +109,6 @@ var Task = Type("Task", func() {
 	Attribute("bot_last_names", ArrayOf(String), func() {
 		Description("фамилии для аккаунтов-ботов")
 		Meta("struct:tag:json", "bot_last_names")
-	})
-
-	Attribute("bot_images", ArrayOf(String), func() {
-		Description("аватарки для ботов")
-		Meta("struct:tag:json", "bot_images")
 	})
 
 	Attribute("bot_urls", ArrayOf(String), func() {
@@ -176,7 +176,16 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_per_post")
 	})
 
-	Required("id", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num",
+	Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
+		Meta("struct:tag:json", "post_images")
+	})
+
+	Attribute("bot_images", ArrayOf(String), func() {
+		Description("аватарки для ботов")
+		Meta("struct:tag:json", "bot_images")
+	})
+
+	Required("id", "type", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num",
 		"cheap_proxies_num", "targets_num", "bot_images", "landing_accounts", "bot_names", "bot_last_names", "bot_urls",
 		"targets_per_post", "posts_per_bot", "photo_tags_delay_seconds", "per_post_sleep_seconds", "need_photo_tags", "follow_targets",
 	)

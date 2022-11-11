@@ -15,3 +15,12 @@ const (
 	// DoneTaskStatus задача выполнена
 	DoneTaskStatus taskStatus = 6
 )
+
+type taskType int16
+
+const (
+	// PhotoTaskType задача только создана, нужно загрузить список ботов, прокси и получателей
+	PhotoTaskType taskType = 1
+	// ReelsTaskType в задачу загрузили необходимые списки, нужно присвоить прокси для ботов
+	ReelsTaskType taskType = 2
+)

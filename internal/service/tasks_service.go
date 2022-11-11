@@ -11,13 +11,14 @@ import (
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
+	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
 )
 
 type taskStore interface {
-	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte, opts ...tasks.DraftOption) (uuid.UUID, error)
+	CreateDraftTask(ctx context.Context, userID uuid.UUID, title, textTemplate string, accounts []string, images [][]byte, taskType tasksservice.TaskType, opts ...tasks.DraftOption) (uuid.UUID, error)
 	UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...tasks.UpdateOption) (domain.Task, error)
 	StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error)
 	StopTask(ctx context.Context, taskID uuid.UUID) error
@@ -27,6 +28,7 @@ type taskStore interface {
 	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
 	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
 	TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error)
+	SaveVideo(ctx context.Context, taskID uuid.UUID, video []byte, filename string) (domain.Task, error)
 }
 
 // tasks_service service example implementation.
@@ -83,7 +85,7 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 		botProfileImages = append(botProfileImages, imageDecodedBytes)
 	}
 
-	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, p.LandingAccounts, imagesDecodedBytes,
+	taskID, err := s.store.CreateDraftTask(ctx, userID, p.Title, p.TextTemplate, p.LandingAccounts, imagesDecodedBytes, p.Type,
 		tasks.CreateDraftWithAccountNames(p.BotNames),
 		tasks.CreateDraftWithAccountLastNames(p.BotLastNames),
 		tasks.CreateDraftWithAccountProfileImages(botProfileImages),
@@ -323,12 +325,44 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 			return result, tasksservice.BadRequest("invalid task status")
 		}
 
-		return result, tasksservice.InternalError(err.Error())
+		return result, internalErr(err)
 	}
 
 	result.Status = tasksservice.TaskStatus(dbmodel.DataUploadedTaskStatus)
 
 	return result, nil
+}
+
+func (s *tasksServicesrvc) UploadVideo(ctx context.Context, p *tasksservice.UploadVideoPayload) (*tasksservice.UploadVideoResult, error) {
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("bad task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	if p.Filename == nil {
+		shortID := mw.ShortID()
+		logger.Warnf(ctx, "got empty file name, using %s instead", shortID)
+		p.Filename = &shortID
+	}
+
+	task, err := s.store.SaveVideo(ctx, taskID, p.Video, *p.Filename)
+	if err != nil {
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+
+		}
+
+		if errors.Is(err, tasks.ErrUnexpectedTaskType) || errors.Is(err, tasks.ErrTaskInvalidStatus) {
+			return nil, tasksservice.BadRequest(err.Error())
+		}
+
+		return nil, internalErr(err)
+	}
+
+	return &tasksservice.UploadVideoResult{Status: tasksservice.TaskStatus(task.Status)}, nil
 }
 
 func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.AssignProxiesPayload) (*tasksservice.AssignProxiesResult, error) {
@@ -348,7 +382,7 @@ func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.As
 			return nil, tasksservice.BadRequest("invalid task status")
 		}
 
-		return nil, tasksservice.InternalError(err.Error())
+		return nil, internalErr(err)
 	}
 
 	return &tasksservice.AssignProxiesResult{
@@ -375,7 +409,7 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 			return tasksservice.TaskNotFound("")
 		}
 
-		return tasksservice.InternalError(err.Error())
+		return internalErr(err)
 	}
 
 	return nil
@@ -402,8 +436,12 @@ func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetP
 			return nil, tasksservice.BadRequest("invalid status")
 		}
 
-		return nil, tasksservice.InternalError(err.Error())
+		return nil, internalErr(err)
 	}
 
 	return domainProgress.ToProto(), nil
+}
+
+func internalErr(err error) tasksservice.InternalError {
+	return tasksservice.InternalError(err.Error())
 }

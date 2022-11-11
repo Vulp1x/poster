@@ -41,6 +41,10 @@ overrides:
     go_type:
       type: "taskStatus"
       import: ""
+  - column: "tasks.type"
+    go_type:
+      type: "taskType"
+      import: ""
   - column: "target_users.status"
     go_type:
       type: "targetStatus"

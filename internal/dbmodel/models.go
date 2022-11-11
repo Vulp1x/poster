@@ -95,6 +95,8 @@ type Task struct {
 	PhotoTagsDelaySeconds int32      `json:"photo_tags_delay_seconds"`
 	PostsPerBot           int32      `json:"posts_per_bot"`
 	TargetsPerPost        int32      `json:"targets_per_post"`
+	Type                  taskType   `json:"type"`
+	VideoFilename         *string    `json:"video_filename"`
 }
 
 type User struct {

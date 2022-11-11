@@ -31,6 +31,7 @@ type CreateTaskDraftRequestBody struct {
 	BotUrls []string `json:"bot_images"`
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
+	Type       *int     `form:"type,omitempty" json:"type,omitempty" xml:"type,omitempty"`
 }
 
 // UpdateTaskRequestBody is the type of the "tasks_service" service "update
@@ -66,6 +67,14 @@ type UpdateTaskRequestBody struct {
 	TargetsPerPost *uint `json:"targets_per_post"`
 }
 
+// UploadVideoRequestBody is the type of the "tasks_service" service "upload
+// video" endpoint HTTP request body.
+type UploadVideoRequestBody struct {
+	// не нужно присылать руками, подставится автоматом
+	Filename *string `form:"filename,omitempty" json:"filename,omitempty" xml:"filename,omitempty"`
+	Video    []byte  `form:"video,omitempty" json:"video,omitempty" xml:"video,omitempty"`
+}
+
 // UploadFilesRequestBody is the type of the "tasks_service" service "upload
 // files" endpoint HTTP request body.
 type UploadFilesRequestBody struct {
@@ -83,19 +92,16 @@ type UploadFilesRequestBody struct {
 // UpdateTaskOKResponseBody is the type of the "tasks_service" service "update
 // task" endpoint HTTP response body.
 type UpdateTaskOKResponseBody struct {
-	ID string `form:"id" json:"id" xml:"id"`
+	ID   string `form:"id" json:"id" xml:"id"`
+	Type int    `form:"type" json:"type" xml:"type"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// список base64 строк картинок
-	PostImages []string `json:"post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
@@ -129,6 +135,16 @@ type UpdateTaskOKResponseBody struct {
 	PostsPerBot uint `json:"posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
+}
+
+// UploadVideoOKResponseBody is the type of the "tasks_service" service "upload
+// video" endpoint HTTP response body.
+type UploadVideoOKResponseBody struct {
+	Status int `form:"status" json:"status" xml:"status"`
 }
 
 // UploadFilesOKResponseBody is the type of the "tasks_service" service "upload
@@ -171,19 +187,16 @@ type StopTaskOKResponseBody struct {
 // GetTaskOKResponseBody is the type of the "tasks_service" service "get task"
 // endpoint HTTP response body.
 type GetTaskOKResponseBody struct {
-	ID string `form:"id" json:"id" xml:"id"`
+	ID   string `form:"id" json:"id" xml:"id"`
+	Type int    `form:"type" json:"type" xml:"type"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// список base64 строк картинок
-	PostImages []string `json:"post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
@@ -217,6 +230,10 @@ type GetTaskOKResponseBody struct {
 	PostsPerBot uint `json:"posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 }
 
 // GetProgressOKResponseBody is the type of the "tasks_service" service "get
@@ -263,19 +280,16 @@ type BotsProgressResponseBody struct {
 
 // TaskResponse is used to define fields on response body types.
 type TaskResponse struct {
-	ID string `form:"id" json:"id" xml:"id"`
+	ID   string `form:"id" json:"id" xml:"id"`
+	Type int    `form:"type" json:"type" xml:"type"`
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// список base64 строк картинок
-	PostImages []string `json:"post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
 	Status  int      `form:"status" json:"status" xml:"status"`
@@ -309,6 +323,10 @@ type TaskResponse struct {
 	PostsPerBot uint `json:"posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 }
 
 // TaskFileNamesRequestBody is used to define fields on request body types.
@@ -349,6 +367,7 @@ type TargetUserRecordRequestBody struct {
 func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBody {
 	body := &UpdateTaskOKResponseBody{
 		ID:                         res.ID,
+		Type:                       int(res.Type),
 		TextTemplate:               res.TextTemplate,
 		Status:                     int(res.Status),
 		Title:                      res.Title,
@@ -366,12 +385,6 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
 		PostsPerBot:                res.PostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
-	}
-	if res.PostImages != nil {
-		body.PostImages = make([]string, len(res.PostImages))
-		for i, val := range res.PostImages {
-			body.PostImages[i] = val
-		}
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -391,17 +404,32 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 			body.BotLastNames[i] = val
 		}
 	}
+	if res.BotUrls != nil {
+		body.BotUrls = make([]string, len(res.BotUrls))
+		for i, val := range res.BotUrls {
+			body.BotUrls[i] = val
+		}
+	}
+	if res.PostImages != nil {
+		body.PostImages = make([]string, len(res.PostImages))
+		for i, val := range res.PostImages {
+			body.PostImages[i] = val
+		}
+	}
 	if res.BotImages != nil {
 		body.BotImages = make([]string, len(res.BotImages))
 		for i, val := range res.BotImages {
 			body.BotImages[i] = val
 		}
 	}
-	if res.BotUrls != nil {
-		body.BotUrls = make([]string, len(res.BotUrls))
-		for i, val := range res.BotUrls {
-			body.BotUrls[i] = val
-		}
+	return body
+}
+
+// NewUploadVideoOKResponseBody builds the HTTP response body from the result
+// of the "upload video" endpoint of the "tasks_service" service.
+func NewUploadVideoOKResponseBody(res *tasksservice.UploadVideoResult) *UploadVideoOKResponseBody {
+	body := &UploadVideoOKResponseBody{
+		Status: int(res.Status),
 	}
 	return body
 }
@@ -463,6 +491,7 @@ func NewStopTaskOKResponseBody(res *tasksservice.StopTaskResult) *StopTaskOKResp
 func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 	body := &GetTaskOKResponseBody{
 		ID:                         res.ID,
+		Type:                       int(res.Type),
 		TextTemplate:               res.TextTemplate,
 		Status:                     int(res.Status),
 		Title:                      res.Title,
@@ -480,12 +509,6 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
 		PostsPerBot:                res.PostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
-	}
-	if res.PostImages != nil {
-		body.PostImages = make([]string, len(res.PostImages))
-		for i, val := range res.PostImages {
-			body.PostImages[i] = val
-		}
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -505,16 +528,22 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 			body.BotLastNames[i] = val
 		}
 	}
-	if res.BotImages != nil {
-		body.BotImages = make([]string, len(res.BotImages))
-		for i, val := range res.BotImages {
-			body.BotImages[i] = val
-		}
-	}
 	if res.BotUrls != nil {
 		body.BotUrls = make([]string, len(res.BotUrls))
 		for i, val := range res.BotUrls {
 			body.BotUrls[i] = val
+		}
+	}
+	if res.PostImages != nil {
+		body.PostImages = make([]string, len(res.PostImages))
+		for i, val := range res.PostImages {
+			body.PostImages[i] = val
+		}
+	}
+	if res.BotImages != nil {
+		body.BotImages = make([]string, len(res.BotImages))
+		for i, val := range res.BotImages {
+			body.BotImages[i] = val
 		}
 	}
 	return body
@@ -555,6 +584,7 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 	v := &tasksservice.CreateTaskDraftPayload{
 		Title:        *body.Title,
 		TextTemplate: *body.TextTemplate,
+		Type:         tasksservice.TaskType(*body.Type),
 	}
 	v.LandingAccounts = make([]string, len(body.LandingAccounts))
 	for i, val := range body.LandingAccounts {
@@ -641,6 +671,19 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 		for i, val := range body.BotUrls {
 			v.BotUrls[i] = val
 		}
+	}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
+// NewUploadVideoPayload builds a tasks_service service upload video endpoint
+// payload.
+func NewUploadVideoPayload(body *UploadVideoRequestBody, taskID string, token string) *tasksservice.UploadVideoPayload {
+	v := &tasksservice.UploadVideoPayload{
+		Filename: body.Filename,
+		Video:    body.Video,
 	}
 	v.TaskID = taskID
 	v.Token = token
@@ -756,6 +799,23 @@ func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err e
 	}
 	if body.LandingAccounts == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("landing_accounts", "body"))
+	}
+	if body.Type == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("type", "body"))
+	}
+	if body.Type != nil {
+		if !(*body.Type == 1 || *body.Type == 2) {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.type", *body.Type, []interface{}{1, 2}))
+		}
+	}
+	return
+}
+
+// ValidateUploadVideoRequestBody runs the validations defined on Upload
+// VideoRequestBody
+func ValidateUploadVideoRequestBody(body *UploadVideoRequestBody) (err error) {
+	if body.Video == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("video", "body"))
 	}
 	return
 }

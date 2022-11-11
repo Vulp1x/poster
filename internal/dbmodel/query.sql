@@ -26,8 +26,8 @@ where id = $1;
 
 -- name: CreateDraftTask :one
 insert into tasks(manager_id, text_template, title, landing_accounts, images, account_names, account_last_names,
-                  account_profile_images, account_urls, status, created_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, now())
+                  account_profile_images, account_urls, status, type, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, $10, now())
 RETURNING id;
 
 -- name: FindTaskByID :one
@@ -227,3 +227,8 @@ select *
 from bot_accounts
 where (res_proxy is not null or work_proxy is not null)
   and status in (2, 4);
+
+-- name: SetTaskVideoFilename :exec
+update tasks
+set video_filename = @video_filename
+where id = @id;

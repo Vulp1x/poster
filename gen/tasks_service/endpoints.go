@@ -18,6 +18,7 @@ import (
 type Endpoints struct {
 	CreateTaskDraft goa.Endpoint
 	UpdateTask      goa.Endpoint
+	UploadVideo     goa.Endpoint
 	UploadFiles     goa.Endpoint
 	AssignProxies   goa.Endpoint
 	ForceDelete     goa.Endpoint
@@ -35,6 +36,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		CreateTaskDraft: NewCreateTaskDraftEndpoint(s, a.JWTAuth),
 		UpdateTask:      NewUpdateTaskEndpoint(s, a.JWTAuth),
+		UploadVideo:     NewUploadVideoEndpoint(s, a.JWTAuth),
 		UploadFiles:     NewUploadFilesEndpoint(s, a.JWTAuth),
 		AssignProxies:   NewAssignProxiesEndpoint(s, a.JWTAuth),
 		ForceDelete:     NewForceDeleteEndpoint(s, a.JWTAuth),
@@ -51,6 +53,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateTaskDraft = m(e.CreateTaskDraft)
 	e.UpdateTask = m(e.UpdateTask)
+	e.UploadVideo = m(e.UploadVideo)
 	e.UploadFiles = m(e.UploadFiles)
 	e.AssignProxies = m(e.AssignProxies)
 	e.ForceDelete = m(e.ForceDelete)
@@ -96,6 +99,25 @@ func NewUpdateTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoi
 			return nil, err
 		}
 		return s.UpdateTask(ctx, p)
+	}
+}
+
+// NewUploadVideoEndpoint returns an endpoint function that calls the method
+// "upload video" of service "tasks_service".
+func NewUploadVideoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UploadVideoPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.UploadVideo(ctx, p)
 	}
 }
 

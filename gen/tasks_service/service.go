@@ -24,6 +24,8 @@ type Service interface {
 	// остановить выполнение.
 	UpdateTask(context.Context, *UpdateTaskPayload) (res *Task, err error)
 	// загрузить файл с пользователями, прокси
+	UploadVideo(context.Context, *UploadVideoPayload) (res *UploadVideoResult, err error)
+	// загрузить файл с пользователями, прокси
 	UploadFiles(context.Context, *UploadFilesPayload) (res *UploadFilesResult, err error)
 	// присвоить ботам прокси
 	AssignProxies(context.Context, *AssignProxiesPayload) (res *AssignProxiesResult, err error)
@@ -55,7 +57,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [10]string{"create task draft", "update task", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "get progress", "list tasks"}
+var MethodNames = [11]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "get progress", "list tasks"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -113,6 +115,7 @@ type CreateTaskDraftPayload struct {
 	BotUrls []string `json:"bot_images"`
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
+	Type       TaskType
 }
 
 // ForceDeletePayload is the payload type of the tasks_service service force
@@ -199,19 +202,16 @@ type TargetUserRecord struct {
 
 // Task is the result type of the tasks_service service update task method.
 type Task struct {
-	ID string
+	ID   string
+	Type TaskType
 	// описание под постом
 	TextTemplate string `json:"text_template"`
-	// список base64 строк картинок
-	PostImages []string `json:"post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
 	Status  TaskStatus
@@ -245,6 +245,10 @@ type Task struct {
 	PostsPerBot uint `json:"posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 }
 
 type TaskFileNames struct {
@@ -281,6 +285,10 @@ type TaskProgress struct {
 // 5 - задача остановлена
 // 6 - задача завершена
 type TaskStatus int
+
+// 1 - загружаем изображения
+// 2- загружаем видео в рилсы
+type TaskType int
 
 // UpdateTaskPayload is the payload type of the tasks_service service update
 // task method.
@@ -354,6 +362,24 @@ type UploadFilesResult struct {
 	// ошибки, которые возникли при загрузке файлов
 	UploadErrors []*UploadError `json:"upload_errors"`
 	Status       TaskStatus
+}
+
+// UploadVideoPayload is the payload type of the tasks_service service upload
+// video method.
+type UploadVideoPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи, в которую загружаем пользователей/прокси
+	TaskID string `json:"task_id"`
+	// не нужно присылать руками, подставится автоматом
+	Filename *string
+	Video    []byte
+}
+
+// UploadVideoResult is the result type of the tasks_service service upload
+// video method.
+type UploadVideoResult struct {
+	Status TaskStatus
 }
 
 // Invalid request

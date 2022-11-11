@@ -160,7 +160,9 @@ CREATE TABLE public.tasks (
     per_post_sleep_seconds integer DEFAULT 0 NOT NULL,
     photo_tags_delay_seconds integer DEFAULT 0 NOT NULL,
     posts_per_bot integer DEFAULT 0 NOT NULL,
-    targets_per_post integer DEFAULT 0 NOT NULL
+    targets_per_post integer DEFAULT 0 NOT NULL,
+    type smallint DEFAULT 0 NOT NULL,
+    video_filename text
 );
 
 

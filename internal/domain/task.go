@@ -46,6 +46,7 @@ func (t Task) ToProto() *tasksservice.Task {
 		PhotoTagsDelaySeconds:      uint(t.PhotoTagsDelaySeconds),
 		PostsPerBot:                uint(t.PostsPerBot),
 		TargetsPerPost:             uint(t.TargetsPerPost),
+		Type:                       tasksservice.TaskType(t.Type),
 	}
 }
 

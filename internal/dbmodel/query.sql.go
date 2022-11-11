@@ -63,8 +63,8 @@ func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProx
 
 const createDraftTask = `-- name: CreateDraftTask :one
 insert into tasks(manager_id, text_template, title, landing_accounts, images, account_names, account_last_names,
-                  account_profile_images, account_urls, status, created_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, now())
+                  account_profile_images, account_urls, status, type, created_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, $10, now())
 RETURNING id
 `
 
@@ -78,6 +78,7 @@ type CreateDraftTaskParams struct {
 	AccountLastNames     []string  `json:"account_last_names"`
 	AccountProfileImages [][]byte  `json:"account_profile_images"`
 	AccountUrls          []string  `json:"account_urls"`
+	Type                 taskType  `json:"type"`
 }
 
 func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams) (uuid.UUID, error) {
@@ -91,6 +92,7 @@ func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams
 		arg.AccountLastNames,
 		arg.AccountProfileImages,
 		arg.AccountUrls,
+		arg.Type,
 	)
 	var id uuid.UUID
 	err := row.Scan(&id)
@@ -400,7 +402,7 @@ func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
 from tasks
 where id = $1
 `
@@ -435,12 +437,14 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.PhotoTagsDelaySeconds,
 		&i.PostsPerBot,
 		&i.TargetsPerPost,
+		&i.Type,
+		&i.VideoFilename,
 	)
 	return i, err
 }
 
 const findTasksByManagerID = `-- name: FindTasksByManagerID :many
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
 from tasks
 where manager_id = $1
 `
@@ -481,6 +485,8 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.PhotoTagsDelaySeconds,
 			&i.PostsPerBot,
 			&i.TargetsPerPost,
+			&i.Type,
+			&i.VideoFilename,
 		); err != nil {
 			return nil, err
 		}
@@ -818,6 +824,22 @@ func (q *Queries) SetTargetsStatus(ctx context.Context, arg SetTargetsStatusPara
 	return err
 }
 
+const setTaskVideoFilename = `-- name: SetTaskVideoFilename :exec
+update tasks
+set video_filename = $1
+where id = $2
+`
+
+type SetTaskVideoFilenameParams struct {
+	VideoFilename *string   `json:"video_filename"`
+	ID            uuid.UUID `json:"id"`
+}
+
+func (q *Queries) SetTaskVideoFilename(ctx context.Context, arg SetTaskVideoFilenameParams) error {
+	_, err := q.db.Exec(ctx, setTaskVideoFilename, arg.VideoFilename, arg.ID)
+	return err
+}
+
 const startTaskByID = `-- name: StartTaskByID :exec
 update tasks
 set status     = 4,
@@ -849,7 +871,7 @@ set text_template            = $1,
     targets_per_post         = $14,
     updated_at               = now()
 where id = $15
-returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post
+returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
 `
 
 type UpdateTaskParams struct {
@@ -916,6 +938,8 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		&i.PhotoTagsDelaySeconds,
 		&i.PostsPerBot,
 		&i.TargetsPerPost,
+		&i.Type,
+		&i.VideoFilename,
 	)
 	return i, err
 }

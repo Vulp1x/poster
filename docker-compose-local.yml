@@ -20,6 +20,7 @@ services:
       - "40000:40000"
     volumes:
       - ./tmp:/root/tmp
+      - ./videos:/root/videos
     networks:
       - ompnw
   postgres:

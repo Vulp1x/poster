@@ -70,7 +70,7 @@ func handleHTTPServer(
 	{
 		eh := errorHandler()
 		authServiceServer = authservicesvr.New(authServiceEndpoints, mux, dec, enc, eh, nil)
-		tasksServiceServer = tasksservicesvr.New(tasksServiceEndpoints, mux, dec, enc, eh, nil, multipart.TasksServiceUploadFileDecoderFunc)
+		tasksServiceServer = tasksservicesvr.New(tasksServiceEndpoints, mux, dec, enc, eh, nil, multipart.TasksServiceUploadVideosDecoderFunc, multipart.TasksServiceUploadFileDecoderFunc)
 		adminServiceServer = adminservicesvr.New(adminServiceEndpoints, mux, dec, enc, eh, nil)
 
 		authServiceServer.Use(mw.RequestLoggerWithDebug(mux, debug))

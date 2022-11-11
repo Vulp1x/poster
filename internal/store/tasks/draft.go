@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 )
 
@@ -15,9 +16,26 @@ func (s *Store) CreateDraftTask(
 	title, textTemplate string,
 	accounts []string,
 	images [][]byte,
+	taskType tasksservice.TaskType,
 	opts ...DraftOption,
 ) (uuid.UUID, error) {
 	q := dbmodel.New(s.dbtxf(ctx))
+
+	dbTaskType := dbmodel.PhotoTaskType
+
+	switch taskType {
+	case tasksservice.TaskType(dbmodel.ReelsTaskType):
+		dbTaskType = dbmodel.ReelsTaskType
+	case tasksservice.TaskType(dbmodel.PhotoTaskType):
+		dbTaskType = dbmodel.PhotoTaskType
+
+	default:
+		return [16]byte{}, fmt.Errorf(
+			"%w: expected %d or %d, got: %d",
+			ErrUnexpectedTaskType, dbmodel.PhotoTaskType, dbmodel.ReelsTaskType, taskType,
+		)
+
+	}
 
 	mandatoryParams := dbmodel.CreateDraftTaskParams{
 		ManagerID:       userID,
@@ -25,6 +43,7 @@ func (s *Store) CreateDraftTask(
 		LandingAccounts: accounts,
 		Images:          images,
 		Title:           title,
+		Type:            dbTaskType,
 	}
 
 	for _, opt := range opts {

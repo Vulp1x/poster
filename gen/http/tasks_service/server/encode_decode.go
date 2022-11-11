@@ -221,6 +221,120 @@ func EncodeUpdateTaskError(encoder func(context.Context, http.ResponseWriter) go
 	}
 }
 
+// EncodeUploadVideoResponse returns an encoder for responses returned by the
+// tasks_service upload video endpoint.
+func EncodeUploadVideoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*tasksservice.UploadVideoResult)
+		enc := encoder(ctx, w)
+		body := NewUploadVideoOKResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeUploadVideoRequest returns a decoder for requests sent to the
+// tasks_service upload video endpoint.
+func DecodeUploadVideoRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var payload *tasksservice.UploadVideoPayload
+		if err := decoder(r).Decode(&payload); err != nil {
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// NewTasksServiceUploadVideoDecoder returns a decoder to decode the multipart
+// request for the "tasks_service" service "upload video" endpoint.
+func NewTasksServiceUploadVideoDecoder(mux goahttp.Muxer, tasksServiceUploadVideoDecoderFn TasksServiceUploadVideoDecoderFunc) func(r *http.Request) goahttp.Decoder {
+	return func(r *http.Request) goahttp.Decoder {
+		return goahttp.EncodingFunc(func(v interface{}) error {
+			mr, merr := r.MultipartReader()
+			if merr != nil {
+				return merr
+			}
+			p := v.(**tasksservice.UploadVideoPayload)
+			if err := tasksServiceUploadVideoDecoderFn(mr, p); err != nil {
+				return err
+			}
+
+			var (
+				taskID string
+				token  string
+				err    error
+
+				params = mux.Vars(r)
+			)
+			taskID = params["task_id"]
+			token = r.Header.Get("Authorization")
+			if token == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+			}
+			if err != nil {
+				return err
+			}
+			(*p).TaskID = taskID
+			(*p).Token = token
+			return nil
+		})
+	}
+}
+
+// EncodeUploadVideoError returns an encoder for errors returned by the upload
+// video tasks_service endpoint.
+func EncodeUploadVideoError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeUploadFilesResponse returns an encoder for responses returned by the
 // tasks_service upload files endpoint.
 func EncodeUploadFilesResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -1047,6 +1161,7 @@ func marshalTasksserviceBotsProgressToBotsProgressResponseBody(v *tasksservice.B
 func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 	res := &TaskResponse{
 		ID:                         v.ID,
+		Type:                       int(v.Type),
 		TextTemplate:               v.TextTemplate,
 		Status:                     int(v.Status),
 		Title:                      v.Title,
@@ -1064,12 +1179,6 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 		PhotoTagsDelaySeconds:      v.PhotoTagsDelaySeconds,
 		PostsPerBot:                v.PostsPerBot,
 		TargetsPerPost:             v.TargetsPerPost,
-	}
-	if v.PostImages != nil {
-		res.PostImages = make([]string, len(v.PostImages))
-		for i, val := range v.PostImages {
-			res.PostImages[i] = val
-		}
 	}
 	if v.LandingAccounts != nil {
 		res.LandingAccounts = make([]string, len(v.LandingAccounts))
@@ -1089,16 +1198,22 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 			res.BotLastNames[i] = val
 		}
 	}
-	if v.BotImages != nil {
-		res.BotImages = make([]string, len(v.BotImages))
-		for i, val := range v.BotImages {
-			res.BotImages[i] = val
-		}
-	}
 	if v.BotUrls != nil {
 		res.BotUrls = make([]string, len(v.BotUrls))
 		for i, val := range v.BotUrls {
 			res.BotUrls[i] = val
+		}
+	}
+	if v.PostImages != nil {
+		res.PostImages = make([]string, len(v.PostImages))
+		for i, val := range v.PostImages {
+			res.PostImages[i] = val
+		}
+	}
+	if v.BotImages != nil {
+		res.BotImages = make([]string, len(v.BotImages))
+		for i, val := range v.BotImages {
+			res.BotImages[i] = val
 		}
 	}
 
