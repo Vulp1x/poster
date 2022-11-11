@@ -15,7 +15,7 @@ from instagrapi import Client
 from instagrapi.exceptions import UserNotFound
 from instagrapi.extractors import extract_user_short
 from instagrapi.types import (
-    User, UserShort
+    User, UserShort, Media
 )
 from starlette.responses import JSONResponse, PlainTextResponse
 
@@ -159,7 +159,7 @@ async def similar(sessionid: str = Form(...),
     blogger: Optional[UserShort] = None
 
     try:
-        bloggers: List[UserShort] = cl.search_users_v1(username, 30)
+        bloggers: List[UserShort] = cl.search_users_v1(username, 5)
         for blogger_ in bloggers:
             if blogger_.username == username:
                 blogger = blogger_
@@ -178,8 +178,66 @@ async def similar(sessionid: str = Form(...),
         return PlainTextResponse(status_code=404, content=f'blogger {username} not found: {e}')
 
     suggested_users = cl.private_request("discover/chaining/", params={"target_id": blogger.pk})
-    extracted_users = [extract_user_short(user) for user in suggested_users.get('users', [])]
+    similar_bloggers.extend([extract_user_short(user) for user in suggested_users.get('users', [])])
 
-    logger.info(f'got {len(extracted_users)} similar accounts')
+    logger.info(f'got {len(similar_bloggers)} similar accounts')
 
-    return extracted_users
+    return similar_bloggers
+
+
+@router.post("/parse", response_model=List[UserShort])
+async def parse_blogger(sessionid: str = Form(...),
+                        user_id: int = Form(...),
+                        posts_count: int = Form(...),
+                        comments_count: int = Form(...),
+                        likes_count: int = Form(...),
+                        clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[UserShort]]:
+    """Get user's followers
+    """
+    try:
+        cl: Client = clients.get(sessionid)
+    except instagrapi.exceptions.ChallengeRequired:
+        return PlainTextResponse(status_code=400,
+                                 content=f"required challenge on init")
+
+    # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
+
+    # data = cl.private_request("users/403353154/info/?include_suggested_users=true")
+
+    parsed_users: List[UserShort] = []
+    # blogger = cl.user_info_v1(str(user_id))
+    # if not blogger.is_private:
+    #     return PlainTextResponse(status_code=403, content=f"user {blogger} is private")
+    #
+
+    medias = cl.user_medias(user_id, posts_count)
+    for media in medias:
+        new_users = parse_post(cl, media, comments_count, likes_count)
+        parsed_users.extend(new_users)
+
+    logger.info(f'returning {len(parsed_users)} parsed users')
+
+    return parsed_users
+
+
+def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_parse) -> List[UserShort]:
+    users_from_post: List[UserShort] = []
+
+    log = logger.bind(media_id=post.pk)
+
+    comments = cl.media_comments(post.pk, 3 * commenters_to_parse)
+    comments = [comment for comment in comments if not comment.user.is_private]
+    random_comments = random.sample(comments, commenters_to_parse)
+    log.info(f'choose {len(random_comments)} from {len(comments)} comments')
+    users_from_post.extend([comment.user for comment in random_comments])
+
+    likes = cl.media_likers(post.pk)
+    random_likes: List[UserShort] = random.sample(likes, likers_to_parse)
+    log.info(f'choose {len(random_likes)} from {len(likes)} likes')
+    users_from_post.extend(random_likes)
+
+    users_from_post = list(set(users_from_post))
+    log.info(f'got {len(users_from_post)} users from post')
+
+
+    return users_from_post
