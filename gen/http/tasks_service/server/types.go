@@ -123,6 +123,8 @@ type UpdateTaskOKResponseBody struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// название файла с видео, если тип задачи - рилсы
+	VideoFilename *string `json:"video_filename"`
 	// нужно ли подписываться на аккаунты
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
@@ -218,6 +220,8 @@ type GetTaskOKResponseBody struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// название файла с видео, если тип задачи - рилсы
+	VideoFilename *string `json:"video_filename"`
 	// нужно ли подписываться на аккаунты
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
@@ -311,6 +315,8 @@ type TaskResponse struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// название файла с видео, если тип задачи - рилсы
+	VideoFilename *string `json:"video_filename"`
 	// нужно ли подписываться на аккаунты
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
@@ -379,6 +385,7 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
+		VideoFilename:              res.VideoFilename,
 		FollowTargets:              res.FollowTargets,
 		NeedPhotoTags:              res.NeedPhotoTags,
 		PerPostSleepSeconds:        res.PerPostSleepSeconds,
@@ -503,6 +510,7 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		ResidentialProxiesFilename: res.ResidentialProxiesFilename,
 		CheapProxiesFilename:       res.CheapProxiesFilename,
 		TargetsFilename:            res.TargetsFilename,
+		VideoFilename:              res.VideoFilename,
 		FollowTargets:              res.FollowTargets,
 		NeedPhotoTags:              res.NeedPhotoTags,
 		PerPostSleepSeconds:        res.PerPostSleepSeconds,

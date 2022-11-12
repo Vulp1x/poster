@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"encoding/base64"
+	"strings"
 
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
@@ -19,6 +20,16 @@ func (t Task) ToProto() *tasksservice.Task {
 	botsProfileImages := make([]string, len(t.AccountProfileImages))
 	for i, image := range t.AccountProfileImages {
 		botsProfileImages[i] = base64.StdEncoding.EncodeToString(image)
+	}
+
+	var videFilenamePointer *string
+	if t.VideoFilename != nil {
+		parts := strings.SplitN(*t.VideoFilename, "_", 3)
+		if len(parts) == 0 {
+			videFilenamePointer = t.VideoFilename
+		} else {
+			videFilenamePointer = &parts[len(parts)-1]
+		}
 	}
 
 	return &tasksservice.Task{
@@ -47,6 +58,7 @@ func (t Task) ToProto() *tasksservice.Task {
 		PostsPerBot:                uint(t.PostsPerBot),
 		TargetsPerPost:             uint(t.TargetsPerPost),
 		Type:                       tasksservice.TaskType(t.Type),
+		VideoFilename:              videFilenamePointer,
 	}
 }
 

@@ -146,6 +146,10 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "targets_filename")
 	})
 
+	Attribute("video_filename", String, "название файла с видео, если тип задачи - рилсы", func() {
+		Meta("struct:tag:json", "video_filename")
+	})
+
 	Attribute("follow_targets", Boolean, func() {
 		Description("нужно ли подписываться на аккаунты")
 		Meta("struct:tag:json", "follow_targets")

@@ -1173,6 +1173,7 @@ func marshalTasksserviceTaskToTaskResponse(v *tasksservice.Task) *TaskResponse {
 		ResidentialProxiesFilename: v.ResidentialProxiesFilename,
 		CheapProxiesFilename:       v.CheapProxiesFilename,
 		TargetsFilename:            v.TargetsFilename,
+		VideoFilename:              v.VideoFilename,
 		FollowTargets:              v.FollowTargets,
 		NeedPhotoTags:              v.NeedPhotoTags,
 		PerPostSleepSeconds:        v.PerPostSleepSeconds,

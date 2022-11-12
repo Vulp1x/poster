@@ -233,6 +233,8 @@ type Task struct {
 	CheapProxiesFilename *string `json:"cheap_proxies_filename"`
 	// название файла, из которого брали целевых пользователей
 	TargetsFilename *string `json:"targets_filename"`
+	// название файла с видео, если тип задачи - рилсы
+	VideoFilename *string `json:"video_filename"`
 	// нужно ли подписываться на аккаунты
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
