@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"sort"
 	"time"
 
 	"github.com/go-chi/chi/middleware"
@@ -25,9 +24,7 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 
 	logFields := logger.Fields{}
 
-	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
-		logFields["req_id"] = reqID
-	}
+	logFields["req_id"] = ShortID()
 
 	scheme := "http"
 	if r.TLS != nil {
@@ -55,17 +52,17 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 	if l.debug {
 		logDebugFields := logger.Fields{}
 
-		// Request Headers
-		keys := make([]string, len(r.Header))
-		i := 0
-		for k := range r.Header {
-			keys[i] = k
-			i++
-		}
-		sort.Strings(keys)
+		// // Request Headers
+		// keys := make([]string, len(r.Header))
+		// i := 0
+		// for k := range r.Header {
+		// 	keys[i] = k
+		// 	i++
+		// }
+		// sort.Strings(keys)
+		// logDebugFields["headers"] = keys
 
 		logDebugFields["content_length"] = byteCount(r.ContentLength)
-		logDebugFields["headers"] = keys
 		if r.ContentLength < 10000 {
 			// Request body
 			b, err := io.ReadAll(r.Body)
