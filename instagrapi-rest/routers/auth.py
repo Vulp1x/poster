@@ -8,7 +8,7 @@ from custom_logging import CustomizeLogger
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Body
 from instagrapi import Client
-from instagrapi.exceptions import ChallengeRequired, LoginRequired
+from instagrapi.exceptions import ChallengeRequired, ChallengeError, LoginRequired
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
 
@@ -100,7 +100,7 @@ async def auth_add(session_id: str = Body(...),
     try:
         cl = clients.get(session_id)
         return PlainTextResponse(cl.sessionid)
-    except ChallengeRequired or LoginRequired as ex:
+    except ChallengeError as ex:
         return PlainTextResponse(f"account is blocked: {ex}", status_code=400)
 
     except Exception as e:
@@ -181,8 +181,10 @@ async def settings_get(sessionid: str,
 
     try:
         cl: Client = clients.get(sessionid)
-    except ChallengeRequired as e:
+    except ChallengeError or LoginRequired as e:
         return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
+    except IndexError as e:
+        return PlainTextResponse(status_code=404, content=f'{e}')
 
     settings = cl.get_settings()
     return settings

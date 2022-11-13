@@ -1,5 +1,6 @@
 import random
 import tempfile
+import time
 from pathlib import Path
 from time import sleep
 from typing import List, Optional, Union
@@ -12,7 +13,7 @@ from custom_logging import CustomizeLogger
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from instagrapi import Client
-from instagrapi.exceptions import UserNotFound
+from instagrapi.exceptions import UserNotFound, ChallengeError, ClientNotFoundError, ClientJSONDecodeError
 from instagrapi.extractors import extract_user_short
 from instagrapi.types import (
     User, UserShort, Media
@@ -40,6 +41,10 @@ async def check_landings(sessionid: str = Form(...),
     except instagrapi.exceptions.ChallengeRequired:
         return JSONResponse(status_code=400,
                             content=f"required challenge on init")
+
+    except instagrapi.exceptions.LoginRequired as e:
+        return JSONResponse(status_code=400,
+                            content=f"required challenge on init: {e}")
 
     checked_landing_accounts: List[str] = []
     if len(usernames) == 1:
@@ -196,9 +201,9 @@ async def parse_blogger(sessionid: str = Form(...),
     """
     try:
         cl: Client = clients.get(sessionid)
-    except instagrapi.exceptions.ChallengeRequired:
+    except ChallengeError as e:
         return PlainTextResponse(status_code=400,
-                                 content=f"required challenge on init")
+                                 content=f"required challenge on init: {e}")
 
     # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
 
@@ -209,11 +214,28 @@ async def parse_blogger(sessionid: str = Form(...),
     # if not blogger.is_private:
     #     return PlainTextResponse(status_code=403, content=f"user {blogger} is private")
     #
+    try:
+        medias = cl.user_medias_v1(user_id, posts_count)
+    except ClientNotFoundError as e:
+        return PlainTextResponse(status_code=404, content=f'{e}')
+    except ClientJSONDecodeError as e:
+        logger.exception(f'{e}')
+        medias = cl.user_medias_v1(user_id, posts_count)
 
-    medias = cl.user_medias(user_id, posts_count)
     for media in medias:
-        new_users = parse_post(cl, media, comments_count, likes_count)
-        parsed_users.extend(new_users)
+        time.sleep(15)
+        try:
+            new_users = parse_post(cl, media, comments_count, likes_count)
+            parsed_users.extend(new_users)
+        except Exception as e:
+            logger.exception(f'e')
+
+            parsed_users = list(set(parsed_users))
+            logger.info(f'returning {len(parsed_users)} parsed users after execption')
+
+            return parsed_users
+
+    parsed_users = list(set(parsed_users))
 
     logger.info(f'returning {len(parsed_users)} parsed users')
 
@@ -225,19 +247,31 @@ def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_pars
 
     log = logger.bind(media_id=post.pk)
 
-    comments = cl.media_comments(post.pk, 3 * commenters_to_parse)
+    log.info(f'parsing post {repr(post.caption_text)} with {post.comment_count} comments and {post.like_count} likes')
+
+    comments = cl.media_comments("%s_%s" % (post.pk, post.user.pk), 3 * commenters_to_parse)
     comments = [comment for comment in comments if not comment.user.is_private]
-    random_comments = random.sample(comments, commenters_to_parse)
-    log.info(f'choose {len(random_comments)} from {len(comments)} comments')
-    users_from_post.extend([comment.user for comment in random_comments])
+    if len(comments) > 0:
+        if commenters_to_parse > len(comments):
+            log.warning(f'have at most {len(comments)} comments')
+            commenters_to_parse = len(comments)
+
+        random_comments = random.sample(comments, commenters_to_parse)
+        log.info(f'choose {len(random_comments)} from {len(comments)} comments')
+        users_from_post.extend([comment.user for comment in random_comments])
+
+    time.sleep(3)
 
     likes = cl.media_likers(post.pk)
+    if likers_to_parse > len(likes):
+        log.warning(f'have at most {len(likes)} likes')
+        likers_to_parse = len(likes)
+
     random_likes: List[UserShort] = random.sample(likes, likers_to_parse)
     log.info(f'choose {len(random_likes)} from {len(likes)} likes')
     users_from_post.extend(random_likes)
 
     users_from_post = list(set(users_from_post))
     log.info(f'got {len(users_from_post)} users from post')
-
 
     return users_from_post

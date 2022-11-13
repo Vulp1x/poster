@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib import parse
 
 from instagrapi import Client
-from instagrapi.exceptions import ClientJSONDecodeError
+from instagrapi.exceptions import ClientJSONDecodeError, LoginRequired
 from tinydb import TinyDB, Query
 
 from custom_logging import CustomizeLogger
@@ -36,10 +36,16 @@ class ClientStorage:
                 cl.get_timeline_feed()
             except ClientJSONDecodeError as ex:
                 logger.exception(ex)
+            # except LoginRequired as ex:
+            #     logger.exception(ex)
+            #     if cl.login('_shalinicious_qhi', 'zwbm1q5a', relogin=True):
+            #         logger.info('login succeeded')
+
+                return cl
 
             return cl
-        except IndexError:
-            raise Exception('Session not found (e.g. after reload process), please relogin')
+        except IndexError as e:
+            raise IndexError(f'Session not found (e.g. after reload process), please re-login {e}')
 
     def set(self, cl: Client) -> bool:
         """Set client settings

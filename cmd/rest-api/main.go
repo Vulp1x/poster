@@ -70,7 +70,7 @@ func main() {
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
 	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname)
-	botsStore := bots.NewStore(dbTXFunc, txFunc)
+	botsStore := bots.NewStore(dbTXFunc, txFunc, conf.Instagrapi.Hostname)
 
 	// Initialize the services.
 	authServiceSvc := service.NewAuthService(userStore, conf.Security)

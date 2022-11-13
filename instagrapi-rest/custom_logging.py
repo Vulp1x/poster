@@ -95,7 +95,7 @@ class CustomizeLogger:
             _logger = logging.getLogger(_log)
             _logger.handlers = [InterceptHandler()]
 
-        return logger.bind(method=None, user_id=None)
+        return logger
 
     @classmethod
     def load_logging_config(cls, config_path):
