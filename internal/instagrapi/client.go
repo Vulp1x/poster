@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -96,7 +97,58 @@ func (c *Client) MakePost(
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.host+"/photo/upload", buf)
+	req, err := http.NewRequestWithContext(ctx, "POST", c.host+"/photo/upload", buf)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	req.Header.Set("Content-Type", contentType)
+
+	resp, err := c.cli.Do(req)
+	if err != nil {
+		return err
+	}
+
+	err = c.saveResponseFunc(ctx, sessionID, resp, WithElapsedTime(time.Since(startedAt)))
+	if err != nil {
+		logger.Errorf(ctx, "failed to save response: %v", err)
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return ErrBotIsBlocked
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got %d response code, expected 200", resp.StatusCode)
+	}
+
+	return nil
+}
+
+// MakeReelsPost выкладывает новый рилс
+func (c *Client) MakeReelsPost(
+	ctx context.Context,
+	task domain.Task,
+	landingAccount, sessionID, cheapProxy string,
+	targets []dbmodel.TargetUser,
+	postVideo []byte,
+) error {
+	startedAt := time.Now()
+
+	if len(postVideo) == 0 {
+		return fmt.Errorf("got empty video")
+	}
+
+	var caption string
+
+	caption = c.preparePostCaption(task.TextTemplate, landingAccount, targets)
+
+	buf, contentType, err := prepareUploadReelsBody(postVideo, sessionID, cheapProxy, caption)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.host+"/video/upload", buf)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -164,7 +216,7 @@ func (c *Client) InitBot(ctx context.Context, bot domain.BotWithTargets) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.host+"/auth/add", bytes.NewReader(bodyBytes))
+	req, err := http.NewRequestWithContext(ctx, "POST", c.host+"/auth/add", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -233,4 +285,24 @@ func (c *Client) preparePostCaption(template, landingAccount string, targetUsers
 	}
 
 	return b.String()
+}
+
+func (c Client) postFormWithCtx(ctx context.Context, url string, data url.Values) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", url, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return c.cli.Do(req)
+}
+
+func (c *Client) getWithCtx(ctx context.Context, url string) (resp *http.Response, err error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.cli.Do(req)
 }

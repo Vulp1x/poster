@@ -17,6 +17,7 @@ import (
 
 type instagrapiClient interface {
 	MakePost(ctx context.Context, task domain.Task, landingAccount string, sessionID string, cheapProxy string, targets []dbmodel.TargetUser, postImage []byte) error
+	MakeReelsPost(ctx context.Context, task domain.Task, landingAccount string, sessionID string, cheapProxy string, targets []dbmodel.TargetUser, reelsVideo []byte) error
 	InitBot(ctx context.Context, bot domain.BotWithTargets) error
 	CheckLandingAccounts(ctx context.Context, sessionID string, landingAccountUsernames []string) ([]string, error)
 	FollowTargets(ctx context.Context, bot domain.BotWithTargets) error
@@ -31,8 +32,26 @@ type worker struct {
 	generator      images.Generator
 	processorIndex int64
 	wg             *sync.WaitGroup
+	videoBytes     []byte
 }
 
+type postCreator func(ctx context.Context, task domain.Task, landingAccount string, sessionID string, cheapProxy string, targets []dbmodel.TargetUser, postBytes []byte) error
+
+func (w *worker) getPostCreator() postCreator {
+	if w.task.Type == 2 {
+		return w.cli.MakeReelsPost
+	}
+
+	return w.cli.MakePost
+}
+
+func (w worker) preparePostBytess(ctx context.Context) []byte {
+	if w.task.Type == dbmodel.PhotoTaskType {
+		return w.generator.Next(ctx)
+	}
+
+	return w.videoBytes
+}
 func (w *worker) run(ctx context.Context) {
 	defer w.wg.Done()
 	ctx = logger.WithKV(ctx, "processor_index", w.processorIndex)
@@ -132,7 +151,7 @@ func (w *worker) run(ctx context.Context) {
 			targetsBatch := botWithTargets.Targets[i*w.task.TargetsPerPost : rightBorderOfTargets]
 			targetIds = domain.Ids(targetsBatch)
 
-			err = w.cli.MakePost(taskCtx, w.task, landingAccount, botWithTargets.Headers.AuthData.SessionID, cheapProxy, targetsBatch, w.generator.Next(taskCtx))
+			err = w.getPostCreator()(taskCtx, w.task, landingAccount, botWithTargets.Headers.AuthData.SessionID, cheapProxy, targetsBatch, w.preparePostBytess(ctx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
 				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})

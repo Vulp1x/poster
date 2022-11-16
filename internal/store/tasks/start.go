@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -114,6 +116,30 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 	logger.Infof(ctx, "got alive landing accounts: %v", aliveLandings)
 	task.LandingAccounts = aliveLandings
 
+	var videoBytes []byte
+
+	if task.Type == dbmodel.ReelsTaskType {
+		if !strings.HasSuffix(strings.ToLower(*task.VideoFilename), "mp4") {
+			return nil, fmt.Errorf("only mp4 files are supported, got: %s", *task.VideoFilename)
+		}
+
+		f, err := os.Open(*task.VideoFilename)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open video file at '%s': %v", *task.VideoFilename, err)
+		}
+
+		videoBytes, err = io.ReadAll(f)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read video: %v", err)
+		}
+
+		err = f.Close()
+		if err != nil {
+			logger.Errorf(ctx, "failed to close file at '%s': %v", *task.VideoFilename, err)
+		}
+
+	}
+
 	err = q.StartTaskByID(ctx, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start task: %v", err)
@@ -138,6 +164,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 			generator:      imageGenerator,
 			processorIndex: int64(i),
 			wg:             wg,
+			videoBytes:     videoBytes,
 		}
 
 		go postingWorker.run(taskCtx)
@@ -155,7 +182,11 @@ func validateTaskBeforeStart(task dbmodel.Task) error {
 		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.ReadyTaskStatus, task.Status)
 	}
 
-	if len(task.Images) == 0 {
+	if len(task.Images) == 0 && task.Type == dbmodel.PhotoTaskType {
+		return ErrTaskWithEmptyPostImages
+	}
+
+	if task.VideoFilename == nil && task.Type == dbmodel.ReelsTaskType {
 		return ErrTaskWithEmptyPostImages
 	}
 

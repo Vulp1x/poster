@@ -101,7 +101,7 @@ func (b *BotAccount) assignUserAgent(input string) error {
 	b.UserAgent = input
 	b.DeviceData, err = headers.NewDeviceSettings(input)
 	if err != nil {
-		return fmt.Errorf("failed to parse device settings from user agent: %v", err)
+		return fmt.Errorf("failed to parse device settings: %v", err)
 	}
 
 	return nil

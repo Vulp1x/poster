@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib import parse
 
 from instagrapi import Client
-from instagrapi.exceptions import ClientJSONDecodeError, LoginRequired
+from instagrapi.exceptions import ClientJSONDecodeError
 from tinydb import TinyDB, Query
 
 from custom_logging import CustomizeLogger
@@ -22,7 +22,7 @@ class ClientStorage:
         cl.request_timeout = 0.1
         return cl
 
-    def get(self, sessionid: str) -> Client:
+    def get(self, sessionid: str, fast: bool = False) -> Client:
         """Get client settings
         """
         key = parse.unquote(sessionid.strip(" \""))
@@ -32,14 +32,17 @@ class ClientStorage:
             cl.username = settings.get('username', 'username_not_set')
             cl.request_logger = logger
 
+            if fast:
+                return cl
+
             try:
                 cl.get_timeline_feed()
             except ClientJSONDecodeError as ex:
                 logger.exception(ex)
-            # except LoginRequired as ex:
-            #     logger.exception(ex)
-            #     if cl.login('_shalinicious_qhi', 'zwbm1q5a', relogin=True):
-            #         logger.info('login succeeded')
+                # except LoginRequired as ex:
+                #     logger.exception(ex)
+                #     if cl.login('_shalinicious_qhi', 'zwbm1q5a', relogin=True):
+                #         logger.info('login succeeded')
 
                 return cl
 

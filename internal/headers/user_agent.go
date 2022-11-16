@@ -36,7 +36,7 @@ func NewDeviceSettings(userAgent string) (DeviceSettings, error) {
 	matches := userAgentRegexp.FindStringSubmatch(userAgent)
 	if len(matches) != 12 {
 		return DeviceSettings{},
-			fmt.Errorf("from user-agent '%s' got %d matches, expected %d", userAgent, len(matches), 12)
+			fmt.Errorf("from User-agent '%s' got %d matches, expected %d", userAgent, len(matches), 12)
 	}
 
 	androidVersion, err := strconv.ParseInt(matches[2], 10, 32)

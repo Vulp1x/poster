@@ -18,7 +18,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-const workersPerTask = 1
+const workersPerTask = 3
 
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")

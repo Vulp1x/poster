@@ -2,13 +2,14 @@ import time
 from pathlib import Path
 from typing import Optional, Dict, List, Union
 
+import loguru
 # noinspection PyUnresolvedReferences
 from custom_logging import CustomizeLogger
 # noinspection PyUnresolvedReferences
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Body
 from instagrapi import Client
-from instagrapi.exceptions import ChallengeRequired, ChallengeError, LoginRequired
+from instagrapi.exceptions import ChallengeRequired, ChallengeError, LoginRequired, ClientError
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
 
@@ -19,7 +20,7 @@ router = APIRouter(
 )
 
 config_path = Path(__file__).parent.with_name("logging_config.json")
-logger = CustomizeLogger.make_logger(config_path)
+logger: "loguru.Logger" = CustomizeLogger.make_logger(config_path)
 
 """
 {
@@ -100,7 +101,7 @@ async def auth_add(session_id: str = Body(...),
     try:
         cl = clients.get(session_id)
         return PlainTextResponse(cl.sessionid)
-    except ChallengeError as ex:
+    except (ChallengeError, ClientError) as ex:
         return PlainTextResponse(f"account is blocked: {ex}", status_code=400)
 
     except Exception as e:
@@ -181,7 +182,7 @@ async def settings_get(sessionid: str,
 
     try:
         cl: Client = clients.get(sessionid)
-    except ChallengeError or LoginRequired as e:
+    except (ChallengeError, LoginRequired) as e:
         return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
     except IndexError as e:
         return PlainTextResponse(status_code=404, content=f'{e}')
@@ -214,8 +215,7 @@ async def timeline_feed(sessionid: str,
     """
     cl: Client = clients.get(sessionid)
     try:
-        cl.get_timeline_feed()
+        return cl.get_timeline_feed()
+
     except ChallengeRequired as e:
         return PlainTextResponse(status_code=400, content=f'bot {cl.username} is blocked')
-
-    return

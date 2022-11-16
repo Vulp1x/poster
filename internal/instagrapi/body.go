@@ -142,6 +142,62 @@ func prepareUploadImageBody(image []byte, sessionID, cheapProxy, caption string,
 	return buf, mpWriter.FormDataContentType(), nil
 }
 
+func prepareUploadReelsBody(video []byte, sessionID, cheapProxy, caption string) (*bytes.Buffer, string, error) {
+	buf := bytes.NewBuffer(nil)
+	mpWriter := multipart.NewWriter(buf)
+
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="IMG_%04d.jpeg"`, rand.Intn(10000)))
+	h.Set("Content-Type", "video/mp4")
+
+	fileForm, err := mpWriter.CreatePart(h)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create new multipart file part: %v", err)
+	}
+
+	_, err = fileForm.Write(video)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write video to file: %v", err)
+	}
+
+	sessionWriter, err := mpWriter.CreateFormField("sessionid")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field sessionid: %v", err)
+	}
+
+	_, err = sessionWriter.Write([]byte(sessionID))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write session id part: %v", err)
+	}
+
+	captionWriter, err := mpWriter.CreateFormField("caption")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field caption: %v", err)
+	}
+
+	_, err = captionWriter.Write([]byte(caption))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
+	}
+
+	cheapProxyWriter, err := mpWriter.CreateFormField("cheap_proxy")
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to create form field caption: %v", err)
+	}
+
+	_, err = cheapProxyWriter.Write([]byte(cheapProxy))
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to write caption id part: %v", err)
+	}
+
+	err = mpWriter.Close()
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to close multi-part writer: %v", err)
+	}
+
+	return buf, mpWriter.FormDataContentType(), nil
+}
+
 func prepareEditProfileBody(image []byte, sessionID, fullName string) (*bytes.Buffer, string, error) {
 	buf := bytes.NewBuffer(nil)
 	mpWriter := multipart.NewWriter(buf)

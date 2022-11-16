@@ -5,7 +5,6 @@ from pathlib import Path
 from time import sleep
 from typing import List, Optional, Union
 
-import instagrapi.exceptions
 import loguru
 # noinspection PyUnresolvedReferences
 from custom_logging import CustomizeLogger
@@ -13,7 +12,14 @@ from custom_logging import CustomizeLogger
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from instagrapi import Client
-from instagrapi.exceptions import UserNotFound, ChallengeError, ClientNotFoundError, ClientJSONDecodeError
+from instagrapi.exceptions import (
+    UserNotFound,
+    ChallengeError,
+    ClientNotFoundError,
+    ClientJSONDecodeError,
+    LoginRequired,
+    ChallengeRequired, ClientError
+)
 from instagrapi.extractors import extract_user_short
 from instagrapi.types import (
     User, UserShort, Media
@@ -38,11 +44,7 @@ async def check_landings(sessionid: str = Form(...),
     """
     try:
         cl: Client = clients.get(sessionid)
-    except instagrapi.exceptions.ChallengeRequired:
-        return JSONResponse(status_code=400,
-                            content=f"required challenge on init")
-
-    except instagrapi.exceptions.LoginRequired as e:
+    except (ChallengeRequired, LoginRequired) as e:
         return JSONResponse(status_code=400,
                             content=f"required challenge on init: {e}")
 
@@ -77,9 +79,9 @@ async def edit_profile(sessionid: str = Form(...),
     """Обновить фотографию профиля"""
     try:
         cl: Client = clients.get(sessionid)
-    except instagrapi.exceptions.ChallengeRequired:
-        return PlainTextResponse(status_code=400,
-                                 content=f"required challenge on init")
+    except (ChallengeRequired, LoginRequired) as e:
+        return JSONResponse(status_code=400,
+                            content=f"required challenge on init: {e}")
 
     # if full_name:
     #     result = cl.private_request(
@@ -105,9 +107,8 @@ async def similar_full(sessionid: str = Form(...),
     """
     try:
         cl: Client = clients.get(sessionid)
-    except instagrapi.exceptions.ChallengeRequired:
-        return PlainTextResponse(status_code=400,
-                                 content=f"required challenge on init")
+    except (ChallengeRequired, LoginRequired) as e:
+        return PlainTextResponse(status_code=400, content=f"required challenge on init: {e}")
 
     # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
 
@@ -152,9 +153,9 @@ async def similar(sessionid: str = Form(...),
     """
     try:
         cl: Client = clients.get(sessionid)
-    except instagrapi.exceptions.ChallengeRequired:
+    except (ChallengeRequired, LoginRequired) as e:
         return PlainTextResponse(status_code=400,
-                                 content=f"required challenge on init")
+                                 content=f"required challenge on init {e}")
 
     # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
 
@@ -178,7 +179,6 @@ async def similar(sessionid: str = Form(...),
 
         similar_bloggers.append(blogger)
 
-
     except Exception as e:
         return PlainTextResponse(status_code=404, content=f'blogger {username} not found: {e}')
 
@@ -200,20 +200,25 @@ async def parse_blogger(sessionid: str = Form(...),
     """Get user's followers
     """
     try:
-        cl: Client = clients.get(sessionid)
-    except ChallengeError as e:
-        return PlainTextResponse(status_code=400,
-                                 content=f"required challenge on init: {e}")
-
-    # all posts: 'https://i.instagram.com/api/v1/users/web_profile_info/?username={0}'
-
-    # data = cl.private_request("users/403353154/info/?include_suggested_users=true")
+        cl: Client = clients.get(sessionid, fast=True)
+    except IndexError as e:
+        return PlainTextResponse(status_code=404, content=f"bot not found {e}")
 
     parsed_users: List[UserShort] = []
-    # blogger = cl.user_info_v1(str(user_id))
-    # if not blogger.is_private:
-    #     return PlainTextResponse(status_code=403, content=f"user {blogger} is private")
-    #
+    try:
+        blogger = cl.user_info_v1(str(user_id))
+        if blogger.is_private:
+            return PlainTextResponse(status_code=403, content=f"user {blogger} is private")
+    except (ChallengeError, LoginRequired) as e:
+        return PlainTextResponse(status_code=400,
+                                 content=f"required challenge: {e}")
+    except ClientNotFoundError as e:
+        return PlainTextResponse(status_code=404, content=f'{e}')
+    except ClientError as e:
+        return PlainTextResponse(status_code=429, content=f'{e}')
+
+    logger.info(f'parsing blogger {blogger.username}')
+
     try:
         medias = cl.user_medias_v1(user_id, posts_count)
     except ClientNotFoundError as e:
@@ -221,9 +226,18 @@ async def parse_blogger(sessionid: str = Form(...),
     except ClientJSONDecodeError as e:
         logger.exception(f'{e}')
         medias = cl.user_medias_v1(user_id, posts_count)
+    except (ChallengeError, LoginRequired) as e:
+        return PlainTextResponse(status_code=400,
+                                 content=f"required challenge: {e}")
+
+    if len(medias) == 0:
+        logger.warning(f'found no medias for user {user_id}')
+        return parsed_users
+
+    logger.info(f'going to parse {len(medias)} posts of {medias[0].user.username}')
 
     for media in medias:
-        time.sleep(15)
+        time.sleep(random.randint(25, 35))
         try:
             new_users = parse_post(cl, media, comments_count, likes_count)
             parsed_users.extend(new_users)
@@ -260,7 +274,7 @@ def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_pars
         log.info(f'choose {len(random_comments)} from {len(comments)} comments')
         users_from_post.extend([comment.user for comment in random_comments])
 
-    time.sleep(3)
+    time.sleep(random.randint(30, 40))
 
     likes = cl.media_likers(post.pk)
     if likers_to_parse > len(likes):

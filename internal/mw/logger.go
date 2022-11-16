@@ -77,7 +77,7 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 		logCtx = logger.WithFields(logCtx, logDebugFields)
 	}
 
-	logger.Infof(logCtx, "request started")
+	logger.Debugf(logCtx, "request started")
 
 	return entry
 }
@@ -116,8 +116,6 @@ func (l *DebugStructuredLoggerEntry) Write(status, bytesWriten int, header http.
 		"resp_elapsed_ms": float64(elapsed.Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond),
 	}
 
-	logger.Info(logger.WithFields(l.ctx, fields), "request complete")
-
 	ww, ok := extra.(*responseDupper)
 	if ok {
 		fields["resp_elapsed_ms"] = float64(time.Since(ww.startedAt).Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond)
@@ -128,9 +126,7 @@ func (l *DebugStructuredLoggerEntry) Write(status, bytesWriten int, header http.
 		fields["resp_body"] = ww.Buffer.String()
 	}
 
-	l.ctx = logger.WithFields(l.ctx, fields)
-
-	logger.Debugf(l.ctx, "request complete")
+	logger.Debugf(logger.WithFields(l.ctx, fields), "request complete")
 }
 
 // Panic implemetents logEntry method.

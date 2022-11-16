@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
@@ -28,7 +28,7 @@ func (lrt loggingRoundTripper) RoundTrip(req *http.Request) (res *http.Response,
 	// Do "before sending requests" actions here.
 	ctx := req.Context()
 	if req.Header.Get(requestIDHeaderKey) == "" {
-		req.Header.Set(requestIDHeaderKey, uuid.NewString())
+		req.Header.Set(requestIDHeaderKey, mw.ShortID())
 	}
 
 	logger.Infof(ctx, "sending request to %s, request_id: '%s'", req.URL, req.Header.Get(requestIDHeaderKey))
