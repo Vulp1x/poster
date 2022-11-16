@@ -1,6 +1,6 @@
+import asyncio
 import random
 import tempfile
-import time
 from pathlib import Path
 from time import sleep
 from typing import List, Optional, Union
@@ -237,9 +237,9 @@ async def parse_blogger(sessionid: str = Form(...),
     logger.info(f'going to parse {len(medias)} posts of {medias[0].user.username}')
 
     for media in medias:
-        time.sleep(random.randint(25, 35))
+        await asyncio.sleep(random.randint(25, 35))
         try:
-            new_users = parse_post(cl, media, comments_count, likes_count)
+            new_users = await parse_post(cl, media, comments_count, likes_count)
             parsed_users.extend(new_users)
         except Exception as e:
             logger.exception(f'e')
@@ -256,7 +256,7 @@ async def parse_blogger(sessionid: str = Form(...),
     return parsed_users
 
 
-def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_parse) -> List[UserShort]:
+async def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_parse) -> List[UserShort]:
     users_from_post: List[UserShort] = []
 
     log = logger.bind(media_id=post.pk)
@@ -274,7 +274,7 @@ def parse_post(cl: Client, post: Media, commenters_to_parse: int, likers_to_pars
         log.info(f'choose {len(random_comments)} from {len(comments)} comments')
         users_from_post.extend([comment.user for comment in random_comments])
 
-    time.sleep(random.randint(30, 40))
+    await asyncio.sleep(random.randint(30, 40))
 
     likes = cl.media_likers(post.pk)
     if likers_to_parse > len(likes):

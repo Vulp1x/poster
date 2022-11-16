@@ -182,7 +182,7 @@ async def settings_get(sessionid: str,
 
     try:
         cl: Client = clients.get(sessionid)
-    except (ChallengeError, LoginRequired) as e:
+    except (ChallengeError, LoginRequired, ClientError) as e:
         return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
     except IndexError as e:
         return PlainTextResponse(status_code=404, content=f'{e}')

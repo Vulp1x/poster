@@ -83,7 +83,7 @@ class CustomizeLogger:
             level=level.upper(),
             format=format
         )
-        logging.basicConfig(handlers=[InterceptHandler()], level=10, force=True)
+        logging.basicConfig(handlers=[InterceptHandler()], level=20, force=True)
         logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
 
         # _logger = logging.getLogger('public_request')
