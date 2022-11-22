@@ -85,7 +85,7 @@ class CustomizeLogger:
             backtrace=True,
             level=level.upper(),
             format=format,
-            filte=not_too_long_for_file
+            filter=not_too_long_for_file
         )
         logging.basicConfig(handlers=[InterceptHandler()], level=20, force=True)
         logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
