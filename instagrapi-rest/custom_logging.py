@@ -67,6 +67,9 @@ class CustomizeLogger:
         def not_too_long(record: "loguru.Record") -> bool:
             return len(record.get('message')) < 1000
 
+        def not_too_long_for_file(record: "loguru.Record") -> bool:
+            return len(record.get('message')) < 10000
+
         logger.add(
             sys.stdout,
             enqueue=True,
@@ -81,7 +84,8 @@ class CustomizeLogger:
             enqueue=True,
             backtrace=True,
             level=level.upper(),
-            format=format
+            format=format,
+            filte=not_too_long_for_file
         )
         logging.basicConfig(handlers=[InterceptHandler()], level=20, force=True)
         logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
