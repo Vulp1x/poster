@@ -12,11 +12,12 @@ import (
 	"go.uber.org/multierr"
 )
 
-func readUsersList(ctx context.Context, reader io.Reader) ([]*tasksservice.BotAccountRecord, error) {
+func readBotsList(ctx context.Context, reader io.Reader) ([]*tasksservice.BotAccountRecord, error) {
 	csvReader := csv.NewReader(reader)
 
 	csvReader.Comma = '|'
-	csvReader.FieldsPerRecord = 4
+	// ставим столько, сколько в первой строке
+	csvReader.FieldsPerRecord = 0
 
 	var botAccounts []*tasksservice.BotAccountRecord
 	var errs []error

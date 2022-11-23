@@ -36,9 +36,9 @@ func TasksServiceUploadFileDecoderFunc(mr *multipart.Reader, p **tasksservice.Up
 
 		switch part.FormName() {
 		case botsPartName:
-			payload.Bots, err = readUsersList(ctx, part)
+			payload.Bots, err = readBotsList(ctx, part)
 			if err != nil {
-				return fmt.Errorf("failed to read users list: %v", err)
+				return fmt.Errorf("failed to read bots list: %v", err)
 			}
 			payload.Filenames.BotsFilename = part.FileName()
 		case residentialProxiesPartName:

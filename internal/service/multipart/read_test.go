@@ -14,7 +14,7 @@ func TestName(t *testing.T) {
 
 	defer f.Close()
 
-	bots, err := readUsersList(context.Background(), f)
+	bots, err := readBotsList(context.Background(), f)
 	if err != nil {
 		t.Fatalf("got errors: %v", err)
 	}
