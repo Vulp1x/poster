@@ -24,7 +24,7 @@ async def igtv_download(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)):
     """Download IGTV video using media pk
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.igtv_download(media_pk, folder)
     if returnFile:
         return FileResponse(result)
@@ -41,7 +41,7 @@ async def igtv_download_by_url(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)):
     """Download IGTV video using URL
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.igtv_download_by_url(url, filename, folder)
     if returnFile:
         return FileResponse(result)
@@ -61,7 +61,7 @@ async def igtv_upload(sessionid: str = Form(...),
                        ) -> Media:
     """Upload photo and configure to feed
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     
     usernames_tags = []
     for usertag in usertags:
@@ -95,7 +95,7 @@ async def igtv_upload(sessionid: str = Form(...),
                        ) -> Media:
     """Upload photo by URL and configure to feed
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     
     usernames_tags = []
     for usertag in usertags:

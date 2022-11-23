@@ -58,6 +58,12 @@ func (w *worker) run(ctx context.Context) {
 	q := dbmodel.New(w.dbtxf(ctx))
 	var err error
 
+	if w.task.PerPostSleepSeconds == 0 {
+		w.task.PerPostSleepSeconds = 10
+	}
+
+	sleepDuration := time.Duration(w.task.PerPostSleepSeconds) * time.Second
+
 	for botWithTargets := range w.botsQueue {
 		select {
 		case <-ctx.Done():
@@ -141,6 +147,11 @@ func (w *worker) run(ctx context.Context) {
 			targetIds    []uuid.UUID
 		)
 
+		if botWithTargets.PostsCount > 0 {
+			logger.Infof(ctx, "bot already has %d posts, adding new", botWithTargets.PostsCount)
+			postsDone += int32(botWithTargets.PostsCount)
+		}
+
 		for i = 0; i < w.task.PostsPerBot; i++ {
 			rightBorderOfTargets := (i + 1) * w.task.TargetsPerPost
 			if rightBorderOfTargets >= targetsLen {
@@ -173,6 +184,11 @@ func (w *worker) run(ctx context.Context) {
 
 			postsDone++
 
+			err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
+			if err != nil {
+				logger.Errorf(taskCtx, "failed to update posts count: %v", err)
+			}
+
 			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
@@ -186,18 +202,15 @@ func (w *worker) run(ctx context.Context) {
 			select {
 			case <-ctx.Done():
 				logger.Warnf(taskCtx, "exiting from worker by context done, created %d posts", i)
-				err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
-				if err != nil {
-					logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
-				}
 				return
-			case <-time.After(time.Duration(w.task.PerPostSleepSeconds) * time.Second):
+			case <-time.After(sleepDuration):
+				logger.Infof(ctx, "slept for %s", sleepDuration)
 			}
 		}
 
 		logger.Infof(taskCtx, "made %d posts, saving results time elapsed: %s", postsDone, time.Since(startTime))
 
-		err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
+		err = q.SetBotDoneStatus(taskCtx, botWithTargets.ID)
 		if err != nil {
 			logger.Errorf(taskCtx, "failed to mark bot account as completed: %v", err)
 		}

@@ -23,7 +23,7 @@ async def story_user_stories(sessionid: str = Form(...),
                             clients: ClientStorage = Depends(get_clients)) -> List[Story]:
     """Get a user's stories
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.user_stories(user_id, amount)
 
 
@@ -34,7 +34,7 @@ async def story_info(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> Story:
     """Get Story by pk or id
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.story_info(story_pk, use_cache)
 
 
@@ -44,7 +44,7 @@ async def story_delete(sessionid: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)) -> bool:
     """Delete story
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.story_delete(story_pk)
 
 
@@ -55,7 +55,7 @@ async def story_seen(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> bool:
     """Mark a media as seen
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.story_seen(story_pks, skipped_story_pks)
 
 
@@ -75,7 +75,7 @@ async def story_download(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)):
     """Download story media by media_type
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.story_download(story_pk, filename, folder)
     if returnFile:
         return FileResponse(result)
@@ -92,7 +92,7 @@ async def story_download_by_url(sessionid: str = Form(...),
                                 clients: ClientStorage = Depends(get_clients)):
     """Download story media using URL
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.story_download_by_url(url, filename, folder)
     if returnFile:
         return FileResponse(result)

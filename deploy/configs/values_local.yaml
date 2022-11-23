@@ -13,16 +13,23 @@ logger:
   file level: debug
   file location: ./tmp/logs.log
 postgres:
-  host: localhost
   port: 5432
+  
+  #  host: localhost
+  #  user: postgres
+  #  password: postgres
+  
+  #  prod users
+  host: 65.109.30.237
+  user: docker
+  password: dN5mYdDVKbuyq6ry
+  
   migration_host: localhost
   migration_port: 5432
-  user: postgres
-  password: postgres
   database: insta_poster
   ssl mode: disable
   migrations dir: migrations
-#  used for goose migrations
+  #  used for goose migrations
   pg-dsn: "postgres://postgres@localhost:5432/insta_poster?sslmode=disable&timezone=utc"
 session:
   JWT signing key: "simple route is the best routing soft ever"

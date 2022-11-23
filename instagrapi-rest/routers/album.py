@@ -23,7 +23,7 @@ async def album_download(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)) -> List[Path]:
     """Download photo using media pk
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.album_download(media_pk, folder)
     return result
 
@@ -35,7 +35,7 @@ async def album_download_by_urls(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)) -> List[Path]:
     """Download photo using URL
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     result = cl.album_download_by_urls(urls, folder)
     return result
 
@@ -50,7 +50,7 @@ async def album_upload(sessionid: str = Form(...),
                        ) -> Media:
     """Upload album to feed
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     
     usernames_tags = []
     for usertag in usertags:

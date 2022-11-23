@@ -164,7 +164,7 @@ where proxies.id = x.id
 -- name: DeleteProxiesForTask :execrows
 DELETE
 FROM proxies
-where id in ($1::uuid[])
+where id = ANY ($1::uuid[])
 RETURNING 1;
 
 -- name: DeleteBotAccountsForTask :execrows
@@ -195,9 +195,14 @@ where id = $2;
 
 -- name: SetBotPostsCount :exec
 update bot_accounts
-set status      = 4, -- dbmodel.DoneBotStatus
-    posts_count = $1
+set posts_count = $1
 where id = $2;
+
+-- name: SetBotDoneStatus :exec
+update bot_accounts
+set status = 4 -- dbmodel.DoneBotStatus
+where id = @id;
+
 
 -- name: SetTargetsStatus :exec
 update target_users

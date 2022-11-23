@@ -144,7 +144,7 @@ func (q *Queries) DeleteBotAccountsForTask(ctx context.Context, dollar_1 []uuid.
 const deleteProxiesForTask = `-- name: DeleteProxiesForTask :execrows
 DELETE
 FROM proxies
-where id in ($1::uuid[])
+where id = ANY ($1::uuid[])
 RETURNING 1
 `
 
@@ -775,10 +775,20 @@ func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (Se
 	return i, err
 }
 
+const setBotDoneStatus = `-- name: SetBotDoneStatus :exec
+update bot_accounts
+set status = 4 -- dbmodel.DoneBotStatus
+where id = $1
+`
+
+func (q *Queries) SetBotDoneStatus(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, setBotDoneStatus, id)
+	return err
+}
+
 const setBotPostsCount = `-- name: SetBotPostsCount :exec
 update bot_accounts
-set status      = 4, -- dbmodel.DoneBotStatus
-    posts_count = $1
+set posts_count = $1
 where id = $2
 `
 

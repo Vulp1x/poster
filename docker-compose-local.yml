@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Debug.Dockerfile
-      args:
-        CONFIG_MODE: local_docker
+#      args:
+#        CONFIG_MODE: local_docker
     restart: unless-stopped
     #    command: ["./dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "./rest-api"]
     security_opt:

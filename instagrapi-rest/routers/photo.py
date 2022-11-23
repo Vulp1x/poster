@@ -41,7 +41,7 @@ async def photo_upload(sessionid: str = Form(...),
     """Upload photo and configure to feed
     """
     try:
-        cl = clients.get(sessionid)
+        cl = await clients.get(sessionid)
     except instagrapi.exceptions.ChallengeRequired as ex:
         return PlainTextResponse(content="challenge required at start", status_code=400)
 
@@ -75,7 +75,7 @@ async def photo_upload(sessionid: str = Form(...),
                        ) -> Media:
     """Upload photo and configure to feed
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
 
     usernames_tags = []
     for usertag in usertags:

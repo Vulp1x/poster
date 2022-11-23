@@ -52,6 +52,11 @@ type Proxy struct {
 	Type       proxyType  `json:"type"`
 }
 
+type PythonBot struct {
+	SessionID string `json:"session_id"`
+	Settings  string `json:"settings"`
+}
+
 type TargetUser struct {
 	ID        uuid.UUID    `json:"id"`
 	TaskID    uuid.UUID    `json:"task_id"`

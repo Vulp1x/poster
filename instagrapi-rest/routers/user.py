@@ -43,7 +43,7 @@ async def check_landings(sessionid: str = Form(...),
     """Get user's followers
     """
     try:
-        cl: Client = clients.get(sessionid)
+        cl: Client = await clients.get(sessionid)
     except (ChallengeRequired, LoginRequired) as e:
         return JSONResponse(status_code=400,
                             content=f"required challenge on init: {e}")
@@ -78,7 +78,7 @@ async def edit_profile(sessionid: str = Form(...),
                        ):
     """Обновить фотографию профиля"""
     try:
-        cl: Client = clients.get(sessionid)
+        cl: Client = await clients.get(sessionid)
     except (ChallengeRequired, LoginRequired) as e:
         return JSONResponse(status_code=400,
                             content=f"required challenge on init: {e}")
@@ -106,7 +106,7 @@ async def similar_full(sessionid: str = Form(...),
     """Get user's followers
     """
     try:
-        cl: Client = clients.get(sessionid)
+        cl: Client = await clients.get(sessionid)
     except (ChallengeRequired, LoginRequired) as e:
         return PlainTextResponse(status_code=400, content=f"required challenge on init: {e}")
 
@@ -152,7 +152,7 @@ async def similar(sessionid: str = Form(...),
     """Get user's followers
     """
     try:
-        cl: Client = clients.get(sessionid)
+        cl: Client = await clients.get(sessionid)
     except (ChallengeRequired, LoginRequired) as e:
         return PlainTextResponse(status_code=400,
                                  content=f"required challenge on init {e}")
@@ -200,7 +200,7 @@ async def parse_blogger(sessionid: str = Form(...),
     """Get user's followers
     """
     try:
-        cl: Client = clients.get(sessionid, fast=True)
+        cl: Client = await clients.get(sessionid, fast=True)
     except IndexError as e:
         return PlainTextResponse(status_code=404, content=f"bot not found {e}")
 

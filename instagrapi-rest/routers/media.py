@@ -50,7 +50,7 @@ async def media_info(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> Media:
     """Get media info by pk
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_info(pk, use_cache)
 
 
@@ -61,7 +61,7 @@ async def user_medias(sessionid: str = Form(...),
                       clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.user_medias(user_id, amount)
 
 
@@ -71,7 +71,7 @@ async def media_delete(sessionid: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)) -> bool:
     """Delete media by Media ID
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_delete(media_id)
 
 
@@ -85,7 +85,7 @@ async def media_edit(sessionid: str = Body(...),
                      clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Edit caption for media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_edit(media_id, caption, title, usertags, location)
 
 
@@ -95,7 +95,7 @@ async def media_user(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> UserShort:
     """Get author of the media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_user(media_pk)
 
 
@@ -105,7 +105,7 @@ async def media_oembed(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Return info about media and user from post URL
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_oembed(url)
 
 
@@ -116,7 +116,7 @@ async def media_like(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> bool:
     """Like a media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_like(media_id, revert)
 
 
@@ -126,7 +126,7 @@ async def media_unlike(sessionid: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)) -> bool:
     """Unlike a media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_unlike(media_id)
 
 
@@ -137,7 +137,7 @@ async def media_seen(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> bool:
     """Mark a media as seen
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_seen(media_ids, skipped_media_ids)
 
 
@@ -147,7 +147,7 @@ async def media_likers(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     """Get user's likers
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_likers(media_id)
 
 
@@ -158,7 +158,7 @@ async def media_archive(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> bool:
     """Archive a media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_archive(media_id, revert)
 
 
@@ -168,5 +168,5 @@ async def media_unarchive(sessionid: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> bool:
     """Unarchive a media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.media_unarchive(media_id)

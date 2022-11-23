@@ -24,7 +24,7 @@ async def media_feed_all(sessionid: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)) -> List[Dict]:
     """Return medias with insights
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.insights_media_feed_all(post_type, time_frame, data_ordering, count, sleep=2)
 
 
@@ -33,7 +33,7 @@ async def account(sessionid: str = Form(...),
                   clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get insights for account
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.insights_account()
 
 
@@ -43,5 +43,5 @@ async def media(sessionid: str = Form(...),
                 clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get insights data for media
     """
-    cl = clients.get(sessionid)
+    cl = await clients.get(sessionid)
     return cl.insights_media(media_pk)

@@ -9,7 +9,7 @@ from custom_logging import CustomizeLogger
 from dependencies import ClientStorage, get_clients
 from fastapi import APIRouter, Depends, Body
 from instagrapi import Client
-from instagrapi.exceptions import ChallengeRequired, ChallengeError, LoginRequired, ClientError
+from instagrapi.exceptions import ChallengeRequired, ChallengeError, LoginRequired, ClientError, UserNotFound
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
 
@@ -99,7 +99,7 @@ async def auth_add(session_id: str = Body(...),
     """Login by username and password with 2FA
     """
     try:
-        cl = clients.get(session_id)
+        cl = await clients.get(session_id)
         return PlainTextResponse(cl.sessionid)
     except (ChallengeError, ClientError) as ex:
         return PlainTextResponse(f"account is blocked: {ex}", status_code=400)
@@ -120,11 +120,17 @@ async def auth_add(session_id: str = Body(...),
     cl.set_device(device_settings.as_dict())
     cl.set_uuids(uuids.as_dict())
 
-    result = cl.login_by_sessionid(session_id)
-    if not result:
-        return PlainTextResponse(result)
+    try:
+        result = cl.login_by_sessionid(session_id)
+        if not result:
+            return PlainTextResponse(result)
+    except (UserNotFound, ClientError) as e:
+        return PlainTextResponse(f"account is blocked: {e}", status_code=400)
+    except AssertionError as e:
+        if "sessionid" in str(e):
+            return PlainTextResponse(f"invalid session id '{session_id}': {e}", status_code=400)
 
-    clients.set(cl)
+    await clients.set(cl)
 
     return PlainTextResponse(cl.sessionid)
 
@@ -133,7 +139,7 @@ async def auth_add(session_id: str = Body(...),
 async def auth_add(session_id: str = Body(...),
                    target_user_ids: List[int] = Body(None),
                    clients: ClientStorage = Depends(get_clients)) -> PlainTextResponse:
-    cl: Client = clients.get(session_id)
+    cl: Client = await clients.get(session_id)
 
     followers = cl.user_following(str(cl.user_id), use_cache=False, amount=0)
     followed_count = 0
@@ -181,7 +187,7 @@ async def settings_get(sessionid: str,
     """
 
     try:
-        cl: Client = clients.get(sessionid)
+        cl: Client = await clients.get(sessionid)
     except (ChallengeError, LoginRequired, ClientError) as e:
         return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
     except IndexError as e:
@@ -199,12 +205,12 @@ async def settings_get(sessionid: str,
 #     """Set client's settings
 #     """
 #     if sessionid != "":
-#         cl = clients.get(sessionid)
+#         cl = await clients.get(sessionid)
 #     else:
 #         cl = clients.client()
 #     cl.set_settings(json.loads(settings))
 #     cl.expose()
-#     clients.set(cl)
+#     await clients.set(cl)
 #     return cl.sessionid
 
 
@@ -213,7 +219,7 @@ async def timeline_feed(sessionid: str,
                         clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, Dict]:
     """Get your timeline feed
     """
-    cl: Client = clients.get(sessionid)
+    cl: Client = await clients.get(sessionid)
     try:
         return cl.get_timeline_feed()
 

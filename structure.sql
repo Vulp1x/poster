@@ -105,6 +105,16 @@ CREATE TABLE public.proxies (
 
 
 --
+-- Name: python_bots; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.python_bots (
+    session_id text NOT NULL,
+    settings jsonb NOT NULL
+);
+
+
+--
 -- Name: target_users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -220,6 +230,14 @@ ALTER TABLE ONLY public.proxies
 
 ALTER TABLE ONLY public.proxies
     ADD CONSTRAINT proxies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: python_bots python_bots_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.python_bots
+    ADD CONSTRAINT python_bots_pkey PRIMARY KEY (session_id);
 
 
 --
