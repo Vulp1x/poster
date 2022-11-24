@@ -217,14 +217,6 @@ ALTER TABLE ONLY public.logs
 
 
 --
--- Name: proxies proxies_host_port_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proxies
-    ADD CONSTRAINT proxies_host_port_key UNIQUE (host, port);
-
-
---
 -- Name: proxies proxies_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
