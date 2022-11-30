@@ -9,7 +9,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
-	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/headers"
 	"github.com/stretchr/testify/assert"
 )
@@ -90,39 +89,37 @@ func TestParseBotAccount(t *testing.T) {
 	}
 
 	wantedBot := BotAccount{
-		BotAccount: dbmodel.BotAccount{
-			Username:  "michellemagana598",
-			Password:  "fMS7ZbA7Uu",
-			UserAgent: "Instagram 248.0.0.17.109 Android (29/10; 540dpi; 1440x2400; LGE; LG-P690; gelato_tmb-sk; qcom; ru-RU; 239490569)",
-			DeviceData: headers.DeviceSettings{
-				AppVersion:     "248.0.0.17.109",
-				AndroidVersion: 29,
-				AndroidRelease: "10",
-				Dpi:            "540dpi",
-				Resolution:     "1440x2400",
-				Manufacturer:   "LGE",
-				Device:         "LG-P690",
-				Model:          "gelato_tmb-sk",
-				Cpu:            "qcom",
-				VersionCode:    "239490569",
-			},
-			Session: headers.Session{
-				DeviceID:      "android-0d735e1f4db26782",
-				UUID:          uuid.MustParse("fab80e64-2b3f-44c8-8916-703e6b7a91de"),
-				PhoneID:       uuid.MustParse("d23ccbb6-ca3b-4fe5-8b23-fd0163ba0ce5"),
-				AdvertisingID: uuid.MustParse("c7f9fc1c-cdff-4962-a57d-125a99e81545"),
-			},
-			Headers: headers.Base{
-				Mid:           "",
-				DsUserID:      "55063899557",
-				Rur:           "ODN,55063899557,1693496495:01f73e106e7e6c02e0414f5a6787745fad80bff6af73b01eee0e15b7e5c186447d6a8d62",
-				Authorization: "Bearer IGT:2:eyJkc191c2VyX2lkIjoiNTUwNjM4OTk1NTciLCJzZXNzaW9uaWQiOiI1NTA2Mzg5OTU1NyUzQUN0RGRybU1wek8zMDBiJTNBMyUzQUFZZnhld2dLaVVzU25WekFZZjhoSUFqSkJTMkUyeGI4empYSUotZkZfdyJ9",
-				WWWClaim:      "hmac.AR2dDsO3wL_piE7dQKKv-ZjEwYU0vo-nxZ0hRuMFby-L0fFY",
-				AuthData: headers.AuthorizationData{
-					DsUserID:  "55063899557",
-					SessionID: "55063899557:CtDdrmMpzO300b:3:AYfxewgKiUsSnVzAYf8hIAjJBS2E2xb8zjXIJ-fF_w",
-					CSRFToken: "",
-				},
+		Username:  "michellemagana598",
+		Password:  "fMS7ZbA7Uu",
+		UserAgent: "Instagram 248.0.0.17.109 Android (29/10; 540dpi; 1440x2400; LGE; LG-P690; gelato_tmb-sk; qcom; ru-RU; 239490569)",
+		DeviceData: headers.DeviceSettings{
+			AppVersion:     "248.0.0.17.109",
+			AndroidVersion: 29,
+			AndroidRelease: "10",
+			Dpi:            "540dpi",
+			Resolution:     "1440x2400",
+			Manufacturer:   "LGE",
+			Device:         "LG-P690",
+			Model:          "gelato_tmb-sk",
+			Cpu:            "qcom",
+			VersionCode:    "239490569",
+		},
+		Session: headers.Session{
+			DeviceID:      "android-0d735e1f4db26782",
+			UUID:          uuid.MustParse("fab80e64-2b3f-44c8-8916-703e6b7a91de"),
+			PhoneID:       uuid.MustParse("d23ccbb6-ca3b-4fe5-8b23-fd0163ba0ce5"),
+			AdvertisingID: uuid.MustParse("c7f9fc1c-cdff-4962-a57d-125a99e81545"),
+		},
+		Headers: headers.Base{
+			Mid:           "",
+			DsUserID:      "55063899557",
+			Rur:           "ODN,55063899557,1693496495:01f73e106e7e6c02e0414f5a6787745fad80bff6af73b01eee0e15b7e5c186447d6a8d62",
+			Authorization: "Bearer IGT:2:eyJkc191c2VyX2lkIjoiNTUwNjM4OTk1NTciLCJzZXNzaW9uaWQiOiI1NTA2Mzg5OTU1NyUzQUN0RGRybU1wek8zMDBiJTNBMyUzQUFZZnhld2dLaVVzU25WekFZZjhoSUFqSkJTMkUyeGI4empYSUotZkZfdyJ9",
+			WWWClaim:      "hmac.AR2dDsO3wL_piE7dQKKv-ZjEwYU0vo-nxZ0hRuMFby-L0fFY",
+			AuthData: headers.AuthorizationData{
+				DsUserID:  "55063899557",
+				SessionID: "55063899557:CtDdrmMpzO300b:3:AYfxewgKiUsSnVzAYf8hIAjJBS2E2xb8zjXIJ-fF_w",
+				CSRFToken: "",
 			},
 		},
 	}

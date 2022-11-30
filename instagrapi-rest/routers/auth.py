@@ -225,3 +225,33 @@ async def timeline_feed(sessionid: str,
 
     except ChallengeRequired as e:
         return PlainTextResponse(status_code=400, content=f'bot {cl.username} is blocked')
+
+
+@router.get("/alive")
+async def alive_bots(clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, List[str]]:
+    """Get your timeline feed
+    """
+    clients_list: List[Client] = await clients.list()
+    alive_usernames = []
+    for client in clients_list:
+        client.login()
+        alive_usernames.append(client.sessionid)
+
+    return alive_usernames
+
+
+@router.get("/relogin")
+async def settings_get(sessionid: str,
+                       username: str, password: str,
+                       clients: ClientStorage = Depends(get_clients)) -> Union[PlainTextResponse, Dict]:
+    """Get client's settings
+    """
+
+    try:
+        cl: Client = await clients.get(sessionid, fast=True)
+    except (ChallengeError, LoginRequired, ClientError) as e:
+        return PlainTextResponse(status_code=400, content=f'bot is blocked: {e}')
+    except IndexError as e:
+        return PlainTextResponse(status_code=404, content=f'{e}')
+
+    result = cl.login(username, password, True)

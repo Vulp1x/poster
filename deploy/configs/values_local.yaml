@@ -15,13 +15,13 @@ logger:
 postgres:
   port: 5432
   #  host: localhost
-  user: postgres
-  password: postgres
+#  user: postgres
+#  password: postgres
   
   #  prod users
   host: 65.109.30.237
-#  user: docker
-#  password: dN5mYdDVKbuyq6ry
+  user: docker
+  password: dN5mYdDVKbuyq6ry
   
   migration_host: localhost
   migration_port: 5432
