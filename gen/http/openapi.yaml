@@ -32,6 +32,12 @@ paths:
       responses:
         "200":
           description: OK response.
+          schema:
+            $ref: '#/definitions/AdminServicePushBotsOKResponseBody'
+            required:
+              - sent_bots
+              - saved_bots
+              - usernames
         "400":
           description: Bad Request response.
           schema:
@@ -50,6 +56,12 @@ paths:
             type: string
         "500":
           description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/AdminServicePushBotsInternalServerErrorResponseBody'
+            required:
+              - sent_bots
+              - saved_bots
+              - usernames
       schemes:
         - http
       security:
@@ -765,6 +777,110 @@ definitions:
     required:
       - login
       - password
+  AdminServicePushBotsInternalServerErrorResponseBody:
+    title: AdminServicePushBotsInternalServerErrorResponseBody
+    type: object
+    properties:
+      saved_bots:
+        type: integer
+        description: количество ботов, которых сохранили в проксе
+        example: 1762714493
+        format: int32
+      sent_bots:
+        type: integer
+        description: количество ботов, которых мы отправили
+        example: 7298706598327928324
+        format: int64
+      usernames:
+        type: array
+        items:
+          type: string
+          example: Ipsam officia tempore voluptatum vel dolores.
+        description: имена ботов, которые мы сохранили
+        example:
+          - Aperiam modi.
+          - Ipsa molestiae adipisci id sint dolores.
+          - Voluptatem quibusdam quia.
+    example:
+      saved_bots: 1470858339
+      sent_bots: 4376142905692400743
+      usernames:
+        - Qui nam aut.
+        - Soluta fuga saepe sequi voluptates commodi.
+        - Eum non accusamus enim eligendi sit.
+    required:
+      - sent_bots
+      - saved_bots
+      - usernames
+  AdminServicePushBotsNotFoundResponseBody:
+    title: AdminServicePushBotsNotFoundResponseBody
+    type: object
+    properties:
+      saved_bots:
+        type: integer
+        description: количество ботов, которых сохранили в проксе
+        example: 12728194
+        format: int32
+      sent_bots:
+        type: integer
+        description: количество ботов, которых мы отправили
+        example: 4539865780152955419
+        format: int64
+      usernames:
+        type: array
+        items:
+          type: string
+          example: Qui mollitia excepturi.
+        description: имена ботов, которые мы сохранили
+        example:
+          - Soluta enim dolorum dolor voluptatibus ad.
+          - Qui enim aperiam sequi totam.
+          - Praesentium voluptates adipisci dicta voluptates repellat eaque.
+    example:
+      saved_bots: 325172483
+      sent_bots: 3657244261703185701
+      usernames:
+        - Ipsa esse non aut quia.
+        - Corporis quidem.
+    required:
+      - sent_bots
+      - saved_bots
+      - usernames
+  AdminServicePushBotsOKResponseBody:
+    title: AdminServicePushBotsOKResponseBody
+    type: object
+    properties:
+      saved_bots:
+        type: integer
+        description: количество ботов, которых сохранили в проксе
+        example: 135305981
+        format: int32
+      sent_bots:
+        type: integer
+        description: количество ботов, которых мы отправили
+        example: 1686699058706870835
+        format: int64
+      usernames:
+        type: array
+        items:
+          type: string
+          example: Sit quam sed et quo sunt.
+        description: имена ботов, которые мы сохранили
+        example:
+          - Officia nemo nisi voluptatibus tempore ut.
+          - Et dolorum laudantium.
+          - Alias praesentium laborum.
+          - Consequatur qui at commodi quo.
+    example:
+      saved_bots: 1757765690
+      sent_bots: 6554173407483112405
+      usernames:
+        - Cumque in deleniti facilis ullam.
+        - Veniam voluptates aut aut minus sapiente sed.
+    required:
+      - sent_bots
+      - saved_bots
+      - usernames
   AuthServiceSigninResponseBody:
     title: AuthServiceSigninResponseBody
     type: object
@@ -784,25 +900,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 8014404170738190333
+        example: 6122579774920964872
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Quia enim corrupti dolores corrupti ab ut.
+          example: Dolorem dolores autem.
         example:
-          - Dolore tempore enim quae consequatur laboriosam.
-          - Quis repellendus molestias officiis recusandae reprehenderit.
-          - Vitae blanditiis temporibus est ab quam.
+          - Qui laborum cum omnis sint.
+          - Totam perferendis magni excepturi voluptas.
+          - Soluta est nostrum impedit velit ipsam veniam.
         minItems: 4
         maxItems: 4
     example:
-      line_number: 4781595633172117652
+      line_number: 6980417002971031990
       record:
-        - Similique molestiae sed.
-        - Voluptatibus quos molestiae velit minima.
-        - Assumenda dicta dolores ea.
+        - Voluptatem dignissimos dolor.
+        - Sapiente earum non voluptas.
+        - Voluptas aspernatur laborum occaecati laboriosam pariatur saepe.
     required:
       - record
       - line_number
@@ -813,21 +929,21 @@ definitions:
       posts_count:
         type: integer
         description: количество выложенных постов
-        example: 6977138576287812875
+        example: 7228722385598777106
         format: int64
       status:
         type: integer
         description: текущий статус бота, будут ли выкладываться посты
-        example: 4727091831527109867
+        example: 2016428649008583150
         format: int64
       user_name:
         type: string
         description: имя пользователя бота
-        example: Doloremque ullam ut voluptatum magnam inventore.
+        example: Temporibus sit aliquam quam explicabo modi.
     example:
-      posts_count: 5550390089166950386
-      status: 8664802173321606139
-      user_name: Tempora et unde aliquid error voluptatem vero.
+      posts_count: 298444635071955159
+      status: 13108486945505790
+      user_name: Reprehenderit voluptatem.
     required:
       - user_name
       - posts_count
@@ -839,25 +955,25 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 3978464555891706372
+        example: 2652796597417055703
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Culpa maiores velit minus temporibus autem sunt.
+          example: Nobis repellat sequi tempora et.
         example:
-          - Soluta perferendis omnis.
-          - Necessitatibus tempora dolorem explicabo quisquam nesciunt.
-          - Est amet eveniet.
+          - Est est quidem est.
+          - Et ullam tenetur.
+          - Ratione rem voluptas esse et expedita ea.
         minItems: 4
         maxItems: 4
     example:
-      line_number: 6478919691177255281
+      line_number: 5289169843576377587
       record:
-        - Eum soluta quia consectetur repudiandae.
-        - Nemo eius.
-        - Voluptatem cumque aperiam similique.
+        - At sed.
+        - Perspiciatis ea ut ab.
+        - Et qui iusto suscipit officiis.
     required:
       - record
       - line_number
@@ -868,23 +984,23 @@ definitions:
       line_number:
         type: integer
         description: номер строки в исходном файле
-        example: 872459218782695132
+        example: 8659011001221767782
         format: int64
       record:
         type: array
         items:
           type: string
-          example: Eligendi rerum velit vitae.
+          example: Quod et error ut unde et.
         example:
-          - Tenetur ex quo ullam dolorem.
-          - Eveniet eum optio ducimus.
+          - Adipisci iste corporis.
+          - Totam illum laboriosam animi.
         minItems: 2
         maxItems: 2
     example:
-      line_number: 7586192834996729244
+      line_number: 5856751609658998448
       record:
-        - Excepturi voluptatem dicta.
-        - Eveniet accusamus.
+        - Natus sit sed asperiores voluptas aliquid.
+        - Illum aut numquam omnis earum sint non.
     required:
       - record
       - line_number
@@ -895,24 +1011,24 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Debitis nostrum ut accusantium.
+        example: Ad a nisi itaque consequatur atque veritatis.
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Ipsum ad repellendus molestias corrupti.
+        example: Possimus blanditiis aperiam et et aut.
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Neque magni velit aut voluptatem.
+        example: Voluptatem fuga.
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Et consequatur est maiores soluta ut.
+        example: Perferendis ut impedit et.
     example:
-      bots_filename: Omnis praesentium.
-      cheap_proxies_filename: Ex quos esse aut.
-      residential_proxies_filename: Et optio asperiores dolorem.
-      targets_filename: Nostrum aut excepturi voluptatem.
+      bots_filename: Porro distinctio minus enim excepturi nesciunt dolores.
+      cheap_proxies_filename: Id sapiente voluptatem.
+      residential_proxies_filename: Qui repellat eum.
+      targets_filename: Optio veritatis sapiente et omnis neque.
     required:
       - bots_filename
       - residential_proxies_filename
@@ -926,60 +1042,60 @@ definitions:
         type: array
         items:
           type: string
-          example: Earum est praesentium nesciunt amet eum deleniti.
+          example: Blanditiis dolorem eos quisquam eaque distinctio nemo.
         description: аватарки для ботов
         example:
-          - Vel debitis saepe animi voluptatem.
-          - Et sit vero.
-          - Totam quia consequuntur pariatur et sapiente.
-          - Magni ut doloribus sapiente odit.
+          - Vero consequatur amet ex aut corrupti aut.
+          - Nihil rem consectetur asperiores.
+          - Nihil sed et ex corrupti cum.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Eveniet similique dolore dolor delectus.
+          example: Doloribus velit.
         description: фамилии для аккаунтов-ботов
         example:
-          - Voluptas non exercitationem qui dolores repellendus.
-          - Ea dolores.
+          - Et accusantium veritatis repellendus.
+          - Et est quia ut vero ipsum.
+          - Tempora consequatur.
+          - Dolorum nihil.
       bot_names:
         type: array
         items:
           type: string
-          example: Et et aut sit.
+          example: Atque vel.
         description: имена для аккаунтов-ботов
         example:
-          - Saepe necessitatibus explicabo iste et.
-          - Aut quae quis expedita.
-          - Repellendus aliquam omnis quisquam aliquam ea.
+          - Animi voluptatem.
+          - Et sit vero.
+          - Totam quia consequuntur pariatur et sapiente.
+          - Magni ut doloribus sapiente odit.
       bot_urls:
         type: array
         items:
           type: string
-          example: Eum tempora recusandae quis quia.
+          example: Adipisci rem doloremque.
         description: ссылки для описания у ботов
         example:
-          - Fugit explicabo voluptatum quia numquam.
-          - Aliquid aut.
-          - Pariatur dicta vel quos et doloremque.
-          - Consequuntur repellendus dolores.
+          - Velit delectus at voluptatem non.
+          - Delectus non iure quod velit illo.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Voluptatum suscipit.
+        example: Nostrum iste id aut sapiente.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 1395162484006731594
+        example: 2913694271367876796
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Qui quia exercitationem nihil sed.
+        example: Consequatur voluptatem tempora asperiores ut consequatur.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 3201984214411340099
+        example: 6952040083102939202
         format: int64
       follow_targets:
         type: boolean
@@ -993,51 +1109,48 @@ definitions:
         type: array
         items:
           type: string
-          example: Debitis dignissimos perspiciatis doloremque nulla.
+          example: Libero perspiciatis omnis.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Maiores et in aspernatur.
-          - Veniam voluptas.
-          - Quae ratione dolores labore aut cum rerum.
-          - Tempore numquam expedita rem cumque pariatur aspernatur.
+          - Explicabo placeat reprehenderit tempora quia est tempora.
+          - Nulla a qui magni qui ratione.
+          - Earum est praesentium nesciunt amet eum deleniti.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
-        example: false
+        example: true
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 8787002662685778565
+        example: 9968641553486770879
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 9667950439302141611
+        example: 7601170178537121935
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Iusto unde error rerum similique.
+          example: Praesentium velit.
         description: список base64 строк картинок
         example:
-          - Tempore soluta delectus aut ipsa iure.
-          - Quo nisi libero perspiciatis omnis sequi.
-          - Explicabo placeat reprehenderit tempora quia est tempora.
-          - Nulla a qui magni qui ratione.
+          - Ut fuga velit.
+          - Sequi quia autem sed eum deleniti delectus.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 13520345131083262997
+        example: 5339275911234518009
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Maxime quis pariatur nobis iusto velit.
+        example: A quos.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 2854590703236171599
+        example: 2596729066692230411
         format: int64
       status:
         type: integer
@@ -1052,82 +1165,80 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Vel exercitationem autem.
+        example: Odio corporis consequatur saepe quidem veritatis.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 7943505281118752052
+        example: 7601663317187852759
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 8886293435421050542
+        example: 1578033189260181454
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Consequatur qui ut a saepe harum sunt.
+        example: Soluta delectus aut ipsa iure ea quo.
       title:
         type: string
         description: название задачи
-        example: Rerum voluptas sed ea aut.
+        example: Quo vitae.
       type:
         type: integer
-        example: 1
+        example: 2
         enum:
           - 1
           - 2
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Iusto voluptatibus rem.
+        example: Neque vero non commodi deleniti.
     example:
       bot_images:
+        - Recusandae totam molestias molestiae et est.
+        - Quis distinctio provident voluptas rerum.
+      bot_last_names:
+        - Qui quae aut saepe.
+        - Magni pariatur eum rem.
+      bot_names:
         - Quia ut.
         - Voluptatem molestias ut dignissimos modi saepe nisi.
         - Est officiis enim.
-      bot_last_names:
-        - Quia autem sed eum deleniti delectus ut.
-        - Dolorem eos quisquam eaque distinctio nemo dolores.
-        - Vero consequatur amet ex aut corrupti aut.
-        - Nihil rem consectetur asperiores.
-      bot_names:
-        - Qui libero.
-        - Quia id praesentium velit ratione.
-        - Ut fuga velit.
       bot_urls:
-        - Sed et ex.
-        - Cum voluptatem ut officiis quae est.
-        - Velit expedita at quasi minus quo eveniet.
-        - Corporis sed.
-      bots_filename: Rerum beatae consequatur culpa blanditiis.
-      bots_num: 6817734038456100177
-      cheap_proxies_filename: Saepe asperiores aliquid ipsam.
-      cheap_proxies_num: 9165159410491156747
-      follow_targets: false
+        - Esse debitis.
+        - Id deserunt nostrum aut.
+        - Dolorum voluptatum.
+        - Rerum maiores beatae velit consequatur accusantium.
+      bots_filename: Ipsa dolorem ipsa repudiandae.
+      bots_num: 1361572747834378802
+      cheap_proxies_filename: Ipsa veritatis tempora officia tempore soluta autem.
+      cheap_proxies_num: 8693815831340775588
+      follow_targets: true
       id: 233374F1-297F-8711-5FC3-4F6B3731AD63
       landing_accounts:
-        - A quos.
-        - Consequatur voluptatem tempora asperiores ut consequatur.
-        - Odio corporis consequatur saepe quidem veritatis.
-        - Neque vero non commodi deleniti.
-      need_photo_tags: true
-      per_post_sleep_seconds: 2731640405441969031
-      photo_tags_delay_seconds: 4997375994294670099
-      post_images:
-        - Ut pariatur ab non aut.
+        - Ab voluptas totam qui.
+        - Qui nihil dolores et ut.
+        - Ab non aut.
         - Nostrum voluptatem recusandae nam nisi eaque enim.
-      posts_per_bot: 929048512865082699
-      residential_proxies_filename: Sit deleniti aliquid nostrum cum esse.
-      residential_proxies_num: 3524677230673987194
-      status: 2
-      targets_filename: Dolorem beatae.
-      targets_num: 1179159647608578990
-      targets_per_post: 7957617924335141700
-      text_template: Dolore dolor voluptas nostrum iste id aut.
-      title: Aliquid praesentium earum consequatur cumque.
-      type: 1
-      video_filename: Reprehenderit et quam ut ab.
+      need_photo_tags: false
+      per_post_sleep_seconds: 16602451452193896240
+      photo_tags_delay_seconds: 16832396293877698052
+      post_images:
+        - Et consequatur omnis nostrum harum placeat.
+        - Id in necessitatibus illum modi.
+        - Eum laudantium sint.
+      posts_per_bot: 5558802988458094373
+      residential_proxies_filename: Ut consequatur sed omnis vel quia.
+      residential_proxies_num: 3404107520480803973
+      status: 3
+      targets_filename: Omnis laborum alias.
+      targets_num: 5818759918411753098
+      targets_per_post: 10155240538310313735
+      text_template: Sint reprehenderit et.
+      title: Dolores id suscipit nobis consequatur nihil.
+      type: 2
+      video_filename: Et hic debitis exercitationem nihil deleniti.
     required:
       - id
       - type
@@ -1157,7 +1268,38 @@ definitions:
       bots_number:
         type: integer
         description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-        example: 3004609254549335357
+        example: 7986667134109107246
+        format: int64
+      status:
+        type: integer
+        example: 4
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+      task_id:
+        type: string
+        description: id задачи
+        example: Omnis et aut quia.
+    example:
+      bots_number: 429645127315358741
+      status: 6
+      task_id: Qui rem error enim ut assumenda.
+    required:
+      - bots_number
+      - task_id
+      - status
+  TasksServiceAssignProxiesNotFoundResponseBody:
+    title: TasksServiceAssignProxiesNotFoundResponseBody
+    type: object
+    properties:
+      bots_number:
+        type: integer
+        description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
+        example: 7666459401965140
         format: int64
       status:
         type: integer
@@ -1172,42 +1314,11 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: A nisi itaque consequatur atque veritatis et.
+        example: At ex unde consequatur.
     example:
-      bots_number: 5830428834551507272
-      status: 1
-      task_id: Possimus blanditiis aperiam et et aut.
-    required:
-      - bots_number
-      - task_id
-      - status
-  TasksServiceAssignProxiesNotFoundResponseBody:
-    title: TasksServiceAssignProxiesNotFoundResponseBody
-    type: object
-    properties:
-      bots_number:
-        type: integer
-        description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-        example: 563199431716270239
-        format: int64
-      status:
-        type: integer
-        example: 2
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-      task_id:
-        type: string
-        description: id задачи
-        example: Impedit et.
-    example:
-      bots_number: 8395440182382386784
-      status: 5
-      task_id: Minus enim excepturi nesciunt.
+      bots_number: 2354101825852687898
+      status: 3
+      task_id: Facere est cupiditate sunt incidunt.
     required:
       - bots_number
       - task_id
@@ -1219,11 +1330,11 @@ definitions:
       bots_number:
         type: integer
         description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-        example: 1270445392009228979
+        example: 1779105569516640625
         format: int64
       status:
         type: integer
-        example: 3
+        example: 4
         enum:
           - 1
           - 2
@@ -1234,11 +1345,11 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: Consequatur dolorem.
+        example: Ea asperiores ad est repellat quibusdam quia.
     example:
-      bots_number: 2812849559511682107
-      status: 1
-      task_id: Voluptas fugiat accusantium dolorem et non animi.
+      bots_number: 4605847860580838305
+      status: 5
+      task_id: Voluptatem quidem.
     required:
       - bots_number
       - task_id
@@ -1250,7 +1361,7 @@ definitions:
       bots_number:
         type: integer
         description: количество аккаунтов с проксями, которые будут использованы для текущей задачи
-        example: 3018905314203383843
+        example: 3879908423664008925
         format: int64
       status:
         type: integer
@@ -1265,11 +1376,11 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: Repellat eum voluptatem id sapiente voluptatem.
+        example: Sit sed officia.
     example:
-      bots_number: 6714796272587114672
-      status: 4
-      task_id: Sapiente et.
+      bots_number: 5672140931593847822
+      status: 1
+      task_id: Quo et ipsam illum qui aliquid.
     required:
       - bots_number
       - task_id
@@ -1282,70 +1393,72 @@ definitions:
         type: array
         items:
           type: string
-          example: Officia dicta iusto ipsa esse non aut.
+          example: Et quis.
         description: аватарки для ботов
         example:
-          - Corporis quidem.
-          - Tempore pariatur ipsam officia tempore.
-          - Vel dolores enim velit aperiam modi.
-          - Ipsa molestiae adipisci id sint dolores.
+          - Aut sunt dolorum.
+          - Laborum atque alias et culpa consequatur.
+          - Id cum hic in voluptatem.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Sed est dolore ipsa qui mollitia excepturi.
+          example: Perspiciatis enim ipsum odit velit doloremque.
         description: фамилии для аккаунтов-ботов
         example:
-          - Soluta enim dolorum dolor voluptatibus ad.
-          - Qui enim aperiam sequi totam.
-          - Praesentium voluptates adipisci dicta voluptates repellat eaque.
+          - Temporibus praesentium.
+          - Atque unde.
+          - Porro cum voluptas voluptates iure.
       bot_names:
         type: array
         items:
           type: string
-          example: Consequatur qui at commodi quo.
+          example: Dolores eos.
         description: имена для аккаунтов-ботов
         example:
-          - Vitae aliquam cumque in.
-          - Facilis ullam magnam veniam.
-          - Aut aut minus.
+          - Error quisquam dolores veritatis excepturi dolore.
+          - Corporis fugit sit.
       bot_urls:
         type: array
         items:
           type: string
-          example: Voluptatem quibusdam quia.
+          example: Adipisci autem et quam earum blanditiis.
         description: ссылки для описания у ботов
         example:
-          - Suscipit asperiores qui nam aut.
-          - Soluta fuga saepe sequi voluptates commodi.
-          - Eum non accusamus enim eligendi sit.
+          - Magnam incidunt voluptatibus et non quidem.
+          - Aut saepe.
+          - Pariatur laudantium cum natus.
+          - Quia ipsum suscipit rerum eos.
       landing_accounts:
         type: array
         items:
           type: string
-          example: Nisi voluptatibus tempore.
+          example: In consequuntur officiis eos temporibus enim sequi.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Et dolorum laudantium.
-          - Alias praesentium laborum.
+          - Earum non sequi quos.
+          - Nobis cumque deleniti accusamus est.
+          - Adipisci praesentium sint.
+          - Molestias laboriosam.
       post_images:
         type: array
         items:
           type: string
-          example: Ut temporibus soluta qui enim facilis debitis.
+          example: Praesentium deserunt qui.
         description: список фотографий для постов
         example:
-          - Neque doloribus.
-          - In consequuntur officiis eos temporibus enim sequi.
-          - Qui earum non sequi quos similique.
+          - Sed ad eligendi facilis rem omnis.
+          - Enim maiores.
+          - Non dolore quia illum.
+          - Architecto ipsam labore officiis.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Et aut officia.
+        example: Incidunt neque doloribus.
       title:
         type: string
         description: название задачи
-        example: Sint est sit quam sed et quo.
+        example: Ut temporibus soluta qui enim facilis debitis.
       type:
         type: integer
         example: 1
@@ -1354,31 +1467,32 @@ definitions:
           - 2
     example:
       bot_images:
-        - Dicta porro cum.
-        - Voluptates iure alias.
-        - Quis ut.
+        - Eum cupiditate.
+        - Error voluptas nihil non quasi.
+        - Modi aut qui impedit odio.
       bot_last_names:
-        - Enim ipsum odit velit doloremque.
-        - Culpa temporibus praesentium ut.
+        - Consequatur a quis assumenda aut autem quaerat.
+        - Consequatur nostrum minus et itaque pariatur.
+        - Illum itaque.
       bot_names:
-        - Error quisquam dolores veritatis excepturi dolore.
-        - Corporis fugit sit.
+        - Exercitationem error omnis nulla hic.
+        - Et possimus voluptatem assumenda nisi rerum est.
+        - Et omnis dolor quia ea sed quia.
+        - Voluptatem quasi qui dolor deleniti.
       bot_urls:
-        - Sunt dolorum odio laborum.
-        - Alias et culpa consequatur dolores.
-        - Cum hic in voluptatem molestiae.
-        - Autem et quam earum blanditiis.
+        - Reiciendis aperiam.
+        - Ullam quis maiores distinctio fugiat vel nihil.
+        - Impedit repellat.
       landing_accounts:
-        - Molestias laboriosam.
-        - Dolores eos.
+        - Quia numquam repudiandae quis.
+        - Quis eum ad porro sed doloremque.
       post_images:
-        - Magnam incidunt voluptatibus et non quidem.
-        - Aut saepe.
-        - Pariatur laudantium cum natus.
-        - Quia ipsum suscipit rerum eos.
-      text_template: Temporibus adipisci praesentium.
-      title: Deleniti accusamus.
-      type: 2
+        - Culpa veritatis vitae voluptatem labore.
+        - Totam et ut.
+        - Illum exercitationem.
+      text_template: Cumque explicabo quaerat est reiciendis temporibus voluptas.
+      title: Dicta illo.
+      type: 1
     required:
       - title
       - text_template
@@ -1393,15 +1507,11 @@ definitions:
         type: object
         description: результат работы по каждому боту, ключ- имя бота
         example:
-          Dolore iste explicabo.:
+          Et et aut sit.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
-          Minus repellat.:
-            posts_count: 131746635671988325
-            status: 1552643486998130336
-            user_name: Nesciunt ipsum minima et doloremque eligendi.
-          Reiciendis ipsam.:
+          Tempore numquam expedita rem cumque pariatur aspernatur.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
@@ -1414,28 +1524,36 @@ definitions:
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 7282271003619163546
+        example: 814740293795704882
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 6353519638153629617
+        example: 3431710426566290566
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 6641621616102690223
+        example: 4211714749041841311
         format: int64
     example:
       bots_progresses:
-        Molestiae et nesciunt dignissimos enim.:
+        Consequatur repellendus aliquam omnis quisquam aliquam.:
+          posts_count: 131746635671988325
+          status: 1552643486998130336
+          user_name: Nesciunt ipsum minima et doloremque eligendi.
+        Et blanditiis aut quae quis.:
+          posts_count: 131746635671988325
+          status: 1552643486998130336
+          user_name: Nesciunt ipsum minima et doloremque eligendi.
+        Nesciunt eveniet similique dolore dolor delectus.:
           posts_count: 131746635671988325
           status: 1552643486998130336
           user_name: Nesciunt ipsum minima et doloremque eligendi.
       done: true
-      targets_failed: 3944846280028634995
-      targets_notified: 1064875986508919596
-      targets_waiting: 4525059282913223643
+      targets_failed: 1355265026168644525
+      targets_notified: 3212292419257112178
+      targets_waiting: 1443931682915952405
     required:
       - bots_progresses
       - targets_notified
@@ -1450,11 +1568,15 @@ definitions:
         type: object
         description: результат работы по каждому боту, ключ- имя бота
         example:
-          Facere sed qui.:
+          Consequatur qui ut a saepe harum sunt.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
-          Occaecati et.:
+          Debitis dignissimos perspiciatis doloremque nulla.:
+            posts_count: 131746635671988325
+            status: 1552643486998130336
+            user_name: Nesciunt ipsum minima et doloremque eligendi.
+          Libero mollitia ut voluptatem et.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
@@ -1463,32 +1585,36 @@ definitions:
       done:
         type: boolean
         description: закончена ли задача
-        example: true
+        example: false
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 5470316405082825974
+        example: 3490849785057703501
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 8041107137601999156
+        example: 5737680659997201986
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 2598469645616079282
+        example: 3221867989584737513
         format: int64
     example:
       bots_progresses:
-        Sed est at eius.:
+        Incidunt veniam.:
           posts_count: 131746635671988325
           status: 1552643486998130336
           user_name: Nesciunt ipsum minima et doloremque eligendi.
-      done: false
-      targets_failed: 3682119828419345852
-      targets_notified: 6857467759779255331
-      targets_waiting: 6398956327025497582
+        Sint quae ratione.:
+          posts_count: 131746635671988325
+          status: 1552643486998130336
+          user_name: Nesciunt ipsum minima et doloremque eligendi.
+      done: true
+      targets_failed: 7844232532874772850
+      targets_notified: 1940866519847806359
+      targets_waiting: 7053295060432455053
     required:
       - bots_progresses
       - targets_notified
@@ -1503,15 +1629,15 @@ definitions:
         type: object
         description: результат работы по каждому боту, ключ- имя бота
         example:
-          Iste quia nihil tempora fugit.:
+          Dolores repellendus quo ea.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
-          Modi facere sunt.:
+          Incidunt velit fugit explicabo voluptatum.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
-          Qui architecto ut dolor.:
+          Molestias eum tempora recusandae quis.:
             posts_count: 131746635671988325
             status: 1552643486998130336
             user_name: Nesciunt ipsum minima et doloremque eligendi.
@@ -1520,40 +1646,36 @@ definitions:
       done:
         type: boolean
         description: закончена ли задача
-        example: false
+        example: true
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 5512601832125018642
+        example: 4988185911975831129
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 8293536358674376982
+        example: 204650607765412217
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 6941373261946140234
+        example: 6353118479044435174
         format: int64
     example:
       bots_progresses:
-        Perspiciatis fugiat voluptatum aspernatur tempore.:
+        Consequuntur repellendus dolores.:
           posts_count: 131746635671988325
           status: 1552643486998130336
           user_name: Nesciunt ipsum minima et doloremque eligendi.
-        Qui quisquam illum accusantium velit.:
+        Pariatur dicta vel quos et doloremque.:
           posts_count: 131746635671988325
           status: 1552643486998130336
           user_name: Nesciunt ipsum minima et doloremque eligendi.
-        Quisquam optio et consequatur rem.:
-          posts_count: 131746635671988325
-          status: 1552643486998130336
-          user_name: Nesciunt ipsum minima et doloremque eligendi.
-      done: true
-      targets_failed: 5746030166708090337
-      targets_notified: 1277727496486409583
-      targets_waiting: 4621932748400430363
+      done: false
+      targets_failed: 9113347065708271662
+      targets_notified: 2856753229047657544
+      targets_waiting: 2940070509594292694
     required:
       - bots_progresses
       - targets_notified
@@ -1568,58 +1690,60 @@ definitions:
         type: array
         items:
           type: string
-          example: Et quisquam ad.
+          example: Qui aliquam deleniti molestiae reiciendis.
         description: аватарки для ботов
         example:
-          - Suscipit molestias aut suscipit eligendi.
-          - Ut saepe voluptatum ut.
-          - Ut est voluptas nemo omnis.
+          - Ipsum dolorem.
+          - Ut accusantium ut ratione.
+          - Eius ratione distinctio voluptatem quasi.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Voluptatem minus vero neque rerum.
+          example: Sit vero mollitia quia quae voluptatem quo.
         description: фамилии для аккаунтов-ботов
         example:
-          - Impedit totam voluptatibus nisi dolores enim.
-          - Vero adipisci consequatur.
+          - Corrupti aut impedit vel eaque.
+          - Magni aut.
       bot_names:
         type: array
         items:
           type: string
-          example: Numquam enim quam harum modi fuga est.
+          example: Sit nihil ea eveniet.
         description: имена для аккаунтов-ботов
         example:
-          - Et facilis omnis enim quod velit.
-          - Eos optio.
-          - Aliquam illum.
-          - Impedit qui inventore.
+          - Odio illum corrupti officia animi numquam sapiente.
+          - Sed perspiciatis maxime.
+          - Ut dolores fugiat qui qui inventore occaecati.
+          - Ad nam laboriosam facilis vel qui reprehenderit.
       bot_urls:
         type: array
         items:
           type: string
-          example: Veritatis sint voluptatibus blanditiis voluptatem sint in.
+          example: Dolorem soluta.
         description: ссылки для описания у ботов
         example:
-          - Qui et neque.
-          - Qui non distinctio dolorem assumenda.
+          - Ipsum quis.
+          - Quibusdam possimus iusto id.
+          - Laborum officiis.
+          - Non fugiat consequatur eaque similique quia.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Soluta ut et dolorem optio architecto.
+        example: Natus dolor minus iure.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 5397909554302840536
+        example: 5278312813603811223
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Aut omnis omnis vel.
+        example: Deserunt illo accusamus.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 5342452632000569007
+        example: 6679153234724869395
         format: int64
       follow_targets:
         type: boolean
@@ -1633,11 +1757,12 @@ definitions:
         type: array
         items:
           type: string
-          example: Et numquam suscipit nihil corrupti vero.
+          example: Et ut et quisquam ad rem.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Aut harum placeat.
-          - Totam aut id.
+          - Molestias aut suscipit eligendi eum ut saepe.
+          - Ut fugiat ut.
+          - Voluptas nemo omnis impedit amet.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -1645,39 +1770,41 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 8403548645784542882
+        example: 7001350064926903775
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 9346988500377927089
+        example: 5534628947327410525
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Eligendi doloribus hic iusto praesentium sequi.
+          example: Quod ullam aut.
         description: список base64 строк картинок
         example:
-          - Corrupti unde itaque id aut officiis.
-          - Ut voluptatem dolore qui et.
+          - Et dolores.
+          - Repudiandae quis.
+          - Autem aut.
+          - Autem eveniet quod harum animi et non.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 15228967695764182718
+        example: 3928433399076432376
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Magni eum.
+        example: Itaque vero qui sint sit ea.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 1568618387647971994
+        example: 3516864134180415926
         format: int64
       status:
         type: integer
-        example: 2
+        example: 4
         enum:
           - 1
           - 2
@@ -1688,25 +1815,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Praesentium officia in consequatur odit ut.
+        example: Veniam ex voluptatibus est soluta eveniet.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 7121533731651700298
+        example: 5486939687154000118
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 5525036060877202546
+        example: 6577644252196189066
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Aspernatur corrupti ex.
+        example: Voluptatem dolore.
       title:
         type: string
         description: название задачи
-        example: Beatae aspernatur voluptas illum veritatis beatae voluptatem.
+        example: Ut aut est temporibus.
       type:
         type: integer
         example: 2
@@ -1716,51 +1843,51 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Voluptatem velit qui sint cumque aut.
+        example: Excepturi explicabo nulla et possimus voluptas sunt.
     example:
       bot_images:
-        - Vel repellat pariatur.
-        - Est cum qui quidem quos aut rerum.
+        - Voluptates quos est.
+        - Aspernatur rerum.
+        - Numquam possimus eligendi non odit eligendi alias.
+        - Sit excepturi perspiciatis dolorum.
       bot_last_names:
-        - Vero qui sint sit ea qui deserunt.
-        - Accusamus sunt veniam ex voluptatibus est.
-        - Eveniet debitis excepturi explicabo nulla et.
+        - Nisi autem et.
+        - Dolor et non et autem dignissimos.
+        - Voluptate delectus ducimus.
+        - Ex numquam aliquam itaque.
       bot_names:
-        - Non fugiat consequatur eaque similique quia.
-        - Nobis ut aut est temporibus explicabo sint.
-        - Sit qui natus dolor minus iure.
+        - Omnis dolorum distinctio velit quis dolore ipsa.
+        - Aut fugit atque quos.
       bot_urls:
-        - Sunt laborum sed dolor repellendus aperiam.
-        - Corrupti quod ullam aut est consequatur.
-      bots_filename: Harum animi et.
-      bots_num: 3211572229025830219
-      cheap_proxies_filename: Voluptas ipsum dolorem.
-      cheap_proxies_num: 5380523359005827411
-      follow_targets: false
+        - Laboriosam illo.
+        - Cumque et deserunt enim eum.
+      bots_filename: Quis id nulla odit voluptatem in.
+      bots_num: 4644761471730922224
+      cheap_proxies_filename: Est voluptatum rerum fugit et natus id.
+      cheap_proxies_num: 1837773042721825300
+      follow_targets: true
       id: AB12B85B-1864-53B4-4A92-3519B45D0D5E
       landing_accounts:
-        - Aut sint dolorem soluta.
-        - Saepe ipsum.
-        - Sed quibusdam possimus iusto.
-        - Ab laborum.
+        - Eum et quaerat.
+        - Vel porro voluptatem.
       need_photo_tags: false
-      per_post_sleep_seconds: 5943053285983578261
-      photo_tags_delay_seconds: 8453838362328355145
+      per_post_sleep_seconds: 7544922762786031492
+      photo_tags_delay_seconds: 7683202528861793799
       post_images:
-        - Qui nulla dignissimos.
-        - Ipsum inventore quae facere corporis iusto.
-        - Doloribus ut soluta nisi.
-      posts_per_bot: 13939188406596874664
-      residential_proxies_filename: Est qui aliquam deleniti molestiae reiciendis.
-      residential_proxies_num: 8048918345550955843
-      status: 1
-      targets_filename: Ut accusantium ut ratione.
-      targets_num: 2862167999792072012
-      targets_per_post: 4151176156845310497
-      text_template: Nihil corrupti aut impedit vel eaque.
-      title: Ipsam repudiandae quis aut autem.
-      type: 2
-      video_filename: Eius ratione distinctio voluptatem quasi.
+        - Rerum alias quia rerum dignissimos.
+        - Alias suscipit id temporibus.
+        - Ea sunt deserunt ea.
+      posts_per_bot: 13904577850892937988
+      residential_proxies_filename: Tempora eos temporibus architecto quas.
+      residential_proxies_num: 2799215073948001609
+      status: 4
+      targets_filename: Enim ut quisquam recusandae unde quis veritatis.
+      targets_num: 5106724815658416738
+      targets_per_post: 7330173209762167885
+      text_template: Occaecati nihil non nobis vel et quis.
+      title: Consequuntur vel quisquam voluptas culpa.
+      type: 1
+      video_filename: Dolorem nihil quos maiores saepe.
     required:
       - id
       - type
@@ -1791,62 +1918,64 @@ definitions:
         type: array
         items:
           type: string
-          example: Quasi voluptas dolorum fugiat aut non soluta.
+          example: Ea deleniti odio eveniet pariatur.
         description: аватарки для ботов
         example:
-          - Veniam in eius voluptatibus.
-          - Officia error necessitatibus molestias amet veniam ducimus.
-          - Magnam aliquam ipsam molestiae recusandae voluptatem.
+          - Ad quia aut velit fugiat.
+          - Quisquam doloribus sit.
+          - Nostrum perspiciatis maxime.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Voluptates omnis rerum voluptates praesentium.
+          example: Nemo maiores est error eos nemo.
         description: фамилии для аккаунтов-ботов
         example:
-          - Consequatur voluptatem cum omnis eum cumque.
-          - Odit amet quas.
+          - Consequatur officiis expedita alias sed eum iusto.
+          - Ipsam doloremque vel et.
+          - Quod et ut natus ratione.
+          - Corporis cupiditate aut nostrum rerum dolorum nostrum.
       bot_names:
         type: array
         items:
           type: string
-          example: Aliquid unde mollitia alias.
+          example: Quasi voluptas dolorum fugiat aut non soluta.
         description: имена для аккаунтов-ботов
         example:
-          - Aut cum reprehenderit repudiandae vel dolorem autem.
-          - Accusantium sint dolorem eos.
-          - Excepturi sequi numquam dolores.
+          - Veniam in eius voluptatibus.
+          - Officia error necessitatibus molestias amet veniam ducimus.
+          - Magnam aliquam ipsam molestiae recusandae voluptatem.
       bot_urls:
         type: array
         items:
           type: string
-          example: Quos maxime quis et dolor et.
+          example: Expedita magni ut vel consequatur aliquam ipsam.
         description: ссылки для описания у ботов
         example:
-          - Beatae cum nobis reprehenderit non.
-          - Eum deserunt.
+          - Reiciendis eos.
+          - Qui molestiae aliquid sunt atque.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Laboriosam at aperiam minus laboriosam sit quasi.
+        example: Et dolore.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 7341596380207057358
+        example: 6338008155271148953
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Asperiores sed velit iste.
+        example: In quia maiores quaerat illum cumque vel.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 684160917018387948
+        example: 8478925785970674021
         format: int64
       follow_targets:
         type: boolean
         description: нужно ли подписываться на аккаунты
-        example: false
+        example: true
       id:
         type: string
         example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
@@ -1855,13 +1984,11 @@ definitions:
         type: array
         items:
           type: string
-          example: Ipsum sapiente praesentium neque similique nemo.
+          example: At repellendus voluptatem et necessitatibus non.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Rerum placeat deserunt tenetur qui eius.
-          - Velit delectus qui impedit beatae beatae repudiandae.
-          - Et fugiat.
-          - Voluptas omnis unde quidem voluptas.
+          - Cupiditate accusantium laboriosam autem occaecati.
+          - Dignissimos quo.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -1869,40 +1996,41 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 9155011084649884176
+        example: 8540630812703896446
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 16819942040648195770
+        example: 15948987631320654517
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Facere nulla earum omnis distinctio vel at.
+          example: Sunt consequuntur.
         description: список base64 строк картинок
         example:
-          - Et necessitatibus non asperiores.
-          - Cupiditate accusantium laboriosam autem occaecati.
-          - Dignissimos quo.
+          - Mollitia in rerum deserunt et veniam.
+          - Quis doloribus sequi facilis perspiciatis mollitia excepturi.
+          - Exercitationem asperiores vel quos.
+          - Vel eaque sint.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 3166081030664668070
+        example: 7883542947006810562
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Sapiente magnam eum sunt ipsa sed at.
+        example: Impedit dignissimos culpa itaque consectetur ad qui.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 8781325554622278849
+        example: 2384697981602803500
         format: int64
       status:
         type: integer
-        example: 6
+        example: 5
         enum:
           - 1
           - 2
@@ -1913,25 +2041,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Pariatur vitae animi et.
+        example: Non accusamus voluptatem aspernatur.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 856925583020376013
+        example: 590292789877018211
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 780314573748454978
+        example: 4946528249983196360
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Id dolor.
+        example: Quam facere nulla earum omnis distinctio.
       title:
         type: string
         description: название задачи
-        example: Veritatis tenetur cumque sed sunt.
+        example: Voluptatem quibusdam dolores.
       type:
         type: integer
         example: 1
@@ -1941,53 +2069,50 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Dignissimos voluptatem quidem quasi.
+        example: Quia ratione.
     example:
       bot_images:
-        - Qui voluptatem ea.
-        - Harum vel.
-        - Fugit repellat provident architecto dolorum nemo est.
+        - Beatae aspernatur voluptas illum veritatis beatae voluptatem.
+        - Quod at blanditiis.
+        - Soluta ut et dolorem optio architecto.
       bot_last_names:
-        - Cumque vel dolor non.
-        - Voluptatem aspernatur.
-        - Quia ratione.
+        - Aperiam voluptas unde magnam dicta.
+        - Id sit consequatur pariatur aspernatur corrupti.
+        - Excepturi et numquam.
       bot_names:
-        - Itaque consectetur ad qui voluptatem.
-        - Quia maiores.
+        - Et aliquid hic.
+        - Unde vel et.
       bot_urls:
-        - Eum quia rerum nobis iusto sunt consequuntur.
-        - Nihil mollitia in rerum deserunt.
-        - Veniam voluptatem quis doloribus sequi facilis.
-        - Mollitia excepturi.
-      bots_filename: Eveniet pariatur officiis dicta ad quia.
-      bots_num: 8243073410550506081
-      cheap_proxies_filename: Et nostrum perspiciatis.
-      cheap_proxies_num: 5027885003898272525
+        - Corrupti vero expedita vel aut.
+        - Placeat sit totam aut id autem.
+      bots_filename: Omnis enim quod velit aliquid eos.
+      bots_num: 6208831763025931148
+      cheap_proxies_filename: Voluptatem minus vero neque rerum.
+      cheap_proxies_num: 5485865154342136555
       follow_targets: false
       id: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
       landing_accounts:
-        - Molestiae aliquid sunt atque nam.
-        - Voluptatem quibusdam dolores.
-        - Et nemo nulla nihil.
-        - Dolore consectetur impedit.
+        - Libero pariatur rerum sapiente.
+        - Voluptatem rerum labore molestiae vel magni.
+        - Molestias maxime.
+        - Culpa quae.
       need_photo_tags: true
-      per_post_sleep_seconds: 4095751369522499914
-      photo_tags_delay_seconds: 9002243070067873670
+      per_post_sleep_seconds: 12550115834492475559
+      photo_tags_delay_seconds: 17025411586807882109
       post_images:
-        - Dicta consectetur quia.
-        - Corporis odio veniam eius vitae.
-        - Earum quae neque neque harum quam deleniti.
-      posts_per_bot: 10123738906452181604
-      residential_proxies_filename: Velit fugiat consequatur quisquam doloribus.
-      residential_proxies_num: 4916379490124398634
-      status: 3
-      targets_filename: Natus voluptates voluptatibus reiciendis.
-      targets_num: 8138494299341492300
-      targets_per_post: 7198255279361709051
-      text_template: Reiciendis eos.
-      title: Asperiores vel quos enim vel eaque.
+        - Qui et neque.
+        - Qui non distinctio dolorem assumenda.
+      posts_per_bot: 5895382391318608566
+      residential_proxies_filename: Et aliquam illum esse impedit qui inventore.
+      residential_proxies_num: 8034391061282818865
+      status: 1
+      targets_filename: Voluptatum impedit totam voluptatibus nisi dolores.
+      targets_num: 4770205069389408936
+      targets_per_post: 5378025342946327339
+      text_template: Est nam qui temporibus vel suscipit.
+      title: Quam harum modi fuga.
       type: 1
-      video_filename: Animi provident.
+      video_filename: Rerum vero adipisci consequatur et veritatis.
     required:
       - id
       - type
@@ -2018,63 +2143,61 @@ definitions:
         type: array
         items:
           type: string
-          example: Nesciunt odio dolorem voluptatum aperiam.
+          example: Ut dolorem voluptas dolores qui deleniti.
         description: аватарки для ботов
         example:
-          - Eos et qui.
-          - Occaecati delectus et sed a.
-          - Aut blanditiis.
-          - Omnis eveniet eos incidunt neque aut aut.
+          - Vitae incidunt voluptatibus id.
+          - Eaque aut tenetur sed numquam omnis maiores.
+          - Asperiores expedita voluptas illo.
+          - Cum itaque sed.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Dolorem nihil quos maiores saepe.
+          example: Et omnis eveniet eos incidunt neque aut.
         description: фамилии для аккаунтов-ботов
         example:
-          - Et quasi sed voluptatum voluptatem reiciendis rerum.
-          - Quia rerum dignissimos assumenda alias.
-          - Id temporibus assumenda ea.
-          - Deserunt ea fugit.
+          - Enim perferendis quia ex dolores quos.
+          - Qui modi vero laudantium nulla.
+          - Qui quo corporis consequatur quasi sapiente.
       bot_names:
         type: array
         items:
           type: string
-          example: Sed quaerat.
+          example: Similique repellat eos.
         description: имена для аккаунтов-ботов
         example:
-          - Nulla odit voluptatem in veritatis.
-          - Eos temporibus architecto quas.
-          - Est voluptatum rerum fugit et natus id.
-          - Enim ut quisquam recusandae unde quis veritatis.
+          - Odio dolorem.
+          - Aperiam omnis enim.
+          - Et qui nam occaecati delectus et.
+          - A saepe aut.
       bot_urls:
         type: array
         items:
           type: string
-          example: Voluptates quos est.
+          example: Harum occaecati necessitatibus voluptas ea.
         description: ссылки для описания у ботов
         example:
-          - Rerum dolor numquam possimus eligendi.
-          - Odit eligendi alias assumenda sit excepturi.
-          - Dolorum optio.
-          - Veniam voluptas et.
+          - Dolore praesentium placeat et tempore id.
+          - Labore exercitationem officiis iure delectus vel.
+          - Cupiditate autem voluptatem.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Iusto minus dicta quia est asperiores molestias.
+        example: Dolorum earum aut sed.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 1490211900814458154
+        example: 6264581538191264452
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Dolorem ut aut voluptas ut et.
+        example: Omnis ratione totam rerum facere.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 9044491535816382327
+        example: 1834814664444238647
         format: int64
       follow_targets:
         type: boolean
@@ -2088,51 +2211,51 @@ definitions:
         type: array
         items:
           type: string
-          example: Velit voluptate delectus ducimus.
+          example: Rerum laboriosam quibusdam.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Numquam aliquam itaque cumque nostrum laboriosam.
-          - Et cumque et deserunt enim eum.
-          - Autem consequuntur vel quisquam voluptas.
-          - Temporibus a.
+          - Quo a magni.
+          - Minima et harum consequuntur dolorem porro aspernatur.
+          - Est voluptas.
+          - Tenetur deserunt voluptatem ipsam optio.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
-        example: false
+        example: true
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 9782909014058253310
+        example: 12004751813346798014
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 4548600736675423626
+        example: 14834469700373525586
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Quibusdam eius pariatur quo a.
+          example: Quo voluptatem.
         description: список base64 строк картинок
         example:
-          - Minima et harum consequuntur dolorem porro aspernatur.
-          - Est voluptas.
-          - Tenetur deserunt voluptatem ipsam optio.
-          - Similique repellat eos.
+          - Est in tempora incidunt omnis.
+          - Et cum aut aliquid.
+          - Veniam ut et necessitatibus aut et.
+          - Maiores voluptas voluptatum dolor nemo.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 15371215579645690916
+        example: 9089040031341017966
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Mollitia tenetur.
+        example: Vel et omnis.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 6340007813446667839
+        example: 4263151997164226750
         format: int64
       status:
         type: integer
@@ -2147,25 +2270,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Aut quo deserunt sit et.
+        example: Consequatur quis dicta dolores voluptatem delectus.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 7285843080847121689
+        example: 1864032496979952408
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 14362393514193474314
+        example: 5825564664415561932
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Non et autem.
+        example: Reiciendis tempora praesentium.
       title:
         type: string
         description: название задачи
-        example: Ipsum eaque nobis.
+        example: Rem perspiciatis excepturi temporibus voluptatem.
       type:
         type: integer
         example: 2
@@ -2175,53 +2298,52 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Sapiente quas velit labore ea esse.
+        example: Vero quas corporis.
     example:
       bot_images:
-        - Et excepturi nisi.
-        - Vel similique.
-        - Est vitae architecto.
-        - Vitae autem distinctio consequuntur ut architecto saepe.
+        - Omnis expedita fugiat praesentium quae repellat reiciendis.
+        - A dolor.
+        - Autem neque voluptate.
       bot_last_names:
-        - Blanditiis a iure quo voluptatem qui.
-        - Est in tempora incidunt omnis.
+        - Labore sed.
+        - At eius sit quis amet.
+        - Minus id.
       bot_names:
-        - Ratione totam rerum facere et consequatur.
-        - Dicta dolores voluptatem delectus nihil vero quas.
-        - Numquam repellendus.
+        - Labore tempora et unde aliquid.
+        - Voluptatem vero odio voluptate.
+        - Rerum facere sed qui similique occaecati et.
+        - Sint quis.
       bot_urls:
-        - Cum aut.
-        - Corrupti veniam.
-        - Et necessitatibus aut et culpa maiores voluptas.
-        - Dolor nemo eos ut dolorem voluptas.
-      bots_filename: Eaque aut tenetur sed numquam omnis maiores.
-      bots_num: 5142490910336211943
-      cheap_proxies_filename: Cum itaque sed.
-      cheap_proxies_num: 4695206420139357894
+        - Nam minus repellat ex dolore.
+        - Explicabo accusantium.
+        - Voluptatum fugit aut autem molestiae.
+        - Nesciunt dignissimos enim hic aut.
+      bots_filename: Iste quia nihil tempora fugit.
+      bots_num: 6827303627025655229
+      cheap_proxies_filename: Illo dolores quisquam optio et.
+      cheap_proxies_num: 8554024528234937841
       follow_targets: false
       id: 77DFBD55-EC3C-CF64-7021-5A80D932517B
       landing_accounts:
-        - Temporibus voluptatem ipsam tenetur maiores dolores.
-        - Dolorum earum aut sed.
-        - Vel et omnis.
-      need_photo_tags: true
-      per_post_sleep_seconds: 14938658935343082065
-      photo_tags_delay_seconds: 15790994520763750636
+        - Harum doloremque.
+        - Ut voluptatum magnam inventore.
+      need_photo_tags: false
+      per_post_sleep_seconds: 6002335525440645886
+      photo_tags_delay_seconds: 12898552925332307252
       post_images:
-        - Animi illum sunt rerum fuga.
-        - Quia quia possimus error doloribus perspiciatis est.
-        - Nam maxime.
-      posts_per_bot: 16824373788423183829
-      residential_proxies_filename: Asperiores expedita voluptas illo.
-      residential_proxies_num: 4976680820054964715
+        - Aut ut.
+        - Esse ut sunt rerum unde necessitatibus.
+      posts_per_bot: 10036179667651740715
+      residential_proxies_filename: Quae aspernatur.
+      residential_proxies_num: 8186263921169828862
       status: 4
-      targets_filename: Doloremque maiores necessitatibus.
-      targets_num: 2022332139622606826
-      targets_per_post: 11148620511750964936
-      text_template: Autem accusantium rem.
-      title: Deleniti officiis officia.
-      type: 2
-      video_filename: Vel nesciunt eos vel iste.
+      targets_filename: Rem accusamus.
+      targets_num: 4465931123937892598
+      targets_per_post: 1277727496486409583
+      text_template: Architecto vitae vitae autem distinctio consequuntur ut.
+      title: Odio harum modi facere sunt nobis.
+      type: 1
+      video_filename: Fugiat voluptatum aspernatur tempore aut.
     required:
       - id
       - type
@@ -2252,159 +2374,11 @@ definitions:
         type: array
         items:
           type: string
-          example: Perspiciatis ea ut ab.
+          example: Ipsa rerum natus eligendi.
         description: имена живых аккаунтов, на которых ведем трафик
         example:
-          - Qui iusto suscipit officiis.
-          - Saepe velit facilis.
-          - Et error ut.
-      status:
-        type: integer
-        example: 4
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-      task_id:
-        type: string
-        description: id задачи
-        example: At sed.
-    example:
-      landing_accounts:
-        - Illum laboriosam animi exercitationem.
-        - Natus sit sed asperiores voluptas aliquid.
-        - Illum aut numquam omnis earum sint non.
-      status: 4
-      task_id: Nemo adipisci iste corporis.
-    required:
-      - task_id
-      - status
-      - landing_accounts
-  TasksServiceStartTaskNotFoundResponseBody:
-    title: TasksServiceStartTaskNotFoundResponseBody
-    type: object
-    properties:
-      landing_accounts:
-        type: array
-        items:
-          type: string
-          example: Ea asperiores ad est repellat quibusdam quia.
-        description: имена живых аккаунтов, на которых ведем трафик
-        example:
-          - Vero voluptatem quidem ut doloribus.
-          - Omnis et aut quia.
-          - Est facilis qui.
-      status:
-        type: integer
-        example: 3
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-      task_id:
-        type: string
-        description: id задачи
-        example: Non officia eveniet veritatis deleniti consequatur.
-    example:
-      landing_accounts:
-        - Consequatur odit et.
-        - Facere est cupiditate sunt incidunt.
-        - Voluptatem reprehenderit sit sed officia.
-        - Consequuntur libero quo.
-      status: 2
-      task_id: Enim ut assumenda dolorum autem quam at.
-    required:
-      - task_id
-      - status
-      - landing_accounts
-  TasksServiceStartTaskOKResponseBody:
-    title: TasksServiceStartTaskOKResponseBody
-    type: object
-    properties:
-      landing_accounts:
-        type: array
-        items:
-          type: string
-          example: Cum omnis sint id totam perferendis magni.
-        description: имена живых аккаунтов, на которых ведем трафик
-        example:
-          - Tempora soluta.
-          - Nostrum impedit velit ipsam veniam.
-          - Dolorem voluptatem dignissimos dolor quos sapiente earum.
-      status:
-        type: integer
-        example: 2
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-      task_id:
-        type: string
-        description: id задачи
-        example: Quia dolorem dolores autem aliquid qui.
-    example:
-      landing_accounts:
-        - Nisi similique nobis repellat sequi.
-        - Et quam est est.
-        - Est facilis et ullam tenetur labore ratione.
-        - Voluptas esse et expedita ea.
-      status: 4
-      task_id: Enim voluptas aspernatur laborum occaecati laboriosam pariatur.
-    required:
-      - task_id
-      - status
-      - landing_accounts
-  TasksServiceStartTaskUnauthorizedResponseBody:
-    title: TasksServiceStartTaskUnauthorizedResponseBody
-    type: object
-    properties:
-      landing_accounts:
-        type: array
-        items:
-          type: string
-          example: Deleniti iure rerum pariatur aliquam.
-        description: имена живых аккаунтов, на которых ведем трафик
-        example:
-          - Quasi veritatis.
-          - Animi architecto.
-          - Hic aliquam corrupti neque reprehenderit.
-      status:
-        type: integer
-        example: 4
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-      task_id:
-        type: string
-        description: id задачи
-        example: Illum qui.
-    example:
-      landing_accounts:
-        - Possimus qui debitis corrupti.
-        - Ullam id laudantium dolore sit.
-      status: 6
-      task_id: Perferendis quibusdam non ratione tenetur harum.
-    required:
-      - task_id
-      - status
-      - landing_accounts
-  TasksServiceStopTaskBadRequestResponseBody:
-    title: TasksServiceStopTaskBadRequestResponseBody
-    type: object
-    properties:
+          - Et est quia voluptatem aut similique omnis.
+          - Consequatur minima.
       status:
         type: integer
         example: 3
@@ -2420,15 +2394,66 @@ definitions:
         description: id задачи
         example: Adipisci dolorum.
     example:
+      landing_accounts:
+        - Voluptas aut.
+        - Itaque ullam.
       status: 2
-      task_id: Rerum natus eligendi quas tempora et.
+      task_id: Laboriosam molestiae quidem omnis ea atque.
     required:
       - task_id
       - status
-  TasksServiceStopTaskNotFoundResponseBody:
-    title: TasksServiceStopTaskNotFoundResponseBody
+      - landing_accounts
+  TasksServiceStartTaskNotFoundResponseBody:
+    title: TasksServiceStartTaskNotFoundResponseBody
     type: object
     properties:
+      landing_accounts:
+        type: array
+        items:
+          type: string
+          example: Quia quidem aliquam esse.
+        description: имена живых аккаунтов, на которых ведем трафик
+        example:
+          - Beatae aut autem aut eveniet fuga.
+          - Laboriosam occaecati sed omnis earum.
+      status:
+        type: integer
+        example: 5
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+      task_id:
+        type: string
+        description: id задачи
+        example: Ab aspernatur.
+    example:
+      landing_accounts:
+        - Harum et asperiores velit aut sed.
+        - Consequatur quae et sed debitis dicta.
+      status: 5
+      task_id: Ut ea repellat molestias nisi.
+    required:
+      - task_id
+      - status
+      - landing_accounts
+  TasksServiceStartTaskOKResponseBody:
+    title: TasksServiceStartTaskOKResponseBody
+    type: object
+    properties:
+      landing_accounts:
+        type: array
+        items:
+          type: string
+          example: Veritatis praesentium animi architecto vero hic aliquam.
+        description: имена живых аккаунтов, на которых ведем трафик
+        example:
+          - Reprehenderit odio et perferendis quibusdam non.
+          - Tenetur harum distinctio dolor possimus.
+          - Debitis corrupti quia ullam.
       status:
         type: integer
         example: 1
@@ -2442,15 +2467,81 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: Voluptatem aut.
+        example: Rerum pariatur aliquam iste est.
     example:
-      status: 2
-      task_id: Incidunt consequatur minima officiis ex laboriosam molestiae.
+      landing_accounts:
+        - Rem eius porro eveniet autem officia.
+        - Quaerat asperiores quos dolore.
+      status: 3
+      task_id: Dolore sit distinctio.
     required:
       - task_id
       - status
-  TasksServiceStopTaskOKResponseBody:
-    title: TasksServiceStopTaskOKResponseBody
+      - landing_accounts
+  TasksServiceStartTaskUnauthorizedResponseBody:
+    title: TasksServiceStartTaskUnauthorizedResponseBody
+    type: object
+    properties:
+      landing_accounts:
+        type: array
+        items:
+          type: string
+          example: Aspernatur id dolor voluptatem.
+        description: имена живых аккаунтов, на которых ведем трафик
+        example:
+          - Praesentium neque similique nemo.
+          - Reprehenderit rerum placeat deserunt tenetur qui.
+          - Tempore velit delectus qui impedit.
+      status:
+        type: integer
+        example: 1
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+      task_id:
+        type: string
+        description: id задачи
+        example: Voluptatum reprehenderit maiores velit.
+    example:
+      landing_accounts:
+        - Voluptas omnis unde quidem voluptas.
+        - Aliquid unde mollitia alias.
+      status: 6
+      task_id: Repudiandae autem et.
+    required:
+      - task_id
+      - status
+      - landing_accounts
+  TasksServiceStopTaskBadRequestResponseBody:
+    title: TasksServiceStopTaskBadRequestResponseBody
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 5
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+      task_id:
+        type: string
+        description: id задачи
+        example: Dolores ducimus voluptates omnis.
+    example:
+      status: 1
+      task_id: Praesentium ut quaerat.
+    required:
+      - task_id
+      - status
+  TasksServiceStopTaskNotFoundResponseBody:
+    title: TasksServiceStopTaskNotFoundResponseBody
     type: object
     properties:
       status:
@@ -2466,20 +2557,20 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: Rerum rem eius porro eveniet autem officia.
+        example: Cum omnis eum cumque.
     example:
-      status: 3
-      task_id: Asperiores quos dolore.
+      status: 5
+      task_id: Amet quas odio quos.
     required:
       - task_id
       - status
-  TasksServiceStopTaskUnauthorizedResponseBody:
-    title: TasksServiceStopTaskUnauthorizedResponseBody
+  TasksServiceStopTaskOKResponseBody:
+    title: TasksServiceStopTaskOKResponseBody
     type: object
     properties:
       status:
         type: integer
-        example: 2
+        example: 5
         enum:
           - 1
           - 2
@@ -2490,10 +2581,34 @@ definitions:
       task_id:
         type: string
         description: id задачи
-        example: Ea atque dolor aut voluptas aut qui.
+        example: Aut cum reprehenderit repudiandae vel dolorem autem.
     example:
-      status: 3
-      task_id: Ratione ipsum ab aspernatur dignissimos quia quidem.
+      status: 5
+      task_id: Sint dolorem eos et excepturi.
+    required:
+      - task_id
+      - status
+  TasksServiceStopTaskUnauthorizedResponseBody:
+    title: TasksServiceStopTaskUnauthorizedResponseBody
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 3
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+      task_id:
+        type: string
+        description: id задачи
+        example: Et dolor et omnis quo beatae cum.
+    example:
+      status: 5
+      task_id: Non dolores eum deserunt modi aspernatur.
     required:
       - task_id
       - status
@@ -2505,58 +2620,63 @@ definitions:
         type: array
         items:
           type: string
-          example: Et reiciendis molestiae numquam.
+          example: Dolores laboriosam omnis esse nulla.
         description: аватарки для ботов
         example:
-          - Vero suscipit ad rerum ad impedit eum.
-          - Non quia voluptas a illum.
-          - Autem in id.
+          - Est mollitia voluptas natus.
+          - Tenetur ipsa beatae voluptatem fuga.
+          - Veritatis minus et amet eos et accusamus.
+          - Dolores odio sunt saepe sed.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Id veniam optio nostrum consequatur.
+          example: Dolor sit ex.
         description: фамилии для аккаунтов-ботов
         example:
-          - Nam aliquam ut sint nulla beatae quo.
-          - Molestiae quaerat dolore modi id qui nihil.
-          - Qui ut.
+          - Quia fugit nesciunt ut cupiditate non.
+          - Dolore voluptas ipsa provident asperiores eligendi.
+          - Soluta quis aut odit velit aut.
+          - Accusamus necessitatibus perferendis ut.
       bot_names:
         type: array
         items:
           type: string
-          example: Quia saepe excepturi alias qui vel sunt.
+          example: Et vero suscipit.
         description: имена для аккаунтов-ботов
         example:
-          - Fugit voluptatem.
-          - Dicta quae nihil non ut.
+          - Ad impedit eum perferendis non.
+          - Voluptas a.
+          - Asperiores autem in id officia ut quisquam.
+          - Sed quos rerum numquam soluta quaerat.
       bot_urls:
         type: array
         items:
           type: string
-          example: Tempore ducimus dolores quos ut.
+          example: Atque nobis aliquid aut impedit qui ad.
         description: ссылки для описания у ботов
         example:
-          - Voluptate ad placeat voluptatem ratione corporis quidem.
-          - Doloribus libero porro aut eos natus et.
-          - Eos aliquid qui amet aut quo.
+          - Error id qui et aut in nesciunt.
+          - Qui sequi et unde eum quidem ducimus.
+          - Ipsa magnam expedita ex atque doloribus.
+          - Repudiandae dolor.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Sit magni et.
+        example: Quia unde at.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 3371118128520869917
+        example: 6464762415527834314
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Dolorum veniam in et et provident sunt.
+        example: Et omnis.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 8635107327425272395
+        example: 8775794755463050090
         format: int64
       follow_targets:
         type: boolean
@@ -2570,12 +2690,13 @@ definitions:
         type: array
         items:
           type: string
-          example: Et et autem voluptatem qui est.
+          example: In odio tempore autem.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Eum consequatur vel eaque.
-          - Sequi autem earum nam quia sint.
-          - Minima sint.
+          - Quidem aut.
+          - Tempore vero illum distinctio neque illum tempora.
+          - Quae inventore.
+          - Et reiciendis molestiae numquam.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -2583,41 +2704,41 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 8127503665797138557
+        example: 11372134232366815059
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 629871625917414121
+        example: 7668494624599036762
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Eaque quidem rerum doloremque.
+          example: Quis dolorum enim qui officia est earum.
         description: список base64 строк картинок
         example:
-          - Error recusandae in eos.
-          - In odio tempore autem.
-          - Ab quidem aut repudiandae tempore vero.
-          - Distinctio neque illum tempora eaque quae inventore.
+          - Doloribus et facere similique eos voluptates.
+          - Repellendus debitis provident.
+          - Suscipit deserunt quis omnis fuga eius.
+          - Natus quibusdam dolorem impedit.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 7062696795936699571
+        example: 14586008142365418039
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Aut aut non incidunt necessitatibus animi rerum.
+        example: Eum debitis error atque.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 1748501581174843263
+        example: 5463967310014960412
         format: int64
       status:
         type: integer
-        example: 1
+        example: 4
         enum:
           - 1
           - 2
@@ -2628,25 +2749,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Ut in ut tempora.
+        example: Dolor mollitia quod necessitatibus corporis.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 346472932932251159
+        example: 7177931080269094814
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 15087288419683225525
+        example: 2174421943089202784
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Quod itaque dolorem eius dolores vel.
+        example: Error recusandae in eos.
       title:
         type: string
         description: название задачи
-        example: Quidem omnis et.
+        example: Harum sint.
       type:
         type: integer
         example: 1
@@ -2656,52 +2777,50 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Natus pariatur maiores.
+        example: Sunt cupiditate numquam et accusamus.
     example:
       bot_images:
-        - Debitis porro maiores qui quo.
-        - Consequatur dolorem ut maiores.
-        - Praesentium qui.
+        - Laborum aliquid tempore ut asperiores.
+        - Molestiae aut deserunt qui aut quia.
       bot_last_names:
-        - Et et.
-        - Est dolor mollitia quod necessitatibus corporis vero.
+        - Ut nobis hic fuga tempora.
+        - Voluptatem ut molestiae quia quisquam ex pariatur.
+        - Quae voluptatibus odio nobis cupiditate praesentium molestiae.
       bot_names:
-        - Et repudiandae dolor consequatur accusantium.
-        - Sint perferendis quo dignissimos occaecati fugit.
-        - Unde at dolorem eum debitis.
+        - Repudiandae natus et qui quos sit.
+        - Vel labore.
       bot_urls:
-        - Numquam et accusamus.
-        - Ex et aliquam tempore.
-        - Autem quis dolorum enim qui officia.
-      bots_filename: Debitis provident.
-      bots_num: 3969744561756538089
-      cheap_proxies_filename: Natus quibusdam dolorem impedit.
-      cheap_proxies_num: 7588516741151368355
+        - Eius dolor.
+        - Nihil earum pariatur maiores veritatis.
+        - Eveniet sit omnis quae perferendis.
+      bots_filename: Numquam enim tenetur.
+      bots_num: 7026859049699019735
+      cheap_proxies_filename: Necessitatibus quae quo alias placeat sed.
+      cheap_proxies_num: 6127921602641359116
       follow_targets: false
       id: A45D83CF-F038-77BB-220E-D79EFC31D198
       landing_accounts:
-        - Qui et.
-        - In nesciunt ut.
-        - Sequi et unde.
-        - Quidem ducimus doloremque ipsa magnam expedita ex.
-      need_photo_tags: true
-      per_post_sleep_seconds: 7954352099011793520
-      photo_tags_delay_seconds: 2370867379669687298
+        - Rerum repudiandae et.
+        - Enim aut doloremque.
+        - Similique voluptas possimus veritatis quod vero.
+      need_photo_tags: false
+      per_post_sleep_seconds: 4315561987393162618
+      photo_tags_delay_seconds: 3646701320408811730
       post_images:
-        - Magnam veritatis minus et.
-        - Eos et accusamus reiciendis dolores odio.
-        - Saepe sed velit molestias eaque et.
-      posts_per_bot: 6904862286561336856
-      residential_proxies_filename: Suscipit deserunt quis omnis fuga eius.
-      residential_proxies_num: 2235089239331419007
-      status: 2
-      targets_filename: Dolores laboriosam omnis esse nulla.
-      targets_num: 9152231143065962117
-      targets_per_post: 4028348657202162500
-      text_template: Qui ad ducimus explicabo.
-      title: Ducimus beatae doloribus et facere.
+        - Debitis voluptatum incidunt at nisi nihil.
+        - Eveniet dicta in incidunt sed.
+        - Aut nisi laboriosam.
+      posts_per_bot: 12337358968780262220
+      residential_proxies_filename: Maiores cupiditate molestiae.
+      residential_proxies_num: 1617838334245402494
+      status: 4
+      targets_filename: In dolores voluptas et hic.
+      targets_num: 2532002387573358896
+      targets_per_post: 631773640614648694
+      text_template: Reiciendis est quisquam magnam aut aliquid.
+      title: Sed alias quia possimus eveniet perspiciatis repellat.
       type: 1
-      video_filename: Consectetur est mollitia.
+      video_filename: Necessitatibus reprehenderit quos.
     required:
       - id
       - type
@@ -2732,62 +2851,61 @@ definitions:
         type: array
         items:
           type: string
-          example: Atque magni laborum in nisi et.
+          example: Saepe dolore iusto vitae voluptatum eos.
         description: аватарки для ботов
+        example:
+          - Et laborum quos natus.
+          - Et odit eos.
+          - Occaecati voluptate occaecati corrupti.
+          - Minima sapiente voluptas quia.
+      bot_last_names:
+        type: array
+        items:
+          type: string
+          example: Quas in fuga quia repellendus.
+        description: фамилии для аккаунтов-ботов
+        example:
+          - Alias expedita.
+          - Id in molestiae qui.
+          - Non nihil tempora eum eos officia corrupti.
+          - Eos modi voluptatum quaerat perferendis.
+      bot_names:
+        type: array
+        items:
+          type: string
+          example: Atque magni laborum in nisi et.
+        description: имена для аккаунтов-ботов
         example:
           - Fugiat quia id.
           - Occaecati eaque laudantium nobis pariatur molestias facere.
           - Sapiente repudiandae accusantium assumenda.
           - In ipsam dolor autem minus fuga et.
-      bot_last_names:
-        type: array
-        items:
-          type: string
-          example: Itaque pariatur et illum.
-        description: фамилии для аккаунтов-ботов
-        example:
-          - Vero eum cupiditate nihil error voluptas nihil.
-          - Quasi occaecati modi.
-          - Qui impedit odio voluptas.
-          - Reiciendis aperiam.
-      bot_names:
-        type: array
-        items:
-          type: string
-          example: Ea sed quia et voluptatem quasi.
-        description: имена для аккаунтов-ботов
-        example:
-          - Deleniti et voluptatem consequatur.
-          - Quis assumenda aut autem quaerat rerum.
-          - Nostrum minus.
       bot_urls:
         type: array
         items:
           type: string
-          example: Ullam quis maiores distinctio fugiat vel nihil.
+          example: Illum praesentium quis voluptatem.
         description: ссылки для описания у ботов
         example:
-          - Repellat laudantium nostrum culpa veritatis vitae voluptatem.
-          - Et totam et ut.
-          - Illum exercitationem.
-          - Qui molestiae nihil iusto eos qui et.
+          - Occaecati officia et.
+          - Iste laboriosam.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Qui optio consequatur facere inventore.
+        example: Rerum optio.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 6926127914652544097
+        example: 7014573015693623045
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Quae eum eum vel neque pariatur temporibus.
+        example: Est quos.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 6224240462252330872
+        example: 7510000057676008437
         format: int64
       follow_targets:
         type: boolean
@@ -2801,52 +2919,54 @@ definitions:
         type: array
         items:
           type: string
-          example: Nulla hic tempora et possimus.
+          example: Inventore cupiditate quasi dolorum et.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Nisi rerum est animi.
-          - Omnis dolor.
+          - Vero iste perspiciatis commodi placeat ut voluptate.
+          - Iusto nemo facilis dolore voluptatum ut labore.
+          - Voluptate enim veniam doloribus enim.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
-        example: false
+        example: true
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 5228628504491973664
+        example: 16348264799504315621
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 10100865361203786316
+        example: 13782645088897401433
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Cupiditate quasi dolorum et.
+          example: Possimus provident sint.
         description: список base64 строк картинок
         example:
-          - Vero iste perspiciatis commodi placeat ut voluptate.
-          - Iusto nemo facilis dolore voluptatum ut labore.
-          - Voluptate enim veniam doloribus enim.
+          - Ab aut ab harum optio.
+          - Repellat labore porro.
+          - Dolores aliquid neque commodi tempora.
+          - Rem quibusdam harum porro sed.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 14767178118736880880
+        example: 13022775551912430949
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Ut eius.
+        example: Est explicabo laudantium quod voluptatum.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 5772865619813590528
+        example: 8546887916358855128
         format: int64
       status:
         type: integer
-        example: 1
+        example: 3
         enum:
           - 1
           - 2
@@ -2857,25 +2977,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Et velit molestiae.
+        example: Rem quas natus dignissimos optio ut.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 6954235460980785941
+        example: 6672439737658945183
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 4498260276339671210
+        example: 9705723441531321083
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Porro sed doloremque voluptatem nostrum exercitationem error.
+        example: Iure voluptatibus.
       title:
         type: string
         description: название задачи
-        example: Sed adipisci optio aut tenetur at.
+        example: Quidem non deserunt aperiam mollitia.
       type:
         type: integer
         example: 2
@@ -2885,52 +3005,55 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Occaecati libero consequatur.
+        example: Unde et eius tempora voluptatem.
     example:
       bot_images:
-        - Quis mollitia itaque autem voluptatem.
-        - Qui sint explicabo.
+        - Qui amet aut quo eveniet.
+        - Quidem omnis et.
       bot_last_names:
-        - Aut ab.
-        - Optio consequatur repellat.
-        - Porro nihil dolores aliquid.
-        - Commodi tempora commodi rem quibusdam harum.
+        - Voluptatem delectus architecto consectetur.
+        - Itaque et quod itaque.
+        - Eius dolores vel ut et et autem.
       bot_names:
-        - Tempora voluptatem quisquam ut ea.
-        - Maiores accusamus dolorem possimus provident sint voluptates.
+        - Est sed fugit.
+        - Labore labore minus dignissimos.
+        - Deserunt officiis minima.
+        - Quisquam laudantium exercitationem quia tempora quo fugiat.
       bot_urls:
-        - Veniam saepe dolore.
-        - Vitae voluptatum.
-        - Occaecati illum et laborum quos natus.
-        - Et odit eos.
-      bots_filename: Quia inventore rerum qui quibusdam qui.
-      bots_num: 280653321326722592
-      cheap_proxies_filename: Odio aspernatur vero voluptatem.
-      cheap_proxies_num: 8316672488912231477
-      follow_targets: true
+        - Est id eum eum.
+        - Vel eaque a.
+        - Autem earum nam quia sint molestias minima.
+        - Quas quia.
+      bots_filename: Ducimus dicta quae nihil.
+      bots_num: 8599295523814415120
+      cheap_proxies_filename: Optio nostrum consequatur.
+      cheap_proxies_num: 8168519335666118598
+      follow_targets: false
       id: 7D80331A-7620-D09D-7CCB-2EF87B797732
       landing_accounts:
-        - Debitis ex in rerum.
-        - Eaque est explicabo laudantium quod voluptatum rerum.
-        - Quos ut rem quas natus.
-        - Optio ut quibusdam unde.
+        - Mollitia itaque autem voluptatem modi qui sint.
+        - Iure dolores molestias qui sed sit rerum.
+        - Est dolores est porro.
+        - Molestiae quisquam.
       need_photo_tags: false
-      per_post_sleep_seconds: 16062583547391954996
-      photo_tags_delay_seconds: 16171241927608951288
+      per_post_sleep_seconds: 2464703073426040503
+      photo_tags_delay_seconds: 360131671354203704
       post_images:
-        - Asperiores enim et.
-        - Debitis quis ex dicta deserunt.
-      posts_per_bot: 11344361111376047858
-      residential_proxies_filename: Assumenda et est veritatis et quasi.
-      residential_proxies_num: 2732649406288728652
-      status: 5
-      targets_filename: Sit autem beatae.
-      targets_num: 1528291921659446396
-      targets_per_post: 14732636909511304149
-      text_template: Deserunt aperiam mollitia.
-      title: Voluptate occaecati.
+        - Ut delectus tempore ducimus dolores.
+        - Ut voluptatibus repellat voluptate.
+        - Placeat voluptatem ratione corporis quidem quos doloribus.
+        - Porro aut eos natus et consequuntur.
+      posts_per_bot: 6577974923233492038
+      residential_proxies_filename: Ut nostrum id.
+      residential_proxies_num: 4601861488156902906
+      status: 4
+      targets_filename: Aperiam nam aliquam ut.
+      targets_num: 6552144889356784454
+      targets_per_post: 13365286995548763980
+      text_template: Deserunt porro.
+      title: Alias qui vel.
       type: 1
-      video_filename: Aut necessitatibus sint voluptatem dolorem nisi minus.
+      video_filename: Nulla beatae quo quisquam molestiae.
     required:
       - id
       - type
@@ -2961,44 +3084,44 @@ definitions:
         type: array
         items:
           type: string
-          example: Vel sit nihil.
+          example: Architecto expedita et repudiandae et at.
         description: аватарки для ботов
         example:
-          - Ex dolorem laboriosam voluptatem officiis.
-          - Dignissimos in optio molestiae vero.
-          - Aut optio.
-          - Ea id voluptas laborum incidunt quasi iure.
+          - Autem provident minus veritatis error.
+          - Labore aut est rem nihil.
+          - Omnis omnis.
+          - Doloremque architecto harum placeat quod.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Voluptatem consequuntur a sed mollitia molestias.
+          example: Aliquam quisquam quibusdam voluptas laudantium illo harum.
         description: фамилии для аккаунтов-ботов
         example:
-          - Quia minus sit rerum voluptas ex.
-          - Autem aliquid ipsam est.
-          - Sit est commodi impedit qui rerum.
+          - Suscipit quasi maiores ipsam tempora.
+          - Quasi at et delectus inventore quis.
+          - Laboriosam minus aut dolorem nihil.
       bot_names:
         type: array
         items:
           type: string
-          example: Nostrum labore ut occaecati doloremque explicabo libero.
+          example: Dolore qui numquam excepturi.
         description: имена для аккаунтов-ботов
         example:
-          - Dolor blanditiis qui ratione qui.
-          - Unde error temporibus consectetur saepe ipsam illo.
-          - Enim aut debitis repellat quidem ea assumenda.
+          - Rerum aut consequatur sit.
+          - Aut nisi omnis consequatur et sed sapiente.
+          - Est ducimus laborum voluptates qui sint.
+          - Sed id molestiae laborum.
       bot_urls:
         type: array
         items:
           type: string
-          example: Sapiente cupiditate est non ut numquam ullam.
+          example: Dignissimos quibusdam natus vitae et similique.
         description: ссылки для описания у ботов
         example:
-          - Sint nobis voluptatum porro incidunt qui.
-          - Temporibus omnis unde.
-          - Sed porro quia est magni velit quis.
-          - Labore quos eum adipisci et nulla.
+          - Perspiciatis perspiciatis.
+          - Harum deleniti non sit neque et.
+          - Rem alias quaerat accusamus distinctio qui illum.
       follow_targets:
         type: boolean
         description: нужно ли подписываться на аккаунты
@@ -3007,12 +3130,13 @@ definitions:
         type: array
         items:
           type: string
-          example: Laboriosam inventore corporis accusamus.
+          example: Reiciendis neque fuga dolores.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Aspernatur eaque.
-          - Ipsum aut quisquam modi fuga molestias id.
-          - Aut quia doloremque eos libero et corrupti.
+          - Quia fugit tempora adipisci perferendis illum cupiditate.
+          - Et officiis facilis.
+          - Ipsam similique blanditiis id et.
+          - Id cum officiis quibusdam ea earum.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -3020,78 +3144,77 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 6717308581057408207
+        example: 3522524707616409545
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 17129337309180136483
+        example: 10190652870963028038
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Voluptatem quis esse.
+          example: Est molestiae esse aut possimus fuga.
         description: список фотографий для постов
         example:
-          - Animi a et.
-          - Natus nam deserunt deleniti dolorum reprehenderit dolores.
-          - Molestiae illum.
+          - Numquam est minima nemo.
+          - Eveniet eius dolorem molestiae et et error.
+          - Cumque qui voluptas.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 4238481064706109220
+        example: 2854279374304165776
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 11695457730771993339
+        example: 4462933652725118040
         format: int64
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Ut quia aliquam.
+        example: Commodi perspiciatis incidunt vitae iusto.
       title:
         type: string
         description: название задачи
-        example: Molestiae et.
+        example: Labore quos eum adipisci et nulla.
     example:
       bot_images:
-        - Minus aut dolorem nihil dolorum.
-        - Expedita et.
-        - Et at laborum est autem provident minus.
+        - Repellendus molestias officiis recusandae.
+        - Molestiae vitae blanditiis.
+        - Est ab quam.
+        - Aut similique molestiae sed doloribus.
       bot_last_names:
-        - Quisquam quibusdam.
-        - Laudantium illo harum qui.
-        - Suscipit quasi maiores ipsam tempora.
-        - Quasi at et delectus inventore quis.
+        - Asperiores dolorem eum ex.
+        - Esse aut omnis nostrum aut excepturi voluptatem.
+        - Quia enim corrupti dolores corrupti ab ut.
+        - Dolore tempore enim quae consequatur laboriosam.
       bot_names:
-        - Rerum aut consequatur sit.
-        - Aut nisi omnis consequatur et sed sapiente.
-        - Est ducimus laborum voluptates qui sint.
-        - Sed id molestiae laborum.
+        - Magni velit aut voluptatem eius ipsum.
+        - Repellendus molestias corrupti sunt.
+        - Consequatur est maiores soluta ut est.
+        - Praesentium optio.
       bot_urls:
-        - Non labore aut est.
-        - Nihil provident.
-        - Omnis consequatur.
-      follow_targets: true
+        - Molestiae velit minima sequi assumenda dicta dolores.
+        - Quia aut qui.
+        - Maiores velit minus temporibus autem.
+        - Reprehenderit soluta perferendis.
+      follow_targets: false
       landing_accounts:
-        - Cupiditate rerum et officiis.
-        - Ratione ipsam similique blanditiis id et.
-        - Id cum officiis quibusdam ea earum.
-        - Dolore qui numquam excepturi.
+        - Voluptas sint iure sit.
+        - Et eveniet distinctio debitis.
+        - Ut accusantium.
       need_photo_tags: false
-      per_post_sleep_seconds: 15576949004082708347
-      photo_tags_delay_seconds: 6967422476463187966
+      per_post_sleep_seconds: 5635950592393907547
+      photo_tags_delay_seconds: 12497096689538786168
       post_images:
-        - Dolorem molestiae.
-        - Et error sed cumque qui.
-        - Numquam reiciendis neque.
-        - Dolores accusantium qui quia fugit tempora adipisci.
-      posts_per_bot: 156576366948708254
-      targets_per_post: 1896028122110588347
-      text_template: Non numquam est minima nemo labore.
-      title: Est molestiae esse aut possimus fuga.
+        - Soluta qui voluptas est labore sed.
+        - Eos repudiandae voluptas ea omnis ab eos.
+      posts_per_bot: 16688896314215558
+      targets_per_post: 16406470227862170890
+      text_template: Qui reiciendis modi dignissimos a.
+      title: Fugiat molestias qui nobis.
   TasksServiceUpdateTaskUnauthorizedResponseBody:
     title: TasksServiceUpdateTaskUnauthorizedResponseBody
     type: object
@@ -3100,59 +3223,58 @@ definitions:
         type: array
         items:
           type: string
-          example: Ab esse minus qui.
+          example: Hic qui officiis totam.
         description: аватарки для ботов
         example:
-          - Quia iste ea nisi occaecati non accusamus.
-          - Quas adipisci vero asperiores.
-          - Aut accusantium.
-          - Magni et cupiditate et.
+          - Eligendi saepe nihil.
+          - Aut voluptatem cumque.
+          - Id ut voluptatem non nobis voluptates.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Quia possimus eveniet perspiciatis repellat.
+          example: Cumque neque rerum.
         description: фамилии для аккаунтов-ботов
         example:
-          - Eligendi nemo.
-          - Numquam enim tenetur.
+          - Nobis ratione quaerat amet eius assumenda illum.
+          - Soluta sed porro.
+          - Et soluta consequatur amet ut.
       bot_names:
         type: array
         items:
           type: string
-          example: Praesentium molestiae delectus est eius dolor.
+          example: Vel asperiores velit id.
         description: имена для аккаунтов-ботов
         example:
-          - Earum pariatur maiores veritatis accusantium eveniet.
-          - Omnis quae perferendis dolor minus sed.
+          - Cupiditate error ullam.
+          - Laudantium cumque quasi sunt quis veniam perferendis.
       bot_urls:
         type: array
         items:
           type: string
-          example: Maiores cupiditate molestiae.
+          example: Sunt ducimus a illo nulla.
         description: ссылки для описания у ботов
         example:
-          - Quae quo alias placeat.
-          - Et in dolores voluptas.
-          - Hic et.
-          - Reprehenderit quos ad sit.
+          - Autem vel.
+          - Consequatur eos nesciunt suscipit ut laboriosam.
+          - Voluptatum voluptatem dolorem laudantium libero nostrum harum.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Dicta in incidunt.
+        example: Explicabo sit.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 4443599657965319305
+        example: 6250794521286235573
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Aliquid tempore ut asperiores.
+        example: Et omnis quia tenetur qui.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 7908181675285660909
+        example: 6891815399155105395
         format: int64
       follow_targets:
         type: boolean
@@ -3166,53 +3288,54 @@ definitions:
         type: array
         items:
           type: string
-          example: Et qui quos sit tenetur vel.
+          example: Et cupiditate et qui.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Delectus ut nobis.
-          - Fuga tempora sed voluptatem ut molestiae quia.
-          - Ex pariatur quis quae voluptatibus odio nobis.
+          - Voluptatum eos voluptates quidem culpa nisi.
+          - Omnis quod omnis.
+          - Odio nihil.
+          - Distinctio cum dolorum.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
-        example: true
+        example: false
       per_post_sleep_seconds:
         type: integer
         description: делать отметки на фотографии
-        example: 994889740568281468
+        example: 3157306383420008209
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка перед проставлением отметок
-        example: 11633696479968732551
+        example: 8735587757104760159
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Provident earum repellat placeat.
+          example: Quam eius est.
         description: список base64 строк картинок
         example:
-          - Qui nihil.
-          - Quo suscipit sapiente.
-          - Dolor mollitia qui.
+          - Eos necessitatibus ea explicabo sed in.
+          - Enim laudantium sint aut dicta molestiae et.
+          - Laboriosam cupiditate ullam mollitia accusantium.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 8389913458804757925
+        example: 17172175606686269049
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Et aut nisi laboriosam doloremque corporis.
+        example: Voluptatem recusandae earum.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 9078546497829102605
+        example: 8599825632393810139
         format: int64
       status:
         type: integer
-        example: 5
+        example: 1
         enum:
           - 1
           - 2
@@ -3223,25 +3346,25 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Molestiae aut deserunt qui aut quia.
+        example: Ut rerum ullam dicta ut quo.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 3156470455998495893
+        example: 6317275248624784739
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 10863997377787075386
+        example: 12455751479226158240
         format: int64
       text_template:
         type: string
         description: описание под постом
-        example: Quod vero est nihil repudiandae.
+        example: Adipisci vero asperiores nihil aut accusantium sequi.
       title:
         type: string
         description: название задачи
-        example: Quam quae cumque asperiores debitis voluptatum incidunt.
+        example: Animi cumque ex nam excepturi esse impedit.
       type:
         type: integer
         example: 2
@@ -3251,50 +3374,49 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Dolorem laborum tenetur alias exercitationem.
+        example: Facere voluptates.
     example:
       bot_images:
-        - Assumenda et est assumenda quos labore.
-        - Culpa adipisci debitis explicabo fugiat.
+        - Incidunt qui consequatur temporibus omnis unde.
+        - Sed porro quia est magni velit quis.
       bot_last_names:
-        - Laboriosam dolor voluptatum voluptatem dolorem laudantium libero.
-        - Harum consequatur.
-        - Animi cumque ex nam excepturi esse impedit.
+        - Ratione qui sequi unde error.
+        - Consectetur saepe ipsam illo odit enim.
+        - Debitis repellat quidem ea assumenda.
       bot_names:
-        - Ducimus a illo.
-        - Repellat rem.
-        - Vel eos consequatur eos nesciunt.
+        - Eos libero et corrupti laborum nostrum.
+        - Ut occaecati doloremque explicabo.
+        - Iure et dolor.
       bot_urls:
-        - Eum dolore occaecati.
-        - Sit qui voluptatem recusandae earum accusamus et.
-        - Quia tenetur qui consequatur ut.
-      bots_filename: Aut quam.
-      bots_num: 2836405524114217731
-      cheap_proxies_filename: Eos necessitatibus ea explicabo sed in.
-      cheap_proxies_num: 8735587757104760159
-      follow_targets: true
+        - Consequuntur a sed mollitia.
+        - Vel voluptatem quia minus sit.
+      bots_filename: Est commodi impedit.
+      bots_num: 732511583966702033
+      cheap_proxies_filename: Ex dolorem laboriosam voluptatem officiis.
+      cheap_proxies_num: 5477021936900007428
+      follow_targets: false
       id: AC77D914-0A36-9917-2BA7-F519556A50B8
       landing_accounts:
-        - Illum et soluta sed.
-        - Earum et soluta consequatur amet ut.
+        - Sint ipsum.
+        - Quisquam modi fuga molestias.
+        - Deleniti aut.
       need_photo_tags: true
-      per_post_sleep_seconds: 5882619114088829933
-      photo_tags_delay_seconds: 17681575757606784542
+      per_post_sleep_seconds: 12879967627481709357
+      photo_tags_delay_seconds: 16583303517232966217
       post_images:
-        - Saepe nihil vel.
-        - Voluptatem cumque.
-        - Id ut voluptatem non nobis voluptates.
-      posts_per_bot: 13981793978343950357
-      residential_proxies_filename: Est explicabo.
-      residential_proxies_num: 3157306383420008209
+        - Numquam sapiente cupiditate est non.
+        - Numquam ullam est ut sint nobis.
+      posts_per_bot: 8346847289837622585
+      residential_proxies_filename: Rerum ut vel sit nihil omnis.
+      residential_proxies_num: 3972596504108372225
       status: 5
-      targets_filename: Enim laudantium sint aut dicta molestiae et.
-      targets_num: 7948803569831493241
-      targets_per_post: 12023370090714006186
-      text_template: Quaerat amet.
-      title: Dicta ut quo architecto facere voluptates et.
-      type: 1
-      video_filename: Laboriosam cupiditate ullam mollitia accusantium.
+      targets_filename: Dignissimos in optio molestiae vero.
+      targets_num: 1325562236455779854
+      targets_per_post: 3198354323882879628
+      text_template: Non praesentium.
+      title: Ex maiores autem.
+      type: 2
+      video_filename: Aut optio.
     required:
       - id
       - type
@@ -3323,7 +3445,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 2
+        example: 1
         enum:
           - 1
           - 2
@@ -3337,28 +3459,32 @@ definitions:
           $ref: '#/definitions/UploadErrorResponseBody'
         description: ошибки, которые возникли при загрузке файлов
         example:
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
+            type: 2
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
     example:
-      status: 2
+      status: 4
       upload_errors:
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
     required:
       - status
@@ -3383,32 +3509,28 @@ definitions:
           $ref: '#/definitions/UploadErrorResponseBody'
         description: ошибки, которые возникли при загрузке файлов
         example:
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
+            type: 2
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
     example:
-      status: 5
+      status: 2
       upload_errors:
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
-          type: 2
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
-          type: 2
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
     required:
       - status
@@ -3423,32 +3545,42 @@ definitions:
           $ref: '#/definitions/BotAccountRecordRequestBody'
         description: список ботов
         example:
-          - line_number: 6351477434500972353
+          - line_number: 6994634270884112855
             record:
-              - Quia est labore quaerat.
-              - Nemo et sit adipisci sed.
-              - Est alias corporis molestiae praesentium.
-          - line_number: 6351477434500972353
+              - Voluptates voluptate est labore culpa reiciendis.
+              - Unde voluptate porro vel.
+              - Dicta veniam eum nemo.
+          - line_number: 6994634270884112855
             record:
-              - Quia est labore quaerat.
-              - Nemo et sit adipisci sed.
-              - Est alias corporis molestiae praesentium.
+              - Voluptates voluptate est labore culpa reiciendis.
+              - Unde voluptate porro vel.
+              - Dicta veniam eum nemo.
+          - line_number: 6994634270884112855
+            record:
+              - Voluptates voluptate est labore culpa reiciendis.
+              - Unde voluptate porro vel.
+              - Dicta veniam eum nemo.
       cheap_proxies:
         type: array
         items:
           $ref: '#/definitions/ProxyRecordRequestBody'
         description: список дешёвых проксей для загрузки фото
         example:
-          - line_number: 6994634270884112855
+          - line_number: 5616388430136682553
             record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
-          - line_number: 6994634270884112855
+              - Animi autem.
+              - Autem temporibus laborum.
+              - Assumenda quae non.
+          - line_number: 5616388430136682553
             record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
+              - Animi autem.
+              - Autem temporibus laborum.
+              - Assumenda quae non.
+          - line_number: 5616388430136682553
+            record:
+              - Animi autem.
+              - Autem temporibus laborum.
+              - Assumenda quae non.
       filenames:
         $ref: '#/definitions/TaskFileNamesRequestBody'
       residential_proxies:
@@ -3457,115 +3589,92 @@ definitions:
           $ref: '#/definitions/ProxyRecordRequestBody'
         description: список проксей для использования
         example:
-          - line_number: 6994634270884112855
+          - line_number: 5616388430136682553
             record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
-          - line_number: 6994634270884112855
+              - Animi autem.
+              - Autem temporibus laborum.
+              - Assumenda quae non.
+          - line_number: 5616388430136682553
             record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
-          - line_number: 6994634270884112855
-            record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
-          - line_number: 6994634270884112855
-            record:
-              - Voluptate est labore culpa reiciendis quos.
-              - Voluptate porro vel.
-              - Dicta veniam eum nemo.
+              - Animi autem.
+              - Autem temporibus laborum.
+              - Assumenda quae non.
       targets:
         type: array
         items:
           $ref: '#/definitions/TargetUserRecordRequestBody'
         description: список аккаунтов, которым показать надо рекламу
         example:
-          - line_number: 3445399707083969079
+          - line_number: 8344049004127674757
             record:
-              - Autem enim autem temporibus laborum amet assumenda.
-              - Non eaque corporis quasi consequatur nobis eligendi.
-          - line_number: 3445399707083969079
+              - Nobis eligendi amet.
+              - Officiis quasi suscipit fuga aut laboriosam magni.
+          - line_number: 8344049004127674757
             record:
-              - Autem enim autem temporibus laborum amet assumenda.
-              - Non eaque corporis quasi consequatur nobis eligendi.
-          - line_number: 3445399707083969079
+              - Nobis eligendi amet.
+              - Officiis quasi suscipit fuga aut laboriosam magni.
+          - line_number: 8344049004127674757
             record:
-              - Autem enim autem temporibus laborum amet assumenda.
-              - Non eaque corporis quasi consequatur nobis eligendi.
+              - Nobis eligendi amet.
+              - Officiis quasi suscipit fuga aut laboriosam magni.
     example:
       bots:
-        - line_number: 6351477434500972353
+        - line_number: 6994634270884112855
           record:
-            - Quia est labore quaerat.
-            - Nemo et sit adipisci sed.
-            - Est alias corporis molestiae praesentium.
-        - line_number: 6351477434500972353
+            - Voluptates voluptate est labore culpa reiciendis.
+            - Unde voluptate porro vel.
+            - Dicta veniam eum nemo.
+        - line_number: 6994634270884112855
           record:
-            - Quia est labore quaerat.
-            - Nemo et sit adipisci sed.
-            - Est alias corporis molestiae praesentium.
-        - line_number: 6351477434500972353
+            - Voluptates voluptate est labore culpa reiciendis.
+            - Unde voluptate porro vel.
+            - Dicta veniam eum nemo.
+        - line_number: 6994634270884112855
           record:
-            - Quia est labore quaerat.
-            - Nemo et sit adipisci sed.
-            - Est alias corporis molestiae praesentium.
+            - Voluptates voluptate est labore culpa reiciendis.
+            - Unde voluptate porro vel.
+            - Dicta veniam eum nemo.
       cheap_proxies:
-        - line_number: 6994634270884112855
+        - line_number: 5616388430136682553
           record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
-        - line_number: 6994634270884112855
+            - Animi autem.
+            - Autem temporibus laborum.
+            - Assumenda quae non.
+        - line_number: 5616388430136682553
           record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
-        - line_number: 6994634270884112855
-          record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
+            - Animi autem.
+            - Autem temporibus laborum.
+            - Assumenda quae non.
       filenames:
-        bots_filename: Est sit temporibus officia.
-        cheap_proxies_filename: Nam fugit expedita.
-        residential_proxies_filename: Magnam voluptatem nesciunt quaerat quasi incidunt sed.
-        targets_filename: Et facilis.
+        bots_filename: Hic quia.
+        cheap_proxies_filename: Nemo et sit adipisci sed.
+        residential_proxies_filename: Labore quaerat.
+        targets_filename: Est alias corporis molestiae praesentium.
       residential_proxies:
-        - line_number: 6994634270884112855
+        - line_number: 5616388430136682553
           record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
-        - line_number: 6994634270884112855
+            - Animi autem.
+            - Autem temporibus laborum.
+            - Assumenda quae non.
+        - line_number: 5616388430136682553
           record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
-        - line_number: 6994634270884112855
+            - Animi autem.
+            - Autem temporibus laborum.
+            - Assumenda quae non.
+        - line_number: 5616388430136682553
           record:
-            - Voluptate est labore culpa reiciendis quos.
-            - Voluptate porro vel.
-            - Dicta veniam eum nemo.
+            - Animi autem.
+            - Autem temporibus laborum.
+            - Assumenda quae non.
       targets:
-        - line_number: 3445399707083969079
+        - line_number: 8344049004127674757
           record:
-            - Autem enim autem temporibus laborum amet assumenda.
-            - Non eaque corporis quasi consequatur nobis eligendi.
-        - line_number: 3445399707083969079
+            - Nobis eligendi amet.
+            - Officiis quasi suscipit fuga aut laboriosam magni.
+        - line_number: 8344049004127674757
           record:
-            - Autem enim autem temporibus laborum amet assumenda.
-            - Non eaque corporis quasi consequatur nobis eligendi.
-        - line_number: 3445399707083969079
-          record:
-            - Autem enim autem temporibus laborum amet assumenda.
-            - Non eaque corporis quasi consequatur nobis eligendi.
-        - line_number: 3445399707083969079
-          record:
-            - Autem enim autem temporibus laborum amet assumenda.
-            - Non eaque corporis quasi consequatur nobis eligendi.
+            - Nobis eligendi amet.
+            - Officiis quasi suscipit fuga aut laboriosam magni.
     required:
       - bots
       - residential_proxies
@@ -3578,7 +3687,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 3
+        example: 5
         enum:
           - 1
           - 2
@@ -3592,136 +3701,42 @@ definitions:
           $ref: '#/definitions/UploadErrorResponseBody'
         description: ошибки, которые возникли при загрузке файлов
         example:
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
-          - input: Et consectetur ea.
-            line: 1635309293131902633
-            reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
+            type: 2
+          - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+            line: 8274556685433458708
+            reason: Nulla et vitae nostrum.
             type: 2
     example:
-      status: 1
+      status: 6
       upload_errors:
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
-        - input: Et consectetur ea.
-          line: 1635309293131902633
-          reason: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
+          type: 2
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
+          type: 2
+        - input: Exercitationem voluptate laudantium ullam sapiente dolores ut.
+          line: 8274556685433458708
+          reason: Nulla et vitae nostrum.
           type: 2
     required:
       - status
       - upload_errors
   TasksServiceUploadVideoNotFoundResponseBody:
     title: TasksServiceUploadVideoNotFoundResponseBody
-    type: object
-    properties:
-      status:
-        type: integer
-        example: 1
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-    example:
-      status: 4
-    required:
-      - status
-  TasksServiceUploadVideoOKResponseBody:
-    title: TasksServiceUploadVideoOKResponseBody
-    type: object
-    properties:
-      status:
-        type: integer
-        example: 2
-        enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-    example:
-      status: 5
-    required:
-      - status
-  TasksServiceUploadVideoRequestBody:
-    title: TasksServiceUploadVideoRequestBody
-    type: object
-    properties:
-      filename:
-        type: string
-        description: не нужно присылать руками, подставится автоматом
-        example: Dicta perspiciatis perspiciatis pariatur.
-      video:
-        type: string
-        example:
-          - 68
-          - 101
-          - 108
-          - 101
-          - 110
-          - 105
-          - 116
-          - 105
-          - 32
-          - 110
-          - 111
-          - 110
-          - 32
-          - 115
-          - 105
-          - 116
-          - 32
-          - 110
-          - 101
-          - 113
-          - 117
-          - 101
-          - 32
-          - 101
-          - 116
-          - 32
-          - 102
-          - 117
-          - 103
-          - 97
-          - 46
-        format: byte
-    example:
-      filename: Alias quaerat accusamus distinctio qui.
-      video:
-        - 76
-        - 97
-        - 98
-        - 111
-        - 114
-        - 117
-        - 109
-        - 32
-        - 101
-        - 97
-        - 32
-        - 101
-        - 116
-        - 32
-        - 97
-        - 108
-        - 105
-        - 113
-        - 117
-        - 105
-        - 100
-        - 46
-    required:
-      - video
-  TasksServiceUploadVideoUnauthorizedResponseBody:
-    title: TasksServiceUploadVideoUnauthorizedResponseBody
     type: object
     properties:
       status:
@@ -3735,7 +3750,140 @@ definitions:
           - 5
           - 6
     example:
-      status: 5
+      status: 2
+    required:
+      - status
+  TasksServiceUploadVideoOKResponseBody:
+    title: TasksServiceUploadVideoOKResponseBody
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 6
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+    example:
+      status: 2
+    required:
+      - status
+  TasksServiceUploadVideoRequestBody:
+    title: TasksServiceUploadVideoRequestBody
+    type: object
+    properties:
+      filename:
+        type: string
+        description: не нужно присылать руками, подставится автоматом
+        example: Aut eum soluta quia consectetur repudiandae et.
+      video:
+        type: string
+        example:
+          - 69
+          - 105
+          - 117
+          - 115
+          - 32
+          - 115
+          - 117
+          - 115
+          - 99
+          - 105
+          - 112
+          - 105
+          - 116
+          - 32
+          - 118
+          - 111
+          - 108
+          - 117
+          - 112
+          - 116
+          - 97
+          - 116
+          - 101
+          - 109
+          - 32
+          - 99
+          - 117
+          - 109
+          - 113
+          - 117
+          - 101
+          - 32
+          - 97
+          - 112
+          - 101
+          - 114
+          - 105
+          - 97
+          - 109
+          - 32
+          - 115
+          - 105
+          - 109
+          - 105
+          - 108
+          - 105
+          - 113
+          - 117
+          - 101
+          - 46
+        format: byte
+    example:
+      filename: Asperiores mollitia quis eligendi rerum.
+      video:
+        - 86
+        - 105
+        - 116
+        - 97
+        - 101
+        - 32
+        - 105
+        - 110
+        - 32
+        - 116
+        - 101
+        - 110
+        - 101
+        - 116
+        - 117
+        - 114
+        - 32
+        - 101
+        - 120
+        - 32
+        - 113
+        - 117
+        - 111
+        - 32
+        - 117
+        - 108
+        - 108
+        - 97
+        - 109
+        - 46
+    required:
+      - video
+  TasksServiceUploadVideoUnauthorizedResponseBody:
+    title: TasksServiceUploadVideoUnauthorizedResponseBody
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 5
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+    example:
+      status: 3
     required:
       - status
   UploadErrorResponseBody:
@@ -3745,14 +3893,14 @@ definitions:
       input:
         type: string
         description: номер порта
-        example: Fugiat molestias qui nobis.
+        example: Eum optio ducimus sit ipsa excepturi.
       line:
         type: integer
-        example: 4462933652725118040
+        example: 7277298999490942058
         format: int64
       reason:
         type: string
-        example: Qui reiciendis modi dignissimos a.
+        example: Dicta et eveniet accusamus voluptates id.
       type:
         type: integer
         description: |2-
@@ -3765,10 +3913,10 @@ definitions:
           - 2
           - 3
     example:
-      input: Qui voluptas est labore sed voluptate.
-      line: 6693223313888696334
-      reason: Repudiandae voluptas ea.
-      type: 1
+      input: Dolorem quaerat.
+      line: 2004684635019291148
+      reason: Quibusdam consequatur.
+      type: 2
     required:
       - type
       - line

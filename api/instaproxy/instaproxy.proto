@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/inst-api/poster/internal/pb/instaproxy;instaproxy";
+
+service InstaProxy {
+  // сохраняем ботов
+  rpc SaveBots (SaveBotsRequest) returns (SaveBotsResponse);
+
+  rpc FindSimilarBloggers (SimilarBloggersRequest) returns (SimilarBloggersResponse);
+
+  rpc ParseMedia(ParseMediaRequest) returns (ParseMediaResponse);
+}
+
+message ParseMediaRequest {
+  string media_id = 1;
+  int32 comments_count = 2;
+  int32 likes_count = 3;
+}
+
+message ParseMediaResponse {
+  repeated UserShort targets = 1;
+}
+
+message SimilarBloggersRequest{
+  string username = 1;
+}
+
+message SimilarBloggersResponse{
+  FullUser initial_blogger = 1;
+  repeated UserShort similar_bloggers = 2;
+}
+
+message SaveBotsRequest {
+  repeated Bot bots = 1;
+}
+
+message UserShort {
+  uint64 pk = 1;
+  string username = 2;
+  string full_name = 3;
+  bool is_private = 4;
+  string pk_id = 5;
+  string profile_pic_url = 6;
+  bool is_verified = 7;
+  bool has_anonymous_profile_picture = 8;
+  bool is_unpublished = 9;
+  bool is_favorite = 10;
+  bool has_highlight_reels = 11;
+}
+
+message UserSuperShort {
+  uint64 pk = 1;
+  string username = 2;
+  string full_name = 3;
+  bool is_private = 4;
+  string pk_id = 5;
+  string profile_pic_url = 6;
+  bool is_verified = 7;
+}
+
+message Caption {
+  uint64 pk = 1;
+  uint32 user_id = 2;
+  string text = 3;
+  uint32 type = 4;
+  uint32 created_at = 5;
+  uint32 created_at_utc = 6;
+  string content_type = 7;
+  string status = 8;
+  uint32 bit_flags = 9;
+  bool did_report_as_spam = 10;
+  bool share_enabled = 11;
+  UserSuperShort user = 12;
+  bool is_covered = 13;
+  bool is_ranked_comment = 14;
+  uint64 media_id = 15;
+  uint32 private_reply_status = 16;
+}
+
+message Media {
+  uint32 taken_at = 1;
+  int64 pk = 2;
+  string id = 3;
+  uint64 device_timestamp = 4;
+  uint32 media_type = 5;
+  string code = 6;
+  string client_cache_key = 7;
+  uint32 filter_type = 8;
+  bool is_unified_video = 9;
+  bool should_request_ads = 10;
+  bool original_media_has_visual_reply_media = 11;
+  bool caption_is_edited = 12;
+  bool like_and_view_counts_disabled = 13;
+  string commerciality_status = 14;
+  bool is_paid_partnership = 15;
+  bool is_visual_reply_commenter_notice_enabled = 16;
+  bool has_delayed_metadata = 18;
+  bool comment_likes_enabled = 20;
+  bool comment_threading_enabled = 21;
+  uint32 max_num_visible_preview_comments = 22;
+  bool has_more_comments = 23;
+  bool can_view_more_preview_comments = 24;
+  bool hide_view_all_comment_entrypoint = 25;
+  string inline_composer_display_condition = 26;
+  uint32 inline_composer_imp_trigger_time = 27;
+  bool photo_of_you = 28;
+  bool is_organic_product_tagging_eligible = 29;
+  bool can_see_insights_as_brand = 30;
+  UserShort user = 31;
+  bool can_viewer_reshare = 32;
+  uint32 like_count = 33;
+  bool has_liked = 34;
+  repeated google.protobuf.Any top_likers = 35;
+  uint32 original_width = 38;
+  uint32 original_height = 39;
+  Caption caption = 40;
+  bool can_viewer_save = 43;
+  bool is_in_profile_grid = 44;
+  bool profile_grid_control_enabled = 45;
+  string organic_tracking_token = 46;
+  uint32 has_shared_to_fb = 47;
+  string product_type = 48;
+  uint32 deleted_reason = 49;
+}
+
+message Bot {
+  // номер аккаунта в инстаграме
+  int64 pk = 1;
+  // имя аккаунта в инстаграме
+  string username = 2;
+  string password = 3;
+  // количество блогеров, которые проходят проверку по коду региона
+  string session_id = 4;
+  // прокси для бота
+  Proxy proxy = 5;
+  BotSettings settings = 6;
+}
+
+message BotSettings {
+  message DeviceSettings {
+    string app_version = 1;
+    int32 android_version = 2 ;
+    string android_release = 3;
+    string dpi = 4;
+    string resolution = 5;
+    string manufacturer = 6;
+    string device = 7;
+    string model = 8;
+    string  cpu = 9;
+    string version_code = 10;
+  }
+
+  message Headers {
+    string rur = 1;
+    string shbid = 2 ;
+    string shbts = 3;
+    string xmid = 4;
+    string android_id = 5;
+    string device_id = 6;
+    string phone_id = 7;
+    string advertising_id = 8;
+    string family_device_id = 9;
+  }
+
+  string user_agent = 1;
+  string bearer = 2;
+  Headers headers = 3;
+  DeviceSettings device = 4;
+}
+
+message Proxy {
+  string host = 1;
+  int32 port = 2;
+  string login = 3;
+  string pass = 4;
+}
+
+message SaveBotsResponse {
+  int32 bots_saved = 1;
+  repeated string usernames = 2;
+}
+
+message FullUser {
+  message Bio_links {
+    uint64 link_id = 1;
+    string url = 2;
+    string lynx_url = 3;
+    string link_type = 4;
+    string title = 5;
+    uint32 group_id = 6;
+    bool open_external_url_with_in_app_browser = 7;
+  }
+
+
+  int64 pk = 1;
+  string username = 2;
+  string full_name = 3;
+  bool is_private = 4;
+  string pk_id = 5;
+  string profile_pic_url = 6;
+  string profile_pic_id = 7;
+  bool is_verified = 8;
+  bool has_anonymous_profile_picture = 9;
+  uint32 media_count = 10;
+  uint32 follower_count = 11;
+  uint32 following_count = 12;
+  string biography = 16;
+  string external_url = 17;
+  string external_lynx_url = 18;
+  uint32 total_igtv_videos = 22;
+  uint32 usertags_count = 26;
+  bool is_interest_account = 33;
+  bool has_chaining = 34;
+  uint32 mutual_followers_count = 35;
+  string profile_context = 36;
+  bool is_business = 41;
+  uint32 account_type = 43;
+  repeated Bio_links bio_links = 47;
+}

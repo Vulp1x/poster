@@ -21,6 +21,33 @@ type AddManagerRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// PushBotsOKResponseBody is the type of the "admin_service" service
+// "push_bots" endpoint HTTP response body.
+type PushBotsOKResponseBody struct {
+	// количество ботов, которых мы отправили
+	SentBots int `json:"sent_bots"`
+	// количество ботов, которых сохранили в проксе
+	SavedBots int32 `json:"saved_bots"`
+	// имена ботов, которые мы сохранили
+	Usernames []string `form:"usernames" json:"usernames" xml:"usernames"`
+}
+
+// NewPushBotsOKResponseBody builds the HTTP response body from the result of
+// the "push_bots" endpoint of the "admin_service" service.
+func NewPushBotsOKResponseBody(res *adminservice.PushBotsResult) *PushBotsOKResponseBody {
+	body := &PushBotsOKResponseBody{
+		SentBots:  res.SentBots,
+		SavedBots: res.SavedBots,
+	}
+	if res.Usernames != nil {
+		body.Usernames = make([]string, len(res.Usernames))
+		for i, val := range res.Usernames {
+			body.Usernames[i] = val
+		}
+	}
+	return body
+}
+
 // NewAddManagerPayload builds a admin_service service add_manager endpoint
 // payload.
 func NewAddManagerPayload(body *AddManagerRequestBody, token *string) *adminservice.AddManagerPayload {

@@ -19,7 +19,7 @@ type Service interface {
 	// admins could add drivers from main system
 	AddManager(context.Context, *AddManagerPayload) (err error)
 	// push bots to parser service
-	PushBots(context.Context, *PushBotsPayload) (err error)
+	PushBots(context.Context, *PushBotsPayload) (res *PushBotsResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -52,6 +52,17 @@ type AddManagerPayload struct {
 type PushBotsPayload struct {
 	// JWT used for authentication
 	Token string
+}
+
+// PushBotsResult is the result type of the admin_service service push_bots
+// method.
+type PushBotsResult struct {
+	// количество ботов, которых мы отправили
+	SentBots int `json:"sent_bots"`
+	// количество ботов, которых сохранили в проксе
+	SavedBots int32 `json:"saved_bots"`
+	// имена ботов, которые мы сохранили
+	Usernames []string
 }
 
 // Invalid request

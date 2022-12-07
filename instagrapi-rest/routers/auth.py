@@ -1,8 +1,12 @@
+import base64
 import time
 from pathlib import Path
 from typing import Optional, Dict, List, Union
 
 import loguru
+from Cryptodome.Cipher import PKCS1_v1_5, AES
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Random import get_random_bytes
 # noinspection PyUnresolvedReferences
 from custom_logging import CustomizeLogger
 # noinspection PyUnresolvedReferences
@@ -234,7 +238,6 @@ async def alive_bots(clients: ClientStorage = Depends(get_clients)) -> Union[Pla
     clients_list: List[Client] = await clients.list()
     alive_usernames = []
     for client in clients_list:
-        client.login()
         alive_usernames.append(client.sessionid)
 
     return alive_usernames
@@ -255,3 +258,32 @@ async def settings_get(sessionid: str,
         return PlainTextResponse(status_code=404, content=f'{e}')
 
     result = cl.login(username, password, True)
+
+
+@router.get("/password")
+async def settings_get(password: str, publickey: str, publickeyid: int):
+    # publickeyid, publickey = 89, 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF4TTFNVThUZCtsRzF2b1ZGYm4wdwphSldRekpBd3FwZVJJdWRiVlI5WUphWE9uR3BzS09wMS9mRlNXS3lqcGFOeW1RZTVyVllJa3doR0VIdFgrV2pXCnArUFBSYXU1MWVndXVRLzZHcjB3dnZqbVczcEZoRHF1aGFZUmZlY0JFY0NUMVNIR2NxUWI1Nkd1aTREY3RiaUUKK2dld2RZMVlrUkxjdGdpQ0gyM3lOaXUwU0F0MnVWZWQ1S0MvMWhlQ1dsWWRLU2lRd1phRnZRZDFuQjFNVlNNWgpzOCtnNGljS0xxUFBIWGltenVsb0tmbjkxdTJZSW1LSVREclIyQ1hlYUNvb2IzQWF1VjdsTDVrSnZ3ZXdqQlYyCnhmdW1WQ09rWlVZazRBRzZCSVpBT3VORGNSMlIvTkxPb05yaGcrWFRrUFRhYzhaaFZyZ1Z5VDZ2bG0zK3ZpN00Kd1FJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=='
+    session_key = get_random_bytes(32)
+    iv = get_random_bytes(12)
+    timestamp = str(int(time.time()))
+    decoded_publickey = base64.b64decode(publickey.encode())
+    recipient_key = RSA.import_key(decoded_publickey)
+    cipher_rsa = PKCS1_v1_5.new(recipient_key)
+    rsa_encrypted = cipher_rsa.encrypt(session_key)
+    cipher_aes = AES.new(session_key, AES.MODE_GCM, iv)
+    cipher_aes.update(timestamp.encode())
+    aes_encrypted, tag = cipher_aes.encrypt_and_digest(password.encode("utf8"))
+    size_buffer = len(rsa_encrypted).to_bytes(2, byteorder='little')
+    payload = base64.b64encode(b''.join([
+        b"\x01",
+        publickeyid.to_bytes(1, byteorder='big'),
+        iv,
+        size_buffer,
+        rsa_encrypted,
+        tag,
+        aes_encrypted
+    ]))
+
+    print(f"#PWD_INSTAGRAM:4:{timestamp}:{payload.decode()}")
+
+    print("done")

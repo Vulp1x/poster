@@ -34,18 +34,32 @@ func (s Store) FindReadyBots(ctx context.Context) (domain.BotAccounts, error) {
 
 	domainBots := make([]domain.BotAccount, 0, len(bots))
 
-	for i, bot := range bots {
-		logger.Infof(ctx, "start initing bot %d", i)
+	for i := range bots {
+		domainBot := domain.BotAccount(bots[i])
+		// mu := &sync.Mutex{}
 
-		domainBot := domain.BotAccount(bot)
-
-		err = s.cli.InitBot(ctx, domain.BotWithTargets{BotAccount: domainBot})
-		if err != nil {
-			logger.Errorf(ctx, "failed to init bot: %v", err)
-			continue
-		}
+		// logger.Infof(ctx, "start initing bot (%s) %d", bots[i].Username, i)
+		// err = s.cli.InitBot(ctx, domain.BotWithTargets{BotAccount: domainBot})
+		// if err != nil {
+		// 	logger.Errorf(ctx, "failed to init bot: %v", err)
+		// 	continue
+		// }
 
 		domainBots = append(domainBots, domainBot)
+
+		// go func(m *sync.Mutex, account domain.BotAccount, bots []domain.BotAccount, i int) {
+		// 	logger.Infof(ctx, "start initing bot (%s) %d", account.Username, i)
+		// 	err = s.cli.InitBot(ctx, domain.BotWithTargets{BotAccount: account})
+		// 	if err != nil {
+		// 		logger.Errorf(ctx, "failed to init bot: %v", err)
+		// 		return
+		// 	}
+		//
+		// 	m.Lock()
+		// 	bots = append(bots, account)
+		// 	m.Unlock()
+		//
+		// }(mu, domainBot, domainBots, i)
 	}
 
 	logger.Infof(ctx, "successfully added %d/%d bots", len(domainBots), len(bots))

@@ -648,6 +648,24 @@ var _ = Service("admin_service", func() {
 			Required("token")
 		})
 
+		Result(func() {
+			Attribute("sent_bots", Int, func() {
+				Description("количество ботов, которых мы отправили")
+				Meta("struct:tag:json", "sent_bots")
+			})
+
+			Attribute("saved_bots", Int32, func() {
+				Description("количество ботов, которых сохранили в проксе")
+				Meta("struct:tag:json", "saved_bots")
+			})
+
+			Attribute("usernames", ArrayOf(String), func() {
+				Description("имена ботов, которые мы сохранили")
+			})
+
+			Required("sent_bots", "saved_bots", "usernames")
+		})
+
 		Error("invalid-scopes", String, "Token scopes are invalid")
 
 		HTTP(func() {

@@ -86,7 +86,7 @@ func PrepareLoginRequest(b domain.BotAccount) (*http.Request, error) {
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   instHost,
-			Path:   "/api/v1/BotAccounts/contact_point_prefill/",
+			Path:   "/api/v1/accounts/contact_point_prefill/",
 		},
 		Header: b.ConstructHeaders(int64(body.Len())),
 		Body:   io.NopCloser(body),

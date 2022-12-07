@@ -274,7 +274,7 @@ const findReadyBots = `-- name: FindReadyBots :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
 from bot_accounts
 where (res_proxy is not null or work_proxy is not null)
-  and status in (2, 4)
+  and status >= 2
 `
 
 // -- name: GetTaskTargetsCount :many

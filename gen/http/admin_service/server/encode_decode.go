@@ -120,8 +120,11 @@ func EncodeAddManagerError(encoder func(context.Context, http.ResponseWriter) go
 // admin_service push_bots endpoint.
 func EncodePushBotsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*adminservice.PushBotsResult)
+		enc := encoder(ctx, w)
+		body := NewPushBotsOKResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 

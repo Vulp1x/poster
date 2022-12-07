@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
-	"github.com/inst-api/poster/internal/pb/parser"
+	"github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 )
 
@@ -41,8 +41,8 @@ func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsPar
 	return dbBots
 }
 
-func (b BotAccounts) ToGRPCProto(ctx context.Context) []*parser.Bot {
-	protoBots := make([]*parser.Bot, 0, len(b))
+func (b BotAccounts) ToGRPCProto(ctx context.Context) []*instaproxy.Bot {
+	protoBots := make([]*instaproxy.Bot, 0, len(b))
 
 	for _, botAccount := range b {
 		userID, err := strconv.ParseInt(botAccount.Headers.AuthData.DsUserID, 10, 64)
@@ -60,15 +60,43 @@ func (b BotAccounts) ToGRPCProto(ctx context.Context) []*parser.Bot {
 			continue
 		}
 
-		protoBots = append(protoBots, &parser.Bot{
+		protoBots = append(protoBots, &instaproxy.Bot{
+			Pk:        userID,
 			Username:  botAccount.Username,
-			UserId:    userID,
+			Password:  botAccount.Password,
 			SessionId: botAccount.Headers.AuthData.SessionID,
-			Proxy: &parser.Proxy{
+			Proxy: &instaproxy.Proxy{
 				Host:  proxy.Host,
 				Port:  proxy.Port,
 				Login: proxy.Login,
 				Pass:  proxy.Pass,
+			},
+			Settings: &instaproxy.BotSettings{
+				UserAgent: botAccount.UserAgent,
+				Bearer:    botAccount.Headers.Authorization,
+				Headers: &instaproxy.BotSettings_Headers{
+					Rur:            botAccount.Headers.Rur,
+					Shbid:          "",
+					Shbts:          "",
+					Xmid:           botAccount.Headers.Mid,
+					AndroidId:      botAccount.Session.DeviceID,
+					DeviceId:       botAccount.Session.UUID.String(),
+					PhoneId:        botAccount.Session.PhoneID.String(),
+					AdvertisingId:  botAccount.Session.AdvertisingID.String(),
+					FamilyDeviceId: botAccount.Session.FamilyDeviceID.String(),
+				},
+				Device: &instaproxy.BotSettings_DeviceSettings{
+					AppVersion:     botAccount.DeviceData.AppVersion,
+					AndroidVersion: int32(botAccount.DeviceData.AndroidVersion),
+					AndroidRelease: botAccount.DeviceData.AndroidRelease,
+					Dpi:            botAccount.DeviceData.Dpi,
+					Resolution:     botAccount.DeviceData.Resolution,
+					Manufacturer:   botAccount.DeviceData.Manufacturer,
+					Device:         botAccount.DeviceData.Device,
+					Model:          botAccount.DeviceData.Model,
+					Cpu:            botAccount.DeviceData.Cpu,
+					VersionCode:    botAccount.DeviceData.VersionCode,
+				},
 			},
 		})
 	}

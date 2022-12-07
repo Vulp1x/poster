@@ -75,6 +75,6 @@ func NewPushBotsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.PushBots(ctx, p)
+		return s.PushBots(ctx, p)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	adminservice "github.com/inst-api/poster/gen/admin_service"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	"github.com/inst-api/poster/internal/domain"
-	"github.com/inst-api/poster/internal/pb/parser"
+	"github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
 	"golang.org/x/crypto/bcrypt"
@@ -20,15 +20,15 @@ type botsStore interface {
 // admin_service service example implementation.
 // The example methods log the requests and return zero values.
 type adminServicesrvc struct {
-	auth      authservice.Auther
-	userStore userStore
-	parserCli parser.ParserClient
-	botsStore botsStore
+	auth         authservice.Auther
+	userStore    userStore
+	instProxyCli instaproxy.InstaProxyClient
+	botsStore    botsStore
 }
 
 // NewAdminService returns the admin_service service implementation.
 func NewAdminService(auth authservice.Auther, userStore userStore, botsStore botsStore, conn *grpc.ClientConn) adminservice.Service {
-	return &adminServicesrvc{auth: auth, userStore: userStore, botsStore: botsStore, parserCli: parser.NewParserClient(conn)}
+	return &adminServicesrvc{auth: auth, userStore: userStore, botsStore: botsStore, instProxyCli: instaproxy.NewInstaProxyClient(conn)}
 }
 
 // JWTAuth implements the authorization logic for service "admin_service" for
@@ -71,21 +71,25 @@ func (s *adminServicesrvc) AddManager(ctx context.Context, p *adminservice.AddMa
 	return nil
 }
 
-func (s *adminServicesrvc) PushBots(ctx context.Context, p *adminservice.PushBotsPayload) error {
+func (s *adminServicesrvc) PushBots(ctx context.Context, p *adminservice.PushBotsPayload) (*adminservice.PushBotsResult, error) {
 	bots, err := s.botsStore.FindReadyBots(ctx)
 	if err != nil {
-		return adminservice.InternalError(err.Error())
+		return nil, adminservice.InternalError(err.Error())
 	}
 
 	protoBots := bots.ToGRPCProto(ctx)
 
-	req := parser.SaveBotsRequest{Token: p.Token, Bots: protoBots}
+	req := instaproxy.SaveBotsRequest{Bots: protoBots}
 
-	resp, err := s.parserCli.SaveBots(ctx, &req)
+	resp, err := s.instProxyCli.SaveBots(ctx, &req)
 	if err != nil {
-		return adminservice.InternalError(err.Error())
+		return nil, adminservice.InternalError(err.Error())
 	}
 
 	logger.Infof(ctx, "saved %d bots, sent %d", resp.BotsSaved, len(protoBots))
-	return nil
+	return &adminservice.PushBotsResult{
+		SentBots:  len(bots),
+		SavedBots: resp.BotsSaved,
+		Usernames: resp.Usernames,
+	}, nil
 }
