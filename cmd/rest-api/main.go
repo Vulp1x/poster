@@ -22,6 +22,7 @@ import (
 	"github.com/inst-api/poster/internal/store/bots"
 	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/internal/store/users"
+	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -68,14 +69,6 @@ func main() {
 		logger.Fatalf(ctx, "Failed to connect to transaction's database: %v", err)
 	}
 
-	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
-	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname)
-	botsStore := bots.NewStore(dbTXFunc, txFunc, conf.Instagrapi.Hostname)
-
-	// Initialize the services.
-	authServiceSvc := service.NewAuthService(userStore, conf.Security)
-	tasksService := service.NewTasksService(authServiceSvc, taskStore)
-
 	conn, err := grpc.DialContext(
 		ctx,
 		conf.Listen.ParserURL,
@@ -85,6 +78,16 @@ func main() {
 	if err != nil {
 		logger.Fatalf(ctx, "failed to connect to parser: %v", err)
 	}
+
+	queue := workers.NewQueuue(ctx, dbTXFunc(ctx), dbTXFunc, conn)
+
+	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
+	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname, conn, queue)
+	botsStore := bots.NewStore(dbTXFunc, txFunc, conf.Instagrapi.Hostname)
+
+	// Initialize the services.
+	authServiceSvc := service.NewAuthService(userStore, conf.Security)
+	tasksService := service.NewTasksService(authServiceSvc, taskStore)
 
 	adminsService := service.NewAdminService(authServiceSvc, userStore, botsStore, conn)
 

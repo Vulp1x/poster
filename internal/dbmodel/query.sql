@@ -111,8 +111,8 @@ where id = $15
 returning *;
 
 -- name: SaveBotAccounts :copyfrom
-insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status)
-values ($1, $2, $3, $4, $5, $6, $7, $8);
+insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status, file_order)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9);
 
 -- name: SaveProxies :copyfrom
 insert into proxies (task_id, host, port, login, pass, type)
@@ -237,3 +237,11 @@ where (res_proxy is not null or work_proxy is not null)
 update tasks
 set video_filename = @video_filename
 where id = @id;
+
+-- name: FindTaskBotsByUsername :many
+select *
+from bot_accounts
+where task_id = @task_id
+  and username = any (sqlc.arg('usernames')::text[])
+  and status in (2, 5)
+ORDER BY file_order;

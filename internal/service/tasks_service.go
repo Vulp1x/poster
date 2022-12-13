@@ -29,6 +29,7 @@ type taskStore interface {
 	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
 	TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error)
 	SaveVideo(ctx context.Context, taskID uuid.UUID, video []byte, filename string) (domain.Task, error)
+	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, []string)
 }
 
 // tasks_service service example implementation.
@@ -440,6 +441,25 @@ func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetP
 	}
 
 	return domainProgress.ToProto(), nil
+}
+
+func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice.PartialStartTaskPayload) (*tasksservice.PartialStartTaskResult, error) {
+	logger.Infof(ctx, "partial start task %s", p.TaskID)
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	usernames, errs := s.store.StartBots(ctx, taskID, p.Usernames)
+
+	return &tasksservice.PartialStartTaskResult{
+		TaskID:    taskID.String(),
+		Succeeded: usernames,
+		Errors:    errs,
+	}, nil
 }
 
 func internalErr(err error) tasksservice.InternalError {

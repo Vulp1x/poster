@@ -15,6 +15,7 @@ import (
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
 	"github.com/inst-api/poster/internal/instagrapi"
+	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/jackc/pgx/v4"
 )
@@ -138,41 +139,54 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 			logger.Errorf(ctx, "failed to close file at '%s': %v", *task.VideoFilename, err)
 		}
 
+		err = q.StartTaskByID(ctx, taskID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to start task: %v", err)
+		}
+
+		// нужно отвязаться от ctx, так как он закенселится сразу после окончания запроса
+		taskCtx, taskCancel := context.WithCancel(logger.ToContext(context.Background(), logger.FromContext(ctx)))
+		s.taskMu.Lock()
+		s.taskCancels[task.ID] = taskCancel
+		s.taskMu.Unlock()
+
+		botsChan := make(chan *domain.BotWithTargets, 20)
+
+		wg := &sync.WaitGroup{}
+
+		for i := 0; i < workersPerTask; i++ {
+			postingWorker := &worker{
+				botsQueue:      botsChan,
+				dbtxf:          s.dbtxf,
+				cli:            s.instaClient,
+				task:           domain.Task(task),
+				generator:      imageGenerator,
+				processorIndex: int64(i),
+				wg:             wg,
+				videoBytes:     videoBytes,
+			}
+
+			go postingWorker.run(taskCtx)
+		}
+
+		wg.Add(workersPerTask)
+
+		go s.asyncPushBots(taskCtx, q, task, botsChan, bots, targets, wg)
+
+		return aliveLandings, nil
 	}
+
+	savedBots, err := s.cli.SaveBots(ctx, &api.SaveBotsRequest{Bots: domain.BotsFromDBModels(bots).ToGRPCProto(ctx)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to push bots to instaproxy: %v", err)
+	}
+
+	logger.Infof(ctx, "saved %d/%d bots with usernames %v", savedBots.BotsSaved, len(bots), savedBots.Usernames)
 
 	err = q.StartTaskByID(ctx, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start task: %v", err)
 	}
-
-	// нужно отвязаться от ctx, так как он закенселится сразу после окончания запроса
-	taskCtx, taskCancel := context.WithCancel(logger.ToContext(context.Background(), logger.FromContext(ctx)))
-	s.taskMu.Lock()
-	s.taskCancels[task.ID] = taskCancel
-	s.taskMu.Unlock()
-
-	botsChan := make(chan *domain.BotWithTargets, 20)
-
-	wg := &sync.WaitGroup{}
-
-	for i := 0; i < workersPerTask; i++ {
-		postingWorker := &worker{
-			botsQueue:      botsChan,
-			dbtxf:          s.dbtxf,
-			cli:            s.instaClient,
-			task:           domain.Task(task),
-			generator:      imageGenerator,
-			processorIndex: int64(i),
-			wg:             wg,
-			videoBytes:     videoBytes,
-		}
-
-		go postingWorker.run(taskCtx)
-	}
-
-	wg.Add(workersPerTask)
-
-	go s.asyncPushBots(taskCtx, q, task, botsChan, bots, targets, wg)
 
 	return aliveLandings, nil
 }

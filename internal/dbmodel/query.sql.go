@@ -168,7 +168,7 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const findBotsForTask = `-- name: FindBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
 from bot_accounts
 where task_id = $1
 `
@@ -199,6 +199,7 @@ func (q *Queries) FindBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotA
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.FileOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -271,7 +272,7 @@ func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID)
 const findReadyBots = `-- name: FindReadyBots :many
 
 
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
 from bot_accounts
 where (res_proxy is not null or work_proxy is not null)
   and status >= 2
@@ -308,6 +309,7 @@ func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.FileOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -320,7 +322,7 @@ func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
 }
 
 const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
 from bot_accounts
 where task_id = $1
   and status = 2
@@ -352,6 +354,7 @@ func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.FileOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -390,6 +393,58 @@ func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid
 			&i.Login,
 			&i.Pass,
 			&i.Type,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findTaskBotsByUsername = `-- name: FindTaskBotsByUsername :many
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+from bot_accounts
+where task_id = $1
+  and username = any ($2::text[])
+  and status in (2, 5)
+ORDER BY file_order
+`
+
+type FindTaskBotsByUsernameParams struct {
+	TaskID    uuid.UUID `json:"task_id"`
+	Usernames []string  `json:"usernames"`
+}
+
+func (q *Queries) FindTaskBotsByUsername(ctx context.Context, arg FindTaskBotsByUsernameParams) ([]BotAccount, error) {
+	rows, err := q.db.Query(ctx, findTaskBotsByUsername, arg.TaskID, arg.Usernames)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BotAccount
+	for rows.Next() {
+		var i BotAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.Password,
+			&i.UserAgent,
+			&i.DeviceData,
+			&i.Session,
+			&i.Headers,
+			&i.ResProxy,
+			&i.WorkProxy,
+			&i.Status,
+			&i.PostsCount,
+			&i.StartedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.FileOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -593,7 +648,7 @@ func (q *Queries) ForceDeleteTaskByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const getBotByID = `-- name: GetBotByID :one
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
 from bot_accounts
 where id = $1
 `
@@ -618,6 +673,7 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.FileOrder,
 	)
 	return i, err
 }
@@ -703,6 +759,7 @@ type SaveBotAccountsParams struct {
 	Session    headers.Session        `json:"session"`
 	Headers    headers.Base           `json:"headers"`
 	Status     botStatus              `json:"status"`
+	FileOrder  int32                  `json:"file_order"`
 }
 
 type SaveProxiesParams struct {

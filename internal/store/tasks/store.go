@@ -13,9 +13,12 @@ import (
 	"github.com/inst-api/poster/internal/dbtx"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/instagrapi"
+	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/internal/store"
 	"github.com/inst-api/poster/pkg/logger"
+	"github.com/inst-api/poster/pkg/pgqueue"
 	"github.com/jackc/pgx/v4"
+	"google.golang.org/grpc"
 )
 
 const workersPerTask = 10
@@ -29,7 +32,7 @@ var ErrTaskInvalidStatus = errors.New("invalid task status")
 // ErrUnexpectedTaskType ожидали другой тип таски
 var ErrUnexpectedTaskType = errors.New("unexpected task type")
 
-func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string) *Store {
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string, conn *grpc.ClientConn, queue *pgqueue.Queue) *Store {
 	return &Store{
 		tasksChan:   make(chan domain.Task, 10),
 		taskCancels: make(map[uuid.UUID]func()),
@@ -38,6 +41,8 @@ func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.T
 		txf:         txFunc,
 		taskMu:      &sync.Mutex{},
 		instaClient: instagrapi.NewClient(instagrapiHost),
+		cli:         api.NewInstaProxyClient(conn),
+		queue:       queue,
 	}
 }
 
@@ -49,6 +54,8 @@ type Store struct {
 	dbtxf       dbmodel.DBTXFunc
 	txf         dbmodel.TxFunc
 	instaClient instagrapiClient
+	cli         api.InstaProxyClient
+	queue       *pgqueue.Queue
 }
 
 func (s *Store) ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error) {

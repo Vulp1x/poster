@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package parser;
 
-option go_package = "github.com/inst-api/parser/pkg/api/parser;parser";
+option go_package = "github.com/inst-api/poster/pkg/api/parser;parser";
 
 service Parser {
   // сохраняем ботов

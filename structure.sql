@@ -53,6 +53,7 @@ CREATE TABLE public.bot_accounts (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone,
     deleted_at timestamp without time zone,
+    file_order integer NOT NULL,
     CONSTRAINT not_empty_device CHECK (((device_data <> '[]'::jsonb) AND (device_data <> '{}'::jsonb))),
     CONSTRAINT not_empty_headers CHECK (((headers <> '[]'::jsonb) AND (headers <> '{}'::jsonb))),
     CONSTRAINT not_empty_session CHECK (((session <> '[]'::jsonb) AND (session <> '{}'::jsonb)))
@@ -246,6 +247,14 @@ ALTER TABLE ONLY public.target_users
 
 ALTER TABLE ONLY public.tasks
     ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bot_accounts uniq_file_order; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bot_accounts
+    ADD CONSTRAINT uniq_file_order UNIQUE (task_id, file_order);
 
 
 --

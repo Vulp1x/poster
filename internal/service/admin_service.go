@@ -6,7 +6,7 @@ import (
 	adminservice "github.com/inst-api/poster/gen/admin_service"
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	"github.com/inst-api/poster/internal/domain"
-	"github.com/inst-api/poster/internal/pb/instaproxy"
+	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
 	"golang.org/x/crypto/bcrypt"
@@ -22,13 +22,13 @@ type botsStore interface {
 type adminServicesrvc struct {
 	auth         authservice.Auther
 	userStore    userStore
-	instProxyCli instaproxy.InstaProxyClient
+	instProxyCli api.InstaProxyClient
 	botsStore    botsStore
 }
 
 // NewAdminService returns the admin_service service implementation.
 func NewAdminService(auth authservice.Auther, userStore userStore, botsStore botsStore, conn *grpc.ClientConn) adminservice.Service {
-	return &adminServicesrvc{auth: auth, userStore: userStore, botsStore: botsStore, instProxyCli: instaproxy.NewInstaProxyClient(conn)}
+	return &adminServicesrvc{auth: auth, userStore: userStore, botsStore: botsStore, instProxyCli: api.NewInstaProxyClient(conn)}
 }
 
 // JWTAuth implements the authorization logic for service "admin_service" for
@@ -79,7 +79,7 @@ func (s *adminServicesrvc) PushBots(ctx context.Context, p *adminservice.PushBot
 
 	protoBots := bots.ToGRPCProto(ctx)
 
-	req := instaproxy.SaveBotsRequest{Bots: protoBots}
+	req := api.SaveBotsRequest{Bots: protoBots}
 
 	resp, err := s.instProxyCli.SaveBots(ctx, &req)
 	if err != nil {

@@ -161,12 +161,12 @@ var Task = Type("Task", func() {
 	})
 
 	Attribute("per_post_sleep_seconds", UInt, func() {
-		Description("делать отметки на фотографии")
+		Description("задержка между постами")
 		Meta("struct:tag:json", "per_post_sleep_seconds")
 	})
 
 	Attribute("photo_tags_delay_seconds", UInt, func() {
-		Description("задержка перед проставлением отметок")
+		Description("задержка между загрузкой фотографии и проставлением отметок (в секундах)")
 		Meta("struct:tag:json", "photo_tags_delay_seconds")
 	})
 
@@ -175,9 +175,19 @@ var Task = Type("Task", func() {
 		Meta("struct:tag:json", "posts_per_bot")
 	})
 
+	Attribute("photo_tags_posts_per_bot", UInt, func() {
+		Description("количество постов с отметками на фото для каждого бота")
+		Meta("struct:tag:json", "photo_tags_posts_per_bot")
+	})
+
 	Attribute("targets_per_post", UInt, func() {
 		Description("количество упоминаний под каждым постом")
 		Meta("struct:tag:json", "targets_per_post")
+	})
+
+	Attribute("photo_targets_per_post", UInt, func() {
+		Description("количество упоминаний на фото у каждого поста")
+		Meta("struct:tag:json", "photo_targets_per_post")
 	})
 
 	Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
@@ -192,6 +202,7 @@ var Task = Type("Task", func() {
 	Required("id", "type", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num",
 		"cheap_proxies_num", "targets_num", "bot_images", "landing_accounts", "bot_names", "bot_last_names", "bot_urls",
 		"targets_per_post", "posts_per_bot", "photo_tags_delay_seconds", "per_post_sleep_seconds", "need_photo_tags", "follow_targets",
+		"photo_targets_per_post", "photo_tags_posts_per_bot",
 	)
 })
 

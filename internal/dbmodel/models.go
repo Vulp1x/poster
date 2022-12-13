@@ -28,6 +28,7 @@ type BotAccount struct {
 	CreatedAt  time.Time              `json:"created_at"`
 	UpdatedAt  *time.Time             `json:"updated_at"`
 	DeletedAt  *time.Time             `json:"deleted_at"`
+	FileOrder  int32                  `json:"file_order"`
 }
 
 type Log struct {

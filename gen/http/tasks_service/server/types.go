@@ -37,34 +37,38 @@ type CreateTaskDraftRequestBody struct {
 // UpdateTaskRequestBody is the type of the "tasks_service" service "update
 // task" endpoint HTTP request body.
 type UpdateTaskRequestBody struct {
-	// название задачи
-	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	// шаблон для подписи под постом
+	// описание под постом
 	TextTemplate *string `json:"text_template"`
-	// список фотографий для постов
-	PostImages []string `json:"post_images,post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
+	// название задачи
+	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// нужно ли подписываться на аккаунты
 	FollowTargets *bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags *bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds *uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds *uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot *uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot *uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost *uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost *uint `json:"photo_targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 }
 
 // UploadVideoRequestBody is the type of the "tasks_service" service "upload
@@ -87,6 +91,13 @@ type UploadFilesRequestBody struct {
 	CheapProxies []*ProxyRecordRequestBody `form:"cheap_proxies,omitempty" json:"cheap_proxies,omitempty" xml:"cheap_proxies,omitempty"`
 	// список аккаунтов, которым показать надо рекламу
 	Targets []*TargetUserRecordRequestBody `form:"targets,omitempty" json:"targets,omitempty" xml:"targets,omitempty"`
+}
+
+// PartialStartTaskRequestBody is the type of the "tasks_service" service
+// "partial start task" endpoint HTTP request body.
+type PartialStartTaskRequestBody struct {
+	// список имен ботов, которых нужно запустить
+	Usernames []string `form:"usernames,omitempty" json:"usernames,omitempty" xml:"usernames,omitempty"`
 }
 
 // UpdateTaskOKResponseBody is the type of the "tasks_service" service "update
@@ -129,14 +140,18 @@ type UpdateTaskOKResponseBody struct {
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost uint `json:"photo_targets_per_post"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
@@ -174,6 +189,19 @@ type StartTaskOKResponseBody struct {
 	Status int `form:"status" json:"status" xml:"status"`
 	// id задачи
 	TaskID string `json:"task_id"`
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+}
+
+// PartialStartTaskOKResponseBody is the type of the "tasks_service" service
+// "partial start task" endpoint HTTP response body.
+type PartialStartTaskOKResponseBody struct {
+	// id задачи
+	TaskID string `json:"task_id"`
+	// список успешных имен ботов
+	Succeeded []string `form:"succeeded,omitempty" json:"succeeded,omitempty" xml:"succeeded,omitempty"`
+	// ошибки при запуске остальных ботов
+	Errors []string `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
 	// имена живых аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 }
@@ -226,14 +254,18 @@ type GetTaskOKResponseBody struct {
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost uint `json:"photo_targets_per_post"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
@@ -321,14 +353,18 @@ type TaskResponse struct {
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost uint `json:"photo_targets_per_post"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
@@ -391,7 +427,9 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		PerPostSleepSeconds:        res.PerPostSleepSeconds,
 		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
 		PostsPerBot:                res.PostsPerBot,
+		PhotoTagsPostsPerBot:       res.PhotoTagsPostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
+		PhotoTargetsPerPost:        res.PhotoTargetsPerPost,
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -483,6 +521,33 @@ func NewStartTaskOKResponseBody(res *tasksservice.StartTaskResult) *StartTaskOKR
 	return body
 }
 
+// NewPartialStartTaskOKResponseBody builds the HTTP response body from the
+// result of the "partial start task" endpoint of the "tasks_service" service.
+func NewPartialStartTaskOKResponseBody(res *tasksservice.PartialStartTaskResult) *PartialStartTaskOKResponseBody {
+	body := &PartialStartTaskOKResponseBody{
+		TaskID: res.TaskID,
+	}
+	if res.Succeeded != nil {
+		body.Succeeded = make([]string, len(res.Succeeded))
+		for i, val := range res.Succeeded {
+			body.Succeeded[i] = val
+		}
+	}
+	if res.Errors != nil {
+		body.Errors = make([]string, len(res.Errors))
+		for i, val := range res.Errors {
+			body.Errors[i] = val
+		}
+	}
+	if res.LandingAccounts != nil {
+		body.LandingAccounts = make([]string, len(res.LandingAccounts))
+		for i, val := range res.LandingAccounts {
+			body.LandingAccounts[i] = val
+		}
+	}
+	return body
+}
+
 // NewStopTaskOKResponseBody builds the HTTP response body from the result of
 // the "stop task" endpoint of the "tasks_service" service.
 func NewStopTaskOKResponseBody(res *tasksservice.StopTaskResult) *StopTaskOKResponseBody {
@@ -516,7 +581,9 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		PerPostSleepSeconds:        res.PerPostSleepSeconds,
 		PhotoTagsDelaySeconds:      res.PhotoTagsDelaySeconds,
 		PostsPerBot:                res.PostsPerBot,
+		PhotoTagsPostsPerBot:       res.PhotoTagsPostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
+		PhotoTargetsPerPost:        res.PhotoTargetsPerPost,
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -635,20 +702,16 @@ func NewCreateTaskDraftPayload(body *CreateTaskDraftRequestBody, token string) *
 // payload.
 func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token string) *tasksservice.UpdateTaskPayload {
 	v := &tasksservice.UpdateTaskPayload{
-		Title:                 body.Title,
 		TextTemplate:          body.TextTemplate,
+		Title:                 body.Title,
 		FollowTargets:         body.FollowTargets,
 		NeedPhotoTags:         body.NeedPhotoTags,
 		PerPostSleepSeconds:   body.PerPostSleepSeconds,
 		PhotoTagsDelaySeconds: body.PhotoTagsDelaySeconds,
 		PostsPerBot:           body.PostsPerBot,
+		PhotoTagsPostsPerBot:  body.PhotoTagsPostsPerBot,
 		TargetsPerPost:        body.TargetsPerPost,
-	}
-	if body.PostImages != nil {
-		v.PostImages = make([]string, len(body.PostImages))
-		for i, val := range body.PostImages {
-			v.PostImages[i] = val
-		}
+		PhotoTargetsPerPost:   body.PhotoTargetsPerPost,
 	}
 	if body.LandingAccounts != nil {
 		v.LandingAccounts = make([]string, len(body.LandingAccounts))
@@ -668,16 +731,22 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 			v.BotLastNames[i] = val
 		}
 	}
-	if body.BotImages != nil {
-		v.BotImages = make([]string, len(body.BotImages))
-		for i, val := range body.BotImages {
-			v.BotImages[i] = val
-		}
-	}
 	if body.BotUrls != nil {
 		v.BotUrls = make([]string, len(body.BotUrls))
 		for i, val := range body.BotUrls {
 			v.BotUrls[i] = val
+		}
+	}
+	if body.PostImages != nil {
+		v.PostImages = make([]string, len(body.PostImages))
+		for i, val := range body.PostImages {
+			v.PostImages[i] = val
+		}
+	}
+	if body.BotImages != nil {
+		v.BotImages = make([]string, len(body.BotImages))
+		for i, val := range body.BotImages {
+			v.BotImages[i] = val
 		}
 	}
 	v.TaskID = taskID
@@ -756,6 +825,22 @@ func NewStartTaskPayload(taskID string, token string) *tasksservice.StartTaskPay
 	return v
 }
 
+// NewPartialStartTaskPayload builds a tasks_service service partial start task
+// endpoint payload.
+func NewPartialStartTaskPayload(body *PartialStartTaskRequestBody, taskID string, token string) *tasksservice.PartialStartTaskPayload {
+	v := &tasksservice.PartialStartTaskPayload{}
+	if body.Usernames != nil {
+		v.Usernames = make([]string, len(body.Usernames))
+		for i, val := range body.Usernames {
+			v.Usernames[i] = val
+		}
+	}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
 // NewStopTaskPayload builds a tasks_service service stop task endpoint payload.
 func NewStopTaskPayload(taskID string, token string) *tasksservice.StopTaskPayload {
 	v := &tasksservice.StopTaskPayload{}
@@ -776,9 +861,11 @@ func NewGetTaskPayload(taskID string, token string) *tasksservice.GetTaskPayload
 
 // NewGetProgressPayload builds a tasks_service service get progress endpoint
 // payload.
-func NewGetProgressPayload(taskID string, token string) *tasksservice.GetProgressPayload {
+func NewGetProgressPayload(taskID string, pageSize int, pageNum int, token string) *tasksservice.GetProgressPayload {
 	v := &tasksservice.GetProgressPayload{}
 	v.TaskID = taskID
+	v.PageSize = pageSize
+	v.PageNum = pageNum
 	v.Token = token
 
 	return v

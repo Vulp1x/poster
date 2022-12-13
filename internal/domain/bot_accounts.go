@@ -6,15 +6,26 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
-	"github.com/inst-api/poster/internal/pb/instaproxy"
+	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 )
+
+func BotsFromDBModels(dbBots []dbmodel.BotAccount) BotAccounts {
+	domainBots := make([]BotAccount, len(dbBots))
+	for i, bot := range dbBots {
+		domainBots[i] = BotAccount(bot)
+	}
+
+	return domainBots
+}
 
 type BotAccounts []BotAccount
 
 func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsParams {
 	dbBots := make([]dbmodel.SaveBotAccountsParams, 0, len(b))
 	uniqueMap := make(map[string]bool, len(b))
+
+	var fileOrder = 1
 
 	for _, botAccount := range b {
 		_, ok := uniqueMap[botAccount.Username]
@@ -32,17 +43,19 @@ func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsPar
 			Session:    botAccount.Session,
 			Headers:    botAccount.Headers,
 			Status:     dbmodel.CreatedBotStatus,
+			FileOrder:  int32(fileOrder),
 		})
 
 		uniqueMap[botAccount.Username] = true
+		fileOrder++
 
 	}
 
 	return dbBots
 }
 
-func (b BotAccounts) ToGRPCProto(ctx context.Context) []*instaproxy.Bot {
-	protoBots := make([]*instaproxy.Bot, 0, len(b))
+func (b BotAccounts) ToGRPCProto(ctx context.Context) []*api.Bot {
+	protoBots := make([]*api.Bot, 0, len(b))
 
 	for _, botAccount := range b {
 		userID, err := strconv.ParseInt(botAccount.Headers.AuthData.DsUserID, 10, 64)
@@ -60,21 +73,21 @@ func (b BotAccounts) ToGRPCProto(ctx context.Context) []*instaproxy.Bot {
 			continue
 		}
 
-		protoBots = append(protoBots, &instaproxy.Bot{
+		protoBots = append(protoBots, &api.Bot{
 			Pk:        userID,
 			Username:  botAccount.Username,
 			Password:  botAccount.Password,
 			SessionId: botAccount.Headers.AuthData.SessionID,
-			Proxy: &instaproxy.Proxy{
+			Proxy: &api.Proxy{
 				Host:  proxy.Host,
 				Port:  proxy.Port,
 				Login: proxy.Login,
 				Pass:  proxy.Pass,
 			},
-			Settings: &instaproxy.BotSettings{
+			Settings: &api.BotSettings{
 				UserAgent: botAccount.UserAgent,
 				Bearer:    botAccount.Headers.Authorization,
-				Headers: &instaproxy.BotSettings_Headers{
+				Headers: &api.BotSettings_Headers{
 					Rur:            botAccount.Headers.Rur,
 					Shbid:          "",
 					Shbts:          "",
@@ -85,7 +98,7 @@ func (b BotAccounts) ToGRPCProto(ctx context.Context) []*instaproxy.Bot {
 					AdvertisingId:  botAccount.Session.AdvertisingID.String(),
 					FamilyDeviceId: botAccount.Session.FamilyDeviceID.String(),
 				},
-				Device: &instaproxy.BotSettings_DeviceSettings{
+				Device: &api.BotSettings_DeviceSettings{
 					AppVersion:     botAccount.DeviceData.AppVersion,
 					AndroidVersion: int32(botAccount.DeviceData.AndroidVersion),
 					AndroidRelease: botAccount.DeviceData.AndroidRelease,

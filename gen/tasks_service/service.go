@@ -33,6 +33,8 @@ type Service interface {
 	ForceDelete(context.Context, *ForceDeletePayload) (err error)
 	// начать выполнение задачи
 	StartTask(context.Context, *StartTaskPayload) (res *StartTaskResult, err error)
+	// начать выполнение задачи для конкретных ботов
+	PartialStartTask(context.Context, *PartialStartTaskPayload) (res *PartialStartTaskResult, err error)
 	// остановить выполнение задачи
 	StopTask(context.Context, *StopTaskPayload) (res *StopTaskResult, err error)
 	// получить задачу по id
@@ -57,7 +59,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [11]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "stop task", "get task", "get progress", "list tasks"}
+var MethodNames = [12]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "stop task", "get task", "get progress", "list tasks"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -134,6 +136,10 @@ type GetProgressPayload struct {
 	Token string
 	// id задачи
 	TaskID string `json:"task_id"`
+	// размер страницы для пагинации
+	PageSize int `json:"page_size"`
+	// номер страницы для пагинации
+	PageNum int `json:"page_num"`
 }
 
 // GetTaskPayload is the payload type of the tasks_service service get task
@@ -150,6 +156,30 @@ type GetTaskPayload struct {
 type ListTasksPayload struct {
 	// JWT used for authentication
 	Token string
+}
+
+// PartialStartTaskPayload is the payload type of the tasks_service service
+// partial start task method.
+type PartialStartTaskPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+	// список имен ботов, которых нужно запустить
+	Usernames []string
+}
+
+// PartialStartTaskResult is the result type of the tasks_service service
+// partial start task method.
+type PartialStartTaskResult struct {
+	// id задачи
+	TaskID string `json:"task_id"`
+	// список успешных имен ботов
+	Succeeded []string
+	// ошибки при запуске остальных ботов
+	Errors []string
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
 }
 
 type ProxyRecord struct {
@@ -239,14 +269,18 @@ type Task struct {
 	FollowTargets bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost uint `json:"photo_targets_per_post"`
 	// список base64 строк картинок
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
@@ -299,34 +333,38 @@ type UpdateTaskPayload struct {
 	Token string
 	// id задачи, которую хотим обновить
 	TaskID string `json:"task_id"`
-	// название задачи
-	Title *string
-	// шаблон для подписи под постом
+	// описание под постом
 	TextTemplate *string `json:"text_template"`
-	// список фотографий для постов
-	PostImages []string `json:"post_images,post_images"`
 	// имена аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 	// имена для аккаунтов-ботов
 	BotNames []string `json:"bot_names"`
 	// фамилии для аккаунтов-ботов
 	BotLastNames []string `json:"bot_last_names"`
-	// аватарки для ботов
-	BotImages []string `json:"bot_images"`
 	// ссылки для описания у ботов
 	BotUrls []string `json:"bot_urls"`
+	// название задачи
+	Title *string
 	// нужно ли подписываться на аккаунты
 	FollowTargets *bool `json:"follow_targets"`
 	// делать отметки на фотографии
 	NeedPhotoTags *bool `json:"need_photo_tags"`
-	// делать отметки на фотографии
+	// задержка между постами
 	PerPostSleepSeconds *uint `json:"per_post_sleep_seconds"`
-	// задержка перед проставлением отметок
+	// задержка между загрузкой фотографии и проставлением отметок (в секундах)
 	PhotoTagsDelaySeconds *uint `json:"photo_tags_delay_seconds"`
 	// количество постов для каждого бота
 	PostsPerBot *uint `json:"posts_per_bot"`
+	// количество постов с отметками на фото для каждого бота
+	PhotoTagsPostsPerBot *uint `json:"photo_tags_posts_per_bot"`
 	// количество упоминаний под каждым постом
 	TargetsPerPost *uint `json:"targets_per_post"`
+	// количество упоминаний на фото у каждого поста
+	PhotoTargetsPerPost *uint `json:"photo_targets_per_post"`
+	// список base64 строк картинок
+	PostImages []string `json:"post_images"`
+	// аватарки для ботов
+	BotImages []string `json:"bot_images"`
 }
 
 type UploadError struct {

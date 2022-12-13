@@ -185,20 +185,12 @@ var _ = Service("tasks_service", func() {
 			Attribute("task_id", String, func() {
 				Description("id задачи, которую хотим обновить")
 				Meta("struct:tag:json", "task_id")
-			})
-
-			Attribute("title", String, func() {
-				Description("название задачи")
+				Format(FormatUUID)
 			})
 
 			Attribute("text_template", String, func() {
-				Description("шаблон для подписи под постом")
 				Meta("struct:tag:json", "text_template")
-			})
-
-			Attribute("post_images", ArrayOf(String), func() {
-				Description("фотография для постов")
-				Meta("struct:tag:json", "post_images")
+				Description("описание под постом")
 			})
 
 			Attribute("landing_accounts", ArrayOf(String), func() {
@@ -216,20 +208,12 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "bot_last_names")
 			})
 
-			Attribute("bot_images", ArrayOf(String), func() {
-				Description("аватарки для ботов")
-				Meta("struct:tag:json", "bot_images")
-			})
-
 			Attribute("bot_urls", ArrayOf(String), func() {
 				Description("ссылки для описания у ботов")
 				Meta("struct:tag:json", "bot_urls")
 			})
 
-			Attribute("post_images", ArrayOf(String), func() {
-				Description("список фотографий для постов")
-				Meta("struct:tag:json", "post_images")
-			})
+			Attribute("title", String, "название задачи")
 
 			Attribute("follow_targets", Boolean, func() {
 				Description("нужно ли подписываться на аккаунты")
@@ -242,12 +226,12 @@ var _ = Service("tasks_service", func() {
 			})
 
 			Attribute("per_post_sleep_seconds", UInt, func() {
-				Description("делать отметки на фотографии")
+				Description("задержка между постами")
 				Meta("struct:tag:json", "per_post_sleep_seconds")
 			})
 
 			Attribute("photo_tags_delay_seconds", UInt, func() {
-				Description("задержка перед проставлением отметок")
+				Description("задержка между загрузкой фотографии и проставлением отметок (в секундах)")
 				Meta("struct:tag:json", "photo_tags_delay_seconds")
 			})
 
@@ -256,9 +240,28 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "posts_per_bot")
 			})
 
+			Attribute("photo_tags_posts_per_bot", UInt, func() {
+				Description("количество постов с отметками на фото для каждого бота")
+				Meta("struct:tag:json", "photo_tags_posts_per_bot")
+			})
+
 			Attribute("targets_per_post", UInt, func() {
 				Description("количество упоминаний под каждым постом")
 				Meta("struct:tag:json", "targets_per_post")
+			})
+
+			Attribute("photo_targets_per_post", UInt, func() {
+				Description("количество упоминаний на фото у каждого поста")
+				Meta("struct:tag:json", "photo_targets_per_post")
+			})
+
+			Attribute("post_images", ArrayOf(String), "список base64 строк картинок", func() {
+				Meta("struct:tag:json", "post_images")
+			})
+
+			Attribute("bot_images", ArrayOf(String), func() {
+				Description("аватарки для ботов")
+				Meta("struct:tag:json", "bot_images")
 			})
 
 			Required("token", "task_id")
@@ -472,6 +475,52 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
+	Method("partial start task", func() {
+		Description("начать выполнение задачи для конкретных ботов ")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("usernames", ArrayOf(String), "список имен ботов, которых нужно запустить")
+
+			Required("token", "task_id")
+		})
+
+		Result(func() {
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("succeeded", ArrayOf(String), "список успешных имен ботов")
+			Attribute("errors", ArrayOf(String), "ошибки при запуске остальных ботов")
+
+			Attribute("landing_accounts", ArrayOf(String), func() {
+				Description("имена живых аккаунтов, на которых ведем трафик")
+				Meta("struct:tag:json", "landing_accounts")
+			})
+
+			Required("task_id", "landing_accounts")
+		})
+
+		HTTP(func() {
+			POST("/api/tasks/{task_id}/start/partial/")
+			Response(StatusOK)
+			Response(StatusBadRequest)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
 	Method("stop task", func() {
 		Description("остановить выполнение задачи ")
 
@@ -552,6 +601,18 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
+			Attribute("page_size", Int, func() {
+				Description("размер страницы для пагинации")
+				Default(100)
+				Meta("struct:tag:json", "page_size")
+			})
+
+			Attribute("page_num", Int, func() {
+				Description("номер страницы для пагинации")
+				Default(1)
+				Meta("struct:tag:json", "page_num")
+			})
+
 			Required("token", "task_id")
 		})
 
@@ -559,6 +620,10 @@ var _ = Service("tasks_service", func() {
 
 		HTTP(func() {
 			GET("/api/tasks/{task_id}/progress/")
+			Params(func() {
+				Param("page_size:psize")
+				Param("page_num:pnum")
+			})
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response(StatusUnauthorized)
