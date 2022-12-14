@@ -39,8 +39,6 @@ func NewQueuue(ctx context.Context, executor executor.Executor, txFunc dbmodel.D
 		},
 	})
 
-	queue.RegisterKind()
-
 	queue.Start()
 
 	return queue
