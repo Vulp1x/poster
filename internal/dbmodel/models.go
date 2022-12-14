@@ -5,11 +5,58 @@
 package dbmodel
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/headers"
 )
+
+type PgqueueStatus string
+
+const (
+	PgqueueStatusNew            PgqueueStatus = "new"
+	PgqueueStatusMustRetry      PgqueueStatus = "must_retry"
+	PgqueueStatusNoAttemptsLeft PgqueueStatus = "no_attempts_left"
+	PgqueueStatusCancelled      PgqueueStatus = "cancelled"
+	PgqueueStatusSucceeded      PgqueueStatus = "succeeded"
+)
+
+func (e *PgqueueStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PgqueueStatus(s)
+	case string:
+		*e = PgqueueStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PgqueueStatus: %T", src)
+	}
+	return nil
+}
+
+type NullPgqueueStatus struct {
+	PgqueueStatus PgqueueStatus
+	Valid         bool // Valid is true if String is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPgqueueStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.PgqueueStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PgqueueStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPgqueueStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return ns.PgqueueStatus, nil
+}
 
 type BotAccount struct {
 	ID         uuid.UUID              `json:"id"`
@@ -40,6 +87,20 @@ type Log struct {
 	ResponseCode int32     `json:"response_code"`
 	RequestTime  time.Time `json:"request_time"`
 	ProxyUrl     *string   `json:"proxy_url"`
+}
+
+type Pgqueue struct {
+	ID              int64         `json:"id"`
+	Kind            int16         `json:"kind"`
+	Payload         []byte        `json:"payload"`
+	ExternalKey     *string       `json:"external_key"`
+	Status          PgqueueStatus `json:"status"`
+	Messages        []string      `json:"messages"`
+	AttemptsLeft    int16         `json:"attempts_left"`
+	AttemptsElapsed int16         `json:"attempts_elapsed"`
+	DelayedTill     time.Time     `json:"delayed_till"`
+	CreatedAt       time.Time     `json:"created_at"`
+	UpdatedAt       time.Time     `json:"updated_at"`
 }
 
 type Proxy struct {

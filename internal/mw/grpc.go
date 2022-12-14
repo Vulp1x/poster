@@ -125,12 +125,12 @@ func messageLength(msg interface{}) int64 {
 //	  middleware.XRequestMetadataLimitOption(128))))
 func UnaryRequestID() grpc.UnaryServerInterceptor {
 	return grpc.UnaryServerInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		ctx = generateRequestID(ctx)
+		ctx = GenerateRequestID(ctx)
 		return handler(ctx, req)
 	})
 }
 
-func generateRequestID(ctx context.Context) context.Context {
+func GenerateRequestID(ctx context.Context) context.Context {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		md = metadata.MD{}

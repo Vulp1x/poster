@@ -30,6 +30,19 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
+--
+-- Name: pgqueue_status; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.pgqueue_status AS ENUM (
+    'new',
+    'must_retry',
+    'no_attempts_left',
+    'cancelled',
+    'succeeded'
+);
+
+
 SET default_table_access_method = heap;
 
 --
@@ -87,6 +100,45 @@ CREATE TABLE public.logs (
     request_time timestamp without time zone NOT NULL,
     proxy_url text
 );
+
+
+--
+-- Name: pgqueue; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pgqueue (
+    id bigint NOT NULL,
+    kind smallint NOT NULL,
+    payload bytea NOT NULL,
+    external_key text,
+    status public.pgqueue_status DEFAULT 'new'::public.pgqueue_status NOT NULL,
+    messages text[] DEFAULT ARRAY[]::text[] NOT NULL,
+    attempts_left smallint NOT NULL,
+    attempts_elapsed smallint DEFAULT 0 NOT NULL,
+    delayed_till timestamp with time zone NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+)
+WITH (fillfactor='80');
+
+
+--
+-- Name: pgqueue_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pgqueue_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pgqueue_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pgqueue_id_seq OWNED BY public.pgqueue.id;
 
 
 --
@@ -194,6 +246,13 @@ CREATE TABLE public.users (
 
 
 --
+-- Name: pgqueue id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pgqueue ALTER COLUMN id SET DEFAULT nextval('public.pgqueue_id_seq'::regclass);
+
+
+--
 -- Name: bot_accounts bot_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -215,6 +274,14 @@ ALTER TABLE ONLY public.bot_accounts
 
 ALTER TABLE ONLY public.logs
     ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pgqueue pgqueue_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pgqueue
+    ADD CONSTRAINT pgqueue_pkey PRIMARY KEY (id);
 
 
 --
@@ -271,6 +338,34 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pgqueue_broken_tasks_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pgqueue_broken_tasks_idx ON public.pgqueue USING btree (kind, created_at) WHERE (status = 'no_attempts_left'::public.pgqueue_status);
+
+
+--
+-- Name: pgqueue_idempotency_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX pgqueue_idempotency_idx ON public.pgqueue USING btree (kind, external_key);
+
+
+--
+-- Name: pgqueue_open_tasks_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pgqueue_open_tasks_idx ON public.pgqueue USING btree (kind, delayed_till) WHERE (status = ANY (ARRAY['new'::public.pgqueue_status, 'must_retry'::public.pgqueue_status]));
+
+
+--
+-- Name: pgqueue_terminal_tasks_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX pgqueue_terminal_tasks_idx ON public.pgqueue USING btree (kind, updated_at) WHERE (status = ANY (ARRAY['cancelled'::public.pgqueue_status, 'succeeded'::public.pgqueue_status]));
 
 
 --

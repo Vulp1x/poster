@@ -29,7 +29,7 @@ type taskStore interface {
 	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
 	TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error)
 	SaveVideo(ctx context.Context, taskID uuid.UUID, video []byte, filename string) (domain.Task, error)
-	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, []string)
+	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, error)
 }
 
 // tasks_service service example implementation.
@@ -453,12 +453,19 @@ func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice
 
 	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
-	usernames, errs := s.store.StartBots(ctx, taskID, p.Usernames)
+	usernames, err := s.store.StartBots(ctx, taskID, p.Usernames)
+	if err != nil {
+		logger.Errorf(ctx, "failed to start bots: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, internalErr(err)
+	}
 
 	return &tasksservice.PartialStartTaskResult{
 		TaskID:    taskID.String(),
 		Succeeded: usernames,
-		Errors:    errs,
 	}, nil
 }
 

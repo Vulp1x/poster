@@ -3,6 +3,7 @@ module github.com/inst-api/poster
 go 1.19
 
 require (
+	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/gift v1.2.1
 	github.com/go-chi/chi v4.1.2+incompatible

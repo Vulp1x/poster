@@ -199,9 +199,7 @@ type PartialStartTaskOKResponseBody struct {
 	// id задачи
 	TaskID string `json:"task_id"`
 	// список успешных имен ботов
-	Succeeded []string `form:"succeeded,omitempty" json:"succeeded,omitempty" xml:"succeeded,omitempty"`
-	// ошибки при запуске остальных ботов
-	Errors []string `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
+	Succeeded []string `form:"succeeded" json:"succeeded" xml:"succeeded"`
 	// имена живых аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 }
@@ -531,12 +529,6 @@ func NewPartialStartTaskOKResponseBody(res *tasksservice.PartialStartTaskResult)
 		body.Succeeded = make([]string, len(res.Succeeded))
 		for i, val := range res.Succeeded {
 			body.Succeeded[i] = val
-		}
-	}
-	if res.Errors != nil {
-		body.Errors = make([]string, len(res.Errors))
-		for i, val := range res.Errors {
-			body.Errors[i] = val
 		}
 	}
 	if res.LandingAccounts != nil {

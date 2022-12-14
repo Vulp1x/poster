@@ -176,8 +176,6 @@ type PartialStartTaskResult struct {
 	TaskID string `json:"task_id"`
 	// список успешных имен ботов
 	Succeeded []string
-	// ошибки при запуске остальных ботов
-	Errors []string
 	// имена живых аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 }

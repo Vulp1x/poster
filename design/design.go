@@ -502,14 +502,13 @@ var _ = Service("tasks_service", func() {
 			})
 
 			Attribute("succeeded", ArrayOf(String), "список успешных имен ботов")
-			Attribute("errors", ArrayOf(String), "ошибки при запуске остальных ботов")
 
 			Attribute("landing_accounts", ArrayOf(String), func() {
 				Description("имена живых аккаунтов, на которых ведем трафик")
 				Meta("struct:tag:json", "landing_accounts")
 			})
 
-			Required("task_id", "landing_accounts")
+			Required("task_id", "landing_accounts", "succeeded")
 		})
 
 		HTTP(func() {
