@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 ALTER TABLE proxies
-    DROP CONSTRAINT proxies_host_port_key;
+    DROP CONSTRAINT IF EXISTS proxies_host_port_key;
 -- +goose StatementEnd
 
 -- +goose Down

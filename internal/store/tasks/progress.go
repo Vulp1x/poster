@@ -35,8 +35,8 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 		"count(tu.*) filter ( where interaction_type = 'photo_tag' ) as photo_tags_targets",
 		"count(distinct medias.id) as posts_count").
 		From("bot_accounts as b").
-		InnerJoin("medias on b.id = medias.bot_id").
-		InnerJoin("target_users tu on medias.id = tu.media_fk").
+		LeftJoin("medias on b.id = medias.bot_id").
+		LeftJoin("target_users tu on medias.id = tu.media_fk").
 		GroupBy("b.id", "b."+pager.GetSort()[0]).
 		Where(sq.Eq{"b.task_id": taskID}).Limit(pager.GetLimit64()).Offset(pager.GetOffset64()).OrderBy(pager.GetSort()...)
 
