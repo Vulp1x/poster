@@ -34,12 +34,11 @@ func (t Task) ToProto() *tasksservice.Task {
 
 	return &tasksservice.Task{
 		ID:                         t.ID.String(),
+		Type:                       tasksservice.TaskType(t.Type),
 		TextTemplate:               t.TextTemplate,
-		PostImages:                 images,
 		LandingAccounts:            t.LandingAccounts,
 		BotNames:                   t.AccountNames,
 		BotLastNames:               t.AccountLastNames,
-		BotImages:                  botsProfileImages,
 		BotUrls:                    t.AccountUrls,
 		Status:                     tasksservice.TaskStatus(t.Status),
 		Title:                      t.Title,
@@ -51,14 +50,17 @@ func (t Task) ToProto() *tasksservice.Task {
 		ResidentialProxiesFilename: t.ResProxiesFilename,
 		CheapProxiesFilename:       t.CheapProxiesFilename,
 		TargetsFilename:            t.TargetsFilename,
+		VideoFilename:              videFilenamePointer,
 		FollowTargets:              t.FollowTargets,
 		NeedPhotoTags:              t.NeedPhotoTags,
 		PerPostSleepSeconds:        uint(t.PerPostSleepSeconds),
 		PhotoTagsDelaySeconds:      uint(t.PhotoTagsDelaySeconds),
 		PostsPerBot:                uint(t.PostsPerBot),
+		PhotoTagsPostsPerBot:       uint(t.PhotoTagsPostsPerBot),
 		TargetsPerPost:             uint(t.TargetsPerPost),
-		Type:                       tasksservice.TaskType(t.Type),
-		VideoFilename:              videFilenamePointer,
+		PhotoTargetsPerPost:        uint(t.PhotoTargetsPerPost),
+		PostImages:                 images,
+		BotImages:                  botsProfileImages,
 	}
 }
 
@@ -104,26 +106,39 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 }
 
 type TaskProgress struct {
-	BotsProgress   []dbmodel.GetBotsProgressRow
+	BotsProgress   []BotProgress
 	TargetCounters dbmodel.GetTaskTargetsCountRow
 	Done           bool
 }
 
+type BotProgress struct {
+	Username               string
+	Status                 int32
+	PostDescriptionTargets int32
+	PhotoTaggedTargets     int32
+	PostsCount             int32
+	FileOrder              int32
+}
+
 func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
-	botsMap := make(map[string]*tasksservice.BotsProgress, len(p.BotsProgress))
-	for _, progress := range p.BotsProgress {
-		botsMap[progress.Username] = &tasksservice.BotsProgress{
-			UserName:   progress.Username,
-			PostsCount: int(progress.PostsCount),
-			Status:     int(progress.Status),
+	bots := make([]*tasksservice.BotsProgress, len(p.BotsProgress))
+	for i, progress := range p.BotsProgress {
+		bots[i] = &tasksservice.BotsProgress{
+			UserName:                   progress.Username,
+			PostsCount:                 progress.PostsCount,
+			Status:                     progress.Status,
+			DescriptionTargetsNotified: progress.PostDescriptionTargets,
+			PhotoTargetsNotified:       progress.PhotoTaggedTargets,
+			FileOrder:                  progress.FileOrder,
 		}
 	}
 
 	return &tasksservice.TaskProgress{
-		BotsProgresses:  botsMap,
-		TargetsNotified: int(p.TargetCounters.NotifiedTargets),
-		TargetsFailed:   int(p.TargetCounters.FailedTargets),
-		TargetsWaiting:  int(p.TargetCounters.UnusedTargets),
-		Done:            p.Done,
+		BotsProgresses:       bots,
+		TargetsNotified:      int(p.TargetCounters.DescriptionNotifiedTargets),
+		PhotoTargetsNotified: int(p.TargetCounters.PhotoNotifiedTargets),
+		TargetsFailed:        int(p.TargetCounters.FailedTargets),
+		TargetsWaiting:       int(p.TargetCounters.UnusedTargets),
+		Done:                 p.Done,
 	}
 }

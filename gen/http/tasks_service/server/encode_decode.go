@@ -1017,11 +1017,13 @@ func EncodeGetProgressResponse(encoder func(context.Context, http.ResponseWriter
 func DecodeGetProgressRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			taskID   string
-			pageSize int
-			pageNum  int
-			token    string
-			err      error
+			taskID         string
+			pageSize       uint32
+			page           uint32
+			sort           string
+			sortDescending bool
+			token          string
+			err            error
 
 			params = mux.Vars(r)
 		)
@@ -1031,23 +1033,42 @@ func DecodeGetProgressRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 			if pageSizeRaw == "" {
 				pageSize = 100
 			} else {
-				v, err2 := strconv.ParseInt(pageSizeRaw, 10, strconv.IntSize)
+				v, err2 := strconv.ParseUint(pageSizeRaw, 10, 32)
 				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("pageSize", pageSizeRaw, "integer"))
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("pageSize", pageSizeRaw, "unsigned integer"))
 				}
-				pageSize = int(v)
+				pageSize = uint32(v)
 			}
 		}
 		{
-			pageNumRaw := r.URL.Query().Get("pnum")
-			if pageNumRaw == "" {
-				pageNum = 1
+			pageRaw := r.URL.Query().Get("p")
+			if pageRaw == "" {
+				page = 1
 			} else {
-				v, err2 := strconv.ParseInt(pageNumRaw, 10, strconv.IntSize)
+				v, err2 := strconv.ParseUint(pageRaw, 10, 32)
 				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("pageNum", pageNumRaw, "integer"))
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("page", pageRaw, "unsigned integer"))
 				}
-				pageNum = int(v)
+				page = uint32(v)
+			}
+		}
+		sortRaw := r.URL.Query().Get("sort")
+		if sortRaw != "" {
+			sort = sortRaw
+		} else {
+			sort = "file_order"
+		}
+		if !(sort == "username" || sort == "status" || sort == "posts_count" || sort == "post_description_targets" || sort == "photo_tags_targets" || sort == "file_order") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("sort", sort, []interface{}{"username", "status", "posts_count", "post_description_targets", "photo_tags_targets", "file_order"}))
+		}
+		{
+			sortDescendingRaw := r.URL.Query().Get("sd")
+			if sortDescendingRaw != "" {
+				v, err2 := strconv.ParseBool(sortDescendingRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("sortDescending", sortDescendingRaw, "boolean"))
+				}
+				sortDescending = v
 			}
 		}
 		token = r.Header.Get("Authorization")
@@ -1057,7 +1078,7 @@ func DecodeGetProgressRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetProgressPayload(taskID, pageSize, pageNum, token)
+		payload := NewGetProgressPayload(taskID, pageSize, page, sort, sortDescending, token)
 		if strings.Contains(payload.Token, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Token, " ", 2)[1]
@@ -1278,9 +1299,12 @@ func marshalTasksserviceUploadErrorToUploadErrorResponseBody(v *tasksservice.Upl
 // *tasksservice.BotsProgress.
 func marshalTasksserviceBotsProgressToBotsProgressResponseBody(v *tasksservice.BotsProgress) *BotsProgressResponseBody {
 	res := &BotsProgressResponseBody{
-		UserName:   v.UserName,
-		PostsCount: v.PostsCount,
-		Status:     v.Status,
+		UserName:                   v.UserName,
+		PostsCount:                 v.PostsCount,
+		Status:                     v.Status,
+		DescriptionTargetsNotified: v.DescriptionTargetsNotified,
+		PhotoTargetsNotified:       v.PhotoTargetsNotified,
+		FileOrder:                  v.FileOrder,
 	}
 
 	return res

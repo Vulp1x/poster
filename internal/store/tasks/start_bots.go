@@ -68,7 +68,7 @@ func preparePostingTasks(ctx context.Context, task dbmodel.Task, bots []dbmodel.
 		postingTasks[i] = pgqueue.Task{
 			Kind:        workers.MakePhotoPostsTaskKind,
 			Payload:     workers.EmptyPayload,
-			ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
+			ExternalKey: fmt.Sprintf("%s::%s::0", task.ID.String(), bot.Username),
 		}
 	}
 

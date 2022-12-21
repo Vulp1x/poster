@@ -81,7 +81,7 @@ where task_id = $1
 select *
 from target_users
 where task_id = $1
-  AND status = 1
+  AND status = 'new'
 limit $2;
 
 -- name: UpdateTaskStatus :exec
@@ -106,13 +106,16 @@ set text_template            = $1,
     photo_tags_delay_seconds = $12,
     posts_per_bot            = $13,
     targets_per_post         = $14,
+    photo_targets_per_post   = @photo_targets_per_post,
+    photo_tags_posts_per_bot = @photo_tags_posts_per_bot,
     updated_at               = now()
 where id = $15
 returning *;
 
 -- name: SaveBotAccounts :copyfrom
-insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status, file_order)
-values ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+insert into bot_accounts (task_id, username, password, user_agent, device_data, session, headers, status, file_order,
+                          inst_id)
+values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 -- name: SaveProxies :copyfrom
 insert into proxies (task_id, host, port, login, pass, type)
@@ -212,12 +215,26 @@ where id = ANY (sqlc.arg('ids')::uuid[]);
 -- name: GetBotsProgress :many
 select username, posts_count, status
 from bot_accounts
-where task_id = $1;
+where task_id = $1
+order by CASE
+             WHEN @posts_asc::bool THEN posts_count
+             else
+                 CASE WHEN @posts_desc::bool THEN posts_count end END
+LIMIT $2 OFFSET $3;
 
 -- name: GetTaskTargetsCount :one
-select (select count(*) from target_users t where t.task_id = $1 and t.status = 1) as unused_targets,
-       (select count(*) from target_users t where t.task_id = $1 and t.status = 3) as failed_targets,
-       (select count(*) from target_users t where t.task_id = $1 and t.status = 4) as notified_targets;
+select (select count(*) from target_users t where t.task_id = $1 and t.status = 'new')    as unused_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 'failed') as failed_targets,
+       (select count(*)
+        from target_users t
+        where t.task_id = $1
+          and t.status = 'notified'
+          AND interaction_type = 'photo_tag')                                             as photo_notified_targets,
+       (select count(*)
+        from target_users t
+        where t.task_id = $1
+          and t.status = 'notified'
+          AND interaction_type = 'post_description')                                      as description_notified_targets;
 
 
 -- -- name: GetTaskTargetsCount :many
@@ -245,3 +262,35 @@ where task_id = @task_id
   and username = any (sqlc.arg('usernames')::text[])
   and status in (2, 5)
 ORDER BY file_order;
+
+
+-- name: FindTaskBotByUsername :one
+select *
+from bot_accounts
+where task_id = @task_id
+  and username = @username
+  and status in (2, 5);
+
+-- name: SavePostedMedia :one
+insert into medias(kind, inst_id, bot_id, created_at)
+VALUES (@kind, @inst_id, @bot_id, now())
+returning *;
+
+-- name: MarkTargetsAsNotified :exec
+update target_users
+set media_fk= @media_fk,
+    status='notified',
+    interaction_type= @interaction_type
+where task_id = @task_id
+  and user_id = ANY (sqlc.arg('target_ids')::bigint[]);
+
+-- name: AddBotPost :one
+update bot_accounts
+set posts_count = 1 + @posts_count
+where id = @id
+returning posts_count;
+
+-- name: CountBotMedias :one
+select count(*)
+from medias
+where bot_id = @bot_id;

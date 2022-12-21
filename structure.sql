@@ -31,6 +31,16 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
+-- Name: medias_kind; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.medias_kind AS ENUM (
+    'photo',
+    'reels'
+);
+
+
+--
 -- Name: pgqueue_status; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -40,6 +50,29 @@ CREATE TYPE public.pgqueue_status AS ENUM (
     'no_attempts_left',
     'cancelled',
     'succeeded'
+);
+
+
+--
+-- Name: targets_interaction; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.targets_interaction AS ENUM (
+    'none',
+    'post_description',
+    'photo_tag'
+);
+
+
+--
+-- Name: targets_status; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.targets_status AS ENUM (
+    'new',
+    'in_progress',
+    'failed',
+    'notified'
 );
 
 
@@ -67,6 +100,7 @@ CREATE TABLE public.bot_accounts (
     updated_at timestamp without time zone,
     deleted_at timestamp without time zone,
     file_order integer NOT NULL,
+    inst_id bigint NOT NULL,
     CONSTRAINT not_empty_device CHECK (((device_data <> '[]'::jsonb) AND (device_data <> '{}'::jsonb))),
     CONSTRAINT not_empty_headers CHECK (((headers <> '[]'::jsonb) AND (headers <> '{}'::jsonb))),
     CONSTRAINT not_empty_session CHECK (((session <> '[]'::jsonb) AND (session <> '{}'::jsonb)))
@@ -100,6 +134,39 @@ CREATE TABLE public.logs (
     request_time timestamp without time zone NOT NULL,
     proxy_url text
 );
+
+
+--
+-- Name: medias; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.medias (
+    id bigint NOT NULL,
+    kind public.medias_kind NOT NULL,
+    inst_id text NOT NULL,
+    bot_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: medias_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.medias_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: medias_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.medias_id_seq OWNED BY public.medias.id;
 
 
 --
@@ -176,9 +243,11 @@ CREATE TABLE public.target_users (
     task_id uuid NOT NULL,
     username text NOT NULL,
     user_id bigint NOT NULL,
-    status smallint DEFAULT 1 NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    media_fk bigint,
+    status public.targets_status DEFAULT 'new'::public.targets_status NOT NULL,
+    interaction_type public.targets_interaction DEFAULT 'none'::public.targets_interaction NOT NULL
 );
 
 
@@ -222,10 +291,12 @@ CREATE TABLE public.tasks (
     need_photo_tags boolean DEFAULT false NOT NULL,
     per_post_sleep_seconds integer DEFAULT 0 NOT NULL,
     photo_tags_delay_seconds integer DEFAULT 0 NOT NULL,
-    posts_per_bot integer DEFAULT 0 NOT NULL,
-    targets_per_post integer DEFAULT 0 NOT NULL,
     type smallint DEFAULT 0 NOT NULL,
-    video_filename text
+    video_filename text,
+    posts_per_bot smallint DEFAULT 0 NOT NULL,
+    targets_per_post smallint DEFAULT 0 NOT NULL,
+    photo_tags_posts_per_bot smallint DEFAULT 0 NOT NULL,
+    photo_targets_per_post smallint DEFAULT 0 NOT NULL
 );
 
 
@@ -243,6 +314,13 @@ CREATE TABLE public.users (
     deleted_at timestamp with time zone,
     CONSTRAINT valid_role CHECK ((role = ANY (ARRAY[0, 1])))
 );
+
+
+--
+-- Name: medias id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.medias ALTER COLUMN id SET DEFAULT nextval('public.medias_id_seq'::regclass);
 
 
 --
@@ -274,6 +352,14 @@ ALTER TABLE ONLY public.bot_accounts
 
 ALTER TABLE ONLY public.logs
     ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: medias medias_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.medias
+    ADD CONSTRAINT medias_pkey PRIMARY KEY (id);
 
 
 --
@@ -376,6 +462,20 @@ CREATE UNIQUE INDEX target_users_uniq_idx ON public.target_users USING btree (ta
 
 
 --
+-- Name: targets_task_with_status_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX targets_task_with_status_idx ON public.target_users USING btree (task_id, status);
+
+
+--
+-- Name: targets_user_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX targets_user_id_idx ON public.target_users USING btree (task_id, user_id);
+
+
+--
 -- Name: bot_accounts bot_accounts_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -392,6 +492,14 @@ ALTER TABLE ONLY public.logs
 
 
 --
+-- Name: medias medias_bot_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.medias
+    ADD CONSTRAINT medias_bot_id_fkey FOREIGN KEY (bot_id) REFERENCES public.bot_accounts(id);
+
+
+--
 -- Name: proxies proxies_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -405,6 +513,14 @@ ALTER TABLE ONLY public.proxies
 
 ALTER TABLE ONLY public.proxies
     ADD CONSTRAINT proxies_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
+
+
+--
+-- Name: target_users target_users_media_fk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.target_users
+    ADD CONSTRAINT target_users_media_fk_fkey FOREIGN KEY (media_fk) REFERENCES public.medias(id);
 
 
 --

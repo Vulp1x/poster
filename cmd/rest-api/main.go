@@ -69,6 +69,11 @@ func main() {
 		logger.Fatalf(ctx, "Failed to connect to transaction's database: %v", err)
 	}
 
+	db, err := postgres.NewConn(ctx, conf.Postgres)
+	if err != nil {
+		logger.Fatalf(ctx, "failed to create db conn: %v", err)
+	}
+
 	conn, err := grpc.DialContext(
 		ctx,
 		conf.Listen.ParserURL,
@@ -82,7 +87,7 @@ func main() {
 	queue := workers.NewQueuue(ctx, dbTXFunc(ctx), dbTXFunc, conn)
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
-	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname, conn, queue)
+	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname, conn, queue, db)
 	botsStore := bots.NewStore(dbTXFunc, txFunc, conf.Instagrapi.Hostname)
 
 	// Initialize the services.

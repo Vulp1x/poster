@@ -55,6 +55,8 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...Update
 		PhotoTagsDelaySeconds: task.PhotoTagsDelaySeconds,
 		PostsPerBot:           task.PostsPerBot,
 		TargetsPerPost:        task.TargetsPerPost,
+		PhotoTagsPostsPerBot:  task.PhotoTagsPostsPerBot,
+		PhotoTargetsPerPost:   task.PhotoTargetsPerPost,
 		ID:                    taskID,
 	})
 	if err != nil {
@@ -167,7 +169,7 @@ func WithPhotoTagsDelaySeconds(photoTagsDelaySeconds *uint) UpdateOption {
 func WithPostsPerBot(postsPerBot *uint) UpdateOption {
 	return func(params *dbmodel.Task) {
 		if postsPerBot != nil {
-			params.PostsPerBot = int32(*postsPerBot)
+			params.PostsPerBot = int(*postsPerBot)
 		}
 	}
 }
@@ -176,7 +178,25 @@ func WithPostsPerBot(postsPerBot *uint) UpdateOption {
 func WithTargetsPerPost(targetsPerPost *uint) UpdateOption {
 	return func(params *dbmodel.Task) {
 		if targetsPerPost != nil {
-			params.TargetsPerPost = int32(*targetsPerPost)
+			params.TargetsPerPost = int(*targetsPerPost)
+		}
+	}
+}
+
+// WithPhotoTargetsPerPost добавляет ссылки в профилях ботов
+func WithPhotoTargetsPerPost(targetsPerPost *uint) UpdateOption {
+	return func(params *dbmodel.Task) {
+		if targetsPerPost != nil {
+			params.PhotoTargetsPerPost = int(*targetsPerPost)
+		}
+	}
+}
+
+// WithTargetsPerPost добавляет ссылки в профилях ботов
+func WithPhotoTagsPostsPerBot(photoTagsPostsPerBot *uint) UpdateOption {
+	return func(params *dbmodel.Task) {
+		if photoTagsPostsPerBot != nil {
+			params.PhotoTagsPostsPerBot = int(*photoTagsPostsPerBot)
 		}
 	}
 }

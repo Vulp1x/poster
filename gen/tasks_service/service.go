@@ -91,9 +91,15 @@ type BotsProgress struct {
 	// имя пользователя бота
 	UserName string `json:"user_name"`
 	// количество выложенных постов
-	PostsCount int `json:"posts_count"`
+	PostsCount int32 `json:"posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
-	Status int
+	Status int32
+	// количество аккаунтов, которых упомянули в постах
+	DescriptionTargetsNotified int32 `json:"description_targets_notified"`
+	// количество аккаунтов, которых упомянули в постах на фото
+	PhotoTargetsNotified int32 `json:"photo_targets_notified"`
+	// номер бота в загруженном файле
+	FileOrder int32 `json:"file_order"`
 }
 
 // CreateTaskDraftPayload is the payload type of the tasks_service service
@@ -137,9 +143,12 @@ type GetProgressPayload struct {
 	// id задачи
 	TaskID string `json:"task_id"`
 	// размер страницы для пагинации
-	PageSize int `json:"page_size"`
+	PageSize uint32 `json:"page_size"`
 	// номер страницы для пагинации
-	PageNum int `json:"page_num"`
+	Page uint32
+	Sort string
+	// сортировать по убыванию или нет
+	SortDescending bool
 }
 
 // GetTaskPayload is the payload type of the tasks_service service get task
@@ -299,15 +308,17 @@ type TaskFileNames struct {
 // TaskProgress is the result type of the tasks_service service get progress
 // method.
 type TaskProgress struct {
-	// результат работы по каждому боту, ключ- имя бота
-	BotsProgresses map[string]*BotsProgress `json:"bots_progresses"`
+	// результат работы по каждому боту
+	BotsProgresses []*BotsProgress `json:"bots_progresses"`
 	// количество аккаунтов, которых упомянули в постах
 	TargetsNotified int `json:"targets_notified"`
+	// количество аккаунтов, которых упомянули в постах на фото
+	PhotoTargetsNotified int `json:"photo_targets_notified"`
 	// количество аккаунтов, которых не получилось упомянуть, при перезапуске
 	// задачи будут использованы заново
 	TargetsFailed int `json:"targets_failed"`
 	// количество аккаунтов, которых не выбрали для постов
-	TargetsWaiting int `json:"targets_waiting,targets_waiting"`
+	TargetsWaiting int `json:"targets_waiting"`
 	// закончена ли задача
 	Done bool
 }

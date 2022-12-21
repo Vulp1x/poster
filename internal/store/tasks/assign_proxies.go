@@ -15,7 +15,7 @@ import (
 )
 
 func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error) {
-	tx, err := s.txf(ctx)
+	tx, err := s.db.Begin(ctx)
 	if err != nil {
 		return 0, store.ErrTransactionFail
 	}
@@ -53,12 +53,23 @@ func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error
 	}
 
 	// after deleting botAccounts and residentialProxies would have same length
-	botAccounts, residentialProxies, cheapProxies, err = s.deleteUnnecessaryRows(ctx, tx, botAccounts, residentialProxies, cheapProxies)
-	if err != nil {
-		return 0, err
-	}
+	// botAccounts, residentialProxies, cheapProxies, err = s.deleteUnnecessaryRows(ctx, tx, botAccounts, residentialProxies, cheapProxies)
+	// if err != nil {
+	// 	return 0, err
+	// }
 
 	botIds := domain.Ids(botAccounts)
+
+	if len(botAccounts) > len(residentialProxies) {
+		var newProxies []dbmodel.Proxy
+		newProxies, err = s.insertMoreProxies(ctx, taskID, tx, residentialProxies, len(botAccounts)-len(residentialProxies), false)
+		if err != nil {
+			return 0, fmt.Errorf("failed to insert new residential proxies: %v", err)
+		}
+
+		residentialProxies = append(residentialProxies, newProxies...)
+	}
+
 	err = q.AssignProxiesToBotsForTask(ctx, dbmodel.AssignProxiesToBotsForTaskParams{
 		TaskID:             taskID,
 		ResidentialProxies: domain.Strings(residentialProxies),

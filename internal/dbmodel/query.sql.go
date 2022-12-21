@@ -12,6 +12,25 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
+const addBotPost = `-- name: AddBotPost :one
+update bot_accounts
+set posts_count = 1 + $1
+where id = $2
+returning posts_count
+`
+
+type AddBotPostParams struct {
+	PostsCount interface{} `json:"posts_count"`
+	ID         uuid.UUID   `json:"id"`
+}
+
+func (q *Queries) AddBotPost(ctx context.Context, arg AddBotPostParams) (int, error) {
+	row := q.db.QueryRow(ctx, addBotPost, arg.PostsCount, arg.ID)
+	var posts_count int
+	err := row.Scan(&posts_count)
+	return posts_count, err
+}
+
 const assignBotsToProxiesForTask = `-- name: AssignBotsToProxiesForTask :exec
 UPDATE proxies
 set assigned_to = x.bot_id
@@ -61,6 +80,19 @@ func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProx
 	return err
 }
 
+const countBotMedias = `-- name: CountBotMedias :one
+select count(*)
+from medias
+where bot_id = $1
+`
+
+func (q *Queries) CountBotMedias(ctx context.Context, botID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countBotMedias, botID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createDraftTask = `-- name: CreateDraftTask :one
 insert into tasks(manager_id, text_template, title, landing_accounts, images, account_names, account_last_names,
                   account_profile_images, account_urls, status, type, created_at)
@@ -108,7 +140,7 @@ RETURNING id, login, password_hash, role, created_at, updated_at, deleted_at
 type CreateUserParams struct {
 	Login        string `json:"login"`
 	PasswordHash string `json:"password_hash"`
-	Role         int16  `json:"role"`
+	Role         int    `json:"role"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -168,7 +200,7 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const findBotsForTask = `-- name: FindBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where task_id = $1
 `
@@ -200,6 +232,7 @@ func (q *Queries) FindBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotA
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.FileOrder,
+			&i.InstID,
 		); err != nil {
 			return nil, err
 		}
@@ -272,7 +305,7 @@ func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID)
 const findReadyBots = `-- name: FindReadyBots :many
 
 
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where (res_proxy is not null or work_proxy is not null)
   and status >= 2
@@ -310,6 +343,7 @@ func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.FileOrder,
+			&i.InstID,
 		); err != nil {
 			return nil, err
 		}
@@ -322,7 +356,7 @@ func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
 }
 
 const findReadyBotsForTask = `-- name: FindReadyBotsForTask :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where task_id = $1
   and status = 2
@@ -355,6 +389,7 @@ func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.FileOrder,
+			&i.InstID,
 		); err != nil {
 			return nil, err
 		}
@@ -404,8 +439,47 @@ func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid
 	return items, nil
 }
 
+const findTaskBotByUsername = `-- name: FindTaskBotByUsername :one
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
+from bot_accounts
+where task_id = $1
+  and username = $2
+  and status in (2, 5)
+`
+
+type FindTaskBotByUsernameParams struct {
+	TaskID   uuid.UUID `json:"task_id"`
+	Username string    `json:"username"`
+}
+
+func (q *Queries) FindTaskBotByUsername(ctx context.Context, arg FindTaskBotByUsernameParams) (BotAccount, error) {
+	row := q.db.QueryRow(ctx, findTaskBotByUsername, arg.TaskID, arg.Username)
+	var i BotAccount
+	err := row.Scan(
+		&i.ID,
+		&i.TaskID,
+		&i.Username,
+		&i.Password,
+		&i.UserAgent,
+		&i.DeviceData,
+		&i.Session,
+		&i.Headers,
+		&i.ResProxy,
+		&i.WorkProxy,
+		&i.Status,
+		&i.PostsCount,
+		&i.StartedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.FileOrder,
+		&i.InstID,
+	)
+	return i, err
+}
+
 const findTaskBotsByUsername = `-- name: FindTaskBotsByUsername :many
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where task_id = $1
   and username = any ($2::text[])
@@ -445,6 +519,7 @@ func (q *Queries) FindTaskBotsByUsername(ctx context.Context, arg FindTaskBotsBy
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.FileOrder,
+			&i.InstID,
 		); err != nil {
 			return nil, err
 		}
@@ -457,7 +532,7 @@ func (q *Queries) FindTaskBotsByUsername(ctx context.Context, arg FindTaskBotsBy
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
 from tasks
 where id = $1
 `
@@ -490,16 +565,18 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.NeedPhotoTags,
 		&i.PerPostSleepSeconds,
 		&i.PhotoTagsDelaySeconds,
-		&i.PostsPerBot,
-		&i.TargetsPerPost,
 		&i.Type,
 		&i.VideoFilename,
+		&i.PostsPerBot,
+		&i.TargetsPerPost,
+		&i.PhotoTagsPostsPerBot,
+		&i.PhotoTargetsPerPost,
 	)
 	return i, err
 }
 
 const findTasksByManagerID = `-- name: FindTasksByManagerID :many
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
 from tasks
 where manager_id = $1
 `
@@ -538,10 +615,12 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.NeedPhotoTags,
 			&i.PerPostSleepSeconds,
 			&i.PhotoTagsDelaySeconds,
-			&i.PostsPerBot,
-			&i.TargetsPerPost,
 			&i.Type,
 			&i.VideoFilename,
+			&i.PostsPerBot,
+			&i.TargetsPerPost,
+			&i.PhotoTagsPostsPerBot,
+			&i.PhotoTargetsPerPost,
 		); err != nil {
 			return nil, err
 		}
@@ -554,10 +633,10 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 }
 
 const findUnprocessedTargetsForTask = `-- name: FindUnprocessedTargetsForTask :many
-select id, task_id, username, user_id, status, created_at, updated_at
+select id, task_id, username, user_id, created_at, updated_at, media_fk, status, interaction_type
 from target_users
 where task_id = $1
-  AND status = 1
+  AND status = 'new'
 limit $2
 `
 
@@ -580,9 +659,11 @@ func (q *Queries) FindUnprocessedTargetsForTask(ctx context.Context, arg FindUnp
 			&i.TaskID,
 			&i.Username,
 			&i.UserID,
-			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.MediaFk,
+			&i.Status,
+			&i.InteractionType,
 		); err != nil {
 			return nil, err
 		}
@@ -648,7 +729,7 @@ func (q *Queries) ForceDeleteTaskByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const getBotByID = `-- name: GetBotByID :one
-select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where id = $1
 `
@@ -674,6 +755,7 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.FileOrder,
+		&i.InstID,
 	)
 	return i, err
 }
@@ -682,16 +764,35 @@ const getBotsProgress = `-- name: GetBotsProgress :many
 select username, posts_count, status
 from bot_accounts
 where task_id = $1
+order by CASE
+             WHEN $4::bool THEN posts_count
+             else
+                 CASE WHEN $5::bool THEN posts_count end END
+LIMIT $2 OFFSET $3
 `
+
+type GetBotsProgressParams struct {
+	TaskID    uuid.UUID `json:"task_id"`
+	Limit     int32     `json:"limit"`
+	Offset    int32     `json:"offset"`
+	PostsAsc  bool      `json:"posts_asc"`
+	PostsDesc bool      `json:"posts_desc"`
+}
 
 type GetBotsProgressRow struct {
 	Username   string    `json:"username"`
-	PostsCount int16     `json:"posts_count"`
+	PostsCount int       `json:"posts_count"`
 	Status     botStatus `json:"status"`
 }
 
-func (q *Queries) GetBotsProgress(ctx context.Context, taskID uuid.UUID) ([]GetBotsProgressRow, error) {
-	rows, err := q.db.Query(ctx, getBotsProgress, taskID)
+func (q *Queries) GetBotsProgress(ctx context.Context, arg GetBotsProgressParams) ([]GetBotsProgressRow, error) {
+	rows, err := q.db.Query(ctx, getBotsProgress,
+		arg.TaskID,
+		arg.Limit,
+		arg.Offset,
+		arg.PostsAsc,
+		arg.PostsDesc,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -711,21 +812,36 @@ func (q *Queries) GetBotsProgress(ctx context.Context, taskID uuid.UUID) ([]GetB
 }
 
 const getTaskTargetsCount = `-- name: GetTaskTargetsCount :one
-select (select count(*) from target_users t where t.task_id = $1 and t.status = 1) as unused_targets,
-       (select count(*) from target_users t where t.task_id = $1 and t.status = 3) as failed_targets,
-       (select count(*) from target_users t where t.task_id = $1 and t.status = 4) as notified_targets
+select (select count(*) from target_users t where t.task_id = $1 and t.status = 'new')    as unused_targets,
+       (select count(*) from target_users t where t.task_id = $1 and t.status = 'failed') as failed_targets,
+       (select count(*)
+        from target_users t
+        where t.task_id = $1
+          and t.status = 'notified'
+          AND interaction_type = 'photo_tag')                                             as photo_notified_targets,
+       (select count(*)
+        from target_users t
+        where t.task_id = $1
+          and t.status = 'notified'
+          AND interaction_type = 'post_description')                                      as description_notified_targets
 `
 
 type GetTaskTargetsCountRow struct {
-	UnusedTargets   int64 `json:"unused_targets"`
-	FailedTargets   int64 `json:"failed_targets"`
-	NotifiedTargets int64 `json:"notified_targets"`
+	UnusedTargets              int64 `json:"unused_targets"`
+	FailedTargets              int64 `json:"failed_targets"`
+	PhotoNotifiedTargets       int64 `json:"photo_notified_targets"`
+	DescriptionNotifiedTargets int64 `json:"description_notified_targets"`
 }
 
 func (q *Queries) GetTaskTargetsCount(ctx context.Context, taskID uuid.UUID) (GetTaskTargetsCountRow, error) {
 	row := q.db.QueryRow(ctx, getTaskTargetsCount, taskID)
 	var i GetTaskTargetsCountRow
-	err := row.Scan(&i.UnusedTargets, &i.FailedTargets, &i.NotifiedTargets)
+	err := row.Scan(
+		&i.UnusedTargets,
+		&i.FailedTargets,
+		&i.PhotoNotifiedTargets,
+		&i.DescriptionNotifiedTargets,
+	)
 	return i, err
 }
 
@@ -750,6 +866,32 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const markTargetsAsNotified = `-- name: MarkTargetsAsNotified :exec
+update target_users
+set media_fk= $1,
+    status='notified',
+    interaction_type= $2
+where task_id = $3
+  and user_id = ANY ($4::bigint[])
+`
+
+type MarkTargetsAsNotifiedParams struct {
+	MediaFk         *int64             `json:"media_fk"`
+	InteractionType TargetsInteraction `json:"interaction_type"`
+	TaskID          uuid.UUID          `json:"task_id"`
+	TargetIds       []int64            `json:"target_ids"`
+}
+
+func (q *Queries) MarkTargetsAsNotified(ctx context.Context, arg MarkTargetsAsNotifiedParams) error {
+	_, err := q.db.Exec(ctx, markTargetsAsNotified,
+		arg.MediaFk,
+		arg.InteractionType,
+		arg.TaskID,
+		arg.TargetIds,
+	)
+	return err
+}
+
 type SaveBotAccountsParams struct {
 	TaskID     uuid.UUID              `json:"task_id"`
 	Username   string                 `json:"username"`
@@ -760,6 +902,33 @@ type SaveBotAccountsParams struct {
 	Headers    headers.Base           `json:"headers"`
 	Status     botStatus              `json:"status"`
 	FileOrder  int32                  `json:"file_order"`
+	InstID     int64                  `json:"inst_id"`
+}
+
+const savePostedMedia = `-- name: SavePostedMedia :one
+insert into medias(kind, inst_id, bot_id, created_at)
+VALUES ($1, $2, $3, now())
+returning id, kind, inst_id, bot_id, created_at, updated_at
+`
+
+type SavePostedMediaParams struct {
+	Kind   MediasKind `json:"kind"`
+	InstID string     `json:"inst_id"`
+	BotID  uuid.UUID  `json:"bot_id"`
+}
+
+func (q *Queries) SavePostedMedia(ctx context.Context, arg SavePostedMediaParams) (Media, error) {
+	row := q.db.QueryRow(ctx, savePostedMedia, arg.Kind, arg.InstID, arg.BotID)
+	var i Media
+	err := row.Scan(
+		&i.ID,
+		&i.Kind,
+		&i.InstID,
+		&i.BotID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 type SaveProxiesParams struct {
@@ -850,7 +1019,7 @@ where id = $2
 `
 
 type SetBotPostsCountParams struct {
-	PostsCount int16     `json:"posts_count"`
+	PostsCount int       `json:"posts_count"`
 	ID         uuid.UUID `json:"id"`
 }
 
@@ -882,8 +1051,8 @@ where id = ANY ($2::uuid[])
 `
 
 type SetTargetsStatusParams struct {
-	Status targetStatus `json:"status"`
-	Ids    []uuid.UUID  `json:"ids"`
+	Status TargetsStatus `json:"status"`
+	Ids    []uuid.UUID   `json:"ids"`
 }
 
 func (q *Queries) SetTargetsStatus(ctx context.Context, arg SetTargetsStatusParams) error {
@@ -936,9 +1105,11 @@ set text_template            = $1,
     photo_tags_delay_seconds = $12,
     posts_per_bot            = $13,
     targets_per_post         = $14,
+    photo_targets_per_post   = $16,
+    photo_tags_posts_per_bot = $17,
     updated_at               = now()
 where id = $15
-returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, posts_per_bot, targets_per_post, type, video_filename
+returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
 `
 
 type UpdateTaskParams struct {
@@ -954,9 +1125,11 @@ type UpdateTaskParams struct {
 	NeedPhotoTags         bool      `json:"need_photo_tags"`
 	PerPostSleepSeconds   int32     `json:"per_post_sleep_seconds"`
 	PhotoTagsDelaySeconds int32     `json:"photo_tags_delay_seconds"`
-	PostsPerBot           int32     `json:"posts_per_bot"`
-	TargetsPerPost        int32     `json:"targets_per_post"`
+	PostsPerBot           int       `json:"posts_per_bot"`
+	TargetsPerPost        int       `json:"targets_per_post"`
 	ID                    uuid.UUID `json:"id"`
+	PhotoTargetsPerPost   int       `json:"photo_targets_per_post"`
+	PhotoTagsPostsPerBot  int       `json:"photo_tags_posts_per_bot"`
 }
 
 func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
@@ -976,6 +1149,8 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		arg.PostsPerBot,
 		arg.TargetsPerPost,
 		arg.ID,
+		arg.PhotoTargetsPerPost,
+		arg.PhotoTagsPostsPerBot,
 	)
 	var i Task
 	err := row.Scan(
@@ -1003,10 +1178,12 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		&i.NeedPhotoTags,
 		&i.PerPostSleepSeconds,
 		&i.PhotoTagsDelaySeconds,
-		&i.PostsPerBot,
-		&i.TargetsPerPost,
 		&i.Type,
 		&i.VideoFilename,
+		&i.PostsPerBot,
+		&i.TargetsPerPost,
+		&i.PhotoTagsPostsPerBot,
+		&i.PhotoTargetsPerPost,
 	)
 	return i, err
 }

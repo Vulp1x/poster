@@ -38,6 +38,7 @@ func (r iteratorForSaveBotAccounts) Values() ([]interface{}, error) {
 		r.rows[0].Headers,
 		r.rows[0].Status,
 		r.rows[0].FileOrder,
+		r.rows[0].InstID,
 	}, nil
 }
 
@@ -46,7 +47,7 @@ func (r iteratorForSaveBotAccounts) Err() error {
 }
 
 func (q *Queries) SaveBotAccounts(ctx context.Context, arg []SaveBotAccountsParams) (int64, error) {
-	return q.db.CopyFrom(ctx, []string{"bot_accounts"}, []string{"task_id", "username", "password", "user_agent", "device_data", "session", "headers", "status", "file_order"}, &iteratorForSaveBotAccounts{rows: arg})
+	return q.db.CopyFrom(ctx, []string{"bot_accounts"}, []string{"task_id", "username", "password", "user_agent", "device_data", "session", "headers", "status", "file_order", "inst_id"}, &iteratorForSaveBotAccounts{rows: arg})
 }
 
 // iteratorForSaveProxies implements pgx.CopyFromSource.

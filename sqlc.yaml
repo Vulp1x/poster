@@ -45,9 +45,13 @@ overrides:
     go_type:
       type: "taskType"
       import: ""
-  - column: "target_users.status"
+#  - column: "target_users.status"
+#    go_type:
+#      type: "targetStatus"
+#      import: ""
+  - column: "target_users.targets_per_post"
     go_type:
-      type: "targetStatus"
+      type: "int"
       import: ""
   - column: "proxies.type"
     go_type:
@@ -57,8 +61,13 @@ overrides:
   - db_type: "pg_catalog.int2"
     nullable: true
     go_type:
-      type: "int16"
+      type: "int"
       pointer: true
+  - db_type: "pg_catalog.int2"
+    nullable: false
+    go_type:
+      type: "int"
+      pointer: false
 
   - db_type: "pg_catalog.int4"
     nullable: true

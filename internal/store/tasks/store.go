@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -32,7 +33,7 @@ var ErrTaskInvalidStatus = errors.New("invalid task status")
 // ErrUnexpectedTaskType ожидали другой тип таски
 var ErrUnexpectedTaskType = errors.New("unexpected task type")
 
-func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string, conn *grpc.ClientConn, queue *pgqueue.Queue) *Store {
+func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.TxFunc, instagrapiHost string, conn *grpc.ClientConn, queue *pgqueue.Queue, db dbmodel.DBTX) *Store {
 	return &Store{
 		tasksChan:   make(chan domain.Task, 10),
 		taskCancels: make(map[uuid.UUID]func()),
@@ -43,6 +44,7 @@ func NewStore(timeout time.Duration, dbtxFunc dbmodel.DBTXFunc, txFunc dbmodel.T
 		instaClient: instagrapi.NewClient(instagrapiHost),
 		cli:         api.NewInstaProxyClient(conn),
 		queue:       queue,
+		db:          db,
 	}
 }
 
@@ -56,6 +58,7 @@ type Store struct {
 	instaClient instagrapiClient
 	cli         api.InstaProxyClient
 	queue       *pgqueue.Queue
+	db          dbmodel.DBTX
 }
 
 func (s *Store) ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error) {
@@ -180,25 +183,25 @@ func (s *Store) PrepareTask(
 	savedCount, err := q.SaveBotAccounts(ctx, botAccounts.ToSaveParams(taskID))
 	logger.Infof(ctx, "saved %d bots", savedCount)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save bots: %v", err)
 	}
 
 	savedCount, err = q.SaveProxies(ctx, residentialProxies.ToSaveParams(taskID, false))
 	logger.Infof(ctx, "saved %d residential proxies", savedCount)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save residential proxies: %v", err)
 	}
 
 	savedCount, err = q.SaveProxies(ctx, cheapProxies.ToSaveParams(taskID, true))
 	logger.Infof(ctx, "saved %d cheap proxies", savedCount)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save cheap proxies: %v", err)
 	}
 
 	savedCount, err = q.SaveTargetUsers(ctx, targets.ToSaveParams(taskID))
 	logger.Infof(ctx, "saved %d target users", savedCount)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save targets: %v", err)
 	}
 
 	err = q.SaveUploadedDataToTask(ctx, dbmodel.SaveUploadedDataToTaskParams{
@@ -231,4 +234,36 @@ func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	s.taskMu.Unlock()
 
 	return nil
+}
+
+func (s *Store) insertMoreProxies(
+	ctx context.Context,
+	taskID uuid.UUID,
+	tx dbmodel.Tx,
+	initialProxies []dbmodel.Proxy,
+	proxiesToInsert int,
+	isCheap bool,
+) ([]dbmodel.Proxy, error) {
+	var newProxies = make([]dbmodel.Proxy, 0, proxiesToInsert)
+	var proxiesFromOneInitialProxy = math.Ceil(float64(proxiesToInsert) / float64(len(initialProxies)))
+
+	for _, proxy := range initialProxies {
+		for i := 0; i < int(proxiesFromOneInitialProxy); i++ {
+			newProxies = append(newProxies, proxy)
+		}
+	}
+
+	logger.Infof(ctx, "got %d new proxies, wanted at least %d,from %d initial",
+		len(newProxies), proxiesToInsert, len(initialProxies),
+	)
+
+	q := dbmodel.New(tx)
+	savedProxiesCount, err := q.SaveProxies(ctx, domain.ProxiesFromDB(newProxies).ToSaveParams(taskID, isCheap))
+	if err != nil {
+		return nil, fmt.Errorf("failed to save new proxies: %v", err)
+	}
+
+	logger.Infof(ctx, "saved %d new proxies, is cheap: %t", savedProxiesCount, isCheap)
+
+	return newProxies, nil
 }

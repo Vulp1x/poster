@@ -167,6 +167,11 @@ func (b *BotAccount) assignHeaders(input string) error {
 		BlocksVersionID: buildBloksVersioningID(b.DeviceData),
 	}
 
+	b.InstID, err = strconv.ParseInt(b.Headers.DsUserID, 10, 64)
+	if err != nil {
+		return fmt.Errorf("failed to parse instagram user id from '%s': %v", b.Headers.DsUserID, err)
+	}
+
 	return nil
 }
 

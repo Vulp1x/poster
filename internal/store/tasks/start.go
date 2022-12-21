@@ -14,7 +14,6 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/images"
-	"github.com/inst-api/poster/internal/instagrapi"
 	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/jackc/pgx/v4"
@@ -39,6 +38,7 @@ var ErrTaskWithEmptyLandingAccounts = errors.New("task have 0 landing accounts")
 
 // StartTask начинает выполнение задачи
 func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, error) {
+	logger.Infof(ctx, "started")
 	q := dbmodel.New(s.dbtxf(ctx))
 
 	task, err := q.FindTaskByID(ctx, taskID)
@@ -73,11 +73,12 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf(" в задаче нет ботов, готовых к работе")
 	}
 
-	maximumTargetsNum := int32(len(bots)) * task.PostsPerBot * task.TargetsPerPost
+	maximumTargetsNum := len(bots) * task.PostsPerBot * task.TargetsPerPost
 	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
-		TaskID: taskID, Limit: maximumTargetsNum,
+		TaskID: taskID, Limit: int32(maximumTargetsNum),
 	})
 	if err != nil {
+		logger.Errorf(ctx, "got error: %v", err)
 		return nil, fmt.Errorf("failed to find targets for task: %v", err)
 	}
 
@@ -90,33 +91,37 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("в задаче нет неоповещенных целей")
 	}
 
-	neededBotsNum := int32(len(targets)) / (task.PostsPerBot * task.TargetsPerPost)
+	neededBotsNum := len(targets) / (task.PostsPerBot * task.TargetsPerPost)
 
 	logger.Infof(ctx, "going to use %d/%d bots for %d targets", neededBotsNum, len(bots), len(targets))
 
-	if neededBotsNum < int32(len(bots)) {
+	if neededBotsNum < len(bots) {
 		bots = bots[:neededBotsNum]
 	}
 
-	randomBot := domain.RandomFromSlice(bots)
+	// randomBot := domain.RandomFromSlice(bots)
+	//
+	// aliveLandings, err := s.checkAliveLandingAccounts(ctx, randomBot, task.LandingAccounts)
+	// if err != nil {
+	// 	if errors.Is(err, instagrapi.ErrBotIsBlocked) {
+	// 		err2 := q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.BlockedBotStatus, ID: randomBot.ID})
+	// 		if err2 != nil {
+	// 			logger.Errorf(ctx, "failed to set bot status to blocked: %v", err)
+	// 		}
+	//
+	// 		return nil, fmt.Errorf("аккаунт '%s' для проверки лендингов был заблокирован, попробуйте ещё раз", randomBot.Username)
+	// 	}
+	//
+	// 	return nil, fmt.Errorf("failed to check landing accounts with bot '%s': %v", randomBot.Username, err)
+	// }
+	//
+	// logger.Infof(ctx, "got alive landing accounts: %v", aliveLandings)
+	// task.LandingAccounts = aliveLandings
 
-	aliveLandings, err := s.checkAliveLandingAccounts(ctx, randomBot, task.LandingAccounts)
+	_, err = images.NewRandomGammaGenerator(task.Images)
 	if err != nil {
-		if errors.Is(err, instagrapi.ErrBotIsBlocked) {
-			err2 := q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.BlockedBotStatus, ID: randomBot.ID})
-			if err2 != nil {
-				logger.Errorf(ctx, "failed to set bot status to blocked: %v", err)
-			}
-
-			return nil, fmt.Errorf("аккаунт '%s' для проверки лендингов был заблокирован, попробуйте ещё раз", randomBot.Username)
-		}
-
-		return nil, fmt.Errorf("failed to check landing accounts with bot '%s': %v", randomBot.Username, err)
+		return nil, fmt.Errorf("failed to create images generator: %v", err)
 	}
-
-	logger.Infof(ctx, "got alive landing accounts: %v", aliveLandings)
-	task.LandingAccounts = aliveLandings
-
 	var videoBytes []byte
 
 	if task.Type == dbmodel.ReelsTaskType {
@@ -173,7 +178,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 		go s.asyncPushBots(taskCtx, q, task, botsChan, bots, targets, wg)
 
-		return aliveLandings, nil
+		return task.LandingAccounts, nil
 	}
 
 	savedBots, err := s.cli.SaveBots(ctx, &api.SaveBotsRequest{Bots: domain.BotsFromDBModels(bots).ToGRPCProto(ctx)})
@@ -188,7 +193,7 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("failed to start task: %v", err)
 	}
 
-	return aliveLandings, nil
+	return task.LandingAccounts, nil
 }
 
 func validateTaskBeforeStart(task dbmodel.Task) error {

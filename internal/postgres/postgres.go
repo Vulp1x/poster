@@ -16,6 +16,16 @@ var (
 	onceErr error
 )
 
+// NewConn sets default database connection once, returns it and returns error.
+func NewConn(ctx context.Context, cfg Configuration) (dbmodel.DBTX, error) {
+	err := Load(ctx, cfg)()
+	if err != nil {
+		return nil, err
+	}
+
+	return global, nil
+}
+
 // Load loads default database once and returns validation function.
 func Load(ctx context.Context, cfg Configuration) func() error {
 	v := func() error {

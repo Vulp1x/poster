@@ -44,6 +44,7 @@ func (b BotAccounts) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveBotAccountsPar
 			Headers:    botAccount.Headers,
 			Status:     dbmodel.CreatedBotStatus,
 			FileOrder:  int32(fileOrder),
+			InstID:     botAccount.InstID,
 		})
 
 		uniqueMap[botAccount.Username] = true

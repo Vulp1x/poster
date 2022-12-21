@@ -227,23 +227,35 @@ var BotsProgress = Type("BotsProgress", func() {
 	Attribute("user_name", String, "имя пользователя бота", func() {
 		Meta("struct:tag:json", "user_name")
 	})
-	Attribute("posts_count", Int, "количество выложенных постов", func() {
+	Attribute("posts_count", Int32, "количество выложенных постов", func() {
 		Meta("struct:tag:json", "posts_count")
 	})
+	Attribute("status", Int32, "текущий статус бота, будут ли выкладываться посты")
+	Attribute("description_targets_notified", Int32, "количество аккаунтов, которых упомянули в постах", func() {
+		Meta("struct:tag:json", "description_targets_notified")
+	})
+	Attribute("photo_targets_notified", Int32, "количество аккаунтов, которых упомянули в постах на фото", func() {
+		Meta("struct:tag:json", "photo_targets_notified")
+	})
 
-	Attribute("status", Int, "текущий статус бота, будут ли выкладываться посты")
+	Attribute("file_order", Int32, "номер бота в загруженном файле", func() {
+		Meta("struct:tag:json", "file_order")
+	})
 
-	Required("user_name", "posts_count", "status")
+	Required("user_name", "posts_count", "status", "description_targets_notified", "photo_targets_notified", "file_order")
 })
 
 var TaskProgress = Type("TaskProgress", func() {
-	Attribute("bots_progresses", MapOf(String, BotsProgress), func() {
-		Description("результат работы по каждому боту, ключ- имя бота")
+	Attribute("bots_progresses", ArrayOf(BotsProgress), func() {
+		Description("результат работы по каждому боту")
 		Meta("struct:tag:json", "bots_progresses")
 	})
 
 	Attribute("targets_notified", Int, "количество аккаунтов, которых упомянули в постах", func() {
 		Meta("struct:tag:json", "targets_notified")
+	})
+	Attribute("photo_targets_notified", Int, "количество аккаунтов, которых упомянули в постах на фото", func() {
+		Meta("struct:tag:json", "photo_targets_notified")
 	})
 	Attribute("targets_failed", Int, "количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново", func() {
 		Meta("struct:tag:json", "targets_failed")
@@ -253,12 +265,7 @@ var TaskProgress = Type("TaskProgress", func() {
 		Meta("struct:tag:json", "targets_waiting")
 	})
 
-	Attribute("targets_waiting", Int, "количество аккаунтов, которых не выбрали для постов", func() {
-		Meta("struct:tag:json", "targets_waiting")
-	})
-
 	Attribute("done", Boolean, "закончена ли задача")
 
-	Required("bots_progresses", "targets_notified", "targets_failed", "targets_waiting", "done")
-
+	Required("bots_progresses", "targets_notified", "photo_targets_notified", "targets_failed", "targets_waiting", "done")
 })

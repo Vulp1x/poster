@@ -2,7 +2,6 @@ package domain
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
@@ -12,7 +11,7 @@ type Proxies []Proxy
 
 func (p Proxies) ToSaveParams(taskID uuid.UUID, isCheap bool) []dbmodel.SaveProxiesParams {
 	dbProxies := make([]dbmodel.SaveProxiesParams, 0, len(p))
-	uniqueMap := make(map[string]bool, len(p))
+	// uniqueMap := make(map[string]bool, len(p))
 
 	proxyType := dbmodel.ResidentialProxyType
 	if isCheap {
@@ -20,12 +19,12 @@ func (p Proxies) ToSaveParams(taskID uuid.UUID, isCheap bool) []dbmodel.SaveProx
 	}
 
 	for _, proxy := range p {
-		uniqueKey := proxy.Host + strconv.FormatInt(int64(proxy.Port), 10)
-		_, ok := uniqueMap[uniqueKey]
-		if ok {
-			// прокси с таким username уже есть, пропускаем его
-			continue
-		}
+		// uniqueKey := proxy.Host + strconv.FormatInt(int64(proxy.Port), 10)
+		// _, ok := uniqueMap[uniqueKey]
+		// if ok {
+		// 	прокси с таким username уже есть, пропускаем его
+		// continue
+		// }
 
 		dbProxies = append(dbProxies, dbmodel.SaveProxiesParams{
 			TaskID: taskID,
@@ -36,7 +35,7 @@ func (p Proxies) ToSaveParams(taskID uuid.UUID, isCheap bool) []dbmodel.SaveProx
 			Type:   proxyType,
 		})
 
-		uniqueMap[uniqueKey] = true
+		// uniqueMap[uniqueKey] = true
 	}
 
 	return dbProxies
@@ -51,4 +50,13 @@ func (p Proxies) ToStrings() []string {
 	}
 
 	return ret
+}
+
+func ProxiesFromDB(dbProxies []dbmodel.Proxy) Proxies {
+	proxies := make([]Proxy, len(dbProxies))
+	for i, proxy := range dbProxies {
+		proxies[i] = Proxy(proxy)
+	}
+
+	return proxies
 }

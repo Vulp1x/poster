@@ -13,6 +13,48 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
+type MediasKind string
+
+const (
+	MediasKindPhoto MediasKind = "photo"
+	MediasKindReels MediasKind = "reels"
+)
+
+func (e *MediasKind) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = MediasKind(s)
+	case string:
+		*e = MediasKind(s)
+	default:
+		return fmt.Errorf("unsupported scan type for MediasKind: %T", src)
+	}
+	return nil
+}
+
+type NullMediasKind struct {
+	MediasKind MediasKind
+	Valid      bool // Valid is true if String is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullMediasKind) Scan(value interface{}) error {
+	if value == nil {
+		ns.MediasKind, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.MediasKind.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullMediasKind) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return ns.MediasKind, nil
+}
+
 type PgqueueStatus string
 
 const (
@@ -58,6 +100,93 @@ func (ns NullPgqueueStatus) Value() (driver.Value, error) {
 	return ns.PgqueueStatus, nil
 }
 
+type TargetsInteraction string
+
+const (
+	TargetsInteractionNone            TargetsInteraction = "none"
+	TargetsInteractionPostDescription TargetsInteraction = "post_description"
+	TargetsInteractionPhotoTag        TargetsInteraction = "photo_tag"
+)
+
+func (e *TargetsInteraction) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TargetsInteraction(s)
+	case string:
+		*e = TargetsInteraction(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TargetsInteraction: %T", src)
+	}
+	return nil
+}
+
+type NullTargetsInteraction struct {
+	TargetsInteraction TargetsInteraction
+	Valid              bool // Valid is true if String is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTargetsInteraction) Scan(value interface{}) error {
+	if value == nil {
+		ns.TargetsInteraction, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TargetsInteraction.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTargetsInteraction) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return ns.TargetsInteraction, nil
+}
+
+type TargetsStatus string
+
+const (
+	TargetsStatusNew        TargetsStatus = "new"
+	TargetsStatusInProgress TargetsStatus = "in_progress"
+	TargetsStatusFailed     TargetsStatus = "failed"
+	TargetsStatusNotified   TargetsStatus = "notified"
+)
+
+func (e *TargetsStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TargetsStatus(s)
+	case string:
+		*e = TargetsStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TargetsStatus: %T", src)
+	}
+	return nil
+}
+
+type NullTargetsStatus struct {
+	TargetsStatus TargetsStatus
+	Valid         bool // Valid is true if String is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTargetsStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.TargetsStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TargetsStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTargetsStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return ns.TargetsStatus, nil
+}
+
 type BotAccount struct {
 	ID         uuid.UUID              `json:"id"`
 	TaskID     uuid.UUID              `json:"task_id"`
@@ -70,12 +199,13 @@ type BotAccount struct {
 	ResProxy   *Proxy                 `json:"res_proxy"`
 	WorkProxy  *Proxy                 `json:"work_proxy"`
 	Status     botStatus              `json:"status"`
-	PostsCount int16                  `json:"posts_count"`
+	PostsCount int                    `json:"posts_count"`
 	StartedAt  *time.Time             `json:"started_at"`
 	CreatedAt  time.Time              `json:"created_at"`
 	UpdatedAt  *time.Time             `json:"updated_at"`
 	DeletedAt  *time.Time             `json:"deleted_at"`
 	FileOrder  int32                  `json:"file_order"`
+	InstID     int64                  `json:"inst_id"`
 }
 
 type Log struct {
@@ -89,15 +219,24 @@ type Log struct {
 	ProxyUrl     *string   `json:"proxy_url"`
 }
 
+type Media struct {
+	ID        int64      `json:"id"`
+	Kind      MediasKind `json:"kind"`
+	InstID    string     `json:"inst_id"`
+	BotID     uuid.UUID  `json:"bot_id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
+
 type Pgqueue struct {
 	ID              int64         `json:"id"`
-	Kind            int16         `json:"kind"`
+	Kind            int           `json:"kind"`
 	Payload         []byte        `json:"payload"`
 	ExternalKey     *string       `json:"external_key"`
 	Status          PgqueueStatus `json:"status"`
 	Messages        []string      `json:"messages"`
-	AttemptsLeft    int16         `json:"attempts_left"`
-	AttemptsElapsed int16         `json:"attempts_elapsed"`
+	AttemptsLeft    int           `json:"attempts_left"`
+	AttemptsElapsed int           `json:"attempts_elapsed"`
 	DelayedTill     time.Time     `json:"delayed_till"`
 	CreatedAt       time.Time     `json:"created_at"`
 	UpdatedAt       time.Time     `json:"updated_at"`
@@ -120,13 +259,15 @@ type PythonBot struct {
 }
 
 type TargetUser struct {
-	ID        uuid.UUID    `json:"id"`
-	TaskID    uuid.UUID    `json:"task_id"`
-	Username  string       `json:"username"`
-	UserID    int64        `json:"user_id"`
-	Status    targetStatus `json:"status"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt *time.Time   `json:"updated_at"`
+	ID              uuid.UUID          `json:"id"`
+	TaskID          uuid.UUID          `json:"task_id"`
+	Username        string             `json:"username"`
+	UserID          int64              `json:"user_id"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       *time.Time         `json:"updated_at"`
+	MediaFk         *int64             `json:"media_fk"`
+	Status          TargetsStatus      `json:"status"`
+	InteractionType TargetsInteraction `json:"interaction_type"`
 }
 
 type TargetUsersToTask struct {
@@ -160,17 +301,19 @@ type Task struct {
 	NeedPhotoTags         bool       `json:"need_photo_tags"`
 	PerPostSleepSeconds   int32      `json:"per_post_sleep_seconds"`
 	PhotoTagsDelaySeconds int32      `json:"photo_tags_delay_seconds"`
-	PostsPerBot           int32      `json:"posts_per_bot"`
-	TargetsPerPost        int32      `json:"targets_per_post"`
 	Type                  taskType   `json:"type"`
 	VideoFilename         *string    `json:"video_filename"`
+	PostsPerBot           int        `json:"posts_per_bot"`
+	TargetsPerPost        int        `json:"targets_per_post"`
+	PhotoTagsPostsPerBot  int        `json:"photo_tags_posts_per_bot"`
+	PhotoTargetsPerPost   int        `json:"photo_targets_per_post"`
 }
 
 type User struct {
 	ID           uuid.UUID  `json:"id"`
 	Login        string     `json:"login"`
 	PasswordHash string     `json:"password_hash"`
-	Role         int16      `json:"role"`
+	Role         int        `json:"role"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
 	DeletedAt    *time.Time `json:"deleted_at"`

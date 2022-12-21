@@ -84,7 +84,7 @@ func (w *worker) run(ctx context.Context) {
 
 		err = nil
 
-		targetsLen := int32(len(botWithTargets.Targets))
+		targetsLen := len(botWithTargets.Targets)
 		if targetsLen != w.task.PostsPerBot*w.task.TargetsPerPost {
 			logger.Warnf(taskCtx, "got %d targets, expected %d", targetsLen, w.task.PostsPerBot*w.task.TargetsPerPost)
 		}
@@ -142,14 +142,14 @@ func (w *worker) run(ctx context.Context) {
 		}
 
 		var (
-			i, postsDone int32
+			i, postsDone int
 			shouldBreak  = false
 			targetIds    []uuid.UUID
 		)
 
 		if botWithTargets.PostsCount > 0 {
 			logger.Infof(ctx, "bot already has %d posts, adding new", botWithTargets.PostsCount)
-			postsDone += int32(botWithTargets.PostsCount)
+			postsDone += botWithTargets.PostsCount
 		}
 
 		for i = 0; i < w.task.PostsPerBot; i++ {
@@ -165,12 +165,12 @@ func (w *worker) run(ctx context.Context) {
 			err = w.getPostCreator()(taskCtx, w.task, landingAccount, botWithTargets.Headers.AuthData.SessionID, cheapProxy, targetsBatch, w.preparePostBytess(ctx))
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to create post [%d]: %v", i, err)
-				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
+				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.TargetsStatusFailed, Ids: targetIds})
 				if err != nil {
 					logger.Errorf(taskCtx, "failed to set targets statuses to 'failed' for targets '%v': %v", targetIds, err)
 				}
 
-				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.FailedTargetStatus, Ids: targetIds})
+				err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.TargetsStatusFailed, Ids: targetIds})
 				if err != nil {
 					logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
 				}
@@ -184,12 +184,12 @@ func (w *worker) run(ctx context.Context) {
 
 			postsDone++
 
-			err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: int16(postsDone), ID: botWithTargets.ID})
+			err = q.SetBotPostsCount(taskCtx, dbmodel.SetBotPostsCountParams{PostsCount: postsDone, ID: botWithTargets.ID})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to update posts count: %v", err)
 			}
 
-			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.NotifiedTargetStatus, Ids: targetIds})
+			err = q.SetTargetsStatus(taskCtx, dbmodel.SetTargetsStatusParams{Status: dbmodel.TargetsStatusNotified, Ids: targetIds})
 			if err != nil {
 				logger.Errorf(taskCtx, "failed to set targets statuses to 'notified' for targets '%v': %v", targetIds, err)
 			}

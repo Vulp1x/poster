@@ -600,16 +600,25 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
-			Attribute("page_size", Int, func() {
+			Attribute("page_size", UInt32, func() {
 				Description("размер страницы для пагинации")
 				Default(100)
 				Meta("struct:tag:json", "page_size")
 			})
 
-			Attribute("page_num", Int, func() {
+			Attribute("page", UInt32, func() {
 				Description("номер страницы для пагинации")
 				Default(1)
-				Meta("struct:tag:json", "page_num")
+			})
+
+			Attribute("sort", String, func() {
+				Enum("username", "status", "posts_count", "post_description_targets", "photo_tags_targets", "file_order")
+				Default("file_order")
+			})
+
+			Attribute("sort_descending", Boolean, func() {
+				Description("сортировать по убыванию или нет")
+				Default(false)
 			})
 
 			Required("token", "task_id")
@@ -621,7 +630,9 @@ var _ = Service("tasks_service", func() {
 			GET("/api/tasks/{task_id}/progress/")
 			Params(func() {
 				Param("page_size:psize")
-				Param("page_num:pnum")
+				Param("page:p")
+				Param("sort:sort")
+				Param("sort_descending:sd")
 			})
 			Response(StatusOK)
 			Response(StatusNotFound)

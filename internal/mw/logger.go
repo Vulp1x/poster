@@ -24,8 +24,6 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 
 	logFields := logger.Fields{}
 
-	logFields["req_id"] = ShortID()
-
 	scheme := "http"
 	if r.TLS != nil {
 		scheme = "https"
@@ -39,7 +37,7 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 
 	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
 
-	entryCtx := logger.WithFields(r.Context(), logFields)
+	entryCtx := GenerateRequestID(logger.WithFields(r.Context(), logFields))
 
 	var entry middleware.LogEntry
 	if l.debug {

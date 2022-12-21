@@ -12,6 +12,7 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/mw"
+	"github.com/inst-api/poster/internal/pager"
 	"github.com/inst-api/poster/internal/store/tasks"
 	"github.com/inst-api/poster/pkg/logger"
 	"goa.design/goa/v3/security"
@@ -27,7 +28,7 @@ type taskStore interface {
 	AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error)
 	GetTask(ctx context.Context, taskID uuid.UUID) (domain.TaskWithCounters, error)
 	ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error)
-	TaskProgress(ctx context.Context, taskID uuid.UUID) (domain.TaskProgress, error)
+	TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager.Pager) (domain.TaskProgress, error)
 	SaveVideo(ctx context.Context, taskID uuid.UUID, video []byte, filename string) (domain.Task, error)
 	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, error)
 }
@@ -150,6 +151,8 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 		tasks.WithPhotoTagsDelaySeconds(p.PhotoTagsDelaySeconds),
 		tasks.WithPostsPerBot(p.PostsPerBot),
 		tasks.WithTargetsPerPost(p.TargetsPerPost),
+		tasks.WithPhotoTargetsPerPost(p.PhotoTargetsPerPost),
+		tasks.WithPhotoTagsPostsPerBot(p.PhotoTagsPostsPerBot),
 	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to update task: %v", err)
@@ -426,7 +429,13 @@ func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetP
 
 	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
-	domainProgress, err := s.store.TaskProgress(ctx, taskID)
+	per := pager.NewPagePer(p.Page, p.PageSize)
+	per.SetSortColumns(p.Sort)
+	if p.SortDescending {
+		per.SetReverseOrderSort(p.Sort)
+	}
+
+	domainProgress, err := s.store.TaskProgress(ctx, taskID, per)
 	if err != nil {
 		logger.Errorf(ctx, "failed to get task progress: %v", err)
 		if errors.Is(err, tasks.ErrTaskNotFound) {
