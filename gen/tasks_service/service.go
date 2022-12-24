@@ -43,6 +43,10 @@ type Service interface {
 	GetProgress(context.Context, *GetProgressPayload) (res *TaskProgress, err error)
 	// получить все задачи для текущего пользователя
 	ListTasks(context.Context, *ListTasksPayload) (res []*Task, err error)
+	// получить всех пользователей, которых не тегнули в задаче
+	DownloadTargets(context.Context, *DownloadTargetsPayload) (res []string, err error)
+	// Получить всех ботов из этой задачи
+	DownloadBots(context.Context, *DownloadBotsPayload) (res []string, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -59,7 +63,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [12]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "stop task", "get task", "get progress", "list tasks"}
+var MethodNames = [14]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "stop task", "get task", "get progress", "list tasks", "download targets", "download bots"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -124,6 +128,28 @@ type CreateTaskDraftPayload struct {
 	// список фотографий для постов
 	PostImages []string `json:"post_images"`
 	Type       TaskType
+}
+
+// DownloadBotsPayload is the payload type of the tasks_service service
+// download bots method.
+type DownloadBotsPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+	// 1- только user_id, 2- только username, 3 - и то и другое
+	Format int
+}
+
+// DownloadTargetsPayload is the payload type of the tasks_service service
+// download targets method.
+type DownloadTargetsPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+	// 1- только user_id, 2- только username, 3 - и то и другое
+	Format int
 }
 
 // ForceDeletePayload is the payload type of the tasks_service service force

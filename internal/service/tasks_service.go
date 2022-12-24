@@ -40,6 +40,14 @@ type tasksServicesrvc struct {
 	store taskStore
 }
 
+func (s *tasksServicesrvc) DownloadTargets(ctx context.Context, payload *tasksservice.DownloadTargetsPayload) (res []string, err error) {
+	return []string{"testim"}, nil
+}
+
+func (s *tasksServicesrvc) DownloadBots(ctx context.Context, payload *tasksservice.DownloadBotsPayload) (res []string, err error) {
+	return []string{"bot info would be here"}, err
+}
+
 // NewTasksService returns the tasks_service service implementation.
 func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Service {
 	return &tasksServicesrvc{auth: auth, store: store}

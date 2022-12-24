@@ -70,3 +70,13 @@ func GetProgressTasksServicePath(taskID string) string {
 func ListTasksTasksServicePath() string {
 	return "/api/tasks/"
 }
+
+// DownloadTargetsTasksServicePath returns the URL path to the tasks_service service download targets HTTP endpoint.
+func DownloadTargetsTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/targets/download/", taskID)
+}
+
+// DownloadBotsTasksServicePath returns the URL path to the tasks_service service download bots HTTP endpoint.
+func DownloadBotsTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/bots/download/", taskID)
+}

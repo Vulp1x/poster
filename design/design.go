@@ -663,6 +663,76 @@ var _ = Service("tasks_service", func() {
 			Response(StatusInternalServerError)
 		})
 	})
+
+	Method("download targets", func() {
+		Description("получить всех пользователей, которых не тегнули в задаче")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("format", Int, func() {
+				Enum(1, 2, 3)
+				Description(`1- только user_id, 2- только username, 3 - и то и другое`)
+				Default(3)
+			})
+
+			Required("token", "task_id", "format")
+		})
+
+		Result(ArrayOf(String))
+
+		HTTP(func() {
+			GET("/api/tasks/{task_id}/targets/download/")
+			Param("format:format")
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
+	Method("download bots", func() {
+		Description("Получить всех ботов из этой задачи")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("format", Int, func() {
+				Enum(1, 2, 3)
+				Description(`1- только user_id, 2- только username, 3 - и то и другое`)
+				Default(3)
+			})
+
+			Required("token", "task_id", "format")
+		})
+
+		Result(ArrayOf(String))
+
+		HTTP(func() {
+			GET("/api/tasks/{task_id}/bots/download/")
+			Param("format:format")
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
 })
 
 var _ = Service("admin_service", func() {

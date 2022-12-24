@@ -882,6 +882,28 @@ func NewListTasksPayload(token string) *tasksservice.ListTasksPayload {
 	return v
 }
 
+// NewDownloadTargetsPayload builds a tasks_service service download targets
+// endpoint payload.
+func NewDownloadTargetsPayload(taskID string, format int, token string) *tasksservice.DownloadTargetsPayload {
+	v := &tasksservice.DownloadTargetsPayload{}
+	v.TaskID = taskID
+	v.Format = format
+	v.Token = token
+
+	return v
+}
+
+// NewDownloadBotsPayload builds a tasks_service service download bots endpoint
+// payload.
+func NewDownloadBotsPayload(taskID string, format int, token string) *tasksservice.DownloadBotsPayload {
+	v := &tasksservice.DownloadBotsPayload{}
+	v.TaskID = taskID
+	v.Format = format
+	v.Token = token
+
+	return v
+}
+
 // ValidateCreateTaskDraftRequestBody runs the validations defined on Create
 // Task DraftRequestBody
 func ValidateCreateTaskDraftRequestBody(body *CreateTaskDraftRequestBody) (err error) {

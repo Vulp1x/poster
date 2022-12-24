@@ -32,6 +32,8 @@ type Server struct {
 	GetTask          http.Handler
 	GetProgress      http.Handler
 	ListTasks        http.Handler
+	DownloadTargets  http.Handler
+	DownloadBots     http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -89,6 +91,8 @@ func New(
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
 			{"GetProgress", "GET", "/api/tasks/{task_id}/progress/"},
 			{"ListTasks", "GET", "/api/tasks/"},
+			{"DownloadTargets", "GET", "/api/tasks/{task_id}/targets/download/"},
+			{"DownloadBots", "GET", "/api/tasks/{task_id}/bots/download/"},
 		},
 		CreateTaskDraft:  NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
 		UpdateTask:       NewUpdateTaskHandler(e.UpdateTask, mux, decoder, encoder, errhandler, formatter),
@@ -102,6 +106,8 @@ func New(
 		GetTask:          NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
 		GetProgress:      NewGetProgressHandler(e.GetProgress, mux, decoder, encoder, errhandler, formatter),
 		ListTasks:        NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
+		DownloadTargets:  NewDownloadTargetsHandler(e.DownloadTargets, mux, decoder, encoder, errhandler, formatter),
+		DownloadBots:     NewDownloadBotsHandler(e.DownloadBots, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -122,6 +128,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetTask = m(s.GetTask)
 	s.GetProgress = m(s.GetProgress)
 	s.ListTasks = m(s.ListTasks)
+	s.DownloadTargets = m(s.DownloadTargets)
+	s.DownloadBots = m(s.DownloadBots)
 }
 
 // Mount configures the mux to serve the tasks_service endpoints.
@@ -138,6 +146,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetTaskHandler(mux, h.GetTask)
 	MountGetProgressHandler(mux, h.GetProgress)
 	MountListTasksHandler(mux, h.ListTasks)
+	MountDownloadTargetsHandler(mux, h.DownloadTargets)
+	MountDownloadBotsHandler(mux, h.DownloadBots)
 }
 
 // Mount configures the mux to serve the tasks_service endpoints.
@@ -736,6 +746,108 @@ func NewListTasksHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "list tasks")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDownloadTargetsHandler configures the mux to serve the "tasks_service"
+// service "download targets" endpoint.
+func MountDownloadTargetsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/tasks/{task_id}/targets/download/", f)
+}
+
+// NewDownloadTargetsHandler creates a HTTP handler which loads the HTTP
+// request and calls the "tasks_service" service "download targets" endpoint.
+func NewDownloadTargetsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDownloadTargetsRequest(mux, decoder)
+		encodeResponse = EncodeDownloadTargetsResponse(encoder)
+		encodeError    = EncodeDownloadTargetsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "download targets")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDownloadBotsHandler configures the mux to serve the "tasks_service"
+// service "download bots" endpoint.
+func MountDownloadBotsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/api/tasks/{task_id}/bots/download/", f)
+}
+
+// NewDownloadBotsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "tasks_service" service "download bots" endpoint.
+func NewDownloadBotsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDownloadBotsRequest(mux, decoder)
+		encodeResponse = EncodeDownloadBotsResponse(encoder)
+		encodeError    = EncodeDownloadBotsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "download bots")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
 		payload, err := decodeRequest(r)
 		if err != nil {

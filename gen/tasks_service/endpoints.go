@@ -28,6 +28,8 @@ type Endpoints struct {
 	GetTask          goa.Endpoint
 	GetProgress      goa.Endpoint
 	ListTasks        goa.Endpoint
+	DownloadTargets  goa.Endpoint
+	DownloadBots     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "tasks_service" service with endpoints.
@@ -47,6 +49,8 @@ func NewEndpoints(s Service) *Endpoints {
 		GetTask:          NewGetTaskEndpoint(s, a.JWTAuth),
 		GetProgress:      NewGetProgressEndpoint(s, a.JWTAuth),
 		ListTasks:        NewListTasksEndpoint(s, a.JWTAuth),
+		DownloadTargets:  NewDownloadTargetsEndpoint(s, a.JWTAuth),
+		DownloadBots:     NewDownloadBotsEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -65,6 +69,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetTask = m(e.GetTask)
 	e.GetProgress = m(e.GetProgress)
 	e.ListTasks = m(e.ListTasks)
+	e.DownloadTargets = m(e.DownloadTargets)
+	e.DownloadBots = m(e.DownloadBots)
 }
 
 // NewCreateTaskDraftEndpoint returns an endpoint function that calls the
@@ -292,5 +298,43 @@ func NewListTasksEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoin
 			return nil, err
 		}
 		return s.ListTasks(ctx, p)
+	}
+}
+
+// NewDownloadTargetsEndpoint returns an endpoint function that calls the
+// method "download targets" of service "tasks_service".
+func NewDownloadTargetsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DownloadTargetsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.DownloadTargets(ctx, p)
+	}
+}
+
+// NewDownloadBotsEndpoint returns an endpoint function that calls the method
+// "download bots" of service "tasks_service".
+func NewDownloadBotsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DownloadBotsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.DownloadBots(ctx, p)
 	}
 }

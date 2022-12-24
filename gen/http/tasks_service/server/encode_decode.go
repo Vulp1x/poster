@@ -1223,6 +1223,218 @@ func EncodeListTasksError(encoder func(context.Context, http.ResponseWriter) goa
 	}
 }
 
+// EncodeDownloadTargetsResponse returns an encoder for responses returned by
+// the tasks_service download targets endpoint.
+func EncodeDownloadTargetsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.([]string)
+		enc := encoder(ctx, w)
+		body := res
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeDownloadTargetsRequest returns a decoder for requests sent to the
+// tasks_service download targets endpoint.
+func DecodeDownloadTargetsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			taskID string
+			format int
+			token  string
+			err    error
+
+			params = mux.Vars(r)
+		)
+		taskID = params["task_id"]
+		{
+			formatRaw := r.URL.Query().Get("format")
+			if formatRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("format", "query string"))
+			} else {
+				v, err2 := strconv.ParseInt(formatRaw, 10, strconv.IntSize)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("format", formatRaw, "integer"))
+				}
+				format = int(v)
+			}
+		}
+		if !(format == 1 || format == 2 || format == 3) {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("format", format, []interface{}{1, 2, 3}))
+		}
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDownloadTargetsPayload(taskID, format, token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDownloadTargetsError returns an encoder for errors returned by the
+// download targets tasks_service endpoint.
+func EncodeDownloadTargetsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeDownloadBotsResponse returns an encoder for responses returned by the
+// tasks_service download bots endpoint.
+func EncodeDownloadBotsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.([]string)
+		enc := encoder(ctx, w)
+		body := res
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeDownloadBotsRequest returns a decoder for requests sent to the
+// tasks_service download bots endpoint.
+func DecodeDownloadBotsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			taskID string
+			format int
+			token  string
+			err    error
+
+			params = mux.Vars(r)
+		)
+		taskID = params["task_id"]
+		{
+			formatRaw := r.URL.Query().Get("format")
+			if formatRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("format", "query string"))
+			} else {
+				v, err2 := strconv.ParseInt(formatRaw, 10, strconv.IntSize)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("format", formatRaw, "integer"))
+				}
+				format = int(v)
+			}
+		}
+		if !(format == 1 || format == 2 || format == 3) {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("format", format, []interface{}{1, 2, 3}))
+		}
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDownloadBotsPayload(taskID, format, token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDownloadBotsError returns an encoder for errors returned by the
+// download bots tasks_service endpoint.
+func EncodeDownloadBotsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // unmarshalTaskFileNamesRequestBodyToTasksserviceTaskFileNames builds a value
 // of type *tasksservice.TaskFileNames from a value of type
 // *TaskFileNamesRequestBody.
