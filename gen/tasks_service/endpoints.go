@@ -16,20 +16,21 @@ import (
 
 // Endpoints wraps the "tasks_service" service endpoints.
 type Endpoints struct {
-	CreateTaskDraft  goa.Endpoint
-	UpdateTask       goa.Endpoint
-	UploadVideo      goa.Endpoint
-	UploadFiles      goa.Endpoint
-	AssignProxies    goa.Endpoint
-	ForceDelete      goa.Endpoint
-	StartTask        goa.Endpoint
-	PartialStartTask goa.Endpoint
-	StopTask         goa.Endpoint
-	GetTask          goa.Endpoint
-	GetProgress      goa.Endpoint
-	ListTasks        goa.Endpoint
-	DownloadTargets  goa.Endpoint
-	DownloadBots     goa.Endpoint
+	CreateTaskDraft    goa.Endpoint
+	UpdateTask         goa.Endpoint
+	UploadVideo        goa.Endpoint
+	UploadFiles        goa.Endpoint
+	AssignProxies      goa.Endpoint
+	ForceDelete        goa.Endpoint
+	StartTask          goa.Endpoint
+	PartialStartTask   goa.Endpoint
+	UpdatePostContents goa.Endpoint
+	StopTask           goa.Endpoint
+	GetTask            goa.Endpoint
+	GetProgress        goa.Endpoint
+	ListTasks          goa.Endpoint
+	DownloadTargets    goa.Endpoint
+	DownloadBots       goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "tasks_service" service with endpoints.
@@ -37,20 +38,21 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		CreateTaskDraft:  NewCreateTaskDraftEndpoint(s, a.JWTAuth),
-		UpdateTask:       NewUpdateTaskEndpoint(s, a.JWTAuth),
-		UploadVideo:      NewUploadVideoEndpoint(s, a.JWTAuth),
-		UploadFiles:      NewUploadFilesEndpoint(s, a.JWTAuth),
-		AssignProxies:    NewAssignProxiesEndpoint(s, a.JWTAuth),
-		ForceDelete:      NewForceDeleteEndpoint(s, a.JWTAuth),
-		StartTask:        NewStartTaskEndpoint(s, a.JWTAuth),
-		PartialStartTask: NewPartialStartTaskEndpoint(s, a.JWTAuth),
-		StopTask:         NewStopTaskEndpoint(s, a.JWTAuth),
-		GetTask:          NewGetTaskEndpoint(s, a.JWTAuth),
-		GetProgress:      NewGetProgressEndpoint(s, a.JWTAuth),
-		ListTasks:        NewListTasksEndpoint(s, a.JWTAuth),
-		DownloadTargets:  NewDownloadTargetsEndpoint(s, a.JWTAuth),
-		DownloadBots:     NewDownloadBotsEndpoint(s, a.JWTAuth),
+		CreateTaskDraft:    NewCreateTaskDraftEndpoint(s, a.JWTAuth),
+		UpdateTask:         NewUpdateTaskEndpoint(s, a.JWTAuth),
+		UploadVideo:        NewUploadVideoEndpoint(s, a.JWTAuth),
+		UploadFiles:        NewUploadFilesEndpoint(s, a.JWTAuth),
+		AssignProxies:      NewAssignProxiesEndpoint(s, a.JWTAuth),
+		ForceDelete:        NewForceDeleteEndpoint(s, a.JWTAuth),
+		StartTask:          NewStartTaskEndpoint(s, a.JWTAuth),
+		PartialStartTask:   NewPartialStartTaskEndpoint(s, a.JWTAuth),
+		UpdatePostContents: NewUpdatePostContentsEndpoint(s, a.JWTAuth),
+		StopTask:           NewStopTaskEndpoint(s, a.JWTAuth),
+		GetTask:            NewGetTaskEndpoint(s, a.JWTAuth),
+		GetProgress:        NewGetProgressEndpoint(s, a.JWTAuth),
+		ListTasks:          NewListTasksEndpoint(s, a.JWTAuth),
+		DownloadTargets:    NewDownloadTargetsEndpoint(s, a.JWTAuth),
+		DownloadBots:       NewDownloadBotsEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -65,6 +67,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ForceDelete = m(e.ForceDelete)
 	e.StartTask = m(e.StartTask)
 	e.PartialStartTask = m(e.PartialStartTask)
+	e.UpdatePostContents = m(e.UpdatePostContents)
 	e.StopTask = m(e.StopTask)
 	e.GetTask = m(e.GetTask)
 	e.GetProgress = m(e.GetProgress)
@@ -222,6 +225,25 @@ func NewPartialStartTaskEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.
 			return nil, err
 		}
 		return s.PartialStartTask(ctx, p)
+	}
+}
+
+// NewUpdatePostContentsEndpoint returns an endpoint function that calls the
+// method "update post contents" of service "tasks_service".
+func NewUpdatePostContentsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdatePostContentsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.UpdatePostContents(ctx, p)
 	}
 }
 

@@ -69,6 +69,9 @@ type UpdateTaskRequestBody struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUser *string `json:"testing_tag_user"`
 }
 
 // UploadVideoRequestBody is the type of the "tasks_service" service "upload
@@ -156,6 +159,12 @@ type UpdateTaskOKResponseBody struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 // UploadVideoOKResponseBody is the type of the "tasks_service" service "upload
@@ -200,6 +209,16 @@ type PartialStartTaskOKResponseBody struct {
 	TaskID string `json:"task_id"`
 	// список успешных имен ботов
 	Succeeded []string `form:"succeeded" json:"succeeded" xml:"succeeded"`
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+}
+
+// UpdatePostContentsOKResponseBody is the type of the "tasks_service" service
+// "update post contents" endpoint HTTP response body.
+type UpdatePostContentsOKResponseBody struct {
+	Status int `form:"status" json:"status" xml:"status"`
+	// id задачи
+	TaskID string `json:"task_id"`
 	// имена живых аккаунтов, на которых ведем трафик
 	LandingAccounts []string `json:"landing_accounts"`
 }
@@ -268,6 +287,12 @@ type GetTaskOKResponseBody struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 // GetProgressOKResponseBody is the type of the "tasks_service" service "get
@@ -375,6 +400,12 @@ type TaskResponse struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 // TaskFileNamesRequestBody is used to define fields on request body types.
@@ -436,6 +467,8 @@ func NewUpdateTaskOKResponseBody(res *tasksservice.Task) *UpdateTaskOKResponseBo
 		PhotoTagsPostsPerBot:       res.PhotoTagsPostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
 		PhotoTargetsPerPost:        res.PhotoTargetsPerPost,
+		TestingTagUsername:         res.TestingTagUsername,
+		TestingTagUserID:           res.TestingTagUserID,
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -548,6 +581,22 @@ func NewPartialStartTaskOKResponseBody(res *tasksservice.PartialStartTaskResult)
 	return body
 }
 
+// NewUpdatePostContentsOKResponseBody builds the HTTP response body from the
+// result of the "update post contents" endpoint of the "tasks_service" service.
+func NewUpdatePostContentsOKResponseBody(res *tasksservice.UpdatePostContentsResult) *UpdatePostContentsOKResponseBody {
+	body := &UpdatePostContentsOKResponseBody{
+		Status: int(res.Status),
+		TaskID: res.TaskID,
+	}
+	if res.LandingAccounts != nil {
+		body.LandingAccounts = make([]string, len(res.LandingAccounts))
+		for i, val := range res.LandingAccounts {
+			body.LandingAccounts[i] = val
+		}
+	}
+	return body
+}
+
 // NewStopTaskOKResponseBody builds the HTTP response body from the result of
 // the "stop task" endpoint of the "tasks_service" service.
 func NewStopTaskOKResponseBody(res *tasksservice.StopTaskResult) *StopTaskOKResponseBody {
@@ -584,6 +633,8 @@ func NewGetTaskOKResponseBody(res *tasksservice.Task) *GetTaskOKResponseBody {
 		PhotoTagsPostsPerBot:       res.PhotoTagsPostsPerBot,
 		TargetsPerPost:             res.TargetsPerPost,
 		PhotoTargetsPerPost:        res.PhotoTargetsPerPost,
+		TestingTagUsername:         res.TestingTagUsername,
+		TestingTagUserID:           res.TestingTagUserID,
 	}
 	if res.LandingAccounts != nil {
 		body.LandingAccounts = make([]string, len(res.LandingAccounts))
@@ -712,6 +763,7 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 		PhotoTagsPostsPerBot:  body.PhotoTagsPostsPerBot,
 		TargetsPerPost:        body.TargetsPerPost,
 		PhotoTargetsPerPost:   body.PhotoTargetsPerPost,
+		TestingTagUser:        body.TestingTagUser,
 	}
 	if body.LandingAccounts != nil {
 		v.LandingAccounts = make([]string, len(body.LandingAccounts))
@@ -835,6 +887,16 @@ func NewPartialStartTaskPayload(body *PartialStartTaskRequestBody, taskID string
 			v.Usernames[i] = val
 		}
 	}
+	v.TaskID = taskID
+	v.Token = token
+
+	return v
+}
+
+// NewUpdatePostContentsPayload builds a tasks_service service update post
+// contents endpoint payload.
+func NewUpdatePostContentsPayload(taskID string, token string) *tasksservice.UpdatePostContentsPayload {
+	v := &tasksservice.UpdatePostContentsPayload{}
 	v.TaskID = taskID
 	v.Token = token
 

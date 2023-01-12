@@ -35,6 +35,8 @@ type Service interface {
 	StartTask(context.Context, *StartTaskPayload) (res *StartTaskResult, err error)
 	// начать выполнение задачи для конкретных ботов
 	PartialStartTask(context.Context, *PartialStartTaskPayload) (res *PartialStartTaskResult, err error)
+	// Начать обновлять содержимое постов
+	UpdatePostContents(context.Context, *UpdatePostContentsPayload) (res *UpdatePostContentsResult, err error)
 	// остановить выполнение задачи
 	StopTask(context.Context, *StopTaskPayload) (res *StopTaskResult, err error)
 	// получить задачу по id
@@ -63,7 +65,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [14]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "stop task", "get task", "get progress", "list tasks", "download targets", "download bots"}
+var MethodNames = [15]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "update post contents", "stop task", "get task", "get progress", "list tasks", "download targets", "download bots"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -318,6 +320,12 @@ type Task struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 type TaskFileNames struct {
@@ -354,12 +362,33 @@ type TaskProgress struct {
 // 3- задача готова к запуску
 // 4- задача запущена
 // 5 - задача остановлена
-// 6 - задача завершена
+// 6 - выкладывание постов закончено
+// 7 - меняем описания у выложенных постов
+// 8 - задача завершена полностью, терминальный статус
 type TaskStatus int
 
 // 1 - загружаем изображения
 // 2- загружаем видео в рилсы
 type TaskType int
+
+// UpdatePostContentsPayload is the payload type of the tasks_service service
+// update post contents method.
+type UpdatePostContentsPayload struct {
+	// JWT used for authentication
+	Token string
+	// id задачи
+	TaskID string `json:"task_id"`
+}
+
+// UpdatePostContentsResult is the result type of the tasks_service service
+// update post contents method.
+type UpdatePostContentsResult struct {
+	Status TaskStatus
+	// id задачи
+	TaskID string `json:"task_id"`
+	// имена живых аккаунтов, на которых ведем трафик
+	LandingAccounts []string `json:"landing_accounts"`
+}
 
 // UpdateTaskPayload is the payload type of the tasks_service service update
 // task method.
@@ -400,6 +429,9 @@ type UpdateTaskPayload struct {
 	PostImages []string `json:"post_images"`
 	// аватарки для ботов
 	BotImages []string `json:"bot_images"`
+	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUser *string `json:"testing_tag_user"`
 }
 
 type UploadError struct {

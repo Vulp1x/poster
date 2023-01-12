@@ -264,6 +264,11 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "bot_images")
 			})
 
+			Attribute("testing_tag_user", String, func() {
+				Description("username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов")
+				Meta("struct:tag:json", "testing_tag_user")
+			})
+
 			Required("token", "task_id")
 		})
 
@@ -520,6 +525,47 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
+	Method("update post contents", func() {
+		Description("Начать обновлять содержимое постов")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Required("token", "task_id")
+		})
+
+		Result(func() {
+			Attribute("status", TaskStatus)
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("landing_accounts", ArrayOf(String), func() {
+				Description("имена живых аккаунтов, на которых ведем трафик")
+				Meta("struct:tag:json", "landing_accounts")
+			})
+
+			Required("task_id", "status", "landing_accounts")
+		})
+
+		HTTP(func() {
+			POST("/api/tasks/{task_id}/start/post-contents/")
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
 	Method("stop task", func() {
 		Description("остановить выполнение задачи ")
 
@@ -627,7 +673,7 @@ var _ = Service("tasks_service", func() {
 		Result(TaskProgress)
 
 		HTTP(func() {
-			GET("/api/tasks/{task_id}/progress/")
+			GET("/api/tasks/{task_id}/progress")
 			Params(func() {
 				Param("page_size:psize")
 				Param("page:p")

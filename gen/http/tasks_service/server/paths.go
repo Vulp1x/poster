@@ -51,6 +51,11 @@ func PartialStartTaskTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/start/partial/", taskID)
 }
 
+// UpdatePostContentsTasksServicePath returns the URL path to the tasks_service service update post contents HTTP endpoint.
+func UpdatePostContentsTasksServicePath(taskID string) string {
+	return fmt.Sprintf("/api/tasks/%v/start/post-contents/", taskID)
+}
+
 // StopTaskTasksServicePath returns the URL path to the tasks_service service stop task HTTP endpoint.
 func StopTaskTasksServicePath(taskID string) string {
 	return fmt.Sprintf("/api/tasks/%v/stop/", taskID)
@@ -63,7 +68,7 @@ func GetTaskTasksServicePath(taskID string) string {
 
 // GetProgressTasksServicePath returns the URL path to the tasks_service service get progress HTTP endpoint.
 func GetProgressTasksServicePath(taskID string) string {
-	return fmt.Sprintf("/api/tasks/%v/progress/", taskID)
+	return fmt.Sprintf("/api/tasks/%v/progress", taskID)
 }
 
 // ListTasksTasksServicePath returns the URL path to the tasks_service service list tasks HTTP endpoint.

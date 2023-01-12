@@ -19,21 +19,22 @@ import (
 
 // Server lists the tasks_service service endpoint HTTP handlers.
 type Server struct {
-	Mounts           []*MountPoint
-	CreateTaskDraft  http.Handler
-	UpdateTask       http.Handler
-	UploadVideo      http.Handler
-	UploadFiles      http.Handler
-	AssignProxies    http.Handler
-	ForceDelete      http.Handler
-	StartTask        http.Handler
-	PartialStartTask http.Handler
-	StopTask         http.Handler
-	GetTask          http.Handler
-	GetProgress      http.Handler
-	ListTasks        http.Handler
-	DownloadTargets  http.Handler
-	DownloadBots     http.Handler
+	Mounts             []*MountPoint
+	CreateTaskDraft    http.Handler
+	UpdateTask         http.Handler
+	UploadVideo        http.Handler
+	UploadFiles        http.Handler
+	AssignProxies      http.Handler
+	ForceDelete        http.Handler
+	StartTask          http.Handler
+	PartialStartTask   http.Handler
+	UpdatePostContents http.Handler
+	StopTask           http.Handler
+	GetTask            http.Handler
+	GetProgress        http.Handler
+	ListTasks          http.Handler
+	DownloadTargets    http.Handler
+	DownloadBots       http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -87,27 +88,29 @@ func New(
 			{"ForceDelete", "DELETE", "/api/tasks/{task_id}/force/"},
 			{"StartTask", "POST", "/api/tasks/{task_id}/start/"},
 			{"PartialStartTask", "POST", "/api/tasks/{task_id}/start/partial/"},
+			{"UpdatePostContents", "POST", "/api/tasks/{task_id}/start/post-contents/"},
 			{"StopTask", "POST", "/api/tasks/{task_id}/stop/"},
 			{"GetTask", "GET", "/api/tasks/{task_id}/"},
-			{"GetProgress", "GET", "/api/tasks/{task_id}/progress/"},
+			{"GetProgress", "GET", "/api/tasks/{task_id}/progress"},
 			{"ListTasks", "GET", "/api/tasks/"},
 			{"DownloadTargets", "GET", "/api/tasks/{task_id}/targets/download/"},
 			{"DownloadBots", "GET", "/api/tasks/{task_id}/bots/download/"},
 		},
-		CreateTaskDraft:  NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
-		UpdateTask:       NewUpdateTaskHandler(e.UpdateTask, mux, decoder, encoder, errhandler, formatter),
-		UploadVideo:      NewUploadVideoHandler(e.UploadVideo, mux, NewTasksServiceUploadVideoDecoder(mux, tasksServiceUploadVideoDecoderFn), encoder, errhandler, formatter),
-		UploadFiles:      NewUploadFilesHandler(e.UploadFiles, mux, NewTasksServiceUploadFilesDecoder(mux, tasksServiceUploadFilesDecoderFn), encoder, errhandler, formatter),
-		AssignProxies:    NewAssignProxiesHandler(e.AssignProxies, mux, decoder, encoder, errhandler, formatter),
-		ForceDelete:      NewForceDeleteHandler(e.ForceDelete, mux, decoder, encoder, errhandler, formatter),
-		StartTask:        NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
-		PartialStartTask: NewPartialStartTaskHandler(e.PartialStartTask, mux, decoder, encoder, errhandler, formatter),
-		StopTask:         NewStopTaskHandler(e.StopTask, mux, decoder, encoder, errhandler, formatter),
-		GetTask:          NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
-		GetProgress:      NewGetProgressHandler(e.GetProgress, mux, decoder, encoder, errhandler, formatter),
-		ListTasks:        NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
-		DownloadTargets:  NewDownloadTargetsHandler(e.DownloadTargets, mux, decoder, encoder, errhandler, formatter),
-		DownloadBots:     NewDownloadBotsHandler(e.DownloadBots, mux, decoder, encoder, errhandler, formatter),
+		CreateTaskDraft:    NewCreateTaskDraftHandler(e.CreateTaskDraft, mux, decoder, encoder, errhandler, formatter),
+		UpdateTask:         NewUpdateTaskHandler(e.UpdateTask, mux, decoder, encoder, errhandler, formatter),
+		UploadVideo:        NewUploadVideoHandler(e.UploadVideo, mux, NewTasksServiceUploadVideoDecoder(mux, tasksServiceUploadVideoDecoderFn), encoder, errhandler, formatter),
+		UploadFiles:        NewUploadFilesHandler(e.UploadFiles, mux, NewTasksServiceUploadFilesDecoder(mux, tasksServiceUploadFilesDecoderFn), encoder, errhandler, formatter),
+		AssignProxies:      NewAssignProxiesHandler(e.AssignProxies, mux, decoder, encoder, errhandler, formatter),
+		ForceDelete:        NewForceDeleteHandler(e.ForceDelete, mux, decoder, encoder, errhandler, formatter),
+		StartTask:          NewStartTaskHandler(e.StartTask, mux, decoder, encoder, errhandler, formatter),
+		PartialStartTask:   NewPartialStartTaskHandler(e.PartialStartTask, mux, decoder, encoder, errhandler, formatter),
+		UpdatePostContents: NewUpdatePostContentsHandler(e.UpdatePostContents, mux, decoder, encoder, errhandler, formatter),
+		StopTask:           NewStopTaskHandler(e.StopTask, mux, decoder, encoder, errhandler, formatter),
+		GetTask:            NewGetTaskHandler(e.GetTask, mux, decoder, encoder, errhandler, formatter),
+		GetProgress:        NewGetProgressHandler(e.GetProgress, mux, decoder, encoder, errhandler, formatter),
+		ListTasks:          NewListTasksHandler(e.ListTasks, mux, decoder, encoder, errhandler, formatter),
+		DownloadTargets:    NewDownloadTargetsHandler(e.DownloadTargets, mux, decoder, encoder, errhandler, formatter),
+		DownloadBots:       NewDownloadBotsHandler(e.DownloadBots, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -124,6 +127,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ForceDelete = m(s.ForceDelete)
 	s.StartTask = m(s.StartTask)
 	s.PartialStartTask = m(s.PartialStartTask)
+	s.UpdatePostContents = m(s.UpdatePostContents)
 	s.StopTask = m(s.StopTask)
 	s.GetTask = m(s.GetTask)
 	s.GetProgress = m(s.GetProgress)
@@ -142,6 +146,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountForceDeleteHandler(mux, h.ForceDelete)
 	MountStartTaskHandler(mux, h.StartTask)
 	MountPartialStartTaskHandler(mux, h.PartialStartTask)
+	MountUpdatePostContentsHandler(mux, h.UpdatePostContents)
 	MountStopTaskHandler(mux, h.StopTask)
 	MountGetTaskHandler(mux, h.GetTask)
 	MountGetProgressHandler(mux, h.GetProgress)
@@ -563,6 +568,58 @@ func NewPartialStartTaskHandler(
 	})
 }
 
+// MountUpdatePostContentsHandler configures the mux to serve the
+// "tasks_service" service "update post contents" endpoint.
+func MountUpdatePostContentsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/api/tasks/{task_id}/start/post-contents/", f)
+}
+
+// NewUpdatePostContentsHandler creates a HTTP handler which loads the HTTP
+// request and calls the "tasks_service" service "update post contents"
+// endpoint.
+func NewUpdatePostContentsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdatePostContentsRequest(mux, decoder)
+		encodeResponse = EncodeUpdatePostContentsResponse(encoder)
+		encodeError    = EncodeUpdatePostContentsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update post contents")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "tasks_service")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountStopTaskHandler configures the mux to serve the "tasks_service" service
 // "stop task" endpoint.
 func MountStopTaskHandler(mux goahttp.Muxer, h http.Handler) {
@@ -674,7 +731,7 @@ func MountGetProgressHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/api/tasks/{task_id}/progress/", f)
+	mux.Handle("GET", "/api/tasks/{task_id}/progress", f)
 }
 
 // NewGetProgressHandler creates a HTTP handler which loads the HTTP request

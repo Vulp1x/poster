@@ -73,7 +73,9 @@ var TaskStatus = Type("TaskStatus", Int, func() {
 	3- задача готова к запуску
 	4- задача запущена 
 	5 - задача остановлена
-	6 - задача завершена`)
+	6 - выкладывание постов закончено
+	7 - меняем описания у выложенных постов
+	8 - задача завершена полностью, терминальный статус`)
 })
 
 // TaskType описывает тип задачи (фотографии или рилсы)
@@ -197,6 +199,16 @@ var Task = Type("Task", func() {
 	Attribute("bot_images", ArrayOf(String), func() {
 		Description("аватарки для ботов")
 		Meta("struct:tag:json", "bot_images")
+	})
+
+	Attribute("testing_tag_username", String, func() {
+		Description("username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов")
+		Meta("struct:tag:json", "testing_tag_username")
+	})
+
+	Attribute("testing_tag_user_id", Int64, func() {
+		Description("username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов")
+		Meta("struct:tag:json", "testing_tag_user_id")
 	})
 
 	Required("id", "type", "text_template", "post_images", "status", "title", "bots_num", "residential_proxies_num",
