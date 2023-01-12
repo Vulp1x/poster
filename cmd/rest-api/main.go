@@ -71,12 +71,12 @@ func main() {
 
 	db, err := postgres.NewConn(ctx, conf.Postgres)
 	if err != nil {
-		logger.Fatalf(ctx, "failed to create db conn: %v", err)
+		logger.Fatalf(ctx, "failed to create db instaProxyConn: %v", err)
 	}
 
-	conn, err := grpc.DialContext(
+	instaProxyConn, err := grpc.DialContext(
 		ctx,
-		conf.Listen.ParserURL,
+		conf.Listen.InstaProxyURL,
 		grpc.WithUnaryInterceptor(mw.UnaryClientLog()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -84,17 +84,17 @@ func main() {
 		logger.Fatalf(ctx, "failed to connect to parser: %v", err)
 	}
 
-	queue := workers.NewQueuue(ctx, dbTXFunc(ctx), dbTXFunc, conn)
+	queue := workers.NewQueuue(ctx, dbTXFunc(ctx), dbTXFunc, instaProxyConn)
 
 	userStore := users.NewStore(store.WithDBTXFunc(dbTXFunc), store.WithTxFunc(txFunc))
-	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname, conn, queue, db)
+	taskStore := tasks.NewStore(5*time.Second, dbTXFunc, txFunc, conf.Instagrapi.Hostname, instaProxyConn, queue, db)
 	botsStore := bots.NewStore(dbTXFunc, txFunc, conf.Instagrapi.Hostname)
 
 	// Initialize the services.
 	authServiceSvc := service.NewAuthService(userStore, conf.Security)
 	tasksService := service.NewTasksService(authServiceSvc, taskStore)
 
-	adminsService := service.NewAdminService(authServiceSvc, userStore, botsStore, conn)
+	adminsService := service.NewAdminService(authServiceSvc, userStore, botsStore, instaProxyConn)
 
 	// potentially running in different processes.
 	authServiceEndpoints := authservice.NewEndpoints(authServiceSvc)

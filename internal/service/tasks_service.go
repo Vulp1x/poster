@@ -31,6 +31,8 @@ type taskStore interface {
 	TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager.Pager) (domain.TaskProgress, error)
 	SaveVideo(ctx context.Context, taskID uuid.UUID, video []byte, filename string) (domain.Task, error)
 	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, error)
+	TaskTargets(ctx context.Context, taskID uuid.UUID) (domain.Targets, error)
+	TaskBots(ctx context.Context, taskID uuid.UUID) (domain.BotAccounts, error)
 }
 
 // tasks_service service example implementation.
@@ -38,14 +40,6 @@ type taskStore interface {
 type tasksServicesrvc struct {
 	auth  authservice.Auther
 	store taskStore
-}
-
-func (s *tasksServicesrvc) DownloadTargets(ctx context.Context, payload *tasksservice.DownloadTargetsPayload) (res []string, err error) {
-	return []string{"testim"}, nil
-}
-
-func (s *tasksServicesrvc) DownloadBots(ctx context.Context, payload *tasksservice.DownloadBotsPayload) (res []string, err error) {
-	return []string{"bot info would be here"}, err
 }
 
 // NewTasksService returns the tasks_service service implementation.
@@ -484,6 +478,52 @@ func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice
 		TaskID:    taskID.String(),
 		Succeeded: usernames,
 	}, nil
+}
+
+func (s *tasksServicesrvc) DownloadTargets(ctx context.Context, p *tasksservice.DownloadTargetsPayload) ([]string, error) {
+	logger.Infof(ctx, "download task targets %s", p.TaskID)
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	targets, err := s.store.TaskTargets(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to download targets: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, internalErr(err)
+	}
+
+	return targets.ToProto(p.Format), nil
+}
+
+func (s *tasksServicesrvc) DownloadBots(ctx context.Context, p *tasksservice.DownloadBotsPayload) ([]string, error) {
+	logger.Infof(ctx, "download task bots %s", p.TaskID)
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	bots, err := s.store.TaskBots(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to download bots: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, internalErr(err)
+	}
+
+	return bots.ToProto(p.Proxies), nil
 }
 
 func internalErr(err error) tasksservice.InternalError {

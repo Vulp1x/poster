@@ -1,7 +1,7 @@
 listen:
   port: 8090
   bind_ip: 127.0.0.1
-  parser_url: 127.0.0.1:8092
+  insta_proxy_url: 127.0.0.1:8092
   cert_file: 'localhost.crt'
   key_file: 'localhost.key'
 logger:

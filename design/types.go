@@ -224,8 +224,7 @@ var TaskFilenames = Type("TaskFileNames", func() {
 })
 
 var BotsProgress = Type("BotsProgress", func() {
-	Attribute("user_name", String, "имя пользователя бота", func() {
-		Meta("struct:tag:json", "user_name")
+	Attribute("username", String, "имя пользователя бота", func() {
 	})
 	Attribute("posts_count", Int32, "количество выложенных постов", func() {
 		Meta("struct:tag:json", "posts_count")
@@ -242,7 +241,7 @@ var BotsProgress = Type("BotsProgress", func() {
 		Meta("struct:tag:json", "file_order")
 	})
 
-	Required("user_name", "posts_count", "status", "description_targets_notified", "photo_targets_notified", "file_order")
+	Required("username", "posts_count", "status", "description_targets_notified", "photo_targets_notified", "file_order")
 })
 
 var TaskProgress = Type("TaskProgress", func() {

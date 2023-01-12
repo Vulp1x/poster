@@ -426,16 +426,12 @@ paths:
       description: Получить всех ботов из этой задачи
       operationId: tasks_service#download bots
       parameters:
-        - name: format
+        - name: proxies
           in: query
-          description: 1- только user_id, 2- только username, 3 - и то и другое
+          description: добавлять ли прокси к ботам
           required: true
-          type: integer
-          default: 3
-          enum:
-            - 1
-            - 2
-            - 3
+          type: boolean
+          default: false
         - name: task_id
           in: path
           description: id задачи
@@ -1151,7 +1147,7 @@ definitions:
         description: текущий статус бота, будут ли выкладываться посты
         example: 498294978
         format: int32
-      user_name:
+      username:
         type: string
         description: имя пользователя бота
         example: Sed quo voluptas.
@@ -1161,9 +1157,9 @@ definitions:
       photo_targets_notified: 816605174
       posts_count: 915934443
       status: 142036445
-      user_name: Exercitationem minus eveniet.
+      username: Exercitationem minus eveniet.
     required:
-      - user_name
+      - username
       - posts_count
       - status
       - description_targets_notified
@@ -1747,19 +1743,19 @@ definitions:
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
       done:
         type: boolean
         description: закончена ли задача
@@ -1791,25 +1787,25 @@ definitions:
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
       done: true
       photo_targets_notified: 6206996228618058892
       targets_failed: 3438065596334019948
@@ -1837,13 +1833,13 @@ definitions:
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
       done:
         type: boolean
         description: закончена ли задача
@@ -1875,25 +1871,25 @@ definitions:
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
       done: false
       photo_targets_notified: 9130982797642173773
       targets_failed: 6321830785375711834
@@ -1921,25 +1917,25 @@ definitions:
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
           - description_targets_notified: 2051982833
             file_order: 1670982266
             photo_targets_notified: 1817605030
             posts_count: 48166849
             status: 778805235
-            user_name: Totam qui voluptatum.
+            username: Totam qui voluptatum.
       done:
         type: boolean
         description: закончена ли задача
@@ -1971,19 +1967,19 @@ definitions:
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
         - description_targets_notified: 2051982833
           file_order: 1670982266
           photo_targets_notified: 1817605030
           posts_count: 48166849
           status: 778805235
-          user_name: Totam qui voluptatum.
+          username: Totam qui voluptatum.
       done: true
       photo_targets_notified: 6005790484489931519
       targets_failed: 3036141612650495292

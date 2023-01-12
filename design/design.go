@@ -714,20 +714,19 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "task_id")
 			})
 
-			Attribute("format", Int, func() {
-				Enum(1, 2, 3)
-				Description(`1- только user_id, 2- только username, 3 - и то и другое`)
-				Default(3)
+			Attribute("proxies", Boolean, func() {
+				Description(`добавлять ли прокси к ботам`)
+				Default(false)
 			})
 
-			Required("token", "task_id", "format")
+			Required("token", "task_id", "proxies")
 		})
 
 		Result(ArrayOf(String))
 
 		HTTP(func() {
 			GET("/api/tasks/{task_id}/bots/download/")
-			Param("format:format")
+			Param("proxies:proxies")
 			Response(StatusOK)
 			Response(StatusNotFound)
 			Response(StatusUnauthorized)

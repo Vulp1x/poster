@@ -307,7 +307,7 @@ type UploadErrorResponseBody struct {
 // BotsProgressResponseBody is used to define fields on response body types.
 type BotsProgressResponseBody struct {
 	// имя пользователя бота
-	UserName string `json:"user_name"`
+	Username string `form:"username" json:"username" xml:"username"`
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
@@ -895,10 +895,10 @@ func NewDownloadTargetsPayload(taskID string, format int, token string) *tasksse
 
 // NewDownloadBotsPayload builds a tasks_service service download bots endpoint
 // payload.
-func NewDownloadBotsPayload(taskID string, format int, token string) *tasksservice.DownloadBotsPayload {
+func NewDownloadBotsPayload(taskID string, proxies bool, token string) *tasksservice.DownloadBotsPayload {
 	v := &tasksservice.DownloadBotsPayload{}
 	v.TaskID = taskID
-	v.Format = format
+	v.Proxies = proxies
 	v.Token = token
 
 	return v

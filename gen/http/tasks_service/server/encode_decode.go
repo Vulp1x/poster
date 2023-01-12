@@ -1346,28 +1346,24 @@ func EncodeDownloadBotsResponse(encoder func(context.Context, http.ResponseWrite
 func DecodeDownloadBotsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			taskID string
-			format int
-			token  string
-			err    error
+			taskID  string
+			proxies bool
+			token   string
+			err     error
 
 			params = mux.Vars(r)
 		)
 		taskID = params["task_id"]
 		{
-			formatRaw := r.URL.Query().Get("format")
-			if formatRaw == "" {
-				err = goa.MergeErrors(err, goa.MissingFieldError("format", "query string"))
-			} else {
-				v, err2 := strconv.ParseInt(formatRaw, 10, strconv.IntSize)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("format", formatRaw, "integer"))
-				}
-				format = int(v)
+			proxiesRaw := r.URL.Query().Get("proxies")
+			if proxiesRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("proxies", "query string"))
 			}
-		}
-		if !(format == 1 || format == 2 || format == 3) {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("format", format, []interface{}{1, 2, 3}))
+			v, err2 := strconv.ParseBool(proxiesRaw)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("proxies", proxiesRaw, "boolean"))
+			}
+			proxies = v
 		}
 		token = r.Header.Get("Authorization")
 		if token == "" {
@@ -1376,7 +1372,7 @@ func DecodeDownloadBotsRequest(mux goahttp.Muxer, decoder func(*http.Request) go
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDownloadBotsPayload(taskID, format, token)
+		payload := NewDownloadBotsPayload(taskID, proxies, token)
 		if strings.Contains(payload.Token, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Token, " ", 2)[1]
@@ -1511,7 +1507,7 @@ func marshalTasksserviceUploadErrorToUploadErrorResponseBody(v *tasksservice.Upl
 // *tasksservice.BotsProgress.
 func marshalTasksserviceBotsProgressToBotsProgressResponseBody(v *tasksservice.BotsProgress) *BotsProgressResponseBody {
 	res := &BotsProgressResponseBody{
-		UserName:                   v.UserName,
+		Username:                   v.Username,
 		PostsCount:                 v.PostsCount,
 		Status:                     v.Status,
 		DescriptionTargetsNotified: v.DescriptionTargetsNotified,

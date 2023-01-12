@@ -124,7 +124,7 @@ func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
 	bots := make([]*tasksservice.BotsProgress, len(p.BotsProgress))
 	for i, progress := range p.BotsProgress {
 		bots[i] = &tasksservice.BotsProgress{
-			UserName:                   progress.Username,
+			Username:                   progress.Username,
 			PostsCount:                 progress.PostsCount,
 			Status:                     progress.Status,
 			DescriptionTargetsNotified: progress.PostDescriptionTargets,

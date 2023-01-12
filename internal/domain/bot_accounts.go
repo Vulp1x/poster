@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"bytes"
 	"context"
 	"strconv"
 
@@ -116,6 +117,69 @@ func (b BotAccounts) ToGRPCProto(ctx context.Context) []*api.Bot {
 	}
 
 	return protoBots
+}
+
+func (b BotAccounts) ToProto(proxies bool) []string {
+	botsProto := make([]string, len(b))
+
+	for i, account := range b {
+		botsProto[i] = account.formatBot(proxies)
+	}
+
+	return botsProto
+}
+
+func (b BotAccount) formatBot(proxies bool) string {
+	buf := bytes.NewBufferString(b.Username)
+	// примерный размер итоговых строк
+	buf.Grow(600)
+	buf.WriteByte(':')
+	buf.WriteString(b.Password)
+	buf.WriteByte('|')
+
+	buf.WriteString(b.UserAgent)
+	buf.WriteByte('|')
+
+	buf.WriteString(b.Session.DeviceID)
+	buf.WriteByte(';')
+	buf.WriteString(b.Session.UUID.String())
+	buf.WriteByte(';')
+	buf.WriteString(b.Session.PhoneID.String())
+	buf.WriteByte(';')
+	buf.WriteString(b.Session.AdvertisingID.String())
+	buf.WriteByte('|')
+
+	buf.WriteString("IG-U-DS-USER-ID=")
+	buf.WriteString(strconv.FormatInt(b.InstID, 10))
+	buf.WriteString(";Authorization=")
+	buf.WriteString(b.Headers.Authorization)
+	buf.WriteString(";X-IG-WWW-Claim=")
+	buf.WriteString(b.Headers.WWWClaim)
+
+	if proxies {
+		buf.WriteByte('|')
+		if b.ResProxy != nil {
+			buf.WriteString(b.ResProxy.Host)
+			buf.WriteByte(':')
+			buf.WriteString(strconv.Itoa(int(b.ResProxy.Port)))
+			buf.WriteByte(':')
+			buf.WriteString(b.ResProxy.Login)
+			buf.WriteByte(':')
+			buf.WriteString(b.ResProxy.Pass)
+		}
+		buf.WriteByte('|')
+		if b.ResProxy != nil {
+			buf.WriteString(b.ResProxy.Host)
+			buf.WriteByte(':')
+			buf.WriteString(strconv.Itoa(int(b.ResProxy.Port)))
+			buf.WriteByte(':')
+			buf.WriteString(b.ResProxy.Login)
+			buf.WriteByte(':')
+			buf.WriteString(b.ResProxy.Pass)
+		}
+	}
+
+	return buf.String()
 }
 
 // Ids возвращает список айдишников аккаунтов

@@ -23,6 +23,7 @@ import (
 )
 
 const workersPerTask = 10
+const maxDBLimit = 1000000
 
 // ErrTaskNotFound не смогли найти таску
 var ErrTaskNotFound = errors.New("task not found")
@@ -59,6 +60,49 @@ type Store struct {
 	cli         api.InstaProxyClient
 	queue       *pgqueue.Queue
 	db          dbmodel.DBTX
+}
+
+func (s *Store) TaskBots(ctx context.Context, taskID uuid.UUID) (domain.BotAccounts, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	_, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrTaskNotFound
+		}
+
+		return nil, err
+	}
+
+	bots, err := q.FindBotsForTask(ctx, taskID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find bots: %v", err)
+	}
+
+	return domain.BotsFromDBModels(bots), nil
+}
+
+func (s *Store) TaskTargets(ctx context.Context, taskID uuid.UUID) (domain.Targets, error) {
+	q := dbmodel.New(s.dbtxf(ctx))
+
+	_, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrTaskNotFound
+		}
+
+		return nil, err
+	}
+
+	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
+		TaskID: taskID,
+		Limit:  maxDBLimit,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to find targets ")
+	}
+
+	return targets, nil
 }
 
 func (s *Store) ListTasks(ctx context.Context, userID uuid.UUID) (domain.TasksWithCounters, error) {

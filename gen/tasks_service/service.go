@@ -93,7 +93,7 @@ type BotAccountRecord struct {
 
 type BotsProgress struct {
 	// имя пользователя бота
-	UserName string `json:"user_name"`
+	Username string
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
@@ -137,8 +137,8 @@ type DownloadBotsPayload struct {
 	Token string
 	// id задачи
 	TaskID string `json:"task_id"`
-	// 1- только user_id, 2- только username, 3 - и то и другое
-	Format int
+	// добавлять ли прокси к ботам
+	Proxies bool
 }
 
 // DownloadTargetsPayload is the payload type of the tasks_service service
