@@ -16,6 +16,7 @@ import (
 	"github.com/inst-api/poster/internal/instagrapi"
 	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/internal/store"
+	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/inst-api/poster/pkg/pgqueue"
 	"github.com/jackc/pgx/v4"
@@ -60,6 +61,63 @@ type Store struct {
 	cli         api.InstaProxyClient
 	queue       *pgqueue.Queue
 	db          dbmodel.DBTX
+}
+
+func (s *Store) StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) ([]string, error) {
+	tx, err := s.txf(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %v", err)
+	}
+	dbtx.RollbackUnlessCommitted(ctx, tx)
+
+	q := dbmodel.New(tx)
+
+	task, err := q.FindTaskByID(ctx, taskID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrTaskNotFound
+		}
+
+		return nil, err
+	}
+
+	if task.Status != dbmodel.DoneTaskStatus {
+		return nil, fmt.Errorf("got status %d, expected 6(done)", task.Status)
+	}
+
+	// TODO добавить проверку landing accounts перед началом
+	// s.cli.CheckLandingAccounts()
+
+	if err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
+		Status: dbmodel.UpdatingPostContentsTaskStatus,
+		ID:     taskID,
+	}); err != nil {
+		return nil, fmt.Errorf("failed to update task status: %v", err)
+	}
+
+	bots, err := q.FindBotsForTask(ctx, taskID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find bots for task: %v", err)
+	}
+
+	tasks := make([]pgqueue.Task, len(bots))
+	for i, bot := range bots {
+		tasks[i] = pgqueue.Task{
+			Kind:        workers.UpdatePostsContentsTaskKind,
+			Payload:     workers.EmptyPayload,
+			ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
+		}
+	}
+
+	if err = s.queue.PushTasksTx(ctx, tx, tasks); err != nil {
+		return nil, fmt.Errorf("failed to push %d tasks: %v", len(tasks), err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	return task.LandingAccounts, nil
 }
 
 func (s *Store) TaskBots(ctx context.Context, taskID uuid.UUID) (domain.BotAccounts, error) {

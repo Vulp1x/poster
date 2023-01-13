@@ -33,6 +33,7 @@ type taskStore interface {
 	StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, error)
 	TaskTargets(ctx context.Context, taskID uuid.UUID) (domain.Targets, error)
 	TaskBots(ctx context.Context, taskID uuid.UUID) (domain.BotAccounts, error)
+	StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) ([]string, error)
 }
 
 // tasks_service service example implementation.
@@ -477,6 +478,33 @@ func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice
 	return &tasksservice.PartialStartTaskResult{
 		TaskID:    taskID.String(),
 		Succeeded: usernames,
+	}, nil
+}
+
+func (s *tasksServicesrvc) UpdatePostContents(ctx context.Context, p *tasksservice.UpdatePostContentsPayload) (*tasksservice.UpdatePostContentsResult, error) {
+	logger.Infof(ctx, "starting to update post contents %s", p.TaskID)
+	taskID, err := uuid.Parse(p.TaskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
+		return nil, tasksservice.BadRequest("invalid task_id")
+	}
+
+	ctx = logger.WithKV(ctx, "task_id", taskID.String())
+
+	landingAccounts, err := s.store.StartUpdatePostContents(ctx, taskID)
+	if err != nil {
+		logger.Errorf(ctx, "failed to start updating post contents: %v", err)
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return nil, tasksservice.TaskNotFound("")
+		}
+
+		return nil, internalErr(err)
+	}
+
+	return &tasksservice.UpdatePostContentsResult{
+		Status:          tasksservice.TaskStatus(dbmodel.UpdatingPostContentsTaskStatus),
+		TaskID:          taskID.String(),
+		LandingAccounts: landingAccounts,
 	}, nil
 }
 

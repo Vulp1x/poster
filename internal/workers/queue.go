@@ -14,7 +14,7 @@ import (
 
 const (
 	MakePhotoPostsTaskKind        = 1
-	ParseBloggersMediaTaskKind    = 2
+	UpdatePostsContentsTaskKind   = 2
 	ParseUsersFromMediaTaskKind   = 3
 	TransitToSimilarFoundTaskKind = 4
 )

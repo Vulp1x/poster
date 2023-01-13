@@ -9,7 +9,9 @@ import (
 	"time"
 
 	chimw "github.com/go-chi/chi/middleware"
+	"github.com/inst-api/poster/pkg/logger"
 	goahttp "goa.design/goa/v3/http"
+	"goa.design/goa/v3/middleware"
 )
 
 // responseDupper tees the response to a buffer and a response writer.
@@ -37,6 +39,14 @@ func RequestLoggerWithDebug(mux goahttp.Muxer, debug bool) func(http.Handler) ht
 			defer func() {
 				entry.Write(dupper.Status(), dupper.BytesWritten(), dupper.Header(), time.Since(t1), dupper)
 			}()
+
+			rawTraceID := r.Context().Value(middleware.RequestIDKey)
+			traceID, ok := rawTraceID.(string)
+			if ok {
+				dupper.ResponseWriter.Header().Add("X-Trace-ID", traceID)
+			} else {
+				logger.Infof(r.Context(), "failed to cast trace_id to string from '%v' (type %T)", rawTraceID, rawTraceID)
+			}
 
 			h.ServeHTTP(dupper, chimw.WithLogEntry(r, entry))
 
