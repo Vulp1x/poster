@@ -303,19 +303,12 @@ func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID)
 }
 
 const findReadyBots = `-- name: FindReadyBots :many
-
-
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
 where (res_proxy is not null or work_proxy is not null)
   and status >= 2
 `
 
-// -- name: GetTaskTargetsCount :many
-// select status, count(*)
-// from target_users
-// where task_id = $1
-// group by status;
 func (q *Queries) FindReadyBots(ctx context.Context) ([]BotAccount, error) {
 	rows, err := q.db.Query(ctx, findReadyBots)
 	if err != nil {
@@ -809,6 +802,19 @@ func (q *Queries) GetBotsProgress(ctx context.Context, arg GetBotsProgressParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const getTaskBotsCount = `-- name: GetTaskBotsCount :one
+select count(*)
+from bot_accounts
+where task_id = $1
+`
+
+func (q *Queries) GetTaskBotsCount(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, getTaskBotsCount, taskID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const getTaskTargetsCount = `-- name: GetTaskTargetsCount :one

@@ -108,6 +108,7 @@ func (t TaskWithCounters) ToProto() *tasksservice.Task {
 type TaskProgress struct {
 	BotsProgress   []BotProgress
 	TargetCounters dbmodel.GetTaskTargetsCountRow
+	BotsCount      int
 	Done           bool
 }
 
@@ -140,5 +141,6 @@ func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
 		TargetsFailed:        int(p.TargetCounters.FailedTargets),
 		TargetsWaiting:       int(p.TargetCounters.UnusedTargets),
 		Done:                 p.Done,
+		BotsTotal:            p.BotsCount,
 	}
 }

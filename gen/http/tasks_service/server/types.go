@@ -311,6 +311,8 @@ type GetProgressOKResponseBody struct {
 	TargetsWaiting int `json:"targets_waiting"`
 	// закончена ли задача
 	Done bool `form:"done" json:"done" xml:"done"`
+	// общее количество ботов в задаче
+	BotsTotal int `json:"bots_total"`
 }
 
 // ListTasksResponseBody is the type of the "tasks_service" service "list
@@ -684,6 +686,7 @@ func NewGetProgressOKResponseBody(res *tasksservice.TaskProgress) *GetProgressOK
 		TargetsFailed:        res.TargetsFailed,
 		TargetsWaiting:       res.TargetsWaiting,
 		Done:                 res.Done,
+		BotsTotal:            res.BotsTotal,
 	}
 	if res.BotsProgresses != nil {
 		body.BotsProgresses = make([]*BotsProgressResponseBody, len(res.BotsProgresses))

@@ -355,6 +355,8 @@ type TaskProgress struct {
 	TargetsWaiting int `json:"targets_waiting"`
 	// закончена ли задача
 	Done bool
+	// общее количество ботов в задаче
+	BotsTotal int `json:"bots_total"`
 }
 
 // 1 - задача только создана, нужно загрузить список ботов, прокси и получателей

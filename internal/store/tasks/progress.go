@@ -66,10 +66,16 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 		return domain.TaskProgress{}, fmt.Errorf("failed to get target counters: %v", err)
 	}
 
+	botsCount, err := q.GetTaskBotsCount(ctx, taskID)
+	if err != nil {
+		return domain.TaskProgress{}, fmt.Errorf("failed to get task bots count: %v", err)
+	}
+
 	progress := domain.TaskProgress{
 		BotsProgress:   bots,
 		TargetCounters: targetCounters,
 		Done:           task.Status > dbmodel.StartedTaskStatus,
+		BotsCount:      int(botsCount),
 	}
 	return progress, rows.Err()
 }

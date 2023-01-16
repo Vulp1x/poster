@@ -278,5 +278,10 @@ var TaskProgress = Type("TaskProgress", func() {
 
 	Attribute("done", Boolean, "закончена ли задача")
 
-	Required("bots_progresses", "targets_notified", "photo_targets_notified", "targets_failed", "targets_waiting", "done")
+	Attribute("bots_total", Int, "общее количество ботов в задаче", func() {
+		Meta("struct:tag:json", "bots_total")
+	})
+
+	Required("bots_progresses", "targets_notified", "photo_targets_notified", "targets_failed",
+		"targets_waiting", "done", "bots_total")
 })

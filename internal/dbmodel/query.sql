@@ -236,13 +236,10 @@ select (select count(*) from target_users t where t.task_id = $1 and t.status = 
           and t.status = 'notified'
           AND interaction_type = 'post_description')                                      as description_notified_targets;
 
-
--- -- name: GetTaskTargetsCount :many
--- select status, count(*)
--- from target_users
--- where task_id = $1
--- group by status;
-
+-- name: GetTaskBotsCount :one
+select count(*)
+from bot_accounts
+where task_id = $1;
 
 -- name: FindReadyBots :many
 select *
