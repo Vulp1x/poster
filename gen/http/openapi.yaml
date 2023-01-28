@@ -1428,7 +1428,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 4
+        example: 2
         enum:
           - 1
           - 2
@@ -1436,6 +1436,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -1563,7 +1565,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 1
+        example: 3
         enum:
           - 1
           - 2
@@ -1571,13 +1573,15 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Quidem iusto dolores.
     example:
       bots_number: 3540215904743452421
-      status: 5
+      status: 7
       task_id: Non nobis vel.
     required:
       - bots_number
@@ -1594,7 +1598,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 5
+        example: 1
         enum:
           - 1
           - 2
@@ -1602,13 +1606,15 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Dolorum eum et quaerat dolore vel porro.
     example:
       bots_number: 4799033844962408971
-      status: 4
+      status: 2
       task_id: Omnis dolorum distinctio velit quis dolore ipsa.
     required:
       - bots_number
@@ -1625,7 +1631,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 5
+        example: 1
         enum:
           - 1
           - 2
@@ -1633,6 +1639,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -1664,13 +1672,15 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Atque quos accusamus.
     example:
       bots_number: 158093396325175068
-      status: 1
+      status: 3
       task_id: Et eligendi dolor et non.
     required:
       - bots_number
@@ -2207,6 +2217,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -2285,7 +2297,7 @@ definitions:
       posts_per_bot: 1364872521342983522
       residential_proxies_filename: Voluptatem error ut inventore qui ratione.
       residential_proxies_num: 7177048111626909503
-      status: 2
+      status: 8
       targets_filename: Dolores omnis et ea ut.
       targets_num: 1407257697092627530
       targets_per_post: 10334682406793925157
@@ -2459,6 +2471,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -2538,7 +2552,7 @@ definitions:
       posts_per_bot: 14697849480219974061
       residential_proxies_filename: Sit a nostrum expedita cum.
       residential_proxies_num: 6073832459312178126
-      status: 3
+      status: 7
       targets_filename: Qui omnis.
       targets_num: 7893970249779675655
       targets_per_post: 6629963420447873008
@@ -2703,7 +2717,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 5
+        example: 7
         enum:
           - 1
           - 2
@@ -2711,6 +2725,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -2788,7 +2804,7 @@ definitions:
       posts_per_bot: 9460374075549910318
       residential_proxies_filename: Ipsam aut deleniti repudiandae consectetur sint commodi.
       residential_proxies_num: 1093833172763249597
-      status: 5
+      status: 7
       targets_filename: Fugiat aut iusto omnis quos deleniti ut.
       targets_num: 4095300490276839846
       targets_per_post: 9831526297015818847
@@ -3025,7 +3041,7 @@ definitions:
           - Dolorem nihil quos maiores saepe.
       status:
         type: integer
-        example: 2
+        example: 4
         enum:
           - 1
           - 2
@@ -3033,6 +3049,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3042,7 +3060,7 @@ definitions:
         - Rerum dignissimos assumenda alias suscipit.
         - Temporibus assumenda ea sunt deserunt.
         - Fugit sunt voluptates quos est rerum aspernatur.
-      status: 3
+      status: 1
       task_id: Et quasi sed voluptatum voluptatem reiciendis rerum.
     required:
       - task_id
@@ -3065,7 +3083,7 @@ definitions:
           - Dicta quia est asperiores molestias corporis mollitia.
       status:
         type: integer
-        example: 6
+        example: 8
         enum:
           - 1
           - 2
@@ -3073,6 +3091,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3081,7 +3101,7 @@ definitions:
       landing_accounts:
         - Quo deserunt sit et molestiae sapiente quas.
         - Labore ea.
-      status: 4
+      status: 2
       task_id: Dolorem ut aut voluptas ut et.
     required:
       - task_id
@@ -3110,6 +3130,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3118,7 +3140,7 @@ definitions:
       landing_accounts:
         - Aliquam sed quaerat.
         - Id nulla odit voluptatem in veritatis tempora.
-      status: 4
+      status: 8
       task_id: Consequuntur vel quisquam voluptas culpa.
     required:
       - task_id
@@ -3141,7 +3163,7 @@ definitions:
           - Tenetur deserunt voluptatem ipsam optio.
       status:
         type: integer
-        example: 6
+        example: 8
         enum:
           - 1
           - 2
@@ -3149,6 +3171,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3159,7 +3183,7 @@ definitions:
         - Aperiam omnis enim.
         - Et qui nam occaecati delectus et.
         - A saepe aut.
-      status: 5
+      status: 3
       task_id: Repellat eos.
     required:
       - task_id
@@ -3171,7 +3195,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 1
+        example: 3
         enum:
           - 1
           - 2
@@ -3179,12 +3203,14 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Est praesentium.
     example:
-      status: 5
+      status: 3
       task_id: Eum deleniti corporis atque vel debitis.
     required:
       - task_id
@@ -3195,7 +3221,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 6
+        example: 2
         enum:
           - 1
           - 2
@@ -3203,6 +3229,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3219,7 +3247,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 3
+        example: 1
         enum:
           - 1
           - 2
@@ -3227,12 +3255,14 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Quae explicabo placeat reprehenderit tempora quia est.
     example:
-      status: 6
+      status: 4
       task_id: Nulla a qui magni qui ratione.
     required:
       - task_id
@@ -3243,7 +3273,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 4
+        example: 6
         enum:
           - 1
           - 2
@@ -3251,12 +3281,14 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
         example: Odit est doloribus velit sapiente at et.
     example:
-      status: 2
+      status: 8
       task_id: Repellendus ipsa et est quia.
     required:
       - task_id
@@ -3284,6 +3316,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3292,7 +3326,7 @@ definitions:
       landing_accounts:
         - Dolores placeat.
         - Rerum voluptas sed ea aut.
-      status: 2
+      status: 8
       task_id: Vel quos et doloremque amet.
     required:
       - task_id
@@ -3313,7 +3347,7 @@ definitions:
           - Blanditiis aut.
       status:
         type: integer
-        example: 2
+        example: 6
         enum:
           - 1
           - 2
@@ -3321,6 +3355,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3330,7 +3366,7 @@ definitions:
         - Aliquam ea nesciunt eveniet similique dolore dolor.
         - Tempora rerum.
         - Non exercitationem qui dolores repellendus quo ea.
-      status: 3
+      status: 1
       task_id: Expedita consequatur repellendus aliquam.
     required:
       - task_id
@@ -3352,7 +3388,7 @@ definitions:
           - Exercitationem autem voluptatem iusto voluptatibus rem.
       status:
         type: integer
-        example: 1
+        example: 3
         enum:
           - 1
           - 2
@@ -3360,6 +3396,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       task_id:
         type: string
         description: id задачи
@@ -3368,7 +3406,7 @@ definitions:
       landing_accounts:
         - Rerum similique ut recusandae tempore soluta delectus.
         - Ipsa iure ea quo nisi libero perspiciatis.
-      status: 4
+      status: 2
       task_id: Ut id aut et aspernatur iusto.
     required:
       - task_id
@@ -3505,7 +3543,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 3
+        example: 1
         enum:
           - 1
           - 2
@@ -3513,6 +3551,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -3592,7 +3632,7 @@ definitions:
       posts_per_bot: 6569839450710229058
       residential_proxies_filename: Facilis et ullam tenetur labore ratione.
       residential_proxies_num: 2942420713741350383
-      status: 5
+      status: 7
       targets_filename: Ratione at sed error perspiciatis.
       targets_num: 2772237702783912312
       targets_per_post: 3016202266073956817
@@ -3756,7 +3796,7 @@ definitions:
         format: int64
       status:
         type: integer
-        example: 5
+        example: 7
         enum:
           - 1
           - 2
@@ -3764,6 +3804,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -3843,7 +3885,7 @@ definitions:
       posts_per_bot: 7987040187777657570
       residential_proxies_filename: Et officiis facilis.
       residential_proxies_num: 3673686995994364958
-      status: 5
+      status: 1
       targets_filename: Id cum officiis quibusdam ea earum.
       targets_num: 6201748109723426603
       targets_per_post: 16001140283630682541
@@ -4164,6 +4206,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -4287,7 +4331,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 2
+        example: 8
         enum:
           - 1
           - 2
@@ -4295,6 +4339,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       upload_errors:
         type: array
         items:
@@ -4310,7 +4356,7 @@ definitions:
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
     example:
-      status: 5
+      status: 7
       upload_errors:
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
@@ -4329,7 +4375,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 3
+        example: 7
         enum:
           - 1
           - 2
@@ -4337,6 +4383,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       upload_errors:
         type: array
         items:
@@ -4356,7 +4404,7 @@ definitions:
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
     example:
-      status: 6
+      status: 2
       upload_errors:
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
@@ -4519,7 +4567,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 3
+        example: 5
         enum:
           - 1
           - 2
@@ -4527,6 +4575,8 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
       upload_errors:
         type: array
         items:
@@ -4542,7 +4592,7 @@ definitions:
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
     example:
-      status: 3
+      status: 1
       upload_errors:
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
@@ -4561,7 +4611,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 2
+        example: 6
         enum:
           - 1
           - 2
@@ -4569,8 +4619,10 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
     example:
-      status: 2
+      status: 8
     required:
       - status
   TasksServiceUploadVideoOKResponseBody:
@@ -4579,7 +4631,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 4
+        example: 6
         enum:
           - 1
           - 2
@@ -4587,8 +4639,10 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
     example:
-      status: 6
+      status: 8
     required:
       - status
   TasksServiceUploadVideoRequestBody:
@@ -4679,7 +4733,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 3
+        example: 7
         enum:
           - 1
           - 2
@@ -4687,8 +4741,10 @@ definitions:
           - 4
           - 5
           - 6
+          - 7
+          - 8
     example:
-      status: 4
+      status: 2
     required:
       - status
   UploadErrorResponseBody:
