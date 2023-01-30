@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.5 (Homebrew)
--- Dumped by pg_dump version 14.5
+-- Dumped from database version 14.6 (Homebrew)
+-- Dumped by pg_dump version 15.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -15,6 +15,13 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
 
 --
 -- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
@@ -141,32 +148,14 @@ CREATE TABLE public.logs (
 --
 
 CREATE TABLE public.medias (
-    id bigint NOT NULL,
     kind public.medias_kind NOT NULL,
     inst_id text NOT NULL,
     bot_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    pk bigint NOT NULL,
+    is_edited boolean DEFAULT false NOT NULL
 );
-
-
---
--- Name: medias_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.medias_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: medias_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.medias_id_seq OWNED BY public.medias.id;
 
 
 --
@@ -245,9 +234,9 @@ CREATE TABLE public.target_users (
     user_id bigint NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone,
-    media_fk bigint,
     status public.targets_status DEFAULT 'new'::public.targets_status NOT NULL,
-    interaction_type public.targets_interaction DEFAULT 'none'::public.targets_interaction NOT NULL
+    interaction_type public.targets_interaction DEFAULT 'none'::public.targets_interaction NOT NULL,
+    media_fk bigint
 );
 
 
@@ -317,13 +306,6 @@ CREATE TABLE public.users (
 
 
 --
--- Name: medias id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.medias ALTER COLUMN id SET DEFAULT nextval('public.medias_id_seq'::regclass);
-
-
---
 -- Name: pgqueue id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -359,7 +341,7 @@ ALTER TABLE ONLY public.logs
 --
 
 ALTER TABLE ONLY public.medias
-    ADD CONSTRAINT medias_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT medias_pkey PRIMARY KEY (pk);
 
 
 --
@@ -520,7 +502,7 @@ ALTER TABLE ONLY public.proxies
 --
 
 ALTER TABLE ONLY public.target_users
-    ADD CONSTRAINT target_users_media_fk_fkey FOREIGN KEY (media_fk) REFERENCES public.medias(id);
+    ADD CONSTRAINT target_users_media_fk_fkey FOREIGN KEY (media_fk) REFERENCES public.medias(pk);
 
 
 --

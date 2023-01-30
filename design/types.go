@@ -285,3 +285,33 @@ var TaskProgress = Type("TaskProgress", func() {
 	Required("bots_progresses", "targets_notified", "photo_targets_notified", "targets_failed",
 		"targets_waiting", "done", "bots_total")
 })
+
+var TaskReProgress = Type("TaskReProgress", func() {
+	Attribute("bots_progresses", ArrayOf(BotsProgress), func() {
+		Description("результат работы по каждому боту")
+		Meta("struct:tag:json", "bots_progresses")
+	})
+
+	Attribute("targets_notified", Int, "количество аккаунтов, которых упомянули в постах", func() {
+		Meta("struct:tag:json", "targets_notified")
+	})
+	Attribute("photo_targets_notified", Int, "количество аккаунтов, которых упомянули в постах на фото", func() {
+		Meta("struct:tag:json", "photo_targets_notified")
+	})
+	Attribute("targets_failed", Int, "количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново", func() {
+		Meta("struct:tag:json", "targets_failed")
+	})
+
+	Attribute("targets_waiting", Int, "количество аккаунтов, которых не выбрали для постов", func() {
+		Meta("struct:tag:json", "targets_waiting")
+	})
+
+	Attribute("done", Boolean, "закончена ли задача")
+
+	Attribute("bots_total", Int, "общее количество ботов в задаче", func() {
+		Meta("struct:tag:json", "bots_total")
+	})
+
+	Required("bots_progresses", "targets_notified", "photo_targets_notified", "targets_failed",
+		"targets_waiting", "done", "bots_total")
+})

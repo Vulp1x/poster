@@ -220,12 +220,13 @@ type Log struct {
 }
 
 type Media struct {
-	ID        int64      `json:"id"`
 	Kind      MediasKind `json:"kind"`
 	InstID    string     `json:"inst_id"`
 	BotID     uuid.UUID  `json:"bot_id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
+	Pk        int64      `json:"pk"`
+	IsEdited  bool       `json:"is_edited"`
 }
 
 type Pgqueue struct {
@@ -265,9 +266,9 @@ type TargetUser struct {
 	UserID          int64              `json:"user_id"`
 	CreatedAt       time.Time          `json:"created_at"`
 	UpdatedAt       *time.Time         `json:"updated_at"`
-	MediaFk         *int64             `json:"media_fk"`
 	Status          TargetsStatus      `json:"status"`
 	InteractionType TargetsInteraction `json:"interaction_type"`
+	MediaFk         *int64             `json:"media_fk"`
 }
 
 type TargetUsersToTask struct {

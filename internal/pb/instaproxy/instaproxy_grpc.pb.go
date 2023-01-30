@@ -27,6 +27,10 @@ type InstaProxyClient interface {
 	GetBloggerMedias(ctx context.Context, in *GetBloggerMediasRequest, opts ...grpc.CallOption) (*GetBloggerMediasResponse, error)
 	// выложить пост с фотографией
 	PostPicture(ctx context.Context, in *PostPictureRequest, opts ...grpc.CallOption) (*PostPictureResponse, error)
+	UpdatePicture(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostResponse, error)
+	// перед тем как менять фотки возможно стоит открывать профиль?
+	OpenProfile(ctx context.Context, in *OpenProfileRequest, opts ...grpc.CallOption) (*OpenProfileResponse, error)
+	FollowUsers(ctx context.Context, in *FollowUsersRequest, opts ...grpc.CallOption) (*FollowUsersResponse, error)
 }
 
 type instaProxyClient struct {
@@ -82,6 +86,33 @@ func (c *instaProxyClient) PostPicture(ctx context.Context, in *PostPictureReque
 	return out, nil
 }
 
+func (c *instaProxyClient) UpdatePicture(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostResponse, error) {
+	out := new(UpdatePostResponse)
+	err := c.cc.Invoke(ctx, "/InstaProxy/UpdatePicture", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *instaProxyClient) OpenProfile(ctx context.Context, in *OpenProfileRequest, opts ...grpc.CallOption) (*OpenProfileResponse, error) {
+	out := new(OpenProfileResponse)
+	err := c.cc.Invoke(ctx, "/InstaProxy/OpenProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *instaProxyClient) FollowUsers(ctx context.Context, in *FollowUsersRequest, opts ...grpc.CallOption) (*FollowUsersResponse, error) {
+	out := new(FollowUsersResponse)
+	err := c.cc.Invoke(ctx, "/InstaProxy/FollowUsers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InstaProxyServer is the server API for InstaProxy service.
 // All implementations must embed UnimplementedInstaProxyServer
 // for forward compatibility
@@ -95,6 +126,10 @@ type InstaProxyServer interface {
 	GetBloggerMedias(context.Context, *GetBloggerMediasRequest) (*GetBloggerMediasResponse, error)
 	// выложить пост с фотографией
 	PostPicture(context.Context, *PostPictureRequest) (*PostPictureResponse, error)
+	UpdatePicture(context.Context, *UpdatePostRequest) (*UpdatePostResponse, error)
+	// перед тем как менять фотки возможно стоит открывать профиль?
+	OpenProfile(context.Context, *OpenProfileRequest) (*OpenProfileResponse, error)
+	FollowUsers(context.Context, *FollowUsersRequest) (*FollowUsersResponse, error)
 	mustEmbedUnimplementedInstaProxyServer()
 }
 
@@ -116,6 +151,15 @@ func (UnimplementedInstaProxyServer) GetBloggerMedias(context.Context, *GetBlogg
 }
 func (UnimplementedInstaProxyServer) PostPicture(context.Context, *PostPictureRequest) (*PostPictureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostPicture not implemented")
+}
+func (UnimplementedInstaProxyServer) UpdatePicture(context.Context, *UpdatePostRequest) (*UpdatePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePicture not implemented")
+}
+func (UnimplementedInstaProxyServer) OpenProfile(context.Context, *OpenProfileRequest) (*OpenProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method OpenProfile not implemented")
+}
+func (UnimplementedInstaProxyServer) FollowUsers(context.Context, *FollowUsersRequest) (*FollowUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FollowUsers not implemented")
 }
 func (UnimplementedInstaProxyServer) mustEmbedUnimplementedInstaProxyServer() {}
 
@@ -220,6 +264,60 @@ func _InstaProxy_PostPicture_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InstaProxy_UpdatePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InstaProxyServer).UpdatePicture(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/InstaProxy/UpdatePicture",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InstaProxyServer).UpdatePicture(ctx, req.(*UpdatePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InstaProxy_OpenProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpenProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InstaProxyServer).OpenProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/InstaProxy/OpenProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InstaProxyServer).OpenProfile(ctx, req.(*OpenProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InstaProxy_FollowUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FollowUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InstaProxyServer).FollowUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/InstaProxy/FollowUsers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InstaProxyServer).FollowUsers(ctx, req.(*FollowUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InstaProxy_ServiceDesc is the grpc.ServiceDesc for InstaProxy service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -246,6 +344,18 @@ var InstaProxy_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostPicture",
 			Handler:    _InstaProxy_PostPicture_Handler,
+		},
+		{
+			MethodName: "UpdatePicture",
+			Handler:    _InstaProxy_UpdatePicture_Handler,
+		},
+		{
+			MethodName: "OpenProfile",
+			Handler:    _InstaProxy_OpenProfile_Handler,
+		},
+		{
+			MethodName: "FollowUsers",
+			Handler:    _InstaProxy_FollowUsers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

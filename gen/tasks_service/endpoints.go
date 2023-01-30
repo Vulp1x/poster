@@ -28,6 +28,7 @@ type Endpoints struct {
 	StopTask           goa.Endpoint
 	GetTask            goa.Endpoint
 	GetProgress        goa.Endpoint
+	GetEditingProgress goa.Endpoint
 	ListTasks          goa.Endpoint
 	DownloadTargets    goa.Endpoint
 	DownloadBots       goa.Endpoint
@@ -50,6 +51,7 @@ func NewEndpoints(s Service) *Endpoints {
 		StopTask:           NewStopTaskEndpoint(s, a.JWTAuth),
 		GetTask:            NewGetTaskEndpoint(s, a.JWTAuth),
 		GetProgress:        NewGetProgressEndpoint(s, a.JWTAuth),
+		GetEditingProgress: NewGetEditingProgressEndpoint(s, a.JWTAuth),
 		ListTasks:          NewListTasksEndpoint(s, a.JWTAuth),
 		DownloadTargets:    NewDownloadTargetsEndpoint(s, a.JWTAuth),
 		DownloadBots:       NewDownloadBotsEndpoint(s, a.JWTAuth),
@@ -71,6 +73,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.StopTask = m(e.StopTask)
 	e.GetTask = m(e.GetTask)
 	e.GetProgress = m(e.GetProgress)
+	e.GetEditingProgress = m(e.GetEditingProgress)
 	e.ListTasks = m(e.ListTasks)
 	e.DownloadTargets = m(e.DownloadTargets)
 	e.DownloadBots = m(e.DownloadBots)
@@ -301,6 +304,25 @@ func NewGetProgressEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 			return nil, err
 		}
 		return s.GetProgress(ctx, p)
+	}
+}
+
+// NewGetEditingProgressEndpoint returns an endpoint function that calls the
+// method "get editing progress" of service "tasks_service".
+func NewGetEditingProgressEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetEditingProgressPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"driver", "admin"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.GetEditingProgress(ctx, p)
 	}
 }
 

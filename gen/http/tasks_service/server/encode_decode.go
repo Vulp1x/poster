@@ -1227,6 +1227,143 @@ func EncodeGetProgressError(encoder func(context.Context, http.ResponseWriter) g
 	}
 }
 
+// EncodeGetEditingProgressResponse returns an encoder for responses returned
+// by the tasks_service get editing progress endpoint.
+func EncodeGetEditingProgressResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*tasksservice.TaskProgress)
+		enc := encoder(ctx, w)
+		body := NewGetEditingProgressOKResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetEditingProgressRequest returns a decoder for requests sent to the
+// tasks_service get editing progress endpoint.
+func DecodeGetEditingProgressRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			taskID         string
+			pageSize       uint32
+			page           uint32
+			sort           string
+			sortDescending bool
+			token          string
+			err            error
+
+			params = mux.Vars(r)
+		)
+		taskID = params["task_id"]
+		{
+			pageSizeRaw := r.URL.Query().Get("psize")
+			if pageSizeRaw == "" {
+				pageSize = 100
+			} else {
+				v, err2 := strconv.ParseUint(pageSizeRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("pageSize", pageSizeRaw, "unsigned integer"))
+				}
+				pageSize = uint32(v)
+			}
+		}
+		{
+			pageRaw := r.URL.Query().Get("p")
+			if pageRaw == "" {
+				page = 1
+			} else {
+				v, err2 := strconv.ParseUint(pageRaw, 10, 32)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("page", pageRaw, "unsigned integer"))
+				}
+				page = uint32(v)
+			}
+		}
+		sortRaw := r.URL.Query().Get("sort")
+		if sortRaw != "" {
+			sort = sortRaw
+		} else {
+			sort = "file_order"
+		}
+		if !(sort == "username" || sort == "status" || sort == "posts_count" || sort == "post_description_targets" || sort == "photo_tags_targets" || sort == "file_order") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("sort", sort, []interface{}{"username", "status", "posts_count", "post_description_targets", "photo_tags_targets", "file_order"}))
+		}
+		{
+			sortDescendingRaw := r.URL.Query().Get("sd")
+			if sortDescendingRaw != "" {
+				v, err2 := strconv.ParseBool(sortDescendingRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("sortDescending", sortDescendingRaw, "boolean"))
+				}
+				sortDescending = v
+			}
+		}
+		token = r.Header.Get("Authorization")
+		if token == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetEditingProgressPayload(taskID, pageSize, page, sort, sortDescending, token)
+		if strings.Contains(payload.Token, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Token, " ", 2)[1]
+			payload.Token = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeGetEditingProgressError returns an encoder for errors returned by the
+// get editing progress tasks_service endpoint.
+func EncodeGetEditingProgressError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en ErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "bad request":
+			var res tasksservice.BadRequest
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal error":
+			var res tasksservice.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "task not found":
+			var res tasksservice.TaskNotFound
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res tasksservice.Unauthorized
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeListTasksResponse returns an encoder for responses returned by the
 // tasks_service list tasks endpoint.
 func EncodeListTasksResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {

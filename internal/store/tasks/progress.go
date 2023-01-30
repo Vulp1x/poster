@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
@@ -33,11 +34,11 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 		"b.file_order",
 		"count(tu.*) filter ( where interaction_type = 'post_description' ) as post_description_targets",
 		"count(tu.*) filter ( where interaction_type = 'photo_tag' ) as photo_tags_targets",
-		"count(distinct medias.id) as posts_count").
+		"count(distinct medias.pk) as posts_count").
 		From("bot_accounts as b").
 		LeftJoin("medias on b.id = medias.bot_id").
-		LeftJoin("target_users tu on medias.id = tu.media_fk").
-		GroupBy("b.id", "b."+pager.GetSort()[0]).
+		LeftJoin("target_users tu on medias.pk = tu.media_fk").
+		GroupBy("b.id", "b."+strings.Split(pager.GetSort()[0], " ")[0]).
 		Where(sq.Eq{"b.task_id": taskID}).Limit(pager.GetLimit64()).Offset(pager.GetOffset64()).OrderBy(pager.GetSort()...)
 
 	stmt, args, err := query.ToSql()

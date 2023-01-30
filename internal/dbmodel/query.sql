@@ -269,8 +269,8 @@ where task_id = @task_id
   and status in (2, 5);
 
 -- name: SavePostedMedia :one
-insert into medias(kind, inst_id, bot_id, created_at)
-VALUES (@kind, @inst_id, @bot_id, now())
+insert into medias(pk, kind, inst_id, bot_id, created_at)
+VALUES (@pk, @kind, @inst_id, @bot_id, now())
 returning *;
 
 -- name: MarkTargetsAsNotified :exec

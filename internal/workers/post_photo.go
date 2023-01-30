@@ -173,17 +173,18 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 
 	q = dbmodel.New(tx)
 	savePostedMediaParams := dbmodel.SavePostedMediaParams{
+		Pk:     resp.MediaPk,
 		Kind:   dbmodel.MediasKindPhoto,
 		InstID: resp.MediaId,
 		BotID:  bot.ID,
 	}
 	media, err := q.SavePostedMedia(ctx, savePostedMediaParams)
 	if err != nil {
-		return fmt.Errorf("failed to save created media with params %#v: %v", savePostedMediaParams, err)
+		return fmt.Errorf("failed to save created media with params %+v: %v", savePostedMediaParams, err)
 	}
 
 	markTargetsAsNotifiedParams := dbmodel.MarkTargetsAsNotifiedParams{
-		MediaFk:         &media.ID,
+		MediaFk:         &media.Pk,
 		InteractionType: dbmodel.TargetsInteractionPostDescription,
 		TaskID:          postingTask.ID,
 		TargetIds:       mediaTargets.DescriptionTargets,

@@ -626,7 +626,7 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 }
 
 const findUnprocessedTargetsForTask = `-- name: FindUnprocessedTargetsForTask :many
-select id, task_id, username, user_id, created_at, updated_at, media_fk, status, interaction_type
+select id, task_id, username, user_id, created_at, updated_at, status, interaction_type, media_fk
 from target_users
 where task_id = $1
   AND status = 'new'
@@ -654,9 +654,9 @@ func (q *Queries) FindUnprocessedTargetsForTask(ctx context.Context, arg FindUnp
 			&i.UserID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.MediaFk,
 			&i.Status,
 			&i.InteractionType,
+			&i.MediaFk,
 		); err != nil {
 			return nil, err
 		}
@@ -912,27 +912,34 @@ type SaveBotAccountsParams struct {
 }
 
 const savePostedMedia = `-- name: SavePostedMedia :one
-insert into medias(kind, inst_id, bot_id, created_at)
-VALUES ($1, $2, $3, now())
-returning id, kind, inst_id, bot_id, created_at, updated_at
+insert into medias(pk, kind, inst_id, bot_id, created_at)
+VALUES ($1, $2, $3, $4, now())
+returning kind, inst_id, bot_id, created_at, updated_at, pk, is_edited
 `
 
 type SavePostedMediaParams struct {
+	Pk     int64      `json:"pk"`
 	Kind   MediasKind `json:"kind"`
 	InstID string     `json:"inst_id"`
 	BotID  uuid.UUID  `json:"bot_id"`
 }
 
 func (q *Queries) SavePostedMedia(ctx context.Context, arg SavePostedMediaParams) (Media, error) {
-	row := q.db.QueryRow(ctx, savePostedMedia, arg.Kind, arg.InstID, arg.BotID)
+	row := q.db.QueryRow(ctx, savePostedMedia,
+		arg.Pk,
+		arg.Kind,
+		arg.InstID,
+		arg.BotID,
+	)
 	var i Media
 	err := row.Scan(
-		&i.ID,
 		&i.Kind,
 		&i.InstID,
 		&i.BotID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Pk,
+		&i.IsEdited,
 	)
 	return i, err
 }

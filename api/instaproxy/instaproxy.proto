@@ -20,18 +20,57 @@ service InstaProxy {
 
   // выложить пост с фотографией
   rpc PostPicture(PostPictureRequest) returns (PostPictureResponse);
+
+  rpc UpdatePicture(UpdatePostRequest) returns (UpdatePostResponse);
+
+  // перед тем как менять фотки возможно стоит открывать профиль?
+  rpc OpenProfile (OpenProfileRequest) returns (OpenProfileResponse);
+
+  rpc FollowUsers(FollowUsersRequest) returns (FollowUsersResponse);
 }
 
+message OpenProfileRequest{
+  int64 bot_id = 1 ;
+}
+message  OpenProfileResponse {
+  repeated Media medias = 1;
+  UserSuperShort user = 2;
+}
+
+message FollowUsersRequest{
+  repeated string usernames = 1;
+  int64 bot_id = 2;
+}
+
+message FollowUsersResponse{
+  int32  succeeded_count = 1;
+}
 
 message PostPictureRequest{
   bytes photo = 1;
+  // идентификатор бота
   int64 user_id = 2;
   string  caption = 3;
   repeated int64 user_tags = 4;
   optional Proxy cheap_proxy = 5;
+  int32 update_photo_delay_seconds = 6;
 }
 message PostPictureResponse{
+  // "id": "3026763766533203939_57291273439",
   string media_id = 1;
+  // "pk": "3026763766533203939",
+  int64  media_pk = 2;
+}
+
+message UpdatePostRequest{
+  // идентификатор бота
+  int64 user_id = 1;
+  string  caption = 2;
+  repeated int64 user_tags = 3;
+  string media_id = 4;
+  int32 feed_position = 5;
+}
+message UpdatePostResponse{
 }
 
 

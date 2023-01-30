@@ -107,6 +107,8 @@ gen:
 	rm -rf ./gen/*/client.go
 	rm -rf ./gen/http/cli
 	git restore ./gen/tasks_service/consts.go
+	# regenerate proto
+	buf generate
 
 
 .PHONY: migrate-prod
@@ -133,3 +135,6 @@ hard-restart-test: drop-pgdata restart-test
 
 drop-pgdata:
 	rm -rf ./pgdata
+
+front:
+	cd ../front && npm run dev

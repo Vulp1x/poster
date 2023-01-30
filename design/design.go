@@ -686,6 +686,61 @@ var _ = Service("tasks_service", func() {
 		})
 	})
 
+	Method("get editing progress", func() {
+		Description("получить статус выполнения задачи по id")
+
+		Security(JWTAuth)
+
+		Payload(func() {
+			Token("token", String, func() {
+				Description("JWT used for authentication")
+			})
+
+			Attribute("task_id", String, func() {
+				Description("id задачи")
+				Meta("struct:tag:json", "task_id")
+			})
+
+			Attribute("page_size", UInt32, func() {
+				Description("размер страницы для пагинации")
+				Default(100)
+				Meta("struct:tag:json", "page_size")
+			})
+
+			Attribute("page", UInt32, func() {
+				Description("номер страницы для пагинации")
+				Default(1)
+			})
+
+			Attribute("sort", String, func() {
+				Enum("username", "status", "posts_count", "post_description_targets", "photo_tags_targets", "file_order")
+				Default("file_order")
+			})
+
+			Attribute("sort_descending", Boolean, func() {
+				Description("сортировать по убыванию или нет")
+				Default(false)
+			})
+
+			Required("token", "task_id")
+		})
+
+		Result(TaskProgress)
+
+		HTTP(func() {
+			GET("/api/tasks/{task_id}/reprogress")
+			Params(func() {
+				Param("page_size:psize")
+				Param("page:p")
+				Param("sort:sort")
+				Param("sort_descending:sd")
+			})
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+		})
+	})
+
 	Method("list tasks", func() {
 		Description("получить все задачи для текущего пользователя")
 

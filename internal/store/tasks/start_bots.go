@@ -34,11 +34,11 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 
 	bots, err := q.FindTaskBotsByUsername(ctx, dbmodel.FindTaskBotsByUsernameParams{TaskID: taskID, Usernames: usernames})
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("не найдено ни одного бота")
-		}
-
 		return nil, fmt.Errorf("failed to find bots: %v", err)
+	}
+
+	if len(bots) == 0 {
+		return nil, fmt.Errorf("не найдено ни одного бота")
 	}
 
 	postingTasks := preparePostingTasks(ctx, task, bots)

@@ -43,6 +43,11 @@ type tasksServicesrvc struct {
 	store taskStore
 }
 
+func (s *tasksServicesrvc) GetEditingProgress(ctx context.Context, payload *tasksservice.GetEditingProgressPayload) (res *tasksservice.TaskProgress, err error) {
+	// TODO implement me
+	panic("implement me")
+}
+
 // NewTasksService returns the tasks_service service implementation.
 func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Service {
 	return &tasksServicesrvc{auth: auth, store: store}
@@ -423,7 +428,7 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 }
 
 func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetProgressPayload) (*tasksservice.TaskProgress, error) {
-	logger.Infof(ctx, "get progress of task %s", p.TaskID)
+	logger.Debugf(ctx, "get progress of task %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
