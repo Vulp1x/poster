@@ -209,6 +209,10 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		return fmt.Errorf("failed to count bot medias: %v", err)
 	}
 
+	if err = q.SetBotPostsCount(ctx, dbmodel.SetBotPostsCountParams{PostsCount: int(mediasCount), ID: bot.ID}); err != nil {
+		return fmt.Errorf("failed to set posts count: %v", err)
+	}
+
 	if int(mediasCount) < postingTask.PostsPerBot {
 		logger.Infof(ctx, "adding one more task for posting, got %d/%d posts", mediasCount, postingTask.PostsPerBot)
 		newTask := pgqueue.Task{

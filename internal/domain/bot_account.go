@@ -99,6 +99,10 @@ func (b *BotAccount) assignUserAgent(input string) error {
 	var err error
 
 	b.UserAgent = input
+	if input == "" {
+		input = "Instagram 264.0.0.22.106 Android (33/13; 480dpi; 1080x2168; samsung; SM-A528B; a52sxq; qcom; it_IT; 430370695)"
+	}
+
 	b.DeviceData, err = headers.NewDeviceSettings(input)
 	if err != nil {
 		return fmt.Errorf("failed to parse device settings: %v", err)

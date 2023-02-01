@@ -95,15 +95,22 @@ func (s *Store) StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) (
 		return nil, fmt.Errorf("failed to update task status: %v", err)
 	}
 
-	bots, err := q.FindBotsForTask(ctx, taskID)
+	botsCount, err := q.GetTaskBotsCount(ctx, taskID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find bots for task: %v", err)
+		return nil, fmt.Errorf("failed to count bots for task: %v", err)
 	}
 
-	tasks := make([]pgqueue.Task, len(bots))
-	for i, bot := range bots {
+	aliveBots, err := q.SetBotsEditingPostsStatus(ctx, taskID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update bots statuses to 'editing posts': %v", err)
+	}
+
+	logger.Infof(ctx, "have %d alive bots from %d bots in task", len(aliveBots), botsCount)
+
+	tasks := make([]pgqueue.Task, len(aliveBots))
+	for i, bot := range aliveBots {
 		tasks[i] = pgqueue.Task{
-			Kind:        workers.UpdatePostsContentsTaskKind,
+			Kind:        workers.EditMediaTaskKind,
 			Payload:     workers.EmptyPayload,
 			ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
 		}

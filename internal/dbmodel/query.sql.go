@@ -432,6 +432,44 @@ func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid
 	return items, nil
 }
 
+const findTaskBotByInstID = `-- name: FindTaskBotByInstID :one
+select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
+from bot_accounts
+where task_id = $1
+  and inst_id = $2
+`
+
+type FindTaskBotByInstIDParams struct {
+	TaskID uuid.UUID `json:"task_id"`
+	InstID int64     `json:"inst_id"`
+}
+
+func (q *Queries) FindTaskBotByInstID(ctx context.Context, arg FindTaskBotByInstIDParams) (BotAccount, error) {
+	row := q.db.QueryRow(ctx, findTaskBotByInstID, arg.TaskID, arg.InstID)
+	var i BotAccount
+	err := row.Scan(
+		&i.ID,
+		&i.TaskID,
+		&i.Username,
+		&i.Password,
+		&i.UserAgent,
+		&i.DeviceData,
+		&i.Session,
+		&i.Headers,
+		&i.ResProxy,
+		&i.WorkProxy,
+		&i.Status,
+		&i.PostsCount,
+		&i.StartedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.FileOrder,
+		&i.InstID,
+	)
+	return i, err
+}
+
 const findTaskBotByUsername = `-- name: FindTaskBotByUsername :one
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
@@ -753,6 +791,40 @@ func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, err
 	return i, err
 }
 
+const getBotMedias = `-- name: GetBotMedias :many
+select kind, inst_id, bot_id, created_at, updated_at, pk, is_edited
+from medias
+where bot_id = $1
+`
+
+func (q *Queries) GetBotMedias(ctx context.Context, botID uuid.UUID) ([]Media, error) {
+	rows, err := q.db.Query(ctx, getBotMedias, botID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Media
+	for rows.Next() {
+		var i Media
+		if err := rows.Scan(
+			&i.Kind,
+			&i.InstID,
+			&i.BotID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Pk,
+			&i.IsEdited,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBotsProgress = `-- name: GetBotsProgress :many
 select username, posts_count, status
 from bot_accounts
@@ -1054,6 +1126,64 @@ type SetBotStatusParams struct {
 
 func (q *Queries) SetBotStatus(ctx context.Context, arg SetBotStatusParams) error {
 	_, err := q.db.Exec(ctx, setBotStatus, arg.Status, arg.ID)
+	return err
+}
+
+const setBotsEditingPostsStatus = `-- name: SetBotsEditingPostsStatus :many
+update bot_accounts
+set status = 7 -- dbmodel.EditingPostsBotStatus
+where task_id = $1
+  and status NOT IN (5, 6) -- FailBotStatus, BlockedBotStatus
+returning id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
+`
+
+func (q *Queries) SetBotsEditingPostsStatus(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	rows, err := q.db.Query(ctx, setBotsEditingPostsStatus, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []BotAccount
+	for rows.Next() {
+		var i BotAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.Password,
+			&i.UserAgent,
+			&i.DeviceData,
+			&i.Session,
+			&i.Headers,
+			&i.ResProxy,
+			&i.WorkProxy,
+			&i.Status,
+			&i.PostsCount,
+			&i.StartedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.FileOrder,
+			&i.InstID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const setMediaIsEdited = `-- name: SetMediaIsEdited :exec
+update medias
+set is_edited = true
+where pk = $1
+`
+
+func (q *Queries) SetMediaIsEdited(ctx context.Context, pk int64) error {
+	_, err := q.db.Exec(ctx, setMediaIsEdited, pk)
 	return err
 }
 

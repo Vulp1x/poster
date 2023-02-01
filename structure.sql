@@ -321,14 +321,6 @@ ALTER TABLE ONLY public.bot_accounts
 
 
 --
--- Name: bot_accounts bot_accounts_username_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.bot_accounts
-    ADD CONSTRAINT bot_accounts_username_key UNIQUE (username);
-
-
---
 -- Name: logs logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -406,6 +398,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bot_accounts_uniq_username_taskid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX bot_accounts_uniq_username_taskid_idx ON public.bot_accounts USING btree (task_id, username);
 
 
 --

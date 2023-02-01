@@ -218,7 +218,10 @@ func (q *Queries) RetryTasks(ctx context.Context, arg RetryTasksParams) error {
 const pushTasks = `-- pgqueue: PushTasks :exec
 INSERT INTO pgqueue (kind, payload, external_key, attempts_left, delayed_till)
 VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT DO NOTHING
+ON CONFLICT (kind, external_key) DO UPDATE SET payload       = excluded.payload,
+                                               attempts_left = excluded.attempts_left,
+                                               delayed_till  = excluded.delayed_till,
+                                               status        = 'new'::pgqueue_status;							
 `
 
 type PushTasksBatchResults struct {

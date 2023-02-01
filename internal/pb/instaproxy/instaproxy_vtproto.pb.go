@@ -364,12 +364,10 @@ func (m *UpdatePostRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x28
 	}
-	if len(m.MediaId) > 0 {
-		i -= len(m.MediaId)
-		copy(dAtA[i:], m.MediaId)
-		i = encodeVarint(dAtA, i, uint64(len(m.MediaId)))
+	if m.MediaPk != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.MediaPk))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x20
 	}
 	if len(m.UserTags) > 0 {
 		var pksize2 int
@@ -2471,9 +2469,8 @@ func (m *UpdatePostRequest) SizeVT() (n int) {
 		}
 		n += 1 + sov(uint64(l)) + l
 	}
-	l = len(m.MediaId)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
+	if m.MediaPk != 0 {
+		n += 1 + sov(uint64(m.MediaPk))
 	}
 	if m.FeedPosition != 0 {
 		n += 1 + sov(uint64(m.FeedPosition))
@@ -4164,10 +4161,10 @@ func (m *UpdatePostRequest) UnmarshalVT(dAtA []byte) error {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserTags", wireType)
 			}
 		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MediaId", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MediaPk", wireType)
 			}
-			var stringLen uint64
+			m.MediaPk = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -4177,24 +4174,11 @@ func (m *UpdatePostRequest) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.MediaPk |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MediaId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FeedPosition", wireType)

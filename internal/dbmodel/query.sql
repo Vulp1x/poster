@@ -268,6 +268,12 @@ where task_id = @task_id
   and username = @username
   and status in (2, 5);
 
+-- name: FindTaskBotByInstID :one
+select *
+from bot_accounts
+where task_id = @task_id
+  and inst_id = @inst_id;
+
 -- name: SavePostedMedia :one
 insert into medias(pk, kind, inst_id, bot_id, created_at)
 VALUES (@pk, @kind, @inst_id, @bot_id, now())
@@ -291,3 +297,20 @@ returning posts_count;
 select count(*)
 from medias
 where bot_id = @bot_id;
+
+-- name: GetBotMedias :many
+select *
+from medias
+where bot_id = @bot_id;
+
+-- name: SetBotsEditingPostsStatus :many
+update bot_accounts
+set status = 7 -- dbmodel.EditingPostsBotStatus
+where task_id = @task_id
+  and status NOT IN (5, 6) -- FailBotStatus, BlockedBotStatus
+returning *;
+
+-- name: SetMediaIsEdited :exec
+update medias
+set is_edited = true
+where pk = @pk;
