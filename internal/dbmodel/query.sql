@@ -77,6 +77,22 @@ where task_id = $1
   and type = 2;
 
 
+-- name: LockTargetsForTask :many
+update target_users
+set status     = 'in_progress',
+    updated_at = now()
+where id in (select id
+             from target_users t
+             where t.task_id = $1
+               AND t.status = 'new'
+             limit $2 for update skip locked)
+returning *;
+
+-- name: RollbackTargetsStatus :exec
+update target_users
+set status = 'new'
+where id = ANY (@ids::uuid[]);
+
 -- name: FindUnprocessedTargetsForTask :many
 select *
 from target_users
@@ -196,6 +212,11 @@ update bot_accounts
 set status = $1
 where id = $2;
 
+-- name: SetBotsStatus :exec
+update bot_accounts
+set status = $1
+where id = ANY (@ids::uuid[]);
+
 -- name: SetBotPostsCount :exec
 update bot_accounts
 set posts_count = $1
@@ -265,8 +286,7 @@ ORDER BY file_order;
 select *
 from bot_accounts
 where task_id = @task_id
-  and username = @username
-  and status in (2, 5);
+  and username = @username;
 
 -- name: FindTaskBotByInstID :one
 select *

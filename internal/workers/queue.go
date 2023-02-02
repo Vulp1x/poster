@@ -26,15 +26,15 @@ func NewQueuue(ctx context.Context, executor executor.Executor, txFunc dbmodel.D
 	// выкладывание новых постов
 	queue.RegisterKind(MakePhotoPostsTaskKind, &PostPhotoHandler{dbTxF: txFunc, cli: api.NewInstaProxyClient(conn), queue: queue}, pgqueue.KindOptions{
 		Name:                 "post-photo",
-		WorkerCount:          pgqueue.NewConstProvider(int16(50)),
-		MaxAttempts:          5,
+		WorkerCount:          pgqueue.NewConstProvider(int16(100)),
+		MaxAttempts:          7,
 		AttemptTimeout:       100 * time.Second,
 		MaxTaskErrorMessages: 10,
 		Delayer:              delayer.NewJitterDelayer(delayer.EqualJitter, 20*time.Second),
 		TerminalTasksTTL:     pgqueue.NewConstProvider(1000 * time.Hour),
 		Loop: pgqueue.LoopOptions{
 			JanitorPeriod: pgqueue.NewConstProvider(15 * time.Hour),
-			FetcherPeriod: pgqueue.NewConstProvider(10 * time.Second),
+			FetcherPeriod: pgqueue.NewConstProvider(3 * time.Second),
 		},
 	})
 

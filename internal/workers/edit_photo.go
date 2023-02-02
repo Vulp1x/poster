@@ -54,6 +54,12 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		return fmt.Errorf("%w: failed to find bot with id '%s': %v", pgqueue.ErrMustCancelTask, taskID, err)
 	}
 
+	ctx = logger.WithKV(ctx, "bot_account", bot.Username)
+
+	if bot.Status != dbmodel.EditingPostsBotStatus {
+		return fmt.Errorf("%w: got bot status %d: expected %d (editing posts)", pgqueue.ErrMustCancelTask, bot.Status, dbmodel.EditingPostsBotStatus)
+	}
+
 	medias, err := q.GetBotMedias(ctx, bot.ID)
 	if err != nil {
 		return fmt.Errorf("failed to find bot's medias: %v", err)
@@ -72,8 +78,9 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 	}
 
 	if mediaToEdit.Pk == 0 {
-		// либо нет постов, либо все уже обновлены
-		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.EditingPostsDoneBotStatus, ID: taskID})
+		// все медиа уже обновлены
+		logger.Info(ctx, "all medias are updated, setting bot status to 8 (editing posts done)")
+		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.EditingPostsDoneBotStatus, ID: bot.ID})
 		if err != nil {
 			return fmt.Errorf("failed to set bot status to %d: %v", dbmodel.EditingPostsDoneBotStatus, err)
 		}
@@ -84,7 +91,7 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		targetsLimitForNextPost += postingTask.PhotoTargetsPerPost
 	}
 
-	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
+	targets, err := q.LockTargetsForTask(ctx, dbmodel.LockTargetsForTaskParams{
 		TaskID: taskID,
 		Limit:  int32(targetsLimitForNextPost),
 	})
@@ -104,6 +111,12 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		MediaPk:  mediaToEdit.Pk,
 	}); err != nil {
 		logger.Errorf(ctx, "failed to edit media %d: %v", mediaToEdit.Pk, err)
+
+		err2 := q.RollbackTargetsStatus(ctx, domain.Ids(targets))
+		if err2 != nil {
+			logger.Errorf(ctx, "failed to rollback targets status: %v", err2)
+		}
+
 		if status.Code(err) == codes.PermissionDenied {
 			// бот заблокирован, нужно отметить это в базе
 			logger.Warnf(ctx, "going to block bot, because of instaproxy error: %v", err)

@@ -475,7 +475,6 @@ select id, task_id, username, password, user_agent, device_data, session, header
 from bot_accounts
 where task_id = $1
   and username = $2
-  and status in (2, 5)
 `
 
 type FindTaskBotByUsernameParams struct {
@@ -944,6 +943,53 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
+const lockTargetsForTask = `-- name: LockTargetsForTask :many
+update target_users
+set status     = 'in_progress',
+    updated_at = now()
+where id in (select id
+             from target_users t
+             where t.task_id = $1
+               AND t.status = 'new'
+             limit $2 for update skip locked)
+returning id, task_id, username, user_id, created_at, updated_at, status, interaction_type, media_fk
+`
+
+type LockTargetsForTaskParams struct {
+	TaskID uuid.UUID `json:"task_id"`
+	Limit  int32     `json:"limit"`
+}
+
+func (q *Queries) LockTargetsForTask(ctx context.Context, arg LockTargetsForTaskParams) ([]TargetUser, error) {
+	rows, err := q.db.Query(ctx, lockTargetsForTask, arg.TaskID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TargetUser
+	for rows.Next() {
+		var i TargetUser
+		if err := rows.Scan(
+			&i.ID,
+			&i.TaskID,
+			&i.Username,
+			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Status,
+			&i.InteractionType,
+			&i.MediaFk,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const markTargetsAsNotified = `-- name: MarkTargetsAsNotified :exec
 update target_users
 set media_fk= $1,
@@ -967,6 +1013,17 @@ func (q *Queries) MarkTargetsAsNotified(ctx context.Context, arg MarkTargetsAsNo
 		arg.TaskID,
 		arg.TargetIds,
 	)
+	return err
+}
+
+const rollbackTargetsStatus = `-- name: RollbackTargetsStatus :exec
+update target_users
+set status = 'new'
+where id = ANY ($1::uuid[])
+`
+
+func (q *Queries) RollbackTargetsStatus(ctx context.Context, ids []uuid.UUID) error {
+	_, err := q.db.Exec(ctx, rollbackTargetsStatus, ids)
 	return err
 }
 
@@ -1174,6 +1231,22 @@ func (q *Queries) SetBotsEditingPostsStatus(ctx context.Context, taskID uuid.UUI
 		return nil, err
 	}
 	return items, nil
+}
+
+const setBotsStatus = `-- name: SetBotsStatus :exec
+update bot_accounts
+set status = $1
+where id = ANY ($2::uuid[])
+`
+
+type SetBotsStatusParams struct {
+	Status botStatus   `json:"status"`
+	Ids    []uuid.UUID `json:"ids"`
+}
+
+func (q *Queries) SetBotsStatus(ctx context.Context, arg SetBotsStatusParams) error {
+	_, err := q.db.Exec(ctx, setBotsStatus, arg.Status, arg.Ids)
+	return err
 }
 
 const setMediaIsEdited = `-- name: SetMediaIsEdited :exec

@@ -408,6 +408,20 @@ CREATE UNIQUE INDEX bot_accounts_uniq_username_taskid_idx ON public.bot_accounts
 
 
 --
+-- Name: bots_task_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX bots_task_id_idx ON public.bot_accounts USING btree (task_id);
+
+
+--
+-- Name: medias_bot_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX medias_bot_id_idx ON public.medias USING btree (bot_id);
+
+
+--
 -- Name: pgqueue_broken_tasks_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -433,6 +447,13 @@ CREATE INDEX pgqueue_open_tasks_idx ON public.pgqueue USING btree (kind, delayed
 --
 
 CREATE INDEX pgqueue_terminal_tasks_idx ON public.pgqueue USING btree (kind, updated_at) WHERE (status = ANY (ARRAY['cancelled'::public.pgqueue_status, 'succeeded'::public.pgqueue_status]));
+
+
+--
+-- Name: target_users_media_fk_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX target_users_media_fk_idx ON public.target_users USING btree (media_fk);
 
 
 --

@@ -59,19 +59,18 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 
 	ctx = logger.WithKV(ctx, "bot_account", bot.Username)
 
+	if bot.Status != dbmodel.StartedBotStatus {
+		return fmt.Errorf("%w: got bot status %d: expected %d (started)", pgqueue.ErrMustCancelTask, bot.Status, dbmodel.StartedTaskStatus)
+	}
+
 	logger.Info(ctx, "got account for processing")
 
-	// if bot.PostsCount >= int16(postingTask.PostsPerBot) {
-	// 	logger.Warnf(ctx, "bot has already %d posts but should have at most %d, stop posting", bot.PostsCount, postingTask.PostsPerBot)
-	// 	return nil
-	// }
-
 	targetsLimitForNextPost := postingTask.TargetsPerPost
-	if postingTask.NeedPhotoTags && bot.PostsCount < postingTask.PhotoTargetsPerPost {
+	if postingTask.NeedPhotoTags && bot.PostsCount < postingTask.PhotoTagsPostsPerBot {
 		targetsLimitForNextPost += postingTask.PhotoTargetsPerPost
 	}
 
-	targets, err := q.FindUnprocessedTargetsForTask(ctx, dbmodel.FindUnprocessedTargetsForTaskParams{
+	targets, err := q.LockTargetsForTask(ctx, dbmodel.LockTargetsForTaskParams{
 		TaskID: taskID,
 		Limit:  int32(targetsLimitForNextPost),
 	})
@@ -149,6 +148,11 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		CheapProxy: cheapProxy,
 	})
 	if err != nil {
+		err2 := q.RollbackTargetsStatus(ctx, domain.Ids(targets))
+		if err2 != nil {
+			logger.Errorf(ctx, "failed to rollback targets status: %v", err2)
+		}
+
 		if status.Code(err) == codes.PermissionDenied {
 			// бот заблокирован, нужно отметить это в базе
 			logger.Warnf(ctx, "going to block bot, because of instaproxy error: %v", err)
@@ -225,6 +229,10 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		}
 	} else {
 		logger.Infof(ctx, "already has %d/%d posts, don't add new posting task", mediasCount, postingTask.PostsPerBot)
+		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.DoneBotStatus, ID: bot.ID})
+		if err != nil {
+			return fmt.Errorf("failed to set bot status to %d: %v", dbmodel.EditingPostsDoneBotStatus, err)
+		}
 	}
 
 	if err = tx.Commit(ctx); err != nil {

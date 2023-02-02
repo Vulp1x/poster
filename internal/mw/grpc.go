@@ -20,49 +20,8 @@ const (
 	RequestIDMetadataKey = "x-request-id"
 )
 
-func UnaryServerLog() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return UnaryLog(ctx, req, info, handler)
-	}
-}
-
 func UnaryClientLog() grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		return unaryClientLog(ctx, method, req, reply, cc, invoker, opts...)
-	}
-}
-
-// UnaryLog does the actual logging given the logger for unary methods.
-func UnaryLog(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-	var reqID string
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		md = metadata.MD{}
-	}
-
-	reqID = MetadataValue(md, RequestIDMetadataKey)
-	if reqID == "" {
-		reqID = ShortID()
-	}
-
-	started := time.Now()
-
-	ctx = logger.WithFields(ctx, logger.Fields{"req_id": reqID})
-
-	startCtx := logger.WithFields(ctx, logger.Fields{"method": info.FullMethod, "request_length": byteCount(messageLength(req))})
-	// before executing rpc
-	logger.Info(startCtx, "request started")
-
-	// invoke rpc
-	resp, err = handler(ctx, req)
-
-	// after executing rpc
-	s, _ := status.FromError(err)
-
-	afterCtx := logger.WithFields(ctx, logger.Fields{"status": s.Code(), "bytes": byteCount(messageLength(req)), "elapsed": time.Since(started).String()})
-	logger.Info(afterCtx, "request completed")
-
-	return resp, err
+	return unaryClientLog
 }
 
 // UnaryClientLog does the actual logging given the logger for unary methods.

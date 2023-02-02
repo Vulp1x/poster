@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/dbtx"
+	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/inst-api/poster/pkg/pgqueue"
@@ -39,6 +40,11 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 
 	if len(bots) == 0 {
 		return nil, fmt.Errorf("не найдено ни одного бота")
+	}
+
+	err = q.SetBotsStatus(ctx, dbmodel.SetBotsStatusParams{Status: dbmodel.StartedBotStatus, Ids: domain.Ids(bots)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to set bot statuses to 'started': %v", err)
 	}
 
 	postingTasks := preparePostingTasks(ctx, task, bots)
