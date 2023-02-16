@@ -141,11 +141,12 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 	mediaTargets := preparePostCaption(postingTask, landingAccount, targets)
 
 	resp, err := s.cli.PostPicture(ctx, &api.PostPictureRequest{
-		Photo:      generator.Next(ctx),
-		UserId:     bot.InstID,
-		Caption:    mediaTargets.Caption,
-		UserTags:   mediaTargets.PhotoTargets,
-		CheapProxy: cheapProxy,
+		Photo:                   generator.Next(ctx),
+		UserId:                  bot.InstID,
+		Caption:                 mediaTargets.Caption,
+		UserTags:                mediaTargets.PhotoTargets,
+		CheapProxy:              cheapProxy,
+		UpdatePhotoDelaySeconds: postingTask.PhotoTagsDelaySeconds,
 	})
 	if err != nil {
 		err2 := q.RollbackTargetsStatus(ctx, domain.Ids(targets))
