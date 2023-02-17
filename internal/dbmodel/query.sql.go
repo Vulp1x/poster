@@ -562,7 +562,7 @@ func (q *Queries) FindTaskBotsByUsername(ctx context.Context, arg FindTaskBotsBy
 }
 
 const findTaskByID = `-- name: FindTaskByID :one
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post, fixed_tag, fixed_photo_tag
 from tasks
 where id = $1
 `
@@ -601,12 +601,14 @@ func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) 
 		&i.TargetsPerPost,
 		&i.PhotoTagsPostsPerBot,
 		&i.PhotoTargetsPerPost,
+		&i.FixedTag,
+		&i.FixedPhotoTag,
 	)
 	return i, err
 }
 
 const findTasksByManagerID = `-- name: FindTasksByManagerID :many
-select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
+select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post, fixed_tag, fixed_photo_tag
 from tasks
 where manager_id = $1
 `
@@ -651,6 +653,8 @@ func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID)
 			&i.TargetsPerPost,
 			&i.PhotoTagsPostsPerBot,
 			&i.PhotoTargetsPerPost,
+			&i.FixedTag,
+			&i.FixedPhotoTag,
 		); err != nil {
 			return nil, err
 		}
@@ -1325,7 +1329,7 @@ set text_template            = $1,
     photo_tags_posts_per_bot = $17,
     updated_at               = now()
 where id = $15
-returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post
+returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post, fixed_tag, fixed_photo_tag
 `
 
 type UpdateTaskParams struct {
@@ -1400,6 +1404,8 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		&i.TargetsPerPost,
 		&i.PhotoTagsPostsPerBot,
 		&i.PhotoTargetsPerPost,
+		&i.FixedTag,
+		&i.FixedPhotoTag,
 	)
 	return i, err
 }

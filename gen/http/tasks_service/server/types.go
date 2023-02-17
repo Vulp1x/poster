@@ -71,7 +71,10 @@ type UpdateTaskRequestBody struct {
 	BotImages []string `json:"bot_images"`
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
-	TestingTagUser *string `json:"testing_tag_user"`
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 // UploadVideoRequestBody is the type of the "tasks_service" service "upload
@@ -162,7 +165,7 @@ type UpdateTaskOKResponseBody struct {
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUsername *string `json:"testing_tag_username"`
-	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
@@ -290,7 +293,7 @@ type GetTaskOKResponseBody struct {
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUsername *string `json:"testing_tag_username"`
-	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
@@ -425,7 +428,7 @@ type TaskResponse struct {
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUsername *string `json:"testing_tag_username"`
-	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
@@ -806,7 +809,8 @@ func NewUpdateTaskPayload(body *UpdateTaskRequestBody, taskID string, token stri
 		PhotoTagsPostsPerBot:  body.PhotoTagsPostsPerBot,
 		TargetsPerPost:        body.TargetsPerPost,
 		PhotoTargetsPerPost:   body.PhotoTargetsPerPost,
-		TestingTagUser:        body.TestingTagUser,
+		TestingTagUsername:    body.TestingTagUsername,
+		TestingTagUserID:      body.TestingTagUserID,
 	}
 	if body.LandingAccounts != nil {
 		v.LandingAccounts = make([]string, len(body.LandingAccounts))

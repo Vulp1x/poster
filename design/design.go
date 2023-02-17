@@ -264,9 +264,14 @@ var _ = Service("tasks_service", func() {
 				Meta("struct:tag:json", "bot_images")
 			})
 
-			Attribute("testing_tag_user", String, func() {
+			Attribute("testing_tag_username", String, func() {
 				Description("username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов")
-				Meta("struct:tag:json", "testing_tag_user")
+				Meta("struct:tag:json", "testing_tag_username")
+			})
+
+			Attribute("testing_tag_user_id", Int64, func() {
+				Description("user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов")
+				Meta("struct:tag:json", "testing_tag_user_id")
 			})
 
 			Required("token", "task_id")

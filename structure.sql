@@ -285,7 +285,9 @@ CREATE TABLE public.tasks (
     posts_per_bot smallint DEFAULT 0 NOT NULL,
     targets_per_post smallint DEFAULT 0 NOT NULL,
     photo_tags_posts_per_bot smallint DEFAULT 0 NOT NULL,
-    photo_targets_per_post smallint DEFAULT 0 NOT NULL
+    photo_targets_per_post smallint DEFAULT 0 NOT NULL,
+    fixed_tag text,
+    fixed_photo_tag bigint
 );
 
 

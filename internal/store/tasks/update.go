@@ -209,3 +209,23 @@ func WithPerPostSleepSeconds(perPostSleepSeconds *uint) UpdateOption {
 		}
 	}
 }
+
+func WithFixedTagUpdateOption(username *string) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if username != nil && *username != "" {
+			task.FixedTag = username
+		} else {
+			task.FixedTag = nil
+		}
+	}
+}
+
+func WithFixedPhotoTagUpdateOption(userID *int64) UpdateOption {
+	return func(task *dbmodel.Task) {
+		if userID != nil && *userID != 0 {
+			task.FixedPhotoTag = userID
+		} else {
+			task.FixedPhotoTag = nil
+		}
+	}
+}

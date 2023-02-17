@@ -161,6 +161,8 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 		tasks.WithTargetsPerPost(p.TargetsPerPost),
 		tasks.WithPhotoTargetsPerPost(p.PhotoTargetsPerPost),
 		tasks.WithPhotoTagsPostsPerBot(p.PhotoTagsPostsPerBot),
+		tasks.WithFixedTagUpdateOption(p.TestingTagUsername),
+		tasks.WithFixedPhotoTagUpdateOption(p.TestingTagUserID),
 	)
 	if err != nil {
 		logger.Errorf(ctx, "failed to update task: %v", err)

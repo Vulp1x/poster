@@ -255,6 +255,18 @@ func preparePostCaption(task dbmodel.Task, landingAccount string, targets []dbmo
 	i := 0
 
 	var descriptionTargetsUserIds = make([]int64, 0, task.TargetsPerPost)
+	var photoTargetsUserIds = make([]int64, 0, task.PhotoTargetsPerPost)
+
+	if task.FixedTag != nil {
+		b.WriteByte(' ')
+		b.WriteByte('@')
+		b.WriteString(*task.FixedTag)
+	}
+
+	if task.FixedPhotoTag != nil {
+		photoTargetsUserIds = append(photoTargetsUserIds, *task.FixedPhotoTag)
+	}
+
 	for _, target := range targets {
 		b.WriteByte(' ')
 		b.WriteByte('@')
@@ -265,8 +277,6 @@ func preparePostCaption(task dbmodel.Task, landingAccount string, targets []dbmo
 			break
 		}
 	}
-
-	var photoTargetsUserIds = make([]int64, 0, task.PhotoTargetsPerPost)
 
 	if task.NeedPhotoTags && i < len(targets) {
 		for ; i < len(targets); i++ {

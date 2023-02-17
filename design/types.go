@@ -207,7 +207,7 @@ var Task = Type("Task", func() {
 	})
 
 	Attribute("testing_tag_user_id", Int64, func() {
-		Description("username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов")
+		Description("user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов")
 		Meta("struct:tag:json", "testing_tag_user_id")
 	})
 

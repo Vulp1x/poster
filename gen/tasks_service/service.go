@@ -341,7 +341,7 @@ type Task struct {
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUsername *string `json:"testing_tag_username"`
-	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
 	// поста, чтобы проверить работу ботов
 	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
@@ -451,7 +451,10 @@ type UpdateTaskPayload struct {
 	BotImages []string `json:"bot_images"`
 	// username пользователя в Instagram, без @. Фиксированная отметка для каждого
 	// поста, чтобы проверить работу ботов
-	TestingTagUser *string `json:"testing_tag_user"`
+	TestingTagUsername *string `json:"testing_tag_username"`
+	// user_id пользователя в Instagram. Фиксированная отметка на фото для каждого
+	// поста, чтобы проверить работу ботов
+	TestingTagUserID *int64 `json:"testing_tag_user_id"`
 }
 
 type UploadError struct {

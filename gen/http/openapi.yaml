@@ -1359,15 +1359,15 @@ definitions:
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Qui inventore occaecati.
+        example: Inventore occaecati debitis ad nam laboriosam facilis.
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Sit vero mollitia quia quae voluptatem quo.
+        example: Quae voluptatem quo.
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Ad nam laboriosam facilis vel qui reprehenderit.
+        example: Qui reprehenderit hic sit vero mollitia.
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
@@ -1539,7 +1539,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 2116331441911380562
         format: int64
       testing_tag_username:
@@ -2569,7 +2569,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 7788625986117249
         format: int64
       testing_tag_username:
@@ -2823,7 +2823,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 3616080770556757432
         format: int64
       testing_tag_username:
@@ -3077,7 +3077,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 6578075076151671414
         format: int64
       testing_tag_username:
@@ -3900,7 +3900,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 2463080299594052535
         format: int64
       testing_tag_username:
@@ -4155,7 +4155,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 9214789128391091918
         format: int64
       testing_tag_username:
@@ -4351,7 +4351,12 @@ definitions:
         description: количество упоминаний под каждым постом
         example: 15195839932895579297
         format: int64
-      testing_tag_user:
+      testing_tag_user_id:
+        type: integer
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
+        example: 7881422020797627806
+        format: int64
+      testing_tag_username:
         type: string
         description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
         example: Nihil corrupti vero expedita vel aut harum.
@@ -4365,38 +4370,42 @@ definitions:
         example: Fugit repellat provident architecto dolorum nemo est.
     example:
       bot_images:
-        - Dolorem aut omnis omnis vel facere praesentium.
-        - In consequatur odit ut a voluptatem velit.
-        - Sint cumque aut exercitationem id rerum.
+        - Officia in.
+        - Odit ut a.
+        - Velit qui sint.
+        - Aut exercitationem.
       bot_last_names:
-        - Vero adipisci consequatur.
-        - Veritatis sint voluptatibus blanditiis voluptatem sint in.
+        - Minus vero neque rerum et voluptatum.
+        - Totam voluptatibus nisi dolores.
+        - Rerum vero adipisci consequatur et veritatis.
+        - Voluptatibus blanditiis.
       bot_names:
-        - Optio et aliquam illum esse impedit.
-        - Inventore ut voluptatem minus.
-        - Neque rerum.
-        - Voluptatum impedit totam voluptatibus nisi dolores.
+        - Aliquam illum.
+        - Impedit qui inventore.
       bot_urls:
+        - In rerum.
         - Qui et neque.
-        - Qui non distinctio dolorem assumenda.
-      follow_targets: true
+      follow_targets: false
       landing_accounts:
-        - Autem numquam enim quam harum.
-        - Fuga est velit.
-        - Et facilis omnis enim quod velit.
-      need_photo_tags: true
-      per_post_sleep_seconds: 15079121688584111867
-      photo_tags_delay_seconds: 13675447285077491327
-      photo_tags_posts_per_bot: 15123234450697785502
-      photo_targets_per_post: 1568618387647971994
+        - Enim quam harum modi.
+        - Est velit sunt et facilis omnis enim.
+        - Velit aliquid eos.
+      need_photo_tags: false
+      per_post_sleep_seconds: 14219215042853897468
+      photo_tags_delay_seconds: 10414161647237218460
+      photo_tags_posts_per_bot: 15079121688584111867
+      photo_targets_per_post: 1340423384363361851
       post_images:
-        - Asperiores soluta ut et.
-        - Optio architecto vero.
-      posts_per_bot: 1340423384363361851
-      targets_per_post: 14621281591157616344
-      testing_tag_user: Dolore fugiat.
-      text_template: Sit totam.
-      title: Dolorem beatae.
+        - Quod at blanditiis.
+        - Soluta ut et dolorem optio architecto.
+        - Magni eum.
+        - Aut omnis omnis vel.
+      posts_per_bot: 13085856717477080964
+      targets_per_post: 13675447285077491327
+      testing_tag_user_id: 6005595658909406910
+      testing_tag_username: Rerum nesciunt.
+      text_template: Totam aut id.
+      title: Qui non distinctio dolorem assumenda.
   TasksServiceUpdateTaskUnauthorizedResponseBody:
     title: TasksServiceUpdateTaskUnauthorizedResponseBody
     type: object
@@ -4553,7 +4562,7 @@ definitions:
         format: int64
       testing_tag_user_id:
         type: integer
-        description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+        description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
         example: 9056433853590510700
         format: int64
       testing_tag_username:
@@ -4660,7 +4669,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 8
+        example: 2
         enum:
           - 1
           - 2
@@ -4684,9 +4693,17 @@ definitions:
             line: 3806088037276302890
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
+          - input: Voluptas voluptas voluptates suscipit aut rem provident.
+            line: 3806088037276302890
+            reason: Eum ullam porro dolorem numquam rerum eveniet.
+            type: 1
     example:
-      status: 7
+      status: 2
       upload_errors:
+        - input: Voluptas voluptas voluptates suscipit aut rem provident.
+          line: 3806088037276302890
+          reason: Eum ullam porro dolorem numquam rerum eveniet.
+          type: 1
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
           reason: Eum ullam porro dolorem numquam rerum eveniet.
@@ -4732,8 +4749,12 @@ definitions:
             line: 3806088037276302890
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
+          - input: Voluptas voluptas voluptates suscipit aut rem provident.
+            line: 3806088037276302890
+            reason: Eum ullam porro dolorem numquam rerum eveniet.
+            type: 1
     example:
-      status: 2
+      status: 5
       upload_errors:
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
@@ -4896,7 +4917,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 5
+        example: 2
         enum:
           - 1
           - 2
@@ -4920,9 +4941,25 @@ definitions:
             line: 3806088037276302890
             reason: Eum ullam porro dolorem numquam rerum eveniet.
             type: 1
+          - input: Voluptas voluptas voluptates suscipit aut rem provident.
+            line: 3806088037276302890
+            reason: Eum ullam porro dolorem numquam rerum eveniet.
+            type: 1
+          - input: Voluptas voluptas voluptates suscipit aut rem provident.
+            line: 3806088037276302890
+            reason: Eum ullam porro dolorem numquam rerum eveniet.
+            type: 1
     example:
-      status: 1
+      status: 4
       upload_errors:
+        - input: Voluptas voluptas voluptates suscipit aut rem provident.
+          line: 3806088037276302890
+          reason: Eum ullam porro dolorem numquam rerum eveniet.
+          type: 1
+        - input: Voluptas voluptas voluptates suscipit aut rem provident.
+          line: 3806088037276302890
+          reason: Eum ullam porro dolorem numquam rerum eveniet.
+          type: 1
         - input: Voluptas voluptas voluptates suscipit aut rem provident.
           line: 3806088037276302890
           reason: Eum ullam porro dolorem numquam rerum eveniet.
@@ -4940,7 +4977,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 6
+        example: 8
         enum:
           - 1
           - 2
@@ -4951,7 +4988,7 @@ definitions:
           - 7
           - 8
     example:
-      status: 8
+      status: 6
     required:
       - status
   TasksServiceUploadVideoOKResponseBody:
@@ -4960,7 +4997,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 6
+        example: 3
         enum:
           - 1
           - 2
@@ -4971,7 +5008,7 @@ definitions:
           - 7
           - 8
     example:
-      status: 8
+      status: 6
     required:
       - status
   TasksServiceUploadVideoRequestBody:
@@ -4981,11 +5018,27 @@ definitions:
       filename:
         type: string
         description: не нужно присылать руками, подставится автоматом
-        example: Adipisci eos corrupti unde itaque id aut.
+        example: Sequi adipisci eos corrupti unde.
       video:
         type: string
         example:
-          - 78
+          - 73
+          - 100
+          - 32
+          - 97
+          - 117
+          - 116
+          - 32
+          - 111
+          - 102
+          - 102
+          - 105
+          - 99
+          - 105
+          - 105
+          - 115
+          - 32
+          - 110
           - 111
           - 110
           - 32
@@ -5002,40 +5055,19 @@ definitions:
           - 116
           - 101
           - 109
+          - 32
+          - 100
+          - 111
+          - 108
+          - 111
+          - 114
+          - 101
           - 46
         format: byte
     example:
-      filename: Qui et ut.
+      filename: Et ut et quisquam ad rem.
       video:
-        - 81
-        - 117
-        - 105
-        - 115
-        - 113
-        - 117
-        - 97
-        - 109
-        - 32
-        - 97
-        - 100
-        - 32
-        - 114
-        - 101
-        - 109
-        - 32
-        - 112
-        - 101
-        - 114
-        - 102
-        - 101
-        - 114
-        - 101
-        - 110
-        - 100
-        - 105
-        - 115
-        - 32
-        - 115
+        - 83
         - 117
         - 115
         - 99
@@ -5053,6 +5085,28 @@ definitions:
         - 105
         - 97
         - 115
+        - 32
+        - 97
+        - 117
+        - 116
+        - 32
+        - 115
+        - 117
+        - 115
+        - 99
+        - 105
+        - 112
+        - 105
+        - 116
+        - 32
+        - 101
+        - 108
+        - 105
+        - 103
+        - 101
+        - 110
+        - 100
+        - 105
         - 46
     required:
       - video
@@ -5062,7 +5116,7 @@ definitions:
     properties:
       status:
         type: integer
-        example: 7
+        example: 8
         enum:
           - 1
           - 2
@@ -5073,7 +5127,7 @@ definitions:
           - 7
           - 8
     example:
-      status: 2
+      status: 7
     required:
       - status
   UploadErrorResponseBody:
@@ -5083,14 +5137,14 @@ definitions:
       input:
         type: string
         description: номер порта
-        example: Eum ut saepe.
+        example: Voluptatum ut fugiat ut est.
       line:
         type: integer
-        example: 6682660418329193952
+        example: 9008673716527307496
         format: int64
       reason:
         type: string
-        example: Ut fugiat ut.
+        example: Nemo omnis.
       type:
         type: integer
         description: |2-
@@ -5103,10 +5157,10 @@ definitions:
           - 2
           - 3
     example:
-      input: Omnis impedit amet repellat sit nihil.
-      line: 7207457232895466743
-      reason: Eveniet velit omnis odio illum corrupti.
-      type: 1
+      input: Sit nihil ea eveniet.
+      line: 8126212461842549245
+      reason: Omnis odio illum corrupti officia.
+      type: 3
     required:
       - type
       - line

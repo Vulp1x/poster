@@ -1065,7 +1065,8 @@ paths:
                 - Perspiciatis nobis cupiditate consequatur ea.
               posts_per_bot: 3623098430306267513
               targets_per_post: 13784779891214476028
-              testing_tag_user: Non omnis.
+              testing_tag_user_id: 7905713975101806099
+              testing_tag_username: Non omnis.
               text_template: Sed nihil delectus et inventore dicta non.
               title: Accusantium est eum laboriosam.
       responses:
@@ -2826,7 +2827,7 @@ components:
           example: 3574089268288240440
         testing_tag_user_id:
           type: integer
-          description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
+          description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
           example: 5633470460853943240
           format: int64
         testing_tag_username:
@@ -3146,7 +3147,12 @@ components:
           type: integer
           description: количество упоминаний под каждым постом
           example: 17492735911613174894
-        testing_tag_user:
+        testing_tag_user_id:
+          type: integer
+          description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
+          example: 5848504853988820347
+          format: int64
+        testing_tag_username:
           type: string
           description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
           example: Illum animi libero fugit id libero.
@@ -3189,8 +3195,9 @@ components:
           - Aut quod.
         posts_per_bot: 18024293446359300834
         targets_per_post: 15058445330187001139
-        testing_tag_user: Aut maiores vel et cum expedita neque.
-        text_template: Quibusdam laboriosam commodi.
+        testing_tag_user_id: 7645636889504494876
+        testing_tag_username: Aut maiores vel et cum expedita neque.
+        text_template: Laboriosam commodi.
         title: Repudiandae et nesciunt.
     UploadError:
       type: object

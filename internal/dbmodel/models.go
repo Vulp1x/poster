@@ -308,6 +308,8 @@ type Task struct {
 	TargetsPerPost        int        `json:"targets_per_post"`
 	PhotoTagsPostsPerBot  int        `json:"photo_tags_posts_per_bot"`
 	PhotoTargetsPerPost   int        `json:"photo_targets_per_post"`
+	FixedTag              *string    `json:"fixed_tag"`
+	FixedPhotoTag         *int64     `json:"fixed_photo_tag"`
 }
 
 type User struct {
