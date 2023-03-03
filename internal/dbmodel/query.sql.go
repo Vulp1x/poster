@@ -302,6 +302,72 @@ func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID)
 	return items, nil
 }
 
+const findNotFinishedEditingTaskBots = `-- name: FindNotFinishedEditingTaskBots :many
+select username, status
+from bot_accounts
+where task_id = $1
+  and status NOT IN (6, 8) -- BlockedBotStatus, EditingPostsDoneBotStatus
+ORDER BY status
+`
+
+type FindNotFinishedEditingTaskBotsRow struct {
+	Username string    `json:"username"`
+	Status   botStatus `json:"status"`
+}
+
+func (q *Queries) FindNotFinishedEditingTaskBots(ctx context.Context, taskID uuid.UUID) ([]FindNotFinishedEditingTaskBotsRow, error) {
+	rows, err := q.db.Query(ctx, findNotFinishedEditingTaskBots, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindNotFinishedEditingTaskBotsRow
+	for rows.Next() {
+		var i FindNotFinishedEditingTaskBotsRow
+		if err := rows.Scan(&i.Username, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findNotFinishedPostingTaskBots = `-- name: FindNotFinishedPostingTaskBots :many
+select username, status
+from bot_accounts
+where task_id = $1
+  and status NOT IN (4, 5, 6) -- DoneBotStatus, FailBotStatus, BlockedBotStatus
+ORDER BY status
+`
+
+type FindNotFinishedPostingTaskBotsRow struct {
+	Username string    `json:"username"`
+	Status   botStatus `json:"status"`
+}
+
+func (q *Queries) FindNotFinishedPostingTaskBots(ctx context.Context, taskID uuid.UUID) ([]FindNotFinishedPostingTaskBotsRow, error) {
+	rows, err := q.db.Query(ctx, findNotFinishedPostingTaskBots, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindNotFinishedPostingTaskBotsRow
+	for rows.Next() {
+		var i FindNotFinishedPostingTaskBotsRow
+		if err := rows.Scan(&i.Username, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findReadyBots = `-- name: FindReadyBots :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts
@@ -1327,6 +1393,8 @@ set text_template            = $1,
     targets_per_post         = $14,
     photo_targets_per_post   = $16,
     photo_tags_posts_per_bot = $17,
+    fixed_tag                = $18,
+    fixed_photo_tag          = $19,
     updated_at               = now()
 where id = $15
 returning id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post, fixed_tag, fixed_photo_tag
@@ -1350,6 +1418,8 @@ type UpdateTaskParams struct {
 	ID                    uuid.UUID `json:"id"`
 	PhotoTargetsPerPost   int       `json:"photo_targets_per_post"`
 	PhotoTagsPostsPerBot  int       `json:"photo_tags_posts_per_bot"`
+	FixedTag              *string   `json:"fixed_tag"`
+	FixedPhotoTag         *int64    `json:"fixed_photo_tag"`
 }
 
 func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
@@ -1371,6 +1441,8 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		arg.ID,
 		arg.PhotoTargetsPerPost,
 		arg.PhotoTagsPostsPerBot,
+		arg.FixedTag,
+		arg.FixedPhotoTag,
 	)
 	var i Task
 	err := row.Scan(
@@ -1408,6 +1480,22 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		&i.FixedPhotoTag,
 	)
 	return i, err
+}
+
+const updateTaskLandingAccounts = `-- name: UpdateTaskLandingAccounts :exec
+update tasks
+set landing_accounts = $1
+where id = $2
+`
+
+type UpdateTaskLandingAccountsParams struct {
+	LandingAccounts []string  `json:"landing_accounts"`
+	ID              uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateTaskLandingAccounts(ctx context.Context, arg UpdateTaskLandingAccountsParams) error {
+	_, err := q.db.Exec(ctx, updateTaskLandingAccounts, arg.LandingAccounts, arg.ID)
+	return err
 }
 
 const updateTaskStatus = `-- name: UpdateTaskStatus :exec

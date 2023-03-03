@@ -85,9 +85,6 @@ func (s *Store) StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) (
 		return nil, fmt.Errorf("got status %d, expected 6(done)", task.Status)
 	}
 
-	// TODO добавить проверку landing accounts перед началом
-	// s.cli.CheckLandingAccounts()
-
 	if err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
 		Status: dbmodel.UpdatingPostContentsTaskStatus,
 		ID:     taskID,

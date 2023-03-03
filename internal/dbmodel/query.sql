@@ -124,6 +124,8 @@ set text_template            = $1,
     targets_per_post         = $14,
     photo_targets_per_post   = @photo_targets_per_post,
     photo_tags_posts_per_bot = @photo_tags_posts_per_bot,
+    fixed_tag                = @fixed_tag,
+    fixed_photo_tag          = @fixed_photo_tag,
     updated_at               = now()
 where id = $15
 returning *;
@@ -334,3 +336,22 @@ returning *;
 update medias
 set is_edited = true
 where pk = @pk;
+
+-- name: FindNotFinishedPostingTaskBots :many
+select username, status
+from bot_accounts
+where task_id = $1
+  and status NOT IN (4, 5, 6) -- DoneBotStatus, FailBotStatus, BlockedBotStatus
+ORDER BY status;
+
+-- name: FindNotFinishedEditingTaskBots :many
+select username, status
+from bot_accounts
+where task_id = $1
+  and status NOT IN (6, 8) -- BlockedBotStatus, EditingPostsDoneBotStatus
+ORDER BY status;
+
+-- name: UpdateTaskLandingAccounts :exec
+update tasks
+set landing_accounts = @landing_accounts
+where id = @id;

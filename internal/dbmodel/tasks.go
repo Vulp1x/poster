@@ -17,7 +17,7 @@ const (
 	// UpdatingPostContentsTaskStatus обновляем описания под публикациями
 	UpdatingPostContentsTaskStatus taskStatus = 7
 	// AllDoneTaskStatus все этапы задачи выполнены, конечный статус
-	AllDoneTaskStatus taskStatus = 6
+	AllDoneTaskStatus taskStatus = 8
 )
 
 type taskType int16

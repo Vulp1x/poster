@@ -61,6 +61,8 @@ func (t Task) ToProto() *tasksservice.Task {
 		PhotoTargetsPerPost:        uint(t.PhotoTargetsPerPost),
 		PostImages:                 images,
 		BotImages:                  botsProfileImages,
+		TestingTagUsername:         t.FixedTag,
+		TestingTagUserID:           t.FixedPhotoTag,
 	}
 }
 

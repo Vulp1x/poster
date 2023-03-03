@@ -32,8 +32,8 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...Update
 		return domain.Task{}, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
 	}
 
-	if task.Status == dbmodel.StartedTaskStatus {
-		return domain.Task{}, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DataUploadedTaskStatus, task.Status)
+	if task.Status == dbmodel.AllDoneTaskStatus {
+		return domain.Task{}, fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.AllDoneTaskStatus, task.Status)
 	}
 
 	for _, opt := range opts {
@@ -57,6 +57,8 @@ func (s *Store) UpdateTask(ctx context.Context, taskID uuid.UUID, opts ...Update
 		TargetsPerPost:        task.TargetsPerPost,
 		PhotoTagsPostsPerBot:  task.PhotoTagsPostsPerBot,
 		PhotoTargetsPerPost:   task.PhotoTargetsPerPost,
+		FixedTag:              task.FixedTag,
+		FixedPhotoTag:         task.FixedPhotoTag,
 		ID:                    taskID,
 	})
 	if err != nil {

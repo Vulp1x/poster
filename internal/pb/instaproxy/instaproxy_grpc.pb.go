@@ -31,6 +31,7 @@ type InstaProxyClient interface {
 	// перед тем как менять фотки возможно стоит открывать профиль?
 	OpenProfile(ctx context.Context, in *OpenProfileRequest, opts ...grpc.CallOption) (*OpenProfileResponse, error)
 	FollowUsers(ctx context.Context, in *FollowUsersRequest, opts ...grpc.CallOption) (*FollowUsersResponse, error)
+	CheckLandings(ctx context.Context, in *CheckLandingsRequest, opts ...grpc.CallOption) (*CheckLandingsResponse, error)
 }
 
 type instaProxyClient struct {
@@ -113,6 +114,15 @@ func (c *instaProxyClient) FollowUsers(ctx context.Context, in *FollowUsersReque
 	return out, nil
 }
 
+func (c *instaProxyClient) CheckLandings(ctx context.Context, in *CheckLandingsRequest, opts ...grpc.CallOption) (*CheckLandingsResponse, error) {
+	out := new(CheckLandingsResponse)
+	err := c.cc.Invoke(ctx, "/InstaProxy/CheckLandings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InstaProxyServer is the server API for InstaProxy service.
 // All implementations must embed UnimplementedInstaProxyServer
 // for forward compatibility
@@ -130,6 +140,7 @@ type InstaProxyServer interface {
 	// перед тем как менять фотки возможно стоит открывать профиль?
 	OpenProfile(context.Context, *OpenProfileRequest) (*OpenProfileResponse, error)
 	FollowUsers(context.Context, *FollowUsersRequest) (*FollowUsersResponse, error)
+	CheckLandings(context.Context, *CheckLandingsRequest) (*CheckLandingsResponse, error)
 	mustEmbedUnimplementedInstaProxyServer()
 }
 
@@ -160,6 +171,9 @@ func (UnimplementedInstaProxyServer) OpenProfile(context.Context, *OpenProfileRe
 }
 func (UnimplementedInstaProxyServer) FollowUsers(context.Context, *FollowUsersRequest) (*FollowUsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowUsers not implemented")
+}
+func (UnimplementedInstaProxyServer) CheckLandings(context.Context, *CheckLandingsRequest) (*CheckLandingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckLandings not implemented")
 }
 func (UnimplementedInstaProxyServer) mustEmbedUnimplementedInstaProxyServer() {}
 
@@ -318,6 +332,24 @@ func _InstaProxy_FollowUsers_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InstaProxy_CheckLandings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckLandingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InstaProxyServer).CheckLandings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/InstaProxy/CheckLandings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InstaProxyServer).CheckLandings(ctx, req.(*CheckLandingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InstaProxy_ServiceDesc is the grpc.ServiceDesc for InstaProxy service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -356,6 +388,10 @@ var InstaProxy_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FollowUsers",
 			Handler:    _InstaProxy_FollowUsers_Handler,
+		},
+		{
+			MethodName: "CheckLandings",
+			Handler:    _InstaProxy_CheckLandings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

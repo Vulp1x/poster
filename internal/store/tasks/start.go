@@ -50,6 +50,11 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
 	}
 
+	err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
+	if err != nil {
+		return nil, err
+	}
+
 	if err = validateTaskBeforeStart(task); err != nil {
 		return nil, err
 	}

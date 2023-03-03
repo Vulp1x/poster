@@ -27,6 +27,15 @@ service InstaProxy {
   rpc OpenProfile (OpenProfileRequest) returns (OpenProfileResponse);
 
   rpc FollowUsers(FollowUsersRequest) returns (FollowUsersResponse);
+  rpc CheckLandings(CheckLandingsRequest) returns (CheckLandingsResponse);
+}
+
+message CheckLandingsRequest{
+  repeated string usernames = 1;
+}
+
+message CheckLandingsResponse{
+  repeated string alive_landings = 1;
 }
 
 message OpenProfileRequest{

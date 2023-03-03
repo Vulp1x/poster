@@ -9,6 +9,7 @@ import (
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/dbtx"
 	"github.com/inst-api/poster/internal/domain"
+	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/inst-api/poster/pkg/pgqueue"
@@ -16,13 +17,7 @@ import (
 )
 
 func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []string) ([]string, error) {
-	tx, err := s.txf(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %v", err)
-	}
-	defer dbtx.RollbackUnlessCommitted(ctx, tx)
-
-	q := dbmodel.New(tx)
+	q := dbmodel.New(s.db)
 
 	task, err := q.FindTaskByID(ctx, taskID)
 	if err != nil {
@@ -42,6 +37,19 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 		return nil, fmt.Errorf("не найдено ни одного бота")
 	}
 
+	err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := s.txf(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %v", err)
+	}
+	defer dbtx.RollbackUnlessCommitted(ctx, tx)
+
+	q = dbmodel.New(tx)
+
 	err = q.SetBotsStatus(ctx, dbmodel.SetBotsStatusParams{Status: dbmodel.StartedBotStatus, Ids: domain.Ids(bots)})
 	if err != nil {
 		return nil, fmt.Errorf("failed to set bot statuses to 'started': %v", err)
@@ -51,6 +59,14 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 	err = s.queue.PushTasksTx(ctx, tx, postingTasks)
 	if err != nil {
 		return nil, fmt.Errorf("failed to push tasks to queue: %v", err)
+	}
+
+	if err = s.queue.PushTaskTx(ctx, tx, pgqueue.Task{
+		Kind:        workers.TransitPostsMadeTaskKind,
+		Payload:     workers.EmptyPayload,
+		ExternalKey: taskID.String(),
+	}); err != nil {
+		return nil, fmt.Errorf("failed to push 'update status after all bots done' task: %v", err)
 	}
 
 	logger.Infof(ctx, "pushed %d tasks from %d input usernames", len(postingTasks), len(usernames))
@@ -66,6 +82,25 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 	}
 
 	return succeededUsernames, nil
+}
+
+func (s *Store) checkAndUpdateTaskLandingAccounts(ctx context.Context, task dbmodel.Task, q *dbmodel.Queries) error {
+	checkedLandings, err := s.cli.CheckLandings(ctx, &api.CheckLandingsRequest{Usernames: task.LandingAccounts})
+	if err != nil {
+		return fmt.Errorf("failed to check landings: %v", err)
+	}
+
+	if len(task.LandingAccounts) > len(checkedLandings.AliveLandings) {
+		logger.Warnf(ctx, "before check got %d landing accounts, but only %d are alive: %v",
+			len(task.LandingAccounts), len(checkedLandings.AliveLandings), checkedLandings.AliveLandings,
+		)
+
+		err = q.UpdateTaskLandingAccounts(ctx, dbmodel.UpdateTaskLandingAccountsParams{LandingAccounts: checkedLandings.AliveLandings, ID: task.ID})
+		if err != nil {
+			return fmt.Errorf("failed to update task landing accounts: %v", err)
+		}
+	}
+	return nil
 }
 
 func preparePostingTasks(ctx context.Context, task dbmodel.Task, bots []dbmodel.BotAccount) []pgqueue.Task {
