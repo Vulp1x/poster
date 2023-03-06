@@ -134,6 +134,7 @@ func (p TaskProgress) ToProto() *tasksservice.TaskProgress {
 			DescriptionTargetsNotified: progress.PostDescriptionTargets,
 			PhotoTargetsNotified:       progress.PhotoTaggedTargets,
 			FileOrder:                  progress.FileOrder,
+			EditedPostsCount:           progress.EditedPostsCount,
 		}
 	}
 

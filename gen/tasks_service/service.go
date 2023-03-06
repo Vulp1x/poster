@@ -98,8 +98,8 @@ type BotsProgress struct {
 	Username string
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
-	// количество выложенных постов
-	EditedPostsCount int32 `json:"posts_count"`
+	// количество отредактированных постов
+	EditedPostsCount int32 `json:"edited_posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
 	Status int32
 	// количество аккаунтов, которых упомянули в постах

@@ -242,8 +242,8 @@ var BotsProgress = Type("BotsProgress", func() {
 		Meta("struct:tag:json", "posts_count")
 	})
 
-	Attribute("edited_posts_count", Int32, "количество выложенных постов", func() {
-		Meta("struct:tag:json", "posts_count")
+	Attribute("edited_posts_count", Int32, "количество отредактированных постов", func() {
+		Meta("struct:tag:json", "edited_posts_count")
 	})
 
 	Attribute("status", Int32, "текущий статус бота, будут ли выкладываться посты")

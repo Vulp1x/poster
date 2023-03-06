@@ -2324,7 +2324,7 @@ components:
           format: int32
         edited_posts_count:
           type: integer
-          description: количество выложенных постов
+          description: количество отредактированных постов
           example: 86320602
           format: int32
         file_order:

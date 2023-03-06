@@ -340,8 +340,8 @@ type BotsProgressResponseBody struct {
 	Username string `form:"username" json:"username" xml:"username"`
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
-	// количество выложенных постов
-	EditedPostsCount int32 `json:"posts_count"`
+	// количество отредактированных постов
+	EditedPostsCount int32 `json:"edited_posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
 	Status int32 `form:"status" json:"status" xml:"status"`
 	// количество аккаунтов, которых упомянули в постах

@@ -1176,7 +1176,7 @@ definitions:
         format: int32
       edited_posts_count:
         type: integer
-        description: количество выложенных постов
+        description: количество отредактированных постов
         example: 933301777
         format: int32
       file_order:
