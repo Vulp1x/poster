@@ -20,11 +20,11 @@ type Configuration struct {
 
 // Default sets default values in config variables.
 func (c *Configuration) Default() {
-	c.Host = "postgres"
+	c.Host = "0.0.0.0"
 	c.Port = 5432
 	c.Database = "insta_poster"
-	c.User = "docker"
-	c.Password = "docker"
+	c.User = "postgres"
+	c.Password = "postgres"
 	c.MigrationsDir = "migrations"
 	c.Timeout = 5 * time.Second
 	c.MaxConns = 25

@@ -4,19 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
-	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/dbtx"
 	"github.com/inst-api/poster/internal/domain"
 	"github.com/inst-api/poster/internal/instagrapi"
 	api "github.com/inst-api/poster/internal/pb/instaproxy"
 	"github.com/inst-api/poster/internal/store"
-	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/inst-api/poster/pkg/pgqueue"
 	"github.com/jackc/pgx/v4"
@@ -61,67 +58,6 @@ type Store struct {
 	cli         api.InstaProxyClient
 	queue       *pgqueue.Queue
 	db          dbmodel.DBTX
-}
-
-func (s *Store) StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) ([]string, error) {
-	tx, err := s.txf(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to begin transaction: %v", err)
-	}
-	dbtx.RollbackUnlessCommitted(ctx, tx)
-
-	q := dbmodel.New(tx)
-
-	task, err := q.FindTaskByID(ctx, taskID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, ErrTaskNotFound
-		}
-
-		return nil, err
-	}
-
-	if task.Status != dbmodel.DoneTaskStatus {
-		return nil, fmt.Errorf("got status %d, expected 6(done)", task.Status)
-	}
-
-	if err = q.UpdateTaskStatus(ctx, dbmodel.UpdateTaskStatusParams{
-		Status: dbmodel.UpdatingPostContentsTaskStatus,
-		ID:     taskID,
-	}); err != nil {
-		return nil, fmt.Errorf("failed to update task status: %v", err)
-	}
-
-	botsCount, err := q.GetTaskBotsCount(ctx, taskID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to count bots for task: %v", err)
-	}
-
-	aliveBots, err := q.SetBotsEditingPostsStatus(ctx, taskID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to update bots statuses to 'editing posts': %v", err)
-	}
-
-	logger.Infof(ctx, "have %d alive bots from %d bots in task", len(aliveBots), botsCount)
-
-	tasks := make([]pgqueue.Task, len(aliveBots))
-	for i, bot := range aliveBots {
-		tasks[i] = pgqueue.Task{
-			Kind:        workers.EditMediaTaskKind,
-			Payload:     workers.EmptyPayload,
-			ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
-		}
-	}
-
-	if err = s.queue.PushTasksTx(ctx, tx, tasks); err != nil {
-		return nil, fmt.Errorf("failed to push %d tasks: %v", len(tasks), err)
-	}
-
-	if err = tx.Commit(ctx); err != nil {
-		return nil, fmt.Errorf("failed to commit transaction: %v", err)
-	}
-
-	return task.LandingAccounts, nil
 }
 
 func (s *Store) TaskBots(ctx context.Context, taskID uuid.UUID) (domain.BotAccounts, error) {
@@ -256,74 +192,6 @@ func (s *Store) ForceDelete(ctx context.Context, taskID uuid.UUID) error {
 	return tx.Commit(ctx)
 }
 
-func (s *Store) PrepareTask(
-	ctx context.Context,
-	taskID uuid.UUID,
-	botAccounts domain.BotAccounts,
-	residentialProxies, cheapProxies domain.Proxies,
-	targets domain.TargetUsers,
-	filenames *tasksservice.TaskFileNames,
-) error {
-	tx, err := s.txf(ctx)
-	if err != nil {
-		return store.ErrTransactionFail
-	}
-
-	defer dbtx.RollbackUnlessCommitted(ctx, tx)
-
-	q := dbmodel.New(tx)
-
-	task, err := q.FindTaskByID(ctx, taskID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return ErrTaskNotFound
-		}
-
-		return fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
-	}
-
-	if task.Status != dbmodel.DraftTaskStatus {
-		return fmt.Errorf("%w: expected %d got %d", ErrTaskInvalidStatus, dbmodel.DraftTaskStatus, task.Status)
-	}
-
-	savedCount, err := q.SaveBotAccounts(ctx, botAccounts.ToSaveParams(taskID))
-	logger.Infof(ctx, "saved %d bots", savedCount)
-	if err != nil {
-		return fmt.Errorf("failed to save bots: %v", err)
-	}
-
-	savedCount, err = q.SaveProxies(ctx, residentialProxies.ToSaveParams(taskID, false))
-	logger.Infof(ctx, "saved %d residential proxies", savedCount)
-	if err != nil {
-		return fmt.Errorf("failed to save residential proxies: %v", err)
-	}
-
-	savedCount, err = q.SaveProxies(ctx, cheapProxies.ToSaveParams(taskID, true))
-	logger.Infof(ctx, "saved %d cheap proxies", savedCount)
-	if err != nil {
-		return fmt.Errorf("failed to save cheap proxies: %v", err)
-	}
-
-	savedCount, err = q.SaveTargetUsers(ctx, targets.ToSaveParams(taskID))
-	logger.Infof(ctx, "saved %d target users", savedCount)
-	if err != nil {
-		return fmt.Errorf("failed to save targets: %v", err)
-	}
-
-	err = q.SaveUploadedDataToTask(ctx, dbmodel.SaveUploadedDataToTaskParams{
-		ID:                   taskID,
-		BotsFilename:         &filenames.BotsFilename,
-		ResProxiesFilename:   &filenames.ResidentialProxiesFilename,
-		CheapProxiesFilename: &filenames.CheapProxiesFilename,
-		TargetsFilename:      &filenames.TargetsFilename,
-	})
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit(ctx)
-}
-
 func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	logger.Infof(ctx, "stopping task '%s'", taskID)
 	s.taskMu.Lock()
@@ -340,36 +208,4 @@ func (s *Store) StopTask(ctx context.Context, taskID uuid.UUID) error {
 	s.taskMu.Unlock()
 
 	return nil
-}
-
-func (s *Store) insertMoreProxies(
-	ctx context.Context,
-	taskID uuid.UUID,
-	tx dbmodel.Tx,
-	initialProxies []dbmodel.Proxy,
-	proxiesToInsert int,
-	isCheap bool,
-) ([]dbmodel.Proxy, error) {
-	var newProxies = make([]dbmodel.Proxy, 0, proxiesToInsert)
-	var proxiesFromOneInitialProxy = math.Ceil(float64(proxiesToInsert) / float64(len(initialProxies)))
-
-	for _, proxy := range initialProxies {
-		for i := 0; i < int(proxiesFromOneInitialProxy); i++ {
-			newProxies = append(newProxies, proxy)
-		}
-	}
-
-	logger.Infof(ctx, "got %d new proxies, wanted at least %d,from %d initial",
-		len(newProxies), proxiesToInsert, len(initialProxies),
-	)
-
-	q := dbmodel.New(tx)
-	savedProxiesCount, err := q.SaveProxies(ctx, domain.ProxiesFromDB(newProxies).ToSaveParams(taskID, isCheap))
-	if err != nil {
-		return nil, fmt.Errorf("failed to save new proxies: %v", err)
-	}
-
-	logger.Infof(ctx, "saved %d new proxies, is cheap: %t", savedProxiesCount, isCheap)
-
-	return newProxies, nil
 }

@@ -12,7 +12,7 @@ import (
 var (
 	// global logger instance.
 	global       *zap.SugaredLogger
-	defaultLevel = zap.NewAtomicLevelAt(zap.ErrorLevel)
+	defaultLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
 )
 
 func init() {

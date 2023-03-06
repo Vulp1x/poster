@@ -18,7 +18,7 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
-const defaultInstagramUserAgent = "Instagram 264.0.0.22.106 Android (33/13; 480dpi; 1080x2168; samsung; SM-A528B; a52sxq; qcom; it_IT; 430370695)"
+const defaultInstagramUserAgent = "User-Agent: Instagram 272.0.0.16.73 Android (31/12; 420dpi; 1080x2047; samsung; SM-G975F; beyond2; exynos9820; en_GB; 450448584)"
 
 type BotAccount dbmodel.BotAccount
 

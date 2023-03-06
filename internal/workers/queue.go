@@ -28,7 +28,7 @@ func NewQueuue(ctx context.Context, executor executor.Executor, txFunc dbmodel.D
 	// выкладывание новых постов
 	queue.RegisterKind(MakePhotoPostsTaskKind, &PostPhotoHandler{dbTxF: txFunc, cli: api.NewInstaProxyClient(conn), queue: queue}, pgqueue.KindOptions{
 		Name:                 "post-photo",
-		WorkerCount:          pgqueue.NewConstProvider(int16(1)),
+		WorkerCount:          pgqueue.NewConstProvider(int16(100)),
 		MaxAttempts:          7,
 		AttemptTimeout:       100 * time.Second,
 		MaxTaskErrorMessages: 10,

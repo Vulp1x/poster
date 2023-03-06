@@ -23,7 +23,7 @@ func init() {
 		var err error
 		accessLogFile, err = os.OpenFile("tmp/instagrapi-rest.access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			logger.Fatalf(context.Background(), "failed to open instagrapi access file log: %v, err")
+			logger.Errorf(context.Background(), "failed to open instagrapi access file log: %v, err")
 		}
 	})
 }

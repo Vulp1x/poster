@@ -43,8 +43,6 @@ type Service interface {
 	GetTask(context.Context, *GetTaskPayload) (res *Task, err error)
 	// получить статус выполнения задачи по id
 	GetProgress(context.Context, *GetProgressPayload) (res *TaskProgress, err error)
-	// получить статус выполнения задачи по id
-	GetEditingProgress(context.Context, *GetEditingProgressPayload) (res *TaskProgress, err error)
 	// получить все задачи для текущего пользователя
 	ListTasks(context.Context, *ListTasksPayload) (res []*Task, err error)
 	// получить всех пользователей, которых не тегнули в задаче
@@ -67,7 +65,7 @@ const ServiceName = "tasks_service"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [16]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "update post contents", "stop task", "get task", "get progress", "get editing progress", "list tasks", "download targets", "download bots"}
+var MethodNames = [15]string{"create task draft", "update task", "upload video", "upload files", "assign proxies", "force delete", "start task", "partial start task", "update post contents", "stop task", "get task", "get progress", "list tasks", "download targets", "download bots"}
 
 // AssignProxiesPayload is the payload type of the tasks_service service assign
 // proxies method.
@@ -100,6 +98,8 @@ type BotsProgress struct {
 	Username string
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
+	// количество выложенных постов
+	EditedPostsCount int32 `json:"posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
 	Status int32
 	// количество аккаунтов, которых упомянули в постах
@@ -163,22 +163,6 @@ type ForceDeletePayload struct {
 	Token string
 	// id задачи
 	TaskID string `json:"task_id"`
-}
-
-// GetEditingProgressPayload is the payload type of the tasks_service service
-// get editing progress method.
-type GetEditingProgressPayload struct {
-	// JWT used for authentication
-	Token string
-	// id задачи
-	TaskID string `json:"task_id"`
-	// размер страницы для пагинации
-	PageSize uint32 `json:"page_size"`
-	// номер страницы для пагинации
-	Page uint32
-	Sort string
-	// сортировать по убыванию или нет
-	SortDescending bool
 }
 
 // GetProgressPayload is the payload type of the tasks_service service get

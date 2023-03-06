@@ -120,6 +120,7 @@ type BotProgress struct {
 	PostDescriptionTargets int32
 	PhotoTaggedTargets     int32
 	PostsCount             int32
+	EditedPostsCount       int32
 	FileOrder              int32
 }
 

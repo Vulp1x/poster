@@ -37,10 +37,10 @@ func (s *Store) StartBots(ctx context.Context, taskID uuid.UUID, usernames []str
 		return nil, fmt.Errorf("не найдено ни одного бота")
 	}
 
-	err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
-	if err != nil {
-		return nil, err
-	}
+	// err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	tx, err := s.txf(ctx)
 	if err != nil {

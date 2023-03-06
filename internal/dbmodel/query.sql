@@ -355,3 +355,8 @@ ORDER BY status;
 update tasks
 set landing_accounts = @landing_accounts
 where id = @id;
+
+-- name: FindAllCheapProxies :many
+select distinct host, port, pass, login
+from proxies
+where type = 2;

@@ -43,11 +43,6 @@ type tasksServicesrvc struct {
 	store taskStore
 }
 
-func (s *tasksServicesrvc) GetEditingProgress(ctx context.Context, payload *tasksservice.GetEditingProgressPayload) (res *tasksservice.TaskProgress, err error) {
-	// TODO implement me
-	panic("implement me")
-}
-
 // NewTasksService returns the tasks_service service implementation.
 func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Service {
 	return &tasksServicesrvc{auth: auth, store: store}

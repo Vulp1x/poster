@@ -34,7 +34,8 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 		"b.file_order",
 		"count(tu.*) filter ( where interaction_type = 'post_description' ) as post_description_targets",
 		"count(tu.*) filter ( where interaction_type = 'photo_tag' ) as photo_tags_targets",
-		"count(distinct medias.pk) as posts_count").
+		"count(distinct medias.pk) as posts_count",
+		"count(distinct medias.pk) filter ( where is_edited = true)         as edited_posts_count").
 		From("bot_accounts as b").
 		LeftJoin("medias on b.id = medias.bot_id").
 		LeftJoin("target_users tu on medias.pk = tu.media_fk").
@@ -55,7 +56,15 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 	bots := make([]domain.BotProgress, 0)
 	for rows.Next() {
 		var b domain.BotProgress
-		err = rows.Scan(&b.Username, &b.Status, &b.FileOrder, &b.PostDescriptionTargets, &b.PhotoTaggedTargets, &b.PostsCount)
+		err = rows.Scan(
+			&b.Username,
+			&b.Status,
+			&b.FileOrder,
+			&b.PostDescriptionTargets,
+			&b.PhotoTaggedTargets,
+			&b.PostsCount,
+			&b.EditedPostsCount,
+		)
 		if err != nil {
 			return domain.TaskProgress{}, fmt.Errorf("failed to scan bot progress: %v", err)
 		}

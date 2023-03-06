@@ -449,7 +449,7 @@ paths:
             type: array
             items:
               type: string
-              example: Modi sint dolorum maxime.
+              example: Ipsum ut consequuntur voluptatem reiciendis praesentium sed.
         "400":
           description: Bad Request response.
           schema:
@@ -564,87 +564,6 @@ paths:
           description: OK response.
           schema:
             $ref: '#/definitions/TasksServiceGetProgressOKResponseBody'
-            required:
-              - bots_progresses
-              - targets_notified
-              - photo_targets_notified
-              - targets_failed
-              - targets_waiting
-              - done
-              - bots_total
-        "400":
-          description: Bad Request response.
-          schema:
-            type: string
-        "401":
-          description: Unauthorized response.
-          schema:
-            type: string
-        "404":
-          description: Not Found response.
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error response.
-          schema:
-            type: string
-      schemes:
-        - http
-      security:
-        - jwt_header_Authorization: []
-  /api/tasks/{task_id}/reprogress:
-    get:
-      tags:
-        - tasks_service
-      summary: get editing progress tasks_service
-      description: получить статус выполнения задачи по id
-      operationId: tasks_service#get editing progress
-      parameters:
-        - name: psize
-          in: query
-          description: размер страницы для пагинации
-          required: false
-          type: integer
-          default: 100
-        - name: p
-          in: query
-          description: номер страницы для пагинации
-          required: false
-          type: integer
-          default: 1
-        - name: sort
-          in: query
-          required: false
-          type: string
-          default: file_order
-          enum:
-            - username
-            - status
-            - posts_count
-            - post_description_targets
-            - photo_tags_targets
-            - file_order
-        - name: sd
-          in: query
-          description: сортировать по убыванию или нет
-          required: false
-          type: boolean
-          default: false
-        - name: task_id
-          in: path
-          description: id задачи
-          required: true
-          type: string
-        - name: Authorization
-          in: header
-          description: JWT used for authentication
-          required: true
-          type: string
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/TasksServiceGetEditingProgressOKResponseBody'
             required:
               - bots_progresses
               - targets_notified
@@ -900,7 +819,7 @@ paths:
             type: array
             items:
               type: string
-              example: Aut quisquam qui molestias voluptatibus cupiditate sapiente.
+              example: Repellendus ut corrupti eos.
         "400":
           description: Bad Request response.
           schema:
@@ -1091,14 +1010,14 @@ definitions:
     properties:
       login:
         type: string
-        example: Qui ad ducimus explicabo.
+        example: Soluta quaerat eveniet dolor sit ex nihil.
       password:
         type: string
-        example: ait
+        example: jgb
         minLength: 4
     example:
-      login: In nesciunt ut.
-      password: px4
+      login: Cupiditate non quaerat dolore voluptas ipsa provident.
+      password: ic2
     required:
       - login
       - password
@@ -1109,30 +1028,31 @@ definitions:
       saved_bots:
         type: integer
         description: количество ботов, которых сохранили в проксе
-        example: 2116165142
+        example: 1161699258
         format: int32
       sent_bots:
         type: integer
         description: количество ботов, которых мы отправили
-        example: 2922693848629417043
+        example: 4163079019522061408
         format: int64
       usernames:
         type: array
         items:
           type: string
-          example: Mollitia voluptas natus tenetur tenetur.
+          example: Ex et aliquam tempore.
         description: имена ботов, которые мы сохранили
         example:
-          - Voluptatem fuga magnam veritatis minus et.
-          - Eos et accusamus reiciendis dolores odio.
-          - Saepe sed velit molestias eaque et.
+          - Quis dolorum enim qui officia est earum.
+          - Beatae doloribus et facere similique.
+          - Voluptates fugit repellendus debitis provident ipsa.
+          - Deserunt quis omnis fuga eius eum natus.
     example:
-      saved_bots: 1880968491
-      sent_bots: 7894615188784019641
+      saved_bots: 613302728
+      sent_bots: 6265530653151255847
       usernames:
-        - Maiores qui quo.
-        - Consequatur dolorem ut maiores.
-        - Praesentium qui.
+        - Dolores laboriosam omnis esse nulla.
+        - Consectetur est mollitia.
+        - Natus tenetur tenetur ipsa.
     required:
       - sent_bots
       - saved_bots
@@ -1144,30 +1064,29 @@ definitions:
       saved_bots:
         type: integer
         description: количество ботов, которых сохранили в проксе
-        example: 1715248042
+        example: 1223488752
         format: int32
       sent_bots:
         type: integer
         description: количество ботов, которых мы отправили
-        example: 2177037621445412171
+        example: 80170695992902156
         format: int64
       usernames:
         type: array
         items:
           type: string
-          example: Aliquam tempore consequuntur autem quis.
+          example: Ipsa magnam expedita ex atque doloribus.
         description: имена ботов, которые мы сохранили
         example:
-          - Qui officia est earum.
-          - Beatae doloribus et facere similique.
+          - Dolor consequatur accusantium harum.
+          - Perferendis quo dignissimos occaecati fugit.
+          - Unde at dolorem eum debitis.
     example:
-      saved_bots: 1766839237
-      sent_bots: 2235089239331419007
+      saved_bots: 452326050
+      sent_bots: 7496137555438585665
       usernames:
-        - Debitis provident.
-        - Suscipit deserunt quis omnis fuga eius.
-        - Natus quibusdam dolorem impedit.
-        - Dolores laboriosam omnis esse nulla.
+        - Omnis est dolor mollitia.
+        - Necessitatibus corporis vero sunt cupiditate numquam.
     required:
       - sent_bots
       - saved_bots
@@ -1179,31 +1098,28 @@ definitions:
       saved_bots:
         type: integer
         description: количество ботов, которых сохранили в проксе
-        example: 18666194
+        example: 1908492623
         format: int32
       sent_bots:
         type: integer
         description: количество ботов, которых мы отправили
-        example: 7360808484607059197
+        example: 1343352821286468698
         format: int64
       usernames:
         type: array
         items:
           type: string
-          example: Doloremque ipsa.
+          example: Velit aut odit accusamus.
         description: имена ботов, которые мы сохранили
         example:
-          - Ex atque doloribus et repudiandae dolor.
-          - Accusantium harum.
-          - Perferendis quo dignissimos occaecati fugit.
+          - Ut non.
+          - Nobis aliquid.
     example:
-      saved_bots: 1861162837
-      sent_bots: 3068461422164316831
+      saved_bots: 1819366484
+      sent_bots: 8080549128743596134
       usernames:
-        - Eum debitis error atque.
-        - Et omnis.
-        - Dolor mollitia quod necessitatibus corporis.
-        - Sunt cupiditate numquam et accusamus.
+        - Ducimus explicabo error id qui et aut.
+        - Nesciunt ut qui sequi et unde eum.
     required:
       - sent_bots
       - saved_bots
@@ -1256,17 +1172,22 @@ definitions:
       description_targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 204902930
+        example: 82819093
+        format: int32
+      edited_posts_count:
+        type: integer
+        description: количество выложенных постов
+        example: 933301777
         format: int32
       file_order:
         type: integer
         description: номер бота в загруженном файле
-        example: 85674753
+        example: 1529957406
         format: int32
       photo_targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах на фото
-        example: 82819093
+        example: 85674753
         format: int32
       posts_count:
         type: integer
@@ -1276,19 +1197,20 @@ definitions:
       status:
         type: integer
         description: текущий статус бота, будут ли выкладываться посты
-        example: 933301777
+        example: 204902930
         format: int32
       username:
         type: string
         description: имя пользователя бота
         example: Quia sit impedit qui cumque.
     example:
-      description_targets_notified: 1593707561
-      file_order: 32781711
-      photo_targets_notified: 759947043
-      posts_count: 1886075405
-      status: 29159602
-      username: Veritatis ea.
+      description_targets_notified: 366619476
+      edited_posts_count: 1751289470
+      file_order: 1275407257
+      photo_targets_notified: 1625628449
+      posts_count: 32781711
+      status: 782101547
+      username: Ea voluptatem quo aut nesciunt.
     required:
       - username
       - posts_count
@@ -1296,6 +1218,7 @@ definitions:
       - description_targets_notified
       - photo_targets_notified
       - file_order
+      - edited_posts_count
   ProxyRecordRequestBody:
     title: ProxyRecordRequestBody
     type: object
@@ -1390,63 +1313,65 @@ definitions:
         type: array
         items:
           type: string
-          example: Asperiores sed quo eveniet.
+          example: Nam magni aut pariatur.
         description: аватарки для ботов
         example:
-          - Qui placeat maiores quia rerum.
-          - Itaque est incidunt.
-          - Aperiam rerum voluptate rerum minima.
-          - Deserunt ut possimus ut sed.
+          - Dicta illum quia necessitatibus asperiores sed.
+          - Eveniet autem vero qui placeat maiores.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Laudantium veritatis et.
+          example: Rerum ad in tempore quia fugiat odit.
         description: фамилии для аккаунтов-ботов
         example:
-          - Quae iure.
-          - Sequi consectetur dolores incidunt id rerum qui.
+          - Odio et ea aperiam sit.
+          - Ut officia qui eligendi.
+          - Consequatur aperiam deserunt et laboriosam et voluptatem.
       bot_names:
         type: array
         items:
           type: string
-          example: Fugiat odio et ea aperiam sit.
+          example: Sed et aperiam asperiores.
         description: имена для аккаунтов-ботов
         example:
-          - Officia qui eligendi blanditiis.
-          - Aperiam deserunt et laboriosam et.
+          - Et totam id eligendi voluptatem qui.
+          - Rerum aliquam ad sequi quia beatae placeat.
+          - Et enim aut aliquam necessitatibus molestiae totam.
+          - Assumenda voluptatem qui sint unde sapiente impedit.
       bot_urls:
         type: array
         items:
           type: string
-          example: Eius perferendis voluptatibus molestias quod libero.
+          example: Veritatis et aliquam.
         description: ссылки для описания у ботов
         example:
-          - Optio laborum et aut.
-          - Quaerat sed et aut.
-          - Blanditiis architecto cum.
+          - Iure odit sequi consectetur.
+          - Incidunt id.
+          - Qui quaerat eius perferendis voluptatibus molestias.
+          - Libero consequuntur itaque optio laborum et.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Et perferendis dolor voluptas.
+        example: Voluptatem temporibus ab est.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 6348489422769983062
+        example: 8618545797358981042
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Praesentium qui quaerat.
+        example: Voluptas et perferendis.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 7153728878458120429
+        example: 3221208235758280123
         format: int64
       follow_targets:
         type: boolean
         description: нужно ли подписываться на аккаунты
-        example: false
+        example: true
       id:
         type: string
         example: 1576BB1F-D21C-05AD-6677-73725A387FA6
@@ -1455,13 +1380,13 @@ definitions:
         type: array
         items:
           type: string
-          example: Aliquam ad sequi quia beatae placeat.
+          example: Rem aut velit omnis.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Enim aut aliquam.
-          - Molestiae totam nobis assumenda voluptatem qui sint.
-          - Sapiente impedit aut.
-          - Ad in tempore quia fugiat odit.
+          - Inventore ipsam architecto voluptas voluptatum.
+          - Nihil sint nobis velit voluptates.
+          - Qui nostrum architecto ea.
+          - Dolore sit officiis.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -1469,51 +1394,51 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: задержка между постами
-        example: 8102021059763475522
+        example: 1001846572639398832
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка между загрузкой фотографии и проставлением отметок (в секундах)
-        example: 8708790318709330280
+        example: 13225039823876524675
         format: int64
       photo_tags_posts_per_bot:
         type: integer
         description: количество постов с отметками на фото для каждого бота
-        example: 12378191118883273810
+        example: 8954754926227693251
         format: int64
       photo_targets_per_post:
         type: integer
         description: количество упоминаний на фото у каждого поста
-        example: 4600438667149879309
+        example: 14005205499621560878
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Nobis accusamus a similique.
+          example: In illum impedit dicta amet.
         description: список base64 строк картинок
         example:
-          - Earum aut nesciunt nemo reprehenderit optio commodi.
-          - Molestiae fugiat et omnis aspernatur ducimus.
-          - Repellat nam.
-          - Aut pariatur suscipit qui dicta illum quia.
+          - Dolor quidem nobis accusamus a similique.
+          - Est earum aut nesciunt nemo reprehenderit optio.
+          - Ut molestiae.
+          - Et omnis aspernatur ducimus delectus.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 13866613181253526406
+        example: 12731642156559665843
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Est et totam doloribus nesciunt.
+        example: Quam earum.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 6235809248918833936
+        example: 2222500347735888112
         format: int64
       status:
         type: integer
-        example: 3
+        example: 8
         enum:
           - 1
           - 2
@@ -1526,94 +1451,94 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Ut aspernatur corrupti temporibus.
+        example: Voluptas ipsum est et.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 4872963443800741175
+        example: 6094189096700257736
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 14935524027733050032
+        example: 3855762825389422142
         format: int64
       testing_tag_user_id:
         type: integer
         description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
-        example: 2116331441911380562
+        example: 1412947772729878990
         format: int64
       testing_tag_username:
         type: string
         description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
-        example: Dolor perferendis.
+        example: Rerum ea.
       text_template:
         type: string
         description: описание под постом
-        example: Totam id eligendi voluptatem qui deleniti.
+        example: Odit commodi.
       title:
         type: string
         description: название задачи
-        example: Temporibus ab est.
+        example: Quaerat sed et aut.
       type:
         type: integer
-        example: 1
+        example: 2
         enum:
           - 1
           - 2
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Ducimus atque impedit architecto.
+        example: Doloribus nesciunt voluptatum praesentium qui quaerat molestiae.
     example:
       bot_images:
-        - Corrupti eos.
-        - Debitis et et.
-        - Dolor aliquid eos.
+        - Harum fuga quos exercitationem et consequatur.
+        - Necessitatibus iure odit porro deserunt.
+        - Repellendus consequatur nulla.
+        - Itaque eum perferendis cum.
       bot_last_names:
-        - Ut qui quis fugiat neque.
-        - Et qui.
-      bot_names:
         - Sit molestiae architecto omnis.
         - Ipsam nobis suscipit rem.
         - Magnam odit odio vel vel.
         - Non animi repudiandae voluptatum aut.
-      bot_urls:
-        - Ut consectetur facere illum dolorem omnis.
-        - Voluptatem eius consequatur aspernatur unde sit neque.
-        - Dolores aut aliquam.
-        - Ea eveniet velit facere omnis.
-      bots_filename: Maiores aperiam ipsa consequatur nisi aliquid velit.
-      bots_num: 6283386761285160954
-      cheap_proxies_filename: Sunt animi sapiente sunt quia.
-      cheap_proxies_num: 8617978544275276343
-      follow_targets: false
-      id: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
-      landing_accounts:
+      bot_names:
         - Aspernatur autem perferendis.
         - Velit ipsum qui natus sunt ut est.
         - Et facere illo quis iure.
         - Quis aut voluptas voluptatem repellendus voluptates.
-      need_photo_tags: false
-      per_post_sleep_seconds: 16243236622695848869
-      photo_tags_delay_seconds: 10971866083628537392
-      photo_tags_posts_per_bot: 14209761953452516642
-      photo_targets_per_post: 7156495532744205002
+      bot_urls:
+        - Ut qui quis fugiat neque.
+        - Et qui.
+      bots_filename: Unde sit neque excepturi dolores.
+      bots_num: 4122011329828066670
+      cheap_proxies_filename: Omnis quaerat ut repellat nobis ut.
+      cheap_proxies_num: 2816102987558408451
+      follow_targets: true
+      id: 7F641448-35F7-7B05-AFB4-8DFCC48CED66
+      landing_accounts:
+        - Vel quas nam quo corrupti qui odio.
+        - Consequatur molestiae minus illo vel tenetur eaque.
+      need_photo_tags: true
+      per_post_sleep_seconds: 16614170646517188402
+      photo_tags_delay_seconds: 2076000658942297746
+      photo_tags_posts_per_bot: 9737532508258467620
+      photo_targets_per_post: 15765259107225040597
       post_images:
-        - Cum nihil.
-        - Velit fugit minima officia.
-      posts_per_bot: 2151587372505588041
-      residential_proxies_filename: Et aut dicta reprehenderit ut officia.
-      residential_proxies_num: 2056489011685629939
-      status: 2
-      targets_filename: Quis voluptas veniam harum fuga.
-      targets_num: 4968443956644495083
-      targets_per_post: 10868001903437875208
-      testing_tag_user_id: 6441567508390073692
-      testing_tag_username: Ipsum ut consequuntur voluptatem reiciendis praesentium sed.
-      text_template: Illo vel tenetur eaque.
-      title: Repellat nobis ut voluptatum rem sint voluptatum.
-      type: 1
-      video_filename: Exercitationem et consequatur rerum necessitatibus iure odit.
+        - Aut dicta reprehenderit ut.
+        - Rerum sunt animi sapiente.
+        - Quia saepe quis.
+      posts_per_bot: 15392184663338178863
+      residential_proxies_filename: Aliquam voluptas ea eveniet velit.
+      residential_proxies_num: 724113935156805064
+      status: 4
+      targets_filename: Rem sint voluptatum.
+      targets_num: 8967759997393971994
+      targets_per_post: 15786350675754481274
+      testing_tag_user_id: 2671214391084549241
+      testing_tag_username: Suscipit velit fugit.
+      text_template: Sunt porro sequi nobis ducimus repellendus.
+      title: Ut consectetur facere illum dolorem omnis.
+      type: 2
+      video_filename: Molestiae quis dolore.
     required:
       - id
       - type
@@ -1778,68 +1703,67 @@ definitions:
         type: array
         items:
           type: string
-          example: Est eius dolor quo nihil.
+          example: Et qui quos sit tenetur vel.
         description: аватарки для ботов
         example:
-          - Maiores veritatis accusantium.
-          - Sit omnis quae.
-          - Dolor minus.
-          - Alias quia possimus eveniet.
+          - Delectus ut nobis.
+          - Fuga tempora sed voluptatem ut molestiae quia.
+          - Ex pariatur quis quae voluptatibus odio nobis.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Vel labore.
+          example: Consequuntur reiciendis est quisquam.
         description: фамилии для аккаунтов-ботов
         example:
-          - Ut nobis hic fuga tempora.
-          - Voluptatem ut molestiae quia quisquam ex pariatur.
-          - Quae voluptatibus odio nobis cupiditate praesentium molestiae.
+          - Aliquid rem unde rerum repudiandae et amet.
+          - Aut doloremque quo similique voluptas possimus.
+          - Quod vero est nihil repudiandae.
       bot_names:
         type: array
         items:
           type: string
-          example: Repudiandae et amet enim aut doloremque.
+          example: Repellendus voluptate omnis et aut ut.
         description: имена для аккаунтов-ботов
         example:
-          - Voluptas possimus veritatis quod vero.
-          - Nihil repudiandae natus et qui quos sit.
+          - Sit libero qui ducimus sed sit eligendi.
+          - Reprehenderit quam quaerat corporis aut id tempore.
       bot_urls:
         type: array
         items:
           type: string
-          example: Repellat soluta.
+          example: Praesentium molestiae delectus est eius dolor.
         description: ссылки для описания у ботов
         example:
-          - Nemo sunt numquam.
-          - Tenetur vel maiores.
+          - Earum pariatur maiores veritatis accusantium eveniet.
+          - Omnis quae perferendis dolor minus sed.
       landing_accounts:
         type: array
         items:
           type: string
-          example: Sed sit.
+          example: Saepe sed velit molestias eaque et.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Reprehenderit quam quaerat corporis aut id tempore.
-          - Consequuntur reiciendis est quisquam.
-          - Aut aliquid rem unde.
+          - Debitis porro maiores qui quo.
+          - Consequatur dolorem ut maiores.
+          - Praesentium qui.
       post_images:
         type: array
         items:
           type: string
-          example: Molestiae laudantium necessitatibus.
+          example: Quia possimus eveniet perspiciatis repellat.
         description: список фотографий для постов
         example:
-          - Alias placeat sed.
-          - In dolores voluptas et hic.
+          - Eligendi nemo.
+          - Numquam enim tenetur.
       text_template:
         type: string
         description: шаблон для подписи под постом
-        example: Quam sit libero qui.
+        example: Eos et accusamus reiciendis dolores odio.
       title:
         type: string
         description: название задачи
-        example: Repellendus voluptate omnis et aut ut.
+        example: Voluptatem fuga magnam veritatis minus et.
       type:
         type: integer
         example: 1
@@ -1848,289 +1772,40 @@ definitions:
           - 2
     example:
       bot_images:
-        - Nisi occaecati non accusamus dolor quas.
-        - Vero asperiores nihil aut accusantium.
-        - Magni et cupiditate et.
-        - Voluptatem qui voluptatum eos.
-      bot_last_names:
         - Earum repellat placeat amet laboriosam.
         - Nihil voluptas quo suscipit sapiente quod.
         - Mollitia qui quia ab esse minus qui.
         - Totam quia.
-      bot_names:
+      bot_last_names:
         - Quaerat molestiae aut deserunt qui aut.
         - Rem dolorem laborum.
         - Alias exercitationem.
         - Consequatur velit repellendus amet assumenda.
-      bot_urls:
-        - Culpa nisi velit omnis.
-        - Omnis et odio.
-      landing_accounts:
+      bot_names:
         - Nisi nihil sit eveniet.
         - In incidunt sed et aut.
         - Laboriosam doloremque corporis laborum aliquid tempore.
+      bot_urls:
+        - Nisi occaecati non accusamus dolor quas.
+        - Vero asperiores nihil aut accusantium.
+        - Magni et cupiditate et.
+        - Voluptatem qui voluptatum eos.
+      landing_accounts:
+        - Hic et.
+        - Reprehenderit quos ad sit.
+        - Voluptas quam quae cumque asperiores debitis voluptatum.
       post_images:
-        - Distinctio cum dolorum.
-        - Vel asperiores velit id.
-        - Facilis cupiditate error ullam nobis laudantium cumque.
-      text_template: Voluptas quam quae cumque asperiores debitis voluptatum.
-      title: Reprehenderit quos ad sit.
-      type: 2
+        - Culpa nisi velit omnis.
+        - Omnis et odio.
+      text_template: Quo alias placeat sed et in dolores.
+      title: Cupiditate molestiae laudantium necessitatibus.
+      type: 1
     required:
       - title
       - text_template
       - post_images
       - landing_accounts
       - type
-  TasksServiceGetEditingProgressNotFoundResponseBody:
-    title: TasksServiceGetEditingProgressNotFoundResponseBody
-    type: object
-    properties:
-      bots_progresses:
-        type: array
-        items:
-          $ref: '#/definitions/BotsProgressResponseBody'
-        description: результат работы по каждому боту
-        example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-      bots_total:
-        type: integer
-        description: общее количество ботов в задаче
-        example: 2882949209508328568
-        format: int64
-      done:
-        type: boolean
-        description: закончена ли задача
-        example: true
-      photo_targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах на фото
-        example: 8736994291408922428
-        format: int64
-      targets_failed:
-        type: integer
-        description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 3129949691441023655
-        format: int64
-      targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах
-        example: 7418144717592465079
-        format: int64
-      targets_waiting:
-        type: integer
-        description: количество аккаунтов, которых не выбрали для постов
-        example: 8200325932938525572
-        format: int64
-    example:
-      bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-      bots_total: 7123818799859061166
-      done: true
-      photo_targets_notified: 8298367211207739419
-      targets_failed: 7489539918615673460
-      targets_notified: 8884295099401896421
-      targets_waiting: 831006241096906768
-    required:
-      - bots_progresses
-      - targets_notified
-      - photo_targets_notified
-      - targets_failed
-      - targets_waiting
-      - done
-      - bots_total
-  TasksServiceGetEditingProgressOKResponseBody:
-    title: TasksServiceGetEditingProgressOKResponseBody
-    type: object
-    properties:
-      bots_progresses:
-        type: array
-        items:
-          $ref: '#/definitions/BotsProgressResponseBody'
-        description: результат работы по каждому боту
-        example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-      bots_total:
-        type: integer
-        description: общее количество ботов в задаче
-        example: 6956760047605681952
-        format: int64
-      done:
-        type: boolean
-        description: закончена ли задача
-        example: true
-      photo_targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах на фото
-        example: 2098580995892468222
-        format: int64
-      targets_failed:
-        type: integer
-        description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 8239325578916707749
-        format: int64
-      targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах
-        example: 6616436109887982936
-        format: int64
-      targets_waiting:
-        type: integer
-        description: количество аккаунтов, которых не выбрали для постов
-        example: 7808144528930755547
-        format: int64
-    example:
-      bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-      bots_total: 5189773877089921436
-      done: true
-      photo_targets_notified: 4980783524327779009
-      targets_failed: 217311511826076896
-      targets_notified: 2028803946409998959
-      targets_waiting: 2750706447110270642
-    required:
-      - bots_progresses
-      - targets_notified
-      - photo_targets_notified
-      - targets_failed
-      - targets_waiting
-      - done
-      - bots_total
-  TasksServiceGetEditingProgressUnauthorizedResponseBody:
-    title: TasksServiceGetEditingProgressUnauthorizedResponseBody
-    type: object
-    properties:
-      bots_progresses:
-        type: array
-        items:
-          $ref: '#/definitions/BotsProgressResponseBody'
-        description: результат работы по каждому боту
-        example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-      bots_total:
-        type: integer
-        description: общее количество ботов в задаче
-        example: 5762272232787822737
-        format: int64
-      done:
-        type: boolean
-        description: закончена ли задача
-        example: false
-      photo_targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах на фото
-        example: 1611022356000865810
-        format: int64
-      targets_failed:
-        type: integer
-        description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 1238404072860030262
-        format: int64
-      targets_notified:
-        type: integer
-        description: количество аккаунтов, которых упомянули в постах
-        example: 8709776644090384317
-        format: int64
-      targets_waiting:
-        type: integer
-        description: количество аккаунтов, которых не выбрали для постов
-        example: 4496660787264376026
-        format: int64
-    example:
-      bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-      bots_total: 2381931286206446039
-      done: true
-      photo_targets_notified: 9144926662439849731
-      targets_failed: 6723627144815447660
-      targets_notified: 5158062018905393020
-      targets_waiting: 8131523350240511970
-    required:
-      - bots_progresses
-      - targets_notified
-      - photo_targets_notified
-      - targets_failed
-      - targets_waiting
-      - done
-      - bots_total
   TasksServiceGetProgressNotFoundResponseBody:
     title: TasksServiceGetProgressNotFoundResponseBody
     type: object
@@ -2141,28 +1816,38 @@ definitions:
           $ref: '#/definitions/BotsProgressResponseBody'
         description: результат работы по каждому боту
         example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
+            username: Nam aut.
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
+            posts_count: 1440265469
+            status: 310658263
             username: Nam aut.
       bots_total:
         type: integer
         description: общее количество ботов в задаче
-        example: 686163113311271700
+        example: 8075772060044169587
         format: int64
       done:
         type: boolean
@@ -2171,55 +1856,59 @@ definitions:
       photo_targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах на фото
-        example: 389519991000517764
+        example: 884200593995454365
         format: int64
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 2527961743052628135
+        example: 8917700665018963282
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 880264426717342505
+        example: 686163113311271700
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 4286525636625940387
+        example: 691730186303184321
         format: int64
     example:
       bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-      bots_total: 311276908867196542
+      bots_total: 4454388157661221645
       done: false
-      photo_targets_notified: 691730186303184321
-      targets_failed: 4783528349771167372
-      targets_notified: 8917700665018963282
-      targets_waiting: 8075772060044169587
+      photo_targets_notified: 842354365621727836
+      targets_failed: 5181431731795152062
+      targets_notified: 311276908867196542
+      targets_waiting: 3894808353222227728
     required:
       - bots_progresses
       - targets_notified
@@ -2238,28 +1927,24 @@ definitions:
           $ref: '#/definitions/BotsProgressResponseBody'
         description: результат работы по каждому боту
         example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
       bots_total:
         type: integer
         description: общее количество ботов в задаче
-        example: 463875290534459395
+        example: 6709050204593333503
         format: int64
       done:
         type: boolean
@@ -2268,49 +1953,45 @@ definitions:
       photo_targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах на фото
-        example: 1574618663649428787
+        example: 6004133507569996432
         format: int64
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 6982021026390278820
+        example: 8482519596284171384
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 3359100569221913617
+        example: 463875290534459395
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 5477832461029841151
+        example: 1636388361846969791
         format: int64
     example:
       bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
-          posts_count: 1440265469
-          status: 1291998470
-          username: Nam aut.
-      bots_total: 3834128389775301835
-      done: true
-      photo_targets_notified: 1636388361846969791
-      targets_failed: 1056977692717075886
-      targets_notified: 8482519596284171384
-      targets_waiting: 6709050204593333503
+      bots_total: 4286525636625940387
+      done: false
+      photo_targets_notified: 2419244385982720030
+      targets_failed: 880264426717342505
+      targets_notified: 3834128389775301835
+      targets_waiting: 389519991000517764
     required:
       - bots_progresses
       - targets_notified
@@ -2329,79 +2010,85 @@ definitions:
           $ref: '#/definitions/BotsProgressResponseBody'
         description: результат работы по каждому боту
         example:
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
+          - description_targets_notified: 292278343
+            edited_posts_count: 1291998470
+            file_order: 1695291241
+            photo_targets_notified: 1426545182
             posts_count: 1440265469
-            status: 1291998470
-            username: Nam aut.
-          - description_targets_notified: 310658263
-            file_order: 1426545182
-            photo_targets_notified: 292278343
-            posts_count: 1440265469
-            status: 1291998470
+            status: 310658263
             username: Nam aut.
       bots_total:
         type: integer
         description: общее количество ботов в задаче
-        example: 6098200065128667824
+        example: 8352083301165991864
         format: int64
       done:
         type: boolean
         description: закончена ли задача
-        example: false
+        example: true
       photo_targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах на фото
-        example: 3894808353222227728
+        example: 2726490279554346988
         format: int64
       targets_failed:
         type: integer
         description: количество аккаунтов, которых не получилось упомянуть, при перезапуске задачи будут использованы заново
-        example: 5226843994500946175
+        example: 5646023487919202980
         format: int64
       targets_notified:
         type: integer
         description: количество аккаунтов, которых упомянули в постах
-        example: 5181431731795152062
+        example: 6098200065128667824
         format: int64
       targets_waiting:
         type: integer
         description: количество аккаунтов, которых не выбрали для постов
-        example: 4454388157661221645
+        example: 1913286519625303000
         format: int64
     example:
       bots_progresses:
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-        - description_targets_notified: 310658263
-          file_order: 1426545182
-          photo_targets_notified: 292278343
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
           posts_count: 1440265469
-          status: 1291998470
+          status: 310658263
           username: Nam aut.
-      bots_total: 651012820015915542
-      done: true
-      photo_targets_notified: 1913286519625303000
-      targets_failed: 4316637185887915258
-      targets_notified: 5646023487919202980
-      targets_waiting: 8352083301165991864
+        - description_targets_notified: 292278343
+          edited_posts_count: 1291998470
+          file_order: 1695291241
+          photo_targets_notified: 1426545182
+          posts_count: 1440265469
+          status: 310658263
+          username: Nam aut.
+      bots_total: 7808144528930755547
+      done: false
+      photo_targets_notified: 5008673751815216809
+      targets_failed: 6616436109887982936
+      targets_notified: 651012820015915542
+      targets_waiting: 2098580995892468222
     required:
       - bots_progresses
       - targets_notified
@@ -3773,9 +3460,11 @@ definitions:
         type: array
         items:
           type: string
-          example: Nemo soluta.
+          example: Aliquid impedit fugiat.
         description: имена для аккаунтов-ботов
         example:
+          - Nobis saepe qui reiciendis.
+          - Dignissimos a id nemo soluta qui.
           - Est labore sed voluptate eos repudiandae.
           - Ea omnis.
       bot_urls:
@@ -3819,11 +3508,12 @@ definitions:
         type: array
         items:
           type: string
-          example: Qui illum laborum ea et aliquid sed.
+          example: Perspiciatis perspiciatis.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Fugiat molestias qui nobis.
-          - Qui reiciendis modi dignissimos a.
+          - Deleniti non sit neque et fuga.
+          - Alias quaerat accusamus distinctio qui.
+          - Laborum ea et aliquid.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -3910,7 +3600,7 @@ definitions:
       text_template:
         type: string
         description: описание под постом
-        example: Quaerat accusamus.
+        example: Natus vitae et similique minus.
       title:
         type: string
         description: название задачи
@@ -4005,66 +3695,65 @@ definitions:
         type: array
         items:
           type: string
-          example: Voluptatem consequuntur a sed mollitia molestias.
+          example: Nostrum labore ut occaecati doloremque explicabo libero.
         description: аватарки для ботов
         example:
-          - Quia minus sit rerum voluptas ex.
-          - Autem aliquid ipsam est.
-          - Sit est commodi impedit qui rerum.
+          - Dolor blanditiis qui ratione qui.
+          - Unde error temporibus consectetur saepe ipsam illo.
+          - Enim aut debitis repellat quidem ea assumenda.
       bot_last_names:
         type: array
         items:
           type: string
-          example: Sed in quasi enim.
+          example: Architecto facere.
         description: фамилии для аккаунтов-ботов
         example:
-          - Aut dicta molestiae et eaque laboriosam cupiditate.
-          - Mollitia accusantium ullam hic qui officiis totam.
-          - Esse eligendi saepe nihil vel aut voluptatem.
+          - Commodi eum autem qui vero aut.
+          - Eius est explicabo mollitia eos necessitatibus ea.
+          - Sed in quasi enim.
+          - Sint aut dicta molestiae et eaque.
       bot_names:
         type: array
         items:
           type: string
-          example: Accusamus et omnis quia tenetur.
+          example: Dolorem laudantium libero nostrum harum consequatur officia.
         description: имена для аккаунтов-ботов
         example:
-          - Ut rerum ullam dicta ut quo.
-          - Facere voluptates.
-          - Commodi eum autem qui vero aut.
-          - Eius est explicabo mollitia eos necessitatibus ea.
+          - Ex nam excepturi esse impedit.
+          - Quaerat eum dolore occaecati explicabo sit qui.
+          - Recusandae earum accusamus et omnis quia tenetur.
+          - Consequatur ut rerum ullam dicta ut.
       bot_urls:
         type: array
         items:
           type: string
-          example: Voluptates id ut voluptatem non.
+          example: Cupiditate ullam mollitia accusantium ullam.
         description: ссылки для описания у ботов
         example:
-          - Quam rerum assumenda.
-          - Est assumenda quos labore ab culpa.
-          - Debitis explicabo fugiat ipsum molestiae.
-          - Porro ut quia.
+          - Officiis totam explicabo esse eligendi saepe.
+          - Vel aut.
       bots_filename:
         type: string
         description: название файла, из которого брали ботов
-        example: Suscipit natus nam deserunt deleniti.
+        example: Et est assumenda quos.
       bots_num:
         type: integer
         description: количество ботов в задаче
-        example: 3035289289353475837
+        example: 3303576616482864734
         format: int64
       cheap_proxies_filename:
         type: string
         description: название файла, из которого брали дешёвые прокси
-        example: Inventore corporis accusamus non praesentium.
+        example: Fugiat ipsum molestiae et porro ut quia.
       cheap_proxies_num:
         type: integer
         description: количество дешёвых прокси в задаче
-        example: 7932542494235751532
+        example: 5393724656524821996
         format: int64
       follow_targets:
         type: boolean
         description: нужно ли подписываться на аккаунты
-        example: false
+        example: true
       id:
         type: string
         example: A45D83CF-F038-77BB-220E-D79EFC31D198
@@ -4073,12 +3762,11 @@ definitions:
         type: array
         items:
           type: string
-          example: Nostrum harum consequatur.
+          example: Rem autem vel eos.
         description: имена аккаунтов, на которых ведем трафик
         example:
-          - Cumque ex nam excepturi.
-          - Impedit officia quaerat.
-          - Dolore occaecati explicabo sit qui voluptatem recusandae.
+          - Nesciunt suscipit ut.
+          - Dolor voluptatum.
       need_photo_tags:
         type: boolean
         description: делать отметки на фотографии
@@ -4086,50 +3774,50 @@ definitions:
       per_post_sleep_seconds:
         type: integer
         description: задержка между постами
-        example: 549935370323808964
+        example: 627417025430523481
         format: int64
       photo_tags_delay_seconds:
         type: integer
         description: задержка между загрузкой фотографии и проставлением отметок (в секундах)
-        example: 6431568943692951765
+        example: 4730273130390390373
         format: int64
       photo_tags_posts_per_bot:
         type: integer
         description: количество постов с отметками на фото для каждого бота
-        example: 16343132852298304384
+        example: 5682231658184460227
         format: int64
       photo_targets_per_post:
         type: integer
         description: количество упоминаний на фото у каждого поста
-        example: 16466743606358363456
+        example: 13608630980876829748
         format: int64
       post_images:
         type: array
         items:
           type: string
-          example: Nostrum labore ut occaecati doloremque explicabo libero.
+          example: Dolores autem molestiae illum sapiente laboriosam.
         description: список base64 строк картинок
         example:
-          - Dolor blanditiis qui ratione qui.
-          - Unde error temporibus consectetur saepe ipsam illo.
-          - Enim aut debitis repellat quidem ea assumenda.
+          - Accusamus non praesentium aspernatur eaque.
+          - Ipsum aut quisquam modi fuga molestias id.
+          - Aut quia doloremque eos libero et corrupti.
       posts_per_bot:
         type: integer
         description: количество постов для каждого бота
-        example: 13306883597930196866
+        example: 8232573738333266522
         format: int64
       residential_proxies_filename:
         type: string
         description: название файла, из которого брали резидентские прокси
-        example: Reprehenderit dolores autem molestiae illum sapiente.
+        example: Ab culpa adipisci debitis.
       residential_proxies_num:
         type: integer
         description: количество резидентских прокси в задаче
-        example: 7953491537372740014
+        example: 8303121131536051189
         format: int64
       status:
         type: integer
-        example: 5
+        example: 7
         enum:
           - 1
           - 2
@@ -4142,34 +3830,34 @@ definitions:
       targets_filename:
         type: string
         description: название файла, из которого брали целевых пользователей
-        example: Eaque sint ipsum aut quisquam.
+        example: Velit voluptatem.
       targets_num:
         type: integer
         description: количество целевых пользователей в задаче
-        example: 5114024239015526940
+        example: 5347117589862011926
         format: int64
       targets_per_post:
         type: integer
         description: количество упоминаний под каждым постом
-        example: 7063758775338046158
+        example: 9078009782949616140
         format: int64
       testing_tag_user_id:
         type: integer
         description: user_id пользователя в Instagram. Фиксированная отметка на фото для каждого поста, чтобы проверить работу ботов
-        example: 9214789128391091918
+        example: 5645495929827351034
         format: int64
       testing_tag_username:
         type: string
         description: username пользователя в Instagram, без @. Фиксированная отметка для каждого поста, чтобы проверить работу ботов
-        example: Vel sit nihil.
+        example: Voluptatem consequuntur a sed mollitia molestias.
       text_template:
         type: string
         description: описание под постом
-        example: Voluptatem dolorem laudantium.
+        example: Sunt ducimus a illo nulla.
       title:
         type: string
         description: название задачи
-        example: Voluptatem quis esse.
+        example: Voluptates id ut voluptatem non.
       type:
         type: integer
         example: 2
@@ -4179,51 +3867,55 @@ definitions:
       video_filename:
         type: string
         description: название файла с видео, если тип задачи - рилсы
-        example: Fuga molestias id.
+        example: Esse dolor enim animi.
     example:
       bot_images:
-        - At et delectus inventore quis molestias laboriosam.
-        - Aut dolorem nihil dolorum.
+        - Ullam sed.
+        - Molestiae laborum molestiae aliquam quisquam.
+        - Voluptas laudantium.
       bot_last_names:
-        - Labore eveniet eius.
-        - Molestiae et et error sed cumque qui.
-      bot_names:
         - Molestiae esse aut possimus.
         - Ipsa non numquam est.
-      bot_urls:
-        - Reiciendis neque fuga dolores.
-        - Qui quia fugit tempora adipisci.
-        - Illum cupiditate rerum et officiis.
-      bots_filename: Ea earum.
-      bots_num: 7436570725648030961
-      cheap_proxies_filename: Quia rerum aut consequatur sit.
-      cheap_proxies_num: 192890435931162294
-      follow_targets: false
-      id: 95545D09-3153-0F17-09F7-7FEB1545D780
-      landing_accounts:
+      bot_names:
+        - Porro quia est magni.
+        - Quis ut labore.
         - Eum adipisci et nulla.
         - Commodi perspiciatis incidunt vitae iusto.
+      bot_urls:
+        - Labore eveniet eius.
+        - Molestiae et et error sed cumque qui.
+      bots_filename: Adipisci perferendis illum cupiditate.
+      bots_num: 1657585976246416895
+      cheap_proxies_filename: Ipsam similique blanditiis id et.
+      cheap_proxies_num: 1921564154362060585
+      follow_targets: true
+      id: 95545D09-3153-0F17-09F7-7FEB1545D780
+      landing_accounts:
+        - Ut numquam ullam est ut sint.
+        - Voluptatum porro incidunt qui.
+        - Temporibus omnis unde.
       need_photo_tags: true
-      per_post_sleep_seconds: 5871383810931590204
-      photo_tags_delay_seconds: 4504345925087751262
-      photo_tags_posts_per_bot: 6152737296945937265
-      photo_targets_per_post: 3644793299397040592
+      per_post_sleep_seconds: 4043374984845954996
+      photo_tags_delay_seconds: 6649403587222688217
+      photo_tags_posts_per_bot: 7136306779876228770
+      photo_targets_per_post: 14050301185045674571
       post_images:
-        - Laudantium illo harum qui.
-        - Suscipit quasi maiores ipsam tempora.
-      posts_per_bot: 5195383107910264819
-      residential_proxies_filename: Dolore qui numquam excepturi.
-      residential_proxies_num: 4369556238231513323
-      status: 7
-      targets_filename: Aut nisi omnis consequatur et sed sapiente.
-      targets_num: 110672642845342774
-      targets_per_post: 11903402922628650313
-      testing_tag_user_id: 2127537164293428202
-      testing_tag_username: Expedita et.
-      text_template: Quia est magni velit quis ut.
-      title: Ipsam similique blanditiis id et.
-      type: 1
-      video_filename: Est ducimus laborum voluptates qui sint.
+        - Consequatur et.
+        - Sapiente et est.
+        - Laborum voluptates.
+      posts_per_bot: 7987040187777657570
+      residential_proxies_filename: Et officiis facilis.
+      residential_proxies_num: 3673686995994364958
+      status: 1
+      targets_filename: Id cum officiis quibusdam ea earum.
+      targets_num: 6201748109723426603
+      targets_per_post: 16001140283630682541
+      testing_tag_user_id: 8656066834562543289
+      testing_tag_username: Harum qui sit suscipit quasi maiores.
+      text_template: Quasi iure numquam sapiente cupiditate.
+      title: Reiciendis neque fuga dolores.
+      type: 2
+      video_filename: Dolore qui numquam excepturi.
     required:
       - id
       - type

@@ -318,26 +318,6 @@ type GetProgressOKResponseBody struct {
 	BotsTotal int `json:"bots_total"`
 }
 
-// GetEditingProgressOKResponseBody is the type of the "tasks_service" service
-// "get editing progress" endpoint HTTP response body.
-type GetEditingProgressOKResponseBody struct {
-	// результат работы по каждому боту
-	BotsProgresses []*BotsProgressResponseBody `json:"bots_progresses"`
-	// количество аккаунтов, которых упомянули в постах
-	TargetsNotified int `json:"targets_notified"`
-	// количество аккаунтов, которых упомянули в постах на фото
-	PhotoTargetsNotified int `json:"photo_targets_notified"`
-	// количество аккаунтов, которых не получилось упомянуть, при перезапуске
-	// задачи будут использованы заново
-	TargetsFailed int `json:"targets_failed"`
-	// количество аккаунтов, которых не выбрали для постов
-	TargetsWaiting int `json:"targets_waiting"`
-	// закончена ли задача
-	Done bool `form:"done" json:"done" xml:"done"`
-	// общее количество ботов в задаче
-	BotsTotal int `json:"bots_total"`
-}
-
 // ListTasksResponseBody is the type of the "tasks_service" service "list
 // tasks" endpoint HTTP response body.
 type ListTasksResponseBody []*TaskResponse
@@ -360,6 +340,8 @@ type BotsProgressResponseBody struct {
 	Username string `form:"username" json:"username" xml:"username"`
 	// количество выложенных постов
 	PostsCount int32 `json:"posts_count"`
+	// количество выложенных постов
+	EditedPostsCount int32 `json:"posts_count"`
 	// текущий статус бота, будут ли выкладываться посты
 	Status int32 `form:"status" json:"status" xml:"status"`
 	// количество аккаунтов, которых упомянули в постах
@@ -720,26 +702,6 @@ func NewGetProgressOKResponseBody(res *tasksservice.TaskProgress) *GetProgressOK
 	return body
 }
 
-// NewGetEditingProgressOKResponseBody builds the HTTP response body from the
-// result of the "get editing progress" endpoint of the "tasks_service" service.
-func NewGetEditingProgressOKResponseBody(res *tasksservice.TaskProgress) *GetEditingProgressOKResponseBody {
-	body := &GetEditingProgressOKResponseBody{
-		TargetsNotified:      res.TargetsNotified,
-		PhotoTargetsNotified: res.PhotoTargetsNotified,
-		TargetsFailed:        res.TargetsFailed,
-		TargetsWaiting:       res.TargetsWaiting,
-		Done:                 res.Done,
-		BotsTotal:            res.BotsTotal,
-	}
-	if res.BotsProgresses != nil {
-		body.BotsProgresses = make([]*BotsProgressResponseBody, len(res.BotsProgresses))
-		for i, val := range res.BotsProgresses {
-			body.BotsProgresses[i] = marshalTasksserviceBotsProgressToBotsProgressResponseBody(val)
-		}
-	}
-	return body
-}
-
 // NewListTasksResponseBody builds the HTTP response body from the result of
 // the "list tasks" endpoint of the "tasks_service" service.
 func NewListTasksResponseBody(res []*tasksservice.Task) ListTasksResponseBody {
@@ -972,20 +934,6 @@ func NewGetTaskPayload(taskID string, token string) *tasksservice.GetTaskPayload
 // payload.
 func NewGetProgressPayload(taskID string, pageSize uint32, page uint32, sort string, sortDescending bool, token string) *tasksservice.GetProgressPayload {
 	v := &tasksservice.GetProgressPayload{}
-	v.TaskID = taskID
-	v.PageSize = pageSize
-	v.Page = page
-	v.Sort = sort
-	v.SortDescending = sortDescending
-	v.Token = token
-
-	return v
-}
-
-// NewGetEditingProgressPayload builds a tasks_service service get editing
-// progress endpoint payload.
-func NewGetEditingProgressPayload(taskID string, pageSize uint32, page uint32, sort string, sortDescending bool, token string) *tasksservice.GetEditingProgressPayload {
-	v := &tasksservice.GetEditingProgressPayload{}
 	v.TaskID = taskID
 	v.PageSize = pageSize
 	v.Page = page

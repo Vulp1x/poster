@@ -199,6 +199,44 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const findAllCheapProxies = `-- name: FindAllCheapProxies :many
+select distinct host, port, pass, login
+from proxies
+where type = 2
+`
+
+type FindAllCheapProxiesRow struct {
+	Host  string `json:"host"`
+	Port  int32  `json:"port"`
+	Pass  string `json:"pass"`
+	Login string `json:"login"`
+}
+
+func (q *Queries) FindAllCheapProxies(ctx context.Context) ([]FindAllCheapProxiesRow, error) {
+	rows, err := q.db.Query(ctx, findAllCheapProxies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindAllCheapProxiesRow
+	for rows.Next() {
+		var i FindAllCheapProxiesRow
+		if err := rows.Scan(
+			&i.Host,
+			&i.Port,
+			&i.Pass,
+			&i.Login,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findBotsForTask = `-- name: FindBotsForTask :many
 select id, task_id, username, password, user_agent, device_data, session, headers, res_proxy, work_proxy, status, posts_count, started_at, created_at, updated_at, deleted_at, file_order, inst_id
 from bot_accounts

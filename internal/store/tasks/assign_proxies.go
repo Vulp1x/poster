@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/dbmodel"
@@ -14,6 +15,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// AssignProxies назначает прокси ботам, если проксей недостаточно, то используем одни и те же прокси для разных ботов
 func (s *Store) AssignProxies(ctx context.Context, taskID uuid.UUID) (int, error) {
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
@@ -193,4 +195,36 @@ func min(a, b int) int {
 	}
 
 	return b
+}
+
+func (s *Store) insertMoreProxies(
+	ctx context.Context,
+	taskID uuid.UUID,
+	tx dbmodel.Tx,
+	initialProxies []dbmodel.Proxy,
+	proxiesToInsert int,
+	isCheap bool,
+) ([]dbmodel.Proxy, error) {
+	var newProxies = make([]dbmodel.Proxy, 0, proxiesToInsert)
+	var proxiesFromOneInitialProxy = math.Ceil(float64(proxiesToInsert) / float64(len(initialProxies)))
+
+	for _, proxy := range initialProxies {
+		for i := 0; i < int(proxiesFromOneInitialProxy); i++ {
+			newProxies = append(newProxies, proxy)
+		}
+	}
+
+	logger.Infof(ctx, "got %d new proxies, wanted at least %d,from %d initial",
+		len(newProxies), proxiesToInsert, len(initialProxies),
+	)
+
+	q := dbmodel.New(tx)
+	savedProxiesCount, err := q.SaveProxies(ctx, domain.ProxiesFromDB(newProxies).ToSaveParams(taskID, isCheap))
+	if err != nil {
+		return nil, fmt.Errorf("failed to save new proxies: %v", err)
+	}
+
+	logger.Infof(ctx, "saved %d new proxies, is cheap: %t", savedProxiesCount, isCheap)
+
+	return newProxies, nil
 }
