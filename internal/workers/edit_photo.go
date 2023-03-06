@@ -3,6 +3,7 @@ package workers
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,13 +30,18 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 	logger.Infof(ctx, "starting processing task %s", task.ExternalKey)
 
 	externalKeyParts := strings.Split(task.ExternalKey, "::")
-	if len(externalKeyParts) != 2 {
-		return fmt.Errorf("%w: expected 2 parts in external key with separator '::' in '%s', got %d parts", pgqueue.ErrMustCancelTask, task.ExternalKey, len(externalKeyParts))
+	if len(externalKeyParts) != 3 {
+		return fmt.Errorf("%w: expected 3 parts in external key with separator '::' in '%s', got %d parts", pgqueue.ErrMustCancelTask, task.ExternalKey, len(externalKeyParts))
 	}
 
 	taskID, err := uuid.Parse(externalKeyParts[0])
 	if err != nil {
 		return fmt.Errorf("%w: failed to parse datasaet id from '%s': %v", pgqueue.ErrMustCancelTask, externalKeyParts[0], err)
+	}
+
+	mediaSequenceNumber, err := strconv.ParseInt(externalKeyParts[2], 10, 64)
+	if err != nil {
+		return fmt.Errorf("%w: failed to parse media sequence number from '%s': %v", pgqueue.ErrMustCancelTask, externalKeyParts[2], err)
 	}
 
 	db := h.dbTxF(ctx)
@@ -131,7 +137,7 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		return fmt.Errorf("failed to edit media %d: %v", mediaToEdit.Pk, err)
 	}
 
-	return h.postProcessMediaEdit(ctx, bot, postingTask, mediaToEdit, mediaTargets)
+	return h.postProcessMediaEdit(ctx, bot, postingTask, mediaToEdit, mediaTargets, mediaSequenceNumber+1)
 }
 
 func (h *EditPhotoHandler) postProcessMediaEdit(
@@ -140,6 +146,7 @@ func (h *EditPhotoHandler) postProcessMediaEdit(
 	task dbmodel.Task,
 	editedMedia dbmodel.Media,
 	mediaTargets postTargets,
+	nextMediaSequenceNumber int64,
 ) error {
 	tx, err := h.dbTxF(ctx).Begin(ctx)
 	if err != nil {
@@ -177,9 +184,9 @@ func (h *EditPhotoHandler) postProcessMediaEdit(
 	newTask := pgqueue.Task{
 		Kind:        EditMediaTaskKind,
 		Payload:     EmptyPayload,
-		ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
+		ExternalKey: fmt.Sprintf("%s::%s::%d", task.ID.String(), bot.Username, nextMediaSequenceNumber),
 	}
-	if err = h.queue.PushTaskTx(ctx, tx, newTask, pgqueue.WithDelay(time.Duration(task.PerPostSleepSeconds)*time.Second)); err != nil {
+	if err = h.queue.PushTaskTx(ctx, tx, newTask, pgqueue.WithDelay(2*time.Duration(task.PerPostSleepSeconds)*time.Second)); err != nil {
 		return fmt.Errorf("failed to push task (%#v) to queue: %v", newTask, err)
 	}
 

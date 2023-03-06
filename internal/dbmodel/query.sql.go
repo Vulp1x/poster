@@ -715,6 +715,7 @@ const findTasksByManagerID = `-- name: FindTasksByManagerID :many
 select id, manager_id, text_template, landing_accounts, account_profile_images, account_names, account_urls, images, status, title, bots_filename, cheap_proxies_filename, res_proxies_filename, targets_filename, created_at, started_at, stopped_at, updated_at, deleted_at, account_last_names, follow_targets, need_photo_tags, per_post_sleep_seconds, photo_tags_delay_seconds, type, video_filename, posts_per_bot, targets_per_post, photo_tags_posts_per_bot, photo_targets_per_post, fixed_tag, fixed_photo_tag
 from tasks
 where manager_id = $1
+order by created_at desc
 `
 
 func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID) ([]Task, error) {

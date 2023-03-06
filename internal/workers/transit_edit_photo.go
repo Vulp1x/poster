@@ -32,7 +32,7 @@ func (s *TransitEditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.T
 	}
 
 	if len(notFinishedBots) != 0 {
-		logger.Warnf(ctx, "still has %d bots in not finished statuses: %v", len(notFinishedBots), notFinishedBots)
+		logger.Warnf(ctx, "still has %d bots in not all done status: %v", len(notFinishedBots), notFinishedBots)
 
 		err = s.queue.RetryTasks(ctx, EditMediaTaskKind, 10, 1000)
 		if err != nil {

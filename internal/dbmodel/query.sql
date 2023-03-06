@@ -38,7 +38,8 @@ where id = $1;
 -- name: FindTasksByManagerID :many
 select *
 from tasks
-where manager_id = $1;
+where manager_id = @manager_id
+order by created_at desc;
 
 -- name: StartTaskByID :exec
 update tasks

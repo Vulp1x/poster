@@ -60,9 +60,16 @@ func (s *Store) StartUpdatePostContents(ctx context.Context, taskID uuid.UUID) (
 		tasks[i] = pgqueue.Task{
 			Kind:        workers.EditMediaTaskKind,
 			Payload:     workers.EmptyPayload,
-			ExternalKey: fmt.Sprintf("%s::%s", task.ID.String(), bot.Username),
+			ExternalKey: fmt.Sprintf("%s::%s::0", task.ID.String(), bot.Username),
 		}
 	}
+
+	// задача на обновление статуса до финального в конце концов
+	tasks = append(tasks, pgqueue.Task{
+		Kind:        workers.TransitPostsEditedTaskKind,
+		Payload:     workers.EmptyPayload,
+		ExternalKey: task.ID.String(),
+	})
 
 	if err = s.queue.PushTasksTx(ctx, tx, tasks); err != nil {
 		return nil, fmt.Errorf("failed to push %d tasks: %v", len(tasks), err)

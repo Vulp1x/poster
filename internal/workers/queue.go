@@ -43,9 +43,9 @@ func NewQueuue(ctx context.Context, executor executor.Executor, txFunc dbmodel.D
 	// ищем похожих блогеров на начальных блогеров
 	queue.RegisterKind(EditMediaTaskKind, &EditPhotoHandler{dbTxF: txFunc, cli: api.NewInstaProxyClient(conn), queue: queue}, pgqueue.KindOptions{
 		Name:                 "edit-old-posts",
-		WorkerCount:          pgqueue.NewConstProvider(int16(2)),
+		WorkerCount:          pgqueue.NewConstProvider(int16(5)),
 		MaxAttempts:          5,
-		AttemptTimeout:       30 * time.Second,
+		AttemptTimeout:       40 * time.Second,
 		MaxTaskErrorMessages: 10,
 		Delayer:              delayer.NewJitterDelayer(delayer.EqualJitter, 20*time.Second),
 		TerminalTasksTTL:     pgqueue.NewConstProvider(1000 * time.Hour),

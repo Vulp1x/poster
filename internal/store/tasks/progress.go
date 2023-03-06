@@ -84,7 +84,7 @@ func (s *Store) TaskProgress(ctx context.Context, taskID uuid.UUID, pager *pager
 	progress := domain.TaskProgress{
 		BotsProgress:   bots,
 		TargetCounters: targetCounters,
-		Done:           task.Status > dbmodel.StartedTaskStatus,
+		Done:           task.Status == dbmodel.DoneTaskStatus || task.Status == dbmodel.AllDoneTaskStatus,
 		BotsCount:      int(botsCount),
 	}
 	return progress, rows.Err()
