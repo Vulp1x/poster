@@ -18,7 +18,58 @@ import (
 	"github.com/inst-api/poster/internal/headers"
 )
 
-const defaultInstagramUserAgent = "User-Agent: Instagram 272.0.0.16.73 Android (31/12; 420dpi; 1080x2047; samsung; SM-G975F; beyond2; exynos9820; en_GB; 450448584)"
+var userAgents = []string{
+	"Instagram 265.0.0.19.301 Android (24/7.0; 240dpi; 2069x1080; samsung; SM-G901F; kccat6; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 560dpi; 1080x2233; TCT; ONE TOUCH 4015D; Yaris35_GSM; mt6572; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 640dpi; 1440x2780; samsung; SM-J415G; j4primelte; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 320dpi; 2224x1080; infinix; infinixnote3; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (24/7.0; 280dpi; 1080x2280; Huawei; 201HW; hwu9201L; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 356dpi; 1080x2006; SENSEIT; SENSEIT-L301; SENSEITL301; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1; 160dpi; 1080x2062; Samsung; SM-G3502T; cs02ve3gdtv; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (24/7.0; 540dpi; 1080x2031; HUAWEI/HONOR; DUA-L22; HWDUA-M; m; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 1440x2891; Lenovo; LenovoA396; A396; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 272dpi; 1440x2711; HUAWEI/HONOR; LLD-L31; HWLLD-H; hi6; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (29/10; 420dpi; 1080x2210; samsung; sm-g930f; herolte; sams; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.1; 440dpi; 1440x2910; HMD Global/Nokia; Nokia 8.1; PNX_sprout; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1; 540dpi; 1440x2672; motorola; MotoE2; otus_ds; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 213dpi; 2042x1080; Blackview; BV7000; BV7000; mt6735; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 640dpi; 720x1369; HUAWEI; HUAWEI TAG-L01; HWTAG-L6753; mt6735; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 320dpi; 720x1472; ZTE; Z730; ada; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 160dpi; 640x960; samsung; SM-N970U1; d1q; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 540dpi; 1080x1808; samsung; sm-g920f; zeroflte; samsungexynos7; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 440dpi; 480x894; LGE; LG-SU760; cosmo_450-05; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 272dpi; 1080x2092; TCT; ALCATELONETOUCH; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1; 480dpi; 1080x2207; Samsung; SAMSUNG-SGH-I747Z; d2aio; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 213dpi; 640x1208; Lenovo; IdeaTabS2109A-F; S2109A; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 120dpi; 600x1162; Sony; E2043; E2043; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.1; 420dpi; 480x784; HTC; D626x; htc_a32ul; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 408dpi; 720x1394; Huawei; U8836D; hwu8836D; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.1; 320dpi; 1080x2231; Meizu; U10; U10; mt6755; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (29/10; 440dpi; 1080x2201; samsung; SAMSUNG-SM-G900A; klteatt; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.1; 408dpi; 1080x2221; samsung; sm-a520f; a5y17lte; samsungexyn; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.1; 356dpi; 720x1332; Samsung; SM-T116NU; goyave3gsea; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 440dpi; 1080x2178; LGE; AS740; aloha; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (29/10; 540dpi; 1080x2295; motorola/verizon; DROID3; cdma_solana; mapphone_cdma; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 1440x2768; samsung; SM-G925F; zerolte; samsungexyno; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 480dpi; 1334x750; Huawei; U8500; msm7225; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 480dpi; 1080x2228; Xiaomi/POCO; M2012K11AG; alioth; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 720x1185; HTC; gtou; HTC_Desire_200; hi3660; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 280dpi; 1152x1920; Motorola; sholes; Droid; hi3660; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 1440x2891; Lenovo; LenovoA396; A396; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 190dpi; 720x1453; WIKO; RAINBOWJAM; s5250; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (31/12; 440dpi; 2560x1492; Sony; E2115; E2115; mt6582; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 120dpi; 2041x1080; Lenovo; LenovoTV40S9; jazz; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 272dpi; 1378x720; Clementoni; Clempad_HR; Clempad_HR; h1; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (29/10; 356dpi; 480x899; Huawei; T8830Pro; hwT8830Pro; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 480dpi; 1080x2304; samsung; SM-M205FN; m20lte; exynos7885; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 560dpi; 1080x2080; Acer; N3-2200; da2; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1; 120dpi; 1440x2698; LGE; LG-E975T; geehrc; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 640dpi; 1920x1200; motorola; moto g power; sofia; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (26/8.0.0; 240dpi; 1080x2024; Vestel; Venus E2 Plus; Ada; qcom; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 280dpi; 1152x1920; Motorola; sholes; Droid; hi3660; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 480dpi; 1080x2194; Xiaomi; Redmi Note 4X; nikel; mt6797; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (30/11; 213dpi; 1080x2131; HUAWEI; HUAWEI VNS-L22; HWVNS-H; hi6250; ru_RU; 436384447)",
+}
 
 type BotAccount dbmodel.BotAccount
 
@@ -101,7 +152,7 @@ func (b *BotAccount) assignUserAgent(input string) error {
 	var err error
 
 	if input == "" {
-		input = defaultInstagramUserAgent
+		input = RandomFromSlice(userAgents)
 	}
 
 	b.UserAgent = input

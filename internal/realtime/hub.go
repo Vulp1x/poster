@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"

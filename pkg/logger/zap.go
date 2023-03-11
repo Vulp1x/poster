@@ -37,7 +37,7 @@ func getZapLevel(level string) zapcore.Level {
 	}
 }
 
-func newZapLogger(config Configuration) (*zap.SugaredLogger, error) {
+func newZapLogger(config Configuration) (*zap.Logger, error) {
 	var cores []zapcore.Core
 
 	if config.EnableConsole {
@@ -76,5 +76,5 @@ func newZapLogger(config Configuration) (*zap.SugaredLogger, error) {
 
 	defer logger.Sync() //nolint
 
-	return logger.Sugar(), nil
+	return logger, nil
 }

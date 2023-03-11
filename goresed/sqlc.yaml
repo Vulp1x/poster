@@ -1,3 +1,5 @@
 regenerates:
   - file: "internal/dbmodel/db.go"
     replace: *entry_point_db
+  - file: "internal/dbmodel/query.sql.go"
+    replace: *tracing

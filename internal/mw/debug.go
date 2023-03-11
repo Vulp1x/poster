@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	chimw "github.com/go-chi/chi/middleware"
+	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/inst-api/poster/pkg/logger"
 	goahttp "goa.design/goa/v3/http"
 	"goa.design/goa/v3/middleware"

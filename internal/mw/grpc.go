@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/inst-api/poster/internal/tracer"
 	"github.com/inst-api/poster/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -26,6 +27,9 @@ func UnaryClientLog() grpc.UnaryClientInterceptor {
 
 // UnaryClientLog does the actual logging given the logger for unary methods.
 func unaryClientLog(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	ctx, span := tracer.Start(ctx, "grpc."+method)
+	defer span.End()
+
 	reqID := ShortID()
 	ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{RequestIDMetadataKey: reqID}))
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/inst-api/poster/internal/headers"
+	"github.com/inst-api/poster/internal/tracer"
 )
 
 const addBotPost = `-- name: AddBotPost :one
@@ -25,6 +26,9 @@ type AddBotPostParams struct {
 }
 
 func (q *Queries) AddBotPost(ctx context.Context, arg AddBotPostParams) (int, error) {
+	ctx, span := tracer.Start(ctx, "db.AddBotPost", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, addBotPost, arg.PostsCount, arg.ID)
 	var posts_count int
 	err := row.Scan(&posts_count)
@@ -47,6 +51,9 @@ type AssignBotsToProxiesForTaskParams struct {
 }
 
 func (q *Queries) AssignBotsToProxiesForTask(ctx context.Context, arg AssignBotsToProxiesForTaskParams) error {
+	ctx, span := tracer.Start(ctx, "db.AssignBotsToProxiesForTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, assignBotsToProxiesForTask, arg.TaskID, arg.BotIds, arg.Ids)
 	return err
 }
@@ -71,6 +78,9 @@ type AssignProxiesToBotsForTaskParams struct {
 }
 
 func (q *Queries) AssignProxiesToBotsForTask(ctx context.Context, arg AssignProxiesToBotsForTaskParams) error {
+	ctx, span := tracer.Start(ctx, "db.AssignProxiesToBotsForTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, assignProxiesToBotsForTask,
 		arg.TaskID,
 		arg.ResidentialProxies,
@@ -87,6 +97,9 @@ where bot_id = $1
 `
 
 func (q *Queries) CountBotMedias(ctx context.Context, botID uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.CountBotMedias", tracer.WithCustomStruct("params", botID))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, countBotMedias, botID)
 	var count int64
 	err := row.Scan(&count)
@@ -114,6 +127,9 @@ type CreateDraftTaskParams struct {
 }
 
 func (q *Queries) CreateDraftTask(ctx context.Context, arg CreateDraftTaskParams) (uuid.UUID, error) {
+	ctx, span := tracer.Start(ctx, "db.CreateDraftTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, createDraftTask,
 		arg.ManagerID,
 		arg.TextTemplate,
@@ -144,6 +160,9 @@ type CreateUserParams struct {
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	ctx, span := tracer.Start(ctx, "db.CreateUser", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, createUser, arg.Login, arg.PasswordHash, arg.Role)
 	var i User
 	err := row.Scan(
@@ -166,6 +185,9 @@ RETURNING 1
 `
 
 func (q *Queries) DeleteBotAccountsForTask(ctx context.Context, dollar_1 []uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.DeleteBotAccountsForTask", tracer.WithCustomStruct("params", dollar_1))
+	defer span.End()
+
 	result, err := q.db.Exec(ctx, deleteBotAccountsForTask, dollar_1)
 	if err != nil {
 		return 0, err
@@ -181,6 +203,9 @@ RETURNING 1
 `
 
 func (q *Queries) DeleteProxiesForTask(ctx context.Context, dollar_1 []uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.DeleteProxiesForTask", tracer.WithCustomStruct("params", dollar_1))
+	defer span.End()
+
 	result, err := q.db.Exec(ctx, deleteProxiesForTask, dollar_1)
 	if err != nil {
 		return 0, err
@@ -195,6 +220,9 @@ where id = $1
 `
 
 func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
+	ctx, span := tracer.Start(ctx, "db.DeleteUserByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, deleteUserByID, id)
 	return err
 }
@@ -244,6 +272,9 @@ where task_id = $1
 `
 
 func (q *Queries) FindBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.FindBotsForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findBotsForTask, taskID)
 	if err != nil {
 		return nil, err
@@ -290,6 +321,9 @@ WHERE login = $1
 `
 
 func (q *Queries) FindByLogin(ctx context.Context, login string) (User, error) {
+	ctx, span := tracer.Start(ctx, "db.FindByLogin", tracer.WithCustomStruct("params", login))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, findByLogin, login)
 	var i User
 	err := row.Scan(
@@ -312,6 +346,9 @@ where task_id = $1
 `
 
 func (q *Queries) FindCheapProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
+	ctx, span := tracer.Start(ctx, "db.FindCheapProxiesForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findCheapProxiesForTask, taskID)
 	if err != nil {
 		return nil, err
@@ -354,6 +391,9 @@ type FindNotFinishedEditingTaskBotsRow struct {
 }
 
 func (q *Queries) FindNotFinishedEditingTaskBots(ctx context.Context, taskID uuid.UUID) ([]FindNotFinishedEditingTaskBotsRow, error) {
+	ctx, span := tracer.Start(ctx, "db.FindNotFinishedEditingTaskBots", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findNotFinishedEditingTaskBots, taskID)
 	if err != nil {
 		return nil, err
@@ -387,6 +427,9 @@ type FindNotFinishedPostingTaskBotsRow struct {
 }
 
 func (q *Queries) FindNotFinishedPostingTaskBots(ctx context.Context, taskID uuid.UUID) ([]FindNotFinishedPostingTaskBotsRow, error) {
+	ctx, span := tracer.Start(ctx, "db.FindNotFinishedPostingTaskBots", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findNotFinishedPostingTaskBots, taskID)
 	if err != nil {
 		return nil, err
@@ -460,6 +503,9 @@ where task_id = $1
 `
 
 func (q *Queries) FindReadyBotsForTask(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.FindReadyBotsForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findReadyBotsForTask, taskID)
 	if err != nil {
 		return nil, err
@@ -508,6 +554,9 @@ where task_id = $1
 
 // ProxieAssignedBotStatus
 func (q *Queries) FindResidentialProxiesForTask(ctx context.Context, taskID uuid.UUID) ([]Proxy, error) {
+	ctx, span := tracer.Start(ctx, "db.FindResidentialProxiesForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findResidentialProxiesForTask, taskID)
 	if err != nil {
 		return nil, err
@@ -549,6 +598,9 @@ type FindTaskBotByInstIDParams struct {
 }
 
 func (q *Queries) FindTaskBotByInstID(ctx context.Context, arg FindTaskBotByInstIDParams) (BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.FindTaskBotByInstID", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, findTaskBotByInstID, arg.TaskID, arg.InstID)
 	var i BotAccount
 	err := row.Scan(
@@ -587,6 +639,9 @@ type FindTaskBotByUsernameParams struct {
 }
 
 func (q *Queries) FindTaskBotByUsername(ctx context.Context, arg FindTaskBotByUsernameParams) (BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.FindTaskBotByUsername", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, findTaskBotByUsername, arg.TaskID, arg.Username)
 	var i BotAccount
 	err := row.Scan(
@@ -627,6 +682,9 @@ type FindTaskBotsByUsernameParams struct {
 }
 
 func (q *Queries) FindTaskBotsByUsername(ctx context.Context, arg FindTaskBotsByUsernameParams) ([]BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.FindTaskBotsByUsername", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findTaskBotsByUsername, arg.TaskID, arg.Usernames)
 	if err != nil {
 		return nil, err
@@ -672,6 +730,9 @@ where id = $1
 `
 
 func (q *Queries) FindTaskByID(ctx context.Context, id uuid.UUID) (Task, error) {
+	ctx, span := tracer.Start(ctx, "db.FindTaskByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, findTaskByID, id)
 	var i Task
 	err := row.Scan(
@@ -719,6 +780,9 @@ order by created_at desc
 `
 
 func (q *Queries) FindTasksByManagerID(ctx context.Context, managerID uuid.UUID) ([]Task, error) {
+	ctx, span := tracer.Start(ctx, "db.FindTasksByManagerID", tracer.WithCustomStruct("params", managerID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findTasksByManagerID, managerID)
 	if err != nil {
 		return nil, err
@@ -785,6 +849,9 @@ type FindUnprocessedTargetsForTaskParams struct {
 }
 
 func (q *Queries) FindUnprocessedTargetsForTask(ctx context.Context, arg FindUnprocessedTargetsForTaskParams) ([]TargetUser, error) {
+	ctx, span := tracer.Start(ctx, "db.FindUnprocessedTargetsForTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, findUnprocessedTargetsForTask, arg.TaskID, arg.Limit)
 	if err != nil {
 		return nil, err
@@ -821,6 +888,9 @@ where task_id = $1
 `
 
 func (q *Queries) ForceDeleteBotAccountsForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.ForceDeleteBotAccountsForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	result, err := q.db.Exec(ctx, forceDeleteBotAccountsForTask, taskID)
 	if err != nil {
 		return 0, err
@@ -835,6 +905,9 @@ where task_id = $1
 `
 
 func (q *Queries) ForceDeleteProxiesForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.ForceDeleteProxiesForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	result, err := q.db.Exec(ctx, forceDeleteProxiesForTask, taskID)
 	if err != nil {
 		return 0, err
@@ -849,6 +922,9 @@ where task_id = $1
 `
 
 func (q *Queries) ForceDeleteTargetUsersForTask(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.ForceDeleteTargetUsersForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	result, err := q.db.Exec(ctx, forceDeleteTargetUsersForTask, taskID)
 	if err != nil {
 		return 0, err
@@ -863,6 +939,9 @@ where id = $1
 `
 
 func (q *Queries) ForceDeleteTaskByID(ctx context.Context, id uuid.UUID) error {
+	ctx, span := tracer.Start(ctx, "db.ForceDeleteTaskByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, forceDeleteTaskByID, id)
 	return err
 }
@@ -874,6 +953,9 @@ where id = $1
 `
 
 func (q *Queries) GetBotByID(ctx context.Context, id uuid.UUID) (BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.GetBotByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, getBotByID, id)
 	var i BotAccount
 	err := row.Scan(
@@ -906,6 +988,9 @@ where bot_id = $1
 `
 
 func (q *Queries) GetBotMedias(ctx context.Context, botID uuid.UUID) ([]Media, error) {
+	ctx, span := tracer.Start(ctx, "db.GetBotMedias", tracer.WithCustomStruct("params", botID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, getBotMedias, botID)
 	if err != nil {
 		return nil, err
@@ -959,6 +1044,9 @@ type GetBotsProgressRow struct {
 }
 
 func (q *Queries) GetBotsProgress(ctx context.Context, arg GetBotsProgressParams) ([]GetBotsProgressRow, error) {
+	ctx, span := tracer.Start(ctx, "db.GetBotsProgress", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, getBotsProgress,
 		arg.TaskID,
 		arg.Limit,
@@ -991,6 +1079,9 @@ where task_id = $1
 `
 
 func (q *Queries) GetTaskBotsCount(ctx context.Context, taskID uuid.UUID) (int64, error) {
+	ctx, span := tracer.Start(ctx, "db.GetTaskBotsCount", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, getTaskBotsCount, taskID)
 	var count int64
 	err := row.Scan(&count)
@@ -1020,6 +1111,9 @@ type GetTaskTargetsCountRow struct {
 }
 
 func (q *Queries) GetTaskTargetsCount(ctx context.Context, taskID uuid.UUID) (GetTaskTargetsCountRow, error) {
+	ctx, span := tracer.Start(ctx, "db.GetTaskTargetsCount", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, getTaskTargetsCount, taskID)
 	var i GetTaskTargetsCountRow
 	err := row.Scan(
@@ -1038,6 +1132,9 @@ WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
+	ctx, span := tracer.Start(ctx, "db.GetUserByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
@@ -1070,6 +1167,9 @@ type LockTargetsForTaskParams struct {
 }
 
 func (q *Queries) LockTargetsForTask(ctx context.Context, arg LockTargetsForTaskParams) ([]TargetUser, error) {
+	ctx, span := tracer.Start(ctx, "db.LockTargetsForTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, lockTargetsForTask, arg.TaskID, arg.Limit)
 	if err != nil {
 		return nil, err
@@ -1116,6 +1216,9 @@ type MarkTargetsAsNotifiedParams struct {
 }
 
 func (q *Queries) MarkTargetsAsNotified(ctx context.Context, arg MarkTargetsAsNotifiedParams) error {
+	ctx, span := tracer.Start(ctx, "db.MarkTargetsAsNotified", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, markTargetsAsNotified,
 		arg.MediaFk,
 		arg.InteractionType,
@@ -1132,6 +1235,9 @@ where id = ANY ($1::uuid[])
 `
 
 func (q *Queries) RollbackTargetsStatus(ctx context.Context, ids []uuid.UUID) error {
+	ctx, span := tracer.Start(ctx, "db.RollbackTargetsStatus", tracer.WithCustomStruct("params", ids))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, rollbackTargetsStatus, ids)
 	return err
 }
@@ -1163,6 +1269,9 @@ type SavePostedMediaParams struct {
 }
 
 func (q *Queries) SavePostedMedia(ctx context.Context, arg SavePostedMediaParams) (Media, error) {
+	ctx, span := tracer.Start(ctx, "db.SavePostedMedia", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, savePostedMedia,
 		arg.Pk,
 		arg.Kind,
@@ -1216,6 +1325,9 @@ type SaveUploadedDataToTaskParams struct {
 }
 
 func (q *Queries) SaveUploadedDataToTask(ctx context.Context, arg SaveUploadedDataToTaskParams) error {
+	ctx, span := tracer.Start(ctx, "db.SaveUploadedDataToTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, saveUploadedDataToTask,
 		arg.ID,
 		arg.BotsFilename,
@@ -1241,6 +1353,9 @@ type SelectCountsForTaskRow struct {
 }
 
 func (q *Queries) SelectCountsForTask(ctx context.Context, taskID uuid.UUID) (SelectCountsForTaskRow, error) {
+	ctx, span := tracer.Start(ctx, "db.SelectCountsForTask", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, selectCountsForTask, taskID)
 	var i SelectCountsForTaskRow
 	err := row.Scan(
@@ -1259,6 +1374,9 @@ where id = $1
 `
 
 func (q *Queries) SetBotDoneStatus(ctx context.Context, id uuid.UUID) error {
+	ctx, span := tracer.Start(ctx, "db.SetBotDoneStatus", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setBotDoneStatus, id)
 	return err
 }
@@ -1275,6 +1393,9 @@ type SetBotPostsCountParams struct {
 }
 
 func (q *Queries) SetBotPostsCount(ctx context.Context, arg SetBotPostsCountParams) error {
+	ctx, span := tracer.Start(ctx, "db.SetBotPostsCount", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setBotPostsCount, arg.PostsCount, arg.ID)
 	return err
 }
@@ -1291,6 +1412,9 @@ type SetBotStatusParams struct {
 }
 
 func (q *Queries) SetBotStatus(ctx context.Context, arg SetBotStatusParams) error {
+	ctx, span := tracer.Start(ctx, "db.SetBotStatus", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setBotStatus, arg.Status, arg.ID)
 	return err
 }
@@ -1304,6 +1428,9 @@ returning id, task_id, username, password, user_agent, device_data, session, hea
 `
 
 func (q *Queries) SetBotsEditingPostsStatus(ctx context.Context, taskID uuid.UUID) ([]BotAccount, error) {
+	ctx, span := tracer.Start(ctx, "db.SetBotsEditingPostsStatus", tracer.WithCustomStruct("params", taskID))
+	defer span.End()
+
 	rows, err := q.db.Query(ctx, setBotsEditingPostsStatus, taskID)
 	if err != nil {
 		return nil, err
@@ -1354,6 +1481,9 @@ type SetBotsStatusParams struct {
 }
 
 func (q *Queries) SetBotsStatus(ctx context.Context, arg SetBotsStatusParams) error {
+	ctx, span := tracer.Start(ctx, "db.SetBotsStatus", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setBotsStatus, arg.Status, arg.Ids)
 	return err
 }
@@ -1365,6 +1495,9 @@ where pk = $1
 `
 
 func (q *Queries) SetMediaIsEdited(ctx context.Context, pk int64) error {
+	ctx, span := tracer.Start(ctx, "db.SetMediaIsEdited", tracer.WithCustomStruct("params", pk))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setMediaIsEdited, pk)
 	return err
 }
@@ -1381,6 +1514,9 @@ type SetTargetsStatusParams struct {
 }
 
 func (q *Queries) SetTargetsStatus(ctx context.Context, arg SetTargetsStatusParams) error {
+	ctx, span := tracer.Start(ctx, "db.SetTargetsStatus", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setTargetsStatus, arg.Status, arg.Ids)
 	return err
 }
@@ -1397,6 +1533,9 @@ type SetTaskVideoFilenameParams struct {
 }
 
 func (q *Queries) SetTaskVideoFilename(ctx context.Context, arg SetTaskVideoFilenameParams) error {
+	ctx, span := tracer.Start(ctx, "db.SetTaskVideoFilename", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, setTaskVideoFilename, arg.VideoFilename, arg.ID)
 	return err
 }
@@ -1410,6 +1549,9 @@ where id = $1
 `
 
 func (q *Queries) StartTaskByID(ctx context.Context, id uuid.UUID) error {
+	ctx, span := tracer.Start(ctx, "db.StartTaskByID", tracer.WithCustomStruct("params", id))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, startTaskByID, id)
 	return err
 }
@@ -1462,6 +1604,9 @@ type UpdateTaskParams struct {
 }
 
 func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, error) {
+	ctx, span := tracer.Start(ctx, "db.UpdateTask", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	row := q.db.QueryRow(ctx, updateTask,
 		arg.TextTemplate,
 		arg.Title,
@@ -1533,6 +1678,9 @@ type UpdateTaskLandingAccountsParams struct {
 }
 
 func (q *Queries) UpdateTaskLandingAccounts(ctx context.Context, arg UpdateTaskLandingAccountsParams) error {
+	ctx, span := tracer.Start(ctx, "db.UpdateTaskLandingAccounts", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, updateTaskLandingAccounts, arg.LandingAccounts, arg.ID)
 	return err
 }
@@ -1550,6 +1698,9 @@ type UpdateTaskStatusParams struct {
 }
 
 func (q *Queries) UpdateTaskStatus(ctx context.Context, arg UpdateTaskStatusParams) error {
+	ctx, span := tracer.Start(ctx, "db.UpdateTaskStatus", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, updateTaskStatus, arg.Status, arg.ID)
 	return err
 }
@@ -1566,6 +1717,9 @@ type UpdateUserPasswordParams struct {
 }
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	ctx, span := tracer.Start(ctx, "db.UpdateUserPassword", tracer.WithCustomStruct("params", arg))
+	defer span.End()
+
 	_, err := q.db.Exec(ctx, updateUserPassword, arg.PasswordHash, arg.ID)
 	return err
 }

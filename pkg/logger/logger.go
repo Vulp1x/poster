@@ -5,18 +5,19 @@ import (
 	"io"
 	"os"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var (
 	// global logger instance.
-	global       *zap.SugaredLogger
+	global       *otelzap.SugaredLogger
 	defaultLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
 )
 
 func init() {
-	SetLogger(New(defaultLevel))
+	SetLogger(otelzap.New(New(defaultLevel).Desugar()).Sugar())
 }
 
 // New creates new *zap.SugaredLogger with standard EncoderConfig
@@ -63,12 +64,12 @@ func SetLevel(l zapcore.Level) {
 }
 
 // Logger returns current global logger.
-func Logger() *zap.SugaredLogger {
+func Logger() *otelzap.SugaredLogger {
 	return global
 }
 
 // SetLogger sets global used logger. This function is not thread-safe.
-func SetLogger(l *zap.SugaredLogger) {
+func SetLogger(l *otelzap.SugaredLogger) {
 	global = l
 }
 

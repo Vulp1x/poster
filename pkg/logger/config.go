@@ -1,6 +1,11 @@
 package logger
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"go.uber.org/zap"
+)
 
 // Fields Type to pass when we want to call WithFields for structured logging.
 type Fields map[string]interface{}
@@ -48,7 +53,12 @@ func InitLogger(config Configuration) error {
 		return fmt.Errorf("failed to create new zap logger: %w", err)
 	}
 
-	global = logger
+	global = otelzap.New(
+		logger,
+		otelzap.WithCaller(true),
+		otelzap.WithCallerDepth(1),
+		otelzap.WithMinLevel(zap.InfoLevel),
+	).Sugar()
 
 	return nil
 }

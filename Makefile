@@ -51,7 +51,7 @@ endif
 bin-deps:
 	GOBIN=$(LOCAL_BIN) go install goa.design/goa/v3/cmd/goa@v3 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.2.0 && \
-	GOBIN=$(LOCAL_BIN) go install github.com/kyleconroy/sqlc/cmd/sqlc@v1.15.0 && \
+	GOBIN=$(LOCAL_BIN) go install github.com/kyleconroy/sqlc/cmd/sqlc@v1.17.0 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/goresed/goresed/cmd/goresed@v0.2.3 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/mikefarah/yq/v4@v4.22.1 && \
 	GOBIN=$(LOCAL_BIN) go install github.com/go-delve/delve/cmd/dlv@v1.9.1
@@ -68,7 +68,7 @@ generate-db-structure:
 
 generate-db-code:
 	$(LOCAL_BIN)/sqlc generate --file=sqlc.yaml
-	$(LOCAL_BIN)/goresed regenerate --file=goresed/sqlc.yaml --references=goresed/sqlc_entry_point_ref.yaml
+	$(LOCAL_BIN)/goresed regenerate --file=goresed/sqlc.yaml --references=goresed/sqlc_entry_point_ref.yaml  --references=goresed/sqlc_tracing.yaml
 
 migrate-db:
 	ENVIRONMENT=local scripts/migrate.sh

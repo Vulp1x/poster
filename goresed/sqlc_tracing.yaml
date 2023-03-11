@@ -1,0 +1,8 @@
+entry_point_db: &tracing
+  regexps:
+    - match: "func \(q \*Queries\) (\w+)\(ctx context.Context, (\w+) (.+)\) (.+)"
+      replacement: |-
+        func (q *Queries) $1(ctx context.Context, $2 $3)$4
+            ctx, span := tracer.Start(ctx, "db.$1",tracer.WithCustomStruct("params", $2))
+            defer span.End()
+

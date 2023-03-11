@@ -3,6 +3,7 @@ package logger
 import (
 	"context"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 )
 
@@ -13,16 +14,16 @@ const (
 )
 
 // ToContext returns new context with specified sugared logger inside.
-func ToContext(ctx context.Context, l *zap.SugaredLogger) context.Context {
+func ToContext(ctx context.Context, l *otelzap.SugaredLogger) context.Context {
 	return context.WithValue(ctx, loggerContextKey, l)
 }
 
 // FromContext returns logger from context if set. Otherwise returns global `global` logger.
 // In both cases returned logger is populated with `trace_id` & `span_id`.
-func FromContext(ctx context.Context) *zap.SugaredLogger {
+func FromContext(ctx context.Context) *otelzap.SugaredLogger {
 	log := global
 
-	if logger, ok := ctx.Value(loggerContextKey).(*zap.SugaredLogger); ok {
+	if logger, ok := ctx.Value(loggerContextKey).(*otelzap.SugaredLogger); ok {
 		log = logger
 	}
 
@@ -38,9 +39,9 @@ func FromContext(ctx context.Context) *zap.SugaredLogger {
 //	ctx := WithName(ctx, "GetApples") -> "GetApples"
 //	ctx = WithName(ctx, "AppleManager") -> "GetApples.AppleManager"
 //	ctx = WithName(ctx, "DB") -> "GetApples.AppleManager.DB"
-func WithName(ctx context.Context, name string) context.Context {
-	return ToContext(ctx, FromContext(ctx).Named(name))
-}
+// func WithName(ctx context.Context, name string) context.Context {
+// 	return ToContext(ctx, FromContext(ctx).Named(name))
+// }
 
 // WithKV creates a child logger from provided context and sets custom metadata.
 // It accepts key-value pairs, which will be passed to all child loggers.
@@ -72,7 +73,9 @@ func WithFields(ctx context.Context, fields Fields) context.Context {
 
 	log := FromContext(ctx).
 		Desugar().
-		With(zapFields...).
-		Sugar()
-	return ToContext(ctx, log)
+		With(zapFields...)
+	return ToContext(ctx, otelzap.New(log,
+		otelzap.WithCaller(true),
+		otelzap.WithCallerDepth(1),
+		otelzap.WithMinLevel(zap.InfoLevel)).Sugar())
 }
