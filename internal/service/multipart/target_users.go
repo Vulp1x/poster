@@ -16,7 +16,7 @@ func readTargetsList(ctx context.Context, reader io.Reader) ([]*tasksservice.Tar
 	csvReader := csv.NewReader(reader)
 
 	csvReader.Comma = '|'
-	csvReader.FieldsPerRecord = 2
+	csvReader.FieldsPerRecord = 0
 
 	var botAccounts []*tasksservice.TargetUserRecord
 	var errs []error

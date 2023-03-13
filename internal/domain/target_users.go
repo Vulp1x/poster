@@ -9,10 +9,10 @@ type TargetUsers []TargetUser
 
 func (t TargetUsers) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveTargetUsersParams {
 	dbTargetUsers := make([]dbmodel.SaveTargetUsersParams, 0, len(t))
-	uniqueMap := make(map[int64]struct{}, len(t))
+	uniqueMap := make(map[string]struct{}, len(t))
 
 	for _, target := range t {
-		_, ok := uniqueMap[target.UserID]
+		_, ok := uniqueMap[target.Username]
 		if ok {
 			// target user с таким username уже есть, пропускаем его
 			continue
@@ -25,7 +25,7 @@ func (t TargetUsers) ToSaveParams(taskID uuid.UUID) []dbmodel.SaveTargetUsersPar
 			// Status:   dbmodel.UnusedTargetStatus,
 		})
 
-		uniqueMap[target.UserID] = struct{}{}
+		uniqueMap[target.Username] = struct{}{}
 	}
 
 	return dbTargetUsers

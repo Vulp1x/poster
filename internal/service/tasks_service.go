@@ -14,7 +14,10 @@ import (
 	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/internal/pager"
 	"github.com/inst-api/poster/internal/store/tasks"
+	"github.com/inst-api/poster/internal/tracer"
 	"github.com/inst-api/poster/pkg/logger"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"goa.design/goa/v3/security"
 )
 
@@ -288,7 +291,15 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 }
 
 func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) (*tasksservice.UploadFilesResult, error) {
-	logger.Debug(ctx, "starting UploadFile with filenames %+v", p.Filenames)
+	ctx, span := tracer.Start(ctx, "db.AddBotPost", trace.WithAttributes(
+		attribute.String("bots", p.Filenames.BotsFilename),
+		attribute.String("targets", p.Filenames.TargetsFilename),
+		attribute.String("cheap_proxies", p.Filenames.CheapProxiesFilename),
+		attribute.String("residential_proxies", p.Filenames.ResidentialProxiesFilename),
+	))
+	defer span.End()
+
+	logger.Errorf(ctx, "starting UploadFile with filenames %+v", p.Filenames)
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -298,7 +309,7 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 
 	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
-	domainAccounts, uploadErrors := domain.ParseBotAccounts(p.Bots)
+	domainAccounts, uploadErrors := domain.ParseBotAccounts(ctx, p.Bots)
 	previousLen := len(uploadErrors)
 	logger.Infof(ctx, "got %d bots and %d errors from %d inputs", len(domainAccounts), previousLen, len(p.Bots))
 

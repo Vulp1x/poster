@@ -39,9 +39,14 @@ func (p *TargetUser) parse(targetRecord []string) error {
 		return fmt.Errorf("missing username")
 	}
 
-	userID, err := strconv.ParseInt(targetRecord[1], 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse user_id: %v", err)
+	var userID int64
+	var err error
+	if len(targetRecord) == 2 {
+		userID, err = strconv.ParseInt(targetRecord[1], 10, 64)
+		if err != nil {
+			return fmt.Errorf("failed to parse user_id: %v", err)
+		}
+
 	}
 
 	p.Username = targetRecord[0]

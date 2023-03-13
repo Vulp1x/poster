@@ -1,6 +1,7 @@
 package headers
 
 import (
+	"context"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -62,7 +63,7 @@ func TestParseUserAgent(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got, err := NewDeviceSettings(test.input)
+		got, err := NewDeviceSettings(context.Background(), test.input, "")
 		if !errors.Is(err, test.wantErr) {
 			t.Errorf("wanted error: %v, \ngot: %v", test.wantErr, err)
 		}
@@ -75,7 +76,7 @@ func TestParseUserAgent(t *testing.T) {
 
 func BenchmarkParse(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = NewDeviceSettings("Instagram 248.0.0.17.109 Android (29/10; 540dpi; 1440x2400; LGE; LG-P690; gelato_tmb-sk; qcom; ru-RU; 239490569)")
+		_, _ = NewDeviceSettings(context.Background(), "Instagram 248.0.0.17.109 Android (29/10; 540dpi; 1440x2400; LGE; LG-P690; gelato_tmb-sk; qcom; ru-RU; 239490569)", "")
 	}
 }
 

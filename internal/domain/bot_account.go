@@ -2,6 +2,7 @@ package domain
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -22,7 +23,7 @@ var userAgents = []string{
 	"Instagram 265.0.0.19.301 Android (24/7.0; 240dpi; 2069x1080; samsung; SM-G901F; kccat6; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (27/8.1.0; 560dpi; 1080x2233; TCT; ONE TOUCH 4015D; Yaris35_GSM; mt6572; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (30/11; 640dpi; 1440x2780; samsung; SM-J415G; j4primelte; qcom; ru_RU; 436384447)",
-	"Instagram 265.0.0.19.301 Android (25/7.1.2; 320dpi; 2224x1080; infinix; infinixnote3; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (25/7.1.2; 320dpi; 2224x1080; infinix; infinixnote3; note3; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (24/7.0; 280dpi; 1080x2280; Huawei; 201HW; hwu9201L; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (30/11; 356dpi; 1080x2006; SENSEIT; SENSEIT-L301; SENSEITL301; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (25/7.1; 160dpi; 1080x2062; Samsung; SM-G3502T; cs02ve3gdtv; qcom; ru_RU; 436384447)",
@@ -38,7 +39,7 @@ var userAgents = []string{
 	"Instagram 265.0.0.19.301 Android (30/11; 160dpi; 640x960; samsung; SM-N970U1; d1q; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (26/8.0.0; 540dpi; 1080x1808; samsung; sm-g920f; zeroflte; samsungexynos7; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (25/7.1.2; 440dpi; 480x894; LGE; LG-SU760; cosmo_450-05; qcom; ru_RU; 436384447)",
-	"Instagram 265.0.0.19.301 Android (27/8.1.0; 272dpi; 1080x2092; TCT; ALCATELONETOUCH; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (27/8.1.0; 272dpi; 1080x2092; TCT; ALCATELONETOUCH; d2aio; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (25/7.1; 480dpi; 1080x2207; Samsung; SAMSUNG-SGH-I747Z; d2aio; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (26/8.0.0; 213dpi; 640x1208; Lenovo; IdeaTabS2109A-F; S2109A; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (26/8.0.0; 120dpi; 600x1162; Sony; E2043; E2043; qcom; ru_RU; 436384447)",
@@ -56,7 +57,7 @@ var userAgents = []string{
 	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 720x1185; HTC; gtou; HTC_Desire_200; hi3660; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (27/8.1.0; 280dpi; 1152x1920; Motorola; sholes; Droid; hi3660; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (28/9; 544dpi; 1440x2891; Lenovo; LenovoA396; A396; qcom; ru_RU; 436384447)",
-	"Instagram 265.0.0.19.301 Android (28/9; 190dpi; 720x1453; WIKO; RAINBOWJAM; s5250; ru_RU; 436384447)",
+	"Instagram 265.0.0.19.301 Android (28/9; 190dpi; 720x1453; WIKO; RAINBOWJAM; s5250; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (31/12; 440dpi; 2560x1492; Sony; E2115; E2115; mt6582; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (26/8.0.0; 120dpi; 2041x1080; Lenovo; LenovoTV40S9; jazz; qcom; ru_RU; 436384447)",
 	"Instagram 265.0.0.19.301 Android (30/11; 272dpi; 1378x720; Clementoni; Clempad_HR; Clempad_HR; h1; ru_RU; 436384447)",
@@ -91,13 +92,13 @@ func (b BotAccount) ProxyURL() *url.URL {
 	}
 }
 
-func ParseBotAccounts(bots []*tasksservice.BotAccountRecord) (BotAccounts, []*tasksservice.UploadError) {
+func ParseBotAccounts(ctx context.Context, bots []*tasksservice.BotAccountRecord) (BotAccounts, []*tasksservice.UploadError) {
 	botAccounts := make([]BotAccount, len(bots))
 	var errs []*tasksservice.UploadError
 	var err error
 
 	for i, botAccountRecord := range bots {
-		err = botAccounts[i].parse(botAccountRecord.Record)
+		err = botAccounts[i].parse(ctx, botAccountRecord.Record)
 		if err != nil {
 			errs = append(errs, &tasksservice.UploadError{
 				Type:   tasksservice.BotAccountUploadErrorType,
@@ -112,13 +113,13 @@ func ParseBotAccounts(bots []*tasksservice.BotAccountRecord) (BotAccounts, []*ta
 }
 
 // parse заполняет информацию об аккаунте
-func (b *BotAccount) parse(fields []string) error {
+func (b *BotAccount) parse(ctx context.Context, fields []string) error {
 	err := b.assignLoginAndPassword(fields[0])
 	if err != nil {
 		return err
 	}
 
-	err = b.assignUserAgent(fields[1])
+	err = b.assignUserAgent(ctx, fields[1])
 	if err != nil {
 		return err
 	}
@@ -148,15 +149,16 @@ func (b *BotAccount) assignLoginAndPassword(input string) error {
 	return nil
 }
 
-func (b *BotAccount) assignUserAgent(input string) error {
+func (b *BotAccount) assignUserAgent(ctx context.Context, input string) error {
 	var err error
 
+	fallbackUserAgent := RandomFromSlice(userAgents)
 	if input == "" {
 		input = RandomFromSlice(userAgents)
 	}
 
 	b.UserAgent = input
-	b.DeviceData, err = headers.NewDeviceSettings(input)
+	b.DeviceData, err = headers.NewDeviceSettings(ctx, input, fallbackUserAgent)
 	if err != nil {
 		return fmt.Errorf("failed to parse device settings: %v", err)
 	}
