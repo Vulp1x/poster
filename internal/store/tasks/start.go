@@ -50,11 +50,6 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		return nil, fmt.Errorf("failed to find task with id '%s': %v", taskID, err)
 	}
 
-	err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
-	if err != nil {
-		return nil, err
-	}
-
 	if err = validateTaskBeforeStart(task); err != nil {
 		return nil, err
 	}
@@ -76,6 +71,18 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 		}
 
 		return nil, fmt.Errorf(" в задаче нет ботов, готовых к работе")
+	}
+
+	savedBots, err := s.cli.SaveBots(ctx, &api.SaveBotsRequest{Bots: domain.BotsFromDBModels(bots).ToGRPCProto(ctx)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to push bots to instaproxy: %v", err)
+	}
+
+	logger.Infof(ctx, "saved %d/%d bots with usernames %v", savedBots.BotsSaved, len(bots), savedBots.Usernames)
+
+	err = s.checkAndUpdateTaskLandingAccounts(ctx, task, q)
+	if err != nil {
+		return nil, err
 	}
 
 	maximumTargetsNum := len(bots) * task.PostsPerBot * task.TargetsPerPost
@@ -185,13 +192,6 @@ func (s *Store) StartTask(ctx context.Context, taskID uuid.UUID) ([]string, erro
 
 		return task.LandingAccounts, nil
 	}
-
-	savedBots, err := s.cli.SaveBots(ctx, &api.SaveBotsRequest{Bots: domain.BotsFromDBModels(bots).ToGRPCProto(ctx)})
-	if err != nil {
-		return nil, fmt.Errorf("failed to push bots to instaproxy: %v", err)
-	}
-
-	logger.Infof(ctx, "saved %d/%d bots with usernames %v", savedBots.BotsSaved, len(bots), savedBots.Usernames)
 
 	err = q.StartTaskByID(ctx, taskID)
 	if err != nil {

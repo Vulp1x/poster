@@ -30,7 +30,7 @@ services:
   beats:
     image: elastic/filebeat:8.6.2
     volumes:
-      - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./configs:/usr/share/filebeat:ro
       - ./tmp/:/my_tmp/:ro
     networks:
       - postgres_ompnw
