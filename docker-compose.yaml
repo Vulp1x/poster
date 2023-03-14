@@ -4,8 +4,6 @@ services:
   poster:
     image: 'ghcr.io/inst-api/poster:latest'
     restart: unless-stopped
-    depends_on:
-      - postgres
     ports:
       - "8090:8090" # REST
     #    healthcheck:
@@ -18,29 +16,7 @@ services:
       - ./tmp:/root/tmp
       - ./videos:/root/videos
     networks:
-      - ompnw
-  postgres:
-    image: postgres:14.5
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "insta_poster", "-U", "docker" ]
-      timeout: 45s
-      interval: 10s
-      retries: 10
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: RqEGkWfvq2Lh8BXb
-      POSTGRES_DB: insta_poster
-      APP_DB_USER: docker
-      APP_DB_PASS: dN5mYdDVKbuyq6ry
-      APP_DB_NAME: insta_poster
-    networks:
-      - ompnw
-    volumes:
-      - ./scripts/init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
-      - ./pgdata:/var/lib/postgresql/data
+      - postgres_ompnw
   api:
     image: 'ghcr.io/inst-api/poster.python-api:latest'
     stdin_open: true
@@ -50,12 +26,16 @@ services:
     volumes:
       - ./instagrapi-rest:/app
     networks:
-      - ompnw
+      - postgres_ompnw
+  beats:
+    image: elastic/filebeat:8.6.2
+    volumes:
+      - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./tmp/:/my_tmp/:ro
+    networks:
+      - postgres_ompnw
 
-
-volumes:
-  pgdata:
-    driver: local
 networks:
-  ompnw:
+  postgres_ompnw:
     driver: bridge
+    external: true
