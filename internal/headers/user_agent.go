@@ -1,13 +1,11 @@
 package headers
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strconv"
 
 	"github.com/google/uuid"
-	"github.com/inst-api/poster/pkg/logger"
 )
 
 type DeviceSettings struct {
@@ -34,17 +32,11 @@ type Session struct {
 var userAgentRegexp = regexp.MustCompile(`(?m)Instagram (.+) Android \((\d+)/(.+); (\d+dpi); (\d+x\d+); (.+); (.+); (.+); (.+); (.+); (\d+)\)`)
 
 // NewDeviceSettings возвращает информацию об устройстве основываясь на User-Agent
-func NewDeviceSettings(ctx context.Context, userAgent, fallbackUserAgent string) (DeviceSettings, error) {
+func NewDeviceSettings(userAgent string) (DeviceSettings, error) {
 	matches := userAgentRegexp.FindStringSubmatch(userAgent)
 	if len(matches) != 12 {
-		logger.Errorf(ctx,
-			"from User-agent '%s' got %d matches, expected %d, going to use fallback user-agent", userAgent, len(matches), 12)
-
-		matches = userAgentRegexp.FindStringSubmatch(fallbackUserAgent)
-		if len(matches) != 12 {
-			return DeviceSettings{},
-				fmt.Errorf("from fallback User-agent '%s' got %d matches, expected %d", fallbackUserAgent, len(matches), 12)
-		}
+		return DeviceSettings{},
+			fmt.Errorf("from User-agent '%s' got %d matches, expected %d", userAgent, len(matches), 12)
 	}
 
 	androidVersion, err := strconv.ParseInt(matches[2], 10, 32)

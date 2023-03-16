@@ -17,6 +17,7 @@ import (
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/dbmodel"
 	"github.com/inst-api/poster/internal/headers"
+	"github.com/inst-api/poster/pkg/logger"
 )
 
 var userAgents = []string{
@@ -152,15 +153,21 @@ func (b *BotAccount) assignLoginAndPassword(input string) error {
 func (b *BotAccount) assignUserAgent(ctx context.Context, input string) error {
 	var err error
 
-	fallbackUserAgent := RandomFromSlice(userAgents)
 	if input == "" {
 		input = RandomFromSlice(userAgents)
 	}
 
 	b.UserAgent = input
-	b.DeviceData, err = headers.NewDeviceSettings(ctx, input, fallbackUserAgent)
+	b.DeviceData, err = headers.NewDeviceSettings(input)
 	if err != nil {
-		return fmt.Errorf("failed to parse device settings: %v", err)
+		logger.Errorf(ctx, "got error on parsing device settings, going to use fallback user-agent: %v", err)
+		fallbackUserAgent := RandomFromSlice(userAgents)
+		b.DeviceData, err = headers.NewDeviceSettings(fallbackUserAgent)
+		if err != nil {
+			return fmt.Errorf("failed to parse device settings: %v", err)
+		}
+
+		b.UserAgent = fallbackUserAgent
 	}
 
 	return nil

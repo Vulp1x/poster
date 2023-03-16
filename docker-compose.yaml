@@ -13,7 +13,7 @@ services:
     #      retries: 3
     #      start_period: 20s
     volumes:
-      - ./tmp:/root/tmp
+      - tmp_logs:/root/tmp
       - ./videos:/root/videos
     networks:
       - postgres_ompnw
@@ -27,15 +27,12 @@ services:
       - ./instagrapi-rest:/app
     networks:
       - postgres_ompnw
-  beats:
-    image: elastic/filebeat:8.6.2
-    volumes:
-      - ./configs:/usr/share/filebeat:ro
-      - ./tmp/:/my_tmp/:ro
-    networks:
-      - postgres_ompnw
-
 networks:
   postgres_ompnw:
     driver: bridge
     external: true
+
+volumes:
+  tmp_logs:
+    name: poster_logs
+    driver: local

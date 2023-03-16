@@ -291,7 +291,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 }
 
 func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) (*tasksservice.UploadFilesResult, error) {
-	ctx, span := tracer.Start(ctx, "db.AddBotPost", trace.WithAttributes(
+	ctx, span := tracer.Start(ctx, "UploadFiles", trace.WithAttributes(
 		attribute.String("bots", p.Filenames.BotsFilename),
 		attribute.String("targets", p.Filenames.TargetsFilename),
 		attribute.String("cheap_proxies", p.Filenames.CheapProxiesFilename),

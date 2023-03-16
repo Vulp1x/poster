@@ -88,6 +88,7 @@ func main() {
 		conf.Listen.InstaProxyURL,
 		grpc.WithUnaryInterceptor(mw.UnaryClientLog()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(10000000)),
 	)
 	if err != nil {
 		logger.Fatalf(ctx, "failed to connect to parser: %v", err)
