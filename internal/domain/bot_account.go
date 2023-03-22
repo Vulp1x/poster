@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -204,8 +203,6 @@ func (b *BotAccount) assignSessionData(input string) error {
 
 	return nil
 }
-
-var headersRegexp = regexp.MustCompile(`(?m)X-MID=(.*);IG-U-DS-USER-ID=(.+);IG-U-RUR=(.+);Authorization=(.+);X-IG-WWW-Claim=(.+)`)
 
 const authHeaderPrefix = "Bearer IGT:2:"
 
