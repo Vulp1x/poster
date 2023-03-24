@@ -1,7 +1,7 @@
 ARG GITHUB_PATH=github.com/inst-api/poster
 ARG CONFIG_MODE=prod
 
-FROM golang:1.19-alpine3.15 AS builder
+FROM golang:1.20-alpine3.17 AS builder
 RUN apk add --no-cache  --update make git curl tzdata
 COPY . /home/${GITHUB_PATH}
 WORKDIR /home/${GITHUB_PATH}
