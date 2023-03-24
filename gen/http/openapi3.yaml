@@ -91,6 +91,11 @@ paths:
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
         "400":
           description: 'bad request: Bad Request response.'
           content:
@@ -133,6 +138,11 @@ paths:
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
         "400":
           description: 'bad request: Bad Request response.'
           content:
@@ -247,7 +257,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -295,7 +305,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -343,7 +353,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -391,7 +401,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -440,7 +450,7 @@ paths:
                   cheap_proxies_filename: Accusamus voluptate eius doloribus.
                   cheap_proxies_num: 150513488838986066
                   follow_targets: true
-                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                   landing_accounts:
                     - Dolorum molestias et qui.
                     - Cumque odio sit.
@@ -488,7 +498,7 @@ paths:
                   cheap_proxies_filename: Accusamus voluptate eius doloribus.
                   cheap_proxies_num: 150513488838986066
                   follow_targets: true
-                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                   landing_accounts:
                     - Dolorum molestias et qui.
                     - Cumque odio sit.
@@ -536,7 +546,7 @@ paths:
                   cheap_proxies_filename: Accusamus voluptate eius doloribus.
                   cheap_proxies_num: 150513488838986066
                   follow_targets: true
-                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                   landing_accounts:
                     - Dolorum molestias et qui.
                     - Cumque odio sit.
@@ -600,7 +610,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -648,7 +658,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -705,7 +715,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -753,7 +763,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -801,7 +811,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -849,7 +859,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -906,7 +916,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -954,7 +964,7 @@ paths:
                     cheap_proxies_filename: Accusamus voluptate eius doloribus.
                     cheap_proxies_num: 150513488838986066
                     follow_targets: true
-                    id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                    id: 960a240e-c9d8-11ed-8c38-16a23fb67d14
                     landing_accounts:
                       - Dolorum molestias et qui.
                       - Cumque odio sit.
@@ -1032,7 +1042,7 @@ paths:
                 cheap_proxies_filename: Dicta dolores ipsam aut sapiente ut facere.
                 cheap_proxies_num: 6079883004246834060
                 follow_targets: true
-                id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
+                id: 9609a466-c9d8-11ed-8c38-16a23fb67d14
                 landing_accounts:
                   - Distinctio id quasi repellendus.
                   - Voluptatem ut.
@@ -1105,9 +1115,9 @@ paths:
           schema:
             type: string
             description: id задачи, которую хотим обновить
-            example: 43632E4F-A034-6412-7CEA-7CD0E1AED81D
+            example: 960c1f5c-c9d8-11ed-8c38-16a23fb67d14
             format: uuid
-          example: 76150F6F-C16D-33A6-B049-F5AE2D7C6385
+          example: 960c209c-c9d8-11ed-8c38-16a23fb67d14
       requestBody:
         required: true
         content:
@@ -1180,7 +1190,7 @@ paths:
                 cheap_proxies_filename: Voluptatem qui cupiditate sint dolor dicta.
                 cheap_proxies_num: 2867255320421382007
                 follow_targets: true
-                id: FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE
+                id: 96084e18-c9d8-11ed-8c38-16a23fb67d14
                 landing_accounts:
                   - Veniam eum.
                   - Corrupti nihil et.
@@ -1403,6 +1413,11 @@ paths:
       responses:
         "200":
           description: OK response.
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
         "400":
           description: 'bad request: Bad Request response.'
           content:
@@ -2197,9 +2212,9 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: D358BA94-28F1-C0F1-EA4E-E3BFBD8A6AE2
+                example: 960bcb6a-c9d8-11ed-8c38-16a23fb67d14
                 format: uuid
-              example: E31B6C92-4A10-2D9D-2B43-B3362900308F
+              example: 960c1afc-c9d8-11ed-8c38-16a23fb67d14
         "400":
           description: 'bad request: Bad Request response.'
           content:
@@ -2214,7 +2229,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: CEF3CAF7-AB82-083A-2F08-9497BE6B7488
+                example: 960bcdb8-c9d8-11ed-8c38-16a23fb67d14
                 format: uuid
         "404":
           description: 'task not found: Not Found response.'
@@ -2223,7 +2238,7 @@ paths:
               schema:
                 type: string
                 description: task_id для созданной задачи
-                example: 6D98E750-AE3D-1948-4270-2B4874F82503
+                example: 960bcc96-c9d8-11ed-8c38-16a23fb67d14
                 format: uuid
         "500":
           description: 'internal error: Internal Server Error response.'
@@ -2721,7 +2736,7 @@ components:
           example: false
         id:
           type: string
-          example: F25C441B-B3AA-5871-1077-53EACA084D5A
+          example: 960bd2f4-c9d8-11ed-8c38-16a23fb67d14
           format: uuid
         landing_accounts:
           type: array
@@ -2852,7 +2867,7 @@ components:
         cheap_proxies_filename: Provident illum facere ipsam et et.
         cheap_proxies_num: 8363680474139002114
         follow_targets: false
-        id: E058AD50-5D7F-E9A8-E010-D33044724992
+        id: 960bd60a-c9d8-11ed-8c38-16a23fb67d14
         landing_accounts:
           - In sit id aut hic nisi.
           - Eos enim aut qui et.

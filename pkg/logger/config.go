@@ -53,12 +53,13 @@ func InitLogger(config Configuration) error {
 		return fmt.Errorf("failed to create new zap logger: %w", err)
 	}
 
-	global = otelzap.New(
+	SetLogger(otelzap.New(
 		logger,
 		otelzap.WithCaller(true),
-		otelzap.WithCallerDepth(1),
-		otelzap.WithMinLevel(zap.InfoLevel),
-	).Sugar()
+		otelzap.WithCallerDepth(2),
+		otelzap.WithTraceIDField(true),
+		otelzap.WithMinLevel(zap.DebugLevel),
+	).Sugar())
 
 	return nil
 }

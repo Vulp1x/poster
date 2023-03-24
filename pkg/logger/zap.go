@@ -68,7 +68,7 @@ func newZapLogger(config Configuration) (*zap.Logger, error) {
 
 	// AddCallerSkip skips 1 number of callers, this is important else the file that gets
 	// logged will always be the wrapped file. In our case zap.go
-	const callersToSkip = 1
+	const callersToSkip = 2
 	logger := zap.New(combinedCore,
 		zap.AddCallerSkip(callersToSkip),
 		zap.AddCaller(),

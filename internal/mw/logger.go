@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/inst-api/poster/internal/tracer"
 	"github.com/inst-api/poster/pkg/logger"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 var _ middleware.LogEntry = &StructuredLoggerEntry{}
@@ -20,64 +22,39 @@ type StructuredLogger struct {
 }
 
 // NewLogEntry creates logger.
-func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
-
-	logFields := logger.Fields{}
-
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
-	}
-
-	logFields["http_scheme"] = scheme
-	logFields["http_method"] = r.Method
-
-	logFields["remote_addr"] = r.RemoteAddr
-	logFields["user_agent"] = r.UserAgent()
-
-	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
-
-	entryCtx := GenerateRequestID(logger.WithFields(r.Context(), logFields))
+func (l *StructuredLogger) NewLogEntry(r *http.Request) (context.Context, middleware.LogEntry) {
+	ctx, span := tracer.Start(r.Context(), "body_reader")
+	defer span.End()
 
 	var entry middleware.LogEntry
 	if l.debug {
-		entry = &DebugStructuredLoggerEntry{ctx: entryCtx}
+		entry = &DebugStructuredLoggerEntry{ctx: ctx}
 	} else {
-		entry = &StructuredLoggerEntry{ctx: entryCtx}
+		entry = &StructuredLoggerEntry{ctx: ctx}
 	}
 
-	logCtx := entryCtx
 	if l.debug {
-		logDebugFields := logger.Fields{}
-
-		// // Request Headers
-		// keys := make([]string, len(r.Header))
-		// i := 0
-		// for k := range r.Header {
-		// 	keys[i] = k
-		// 	i++
-		// }
-		// sort.Strings(keys)
-		// logDebugFields["headers"] = keys
-
-		logDebugFields["content_length"] = byteCount(r.ContentLength)
-		if r.ContentLength < 10000 {
+		span.SetAttributes(attribute.String("content_length", byteCount(r.ContentLength)))
+		if r.ContentLength < 10_000 {
 			// Request body
 			b, err := io.ReadAll(r.Body)
 			if err != nil {
 				b = []byte("failed to read body: " + err.Error())
 			}
 
-			logDebugFields["req_body"] = b
+			if err = r.Body.Close(); err != nil {
+				logger.Errorf(ctx, "failed to close body: %v", err)
+			}
+
+			span.SetAttributes(attribute.String("body", string(b)))
 			r.Body = io.NopCloser(bytes.NewBuffer(b))
 		}
 
-		logCtx = logger.WithFields(logCtx, logDebugFields)
 	}
 
-	logger.Debugf(logCtx, "request started")
+	logger.DebugKV(ctx, "request started")
 
-	return entry
+	return ctx, entry
 }
 
 // StructuredLoggerEntry ...
@@ -108,23 +85,25 @@ type DebugStructuredLoggerEntry struct {
 }
 
 func (l *DebugStructuredLoggerEntry) Write(status, bytesWriten int, header http.Header, elapsed time.Duration, extra interface{}) {
+	ctx, span := tracer.Start(l.ctx, "response_saver")
+	defer span.End()
 
 	fields := logger.Fields{
-		"resp_status": status, "resp_bytes_length": bytesWriten,
-		"resp_elapsed_ms": float64(elapsed.Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond),
+		"resp.status": status, "resp.bytes_length": byteCount(int64(bytesWriten)),
+		"resp.elapsed_ms": float64(elapsed.Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond),
 	}
 
 	ww, ok := extra.(*responseDupper)
 	if ok {
-		fields["resp_elapsed_ms"] = float64(time.Since(ww.startedAt).Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond)
-		fields["resp_headers"] = header
+		fields["resp.elapsed_ms"] = float64(time.Since(ww.startedAt).Nanoseconds()) * float64(time.Nanosecond) / float64(time.Millisecond)
+		fields["resp.headers"] = header
 	}
 
 	if ww.Buffer.Len() < 10000 {
-		fields["resp_body"] = ww.Buffer.String()
+		fields["resp.body"] = ww.Buffer.String()
 	}
 
-	logger.Debugf(logger.WithFields(l.ctx, fields), "request complete")
+	logger.DebugKV(logger.WithFields(ctx, fields), "request completed")
 }
 
 // Panic implemetents logEntry method.
@@ -133,34 +112,6 @@ func (l *DebugStructuredLoggerEntry) Panic(v interface{}, stack []byte) {
 		"stack": string(stack),
 		"panic": fmt.Sprintf("%+v", v),
 	})
-}
-
-// Helper methods used by the application to get the request-scoped
-// logger entry and set additional fields between handlers.
-//
-// This is a useful pattern to use to set state on the entry as it
-// passes through the handler chain, which at any point can be logged
-// with a call to .Print(), .Info(), etc.
-
-// GetLogEntry helper method in middleware chain.
-func GetLogEntry(r *http.Request) *StructuredLoggerEntry {
-	entry := middleware.GetLogEntry(r).(*StructuredLoggerEntry)
-
-	return entry
-}
-
-// LogEntrySetField helper method in middleware chain.
-func LogEntrySetField(r *http.Request, key string, value interface{}) {
-	if entry, ok := r.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
-		entry.ctx = logger.WithFields(entry.ctx, logger.Fields{key: value})
-	}
-}
-
-// LogEntrySetFields helper method in middleware chain.
-func LogEntrySetFields(r *http.Request, fields map[string]interface{}) {
-	if entry, ok := r.Context().Value(middleware.LogEntryCtxKey).(*StructuredLoggerEntry); ok {
-		entry.ctx = logger.WithFields(entry.ctx, fields)
-	}
 }
 
 // InternalError helper for sending error.

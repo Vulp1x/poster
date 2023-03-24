@@ -111,13 +111,13 @@ func handleHTTPServer(
 	// 	ExposedHeaders:   []string{"Link"},
 	// 	AllowCredentials: false,
 	// 	MaxAge:           300, // Maximum value not ignored by any of major browsers
-	// 	Debug:            true,
+	// 	DebugKV:            true,
 	// }))
 
 	router.Use(cors.AllowAll().Handler)
 	router.Use(otelchi.Middleware(
 		"chi-poster",
-		otelchi.WithRequestMethodInSpanName(true),
+		// otelchi.WithRequestMethodInSpanName(true),
 		otelchi.WithChiRoutes(router),
 	))
 

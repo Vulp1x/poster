@@ -121,7 +121,7 @@ func (h *Hub) Routes() chi.Router {
 // serveTaskProgress handles websocket requests for one driver's geo updates.
 func (h *Hub) serveTaskProgress(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	logger.Debug(ctx, "upgrading ws connection")
+	logger.DebugKV(ctx, "upgrading ws connection")
 
 	taskID, err := uuid.Parse(chi.URLParam(r, "taskID"))
 	if err != nil {
@@ -170,7 +170,7 @@ func (h *Hub) serveTaskProgress(w http.ResponseWriter, r *http.Request) {
 		cancel: cancel,
 	}
 
-	logger.Debug(ctx, "registered new client")
+	logger.DebugKV(ctx, "registered new client")
 
 	_, _ = w.Write(progressBytes)
 

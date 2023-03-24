@@ -63,7 +63,7 @@ func (s *PostPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 		return fmt.Errorf("%w: got bot status %d: expected %d (started)", pgqueue.ErrMustCancelTask, bot.Status, dbmodel.StartedTaskStatus)
 	}
 
-	logger.Info(ctx, "got account for processing")
+	logger.InfoKV(ctx, "got account for processing")
 
 	targetsLimitForNextPost := postingTask.TargetsPerPost
 	if postingTask.NeedPhotoTags && bot.PostsCount < postingTask.PhotoTagsPostsPerBot {

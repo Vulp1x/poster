@@ -144,7 +144,7 @@ func (s *storage) PushTasks(parentCtx context.Context, kds map[int16]kindData, t
 
 				err2 = batch.Close()
 				if err2 != nil {
-					logger.Error(ctx, "failed to close batch after error: %v", err2)
+					logger.ErrorKV(ctx, "failed to close batch after error", "error", err2)
 					return
 				}
 			}

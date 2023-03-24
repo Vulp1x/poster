@@ -15,7 +15,6 @@ import (
 	authservice "github.com/inst-api/poster/gen/auth_service"
 	tasksservice "github.com/inst-api/poster/gen/tasks_service"
 	"github.com/inst-api/poster/internal/config"
-	"github.com/inst-api/poster/internal/mw"
 	"github.com/inst-api/poster/internal/postgres"
 	"github.com/inst-api/poster/internal/service"
 	"github.com/inst-api/poster/internal/store"
@@ -25,6 +24,7 @@ import (
 	"github.com/inst-api/poster/internal/workers"
 	"github.com/inst-api/poster/pkg/logger"
 	"github.com/uptrace/uptrace-go/uptrace"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -86,9 +86,10 @@ func main() {
 	instaProxyConn, err := grpc.DialContext(
 		ctx,
 		conf.Listen.InstaProxyURL,
-		grpc.WithUnaryInterceptor(mw.UnaryClientLog()),
+		// grpc.WithUnaryInterceptor(mw.UnaryClientLog()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(10000000)),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 	)
 	if err != nil {
 		logger.Fatalf(ctx, "failed to connect to parser: %v", err)
@@ -146,5 +147,5 @@ func main() {
 	cancel()
 
 	wg.Wait()
-	logger.Info(ctx, "exited")
+	logger.InfoKV(ctx, "exited")
 }

@@ -7,7 +7,7 @@ listen:
 logger:
   enable console: true
   console json format: true
-  console level: info
+  console level: debug
   enable file: true
   file json format: true
   file level: debug

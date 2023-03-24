@@ -78,7 +78,7 @@ func saveResponse(ctx context.Context, sessionID string, resp *http.Response, op
 		zap.WithCaller(true),
 		zap.AddCallerSkip(1),
 		zap.Fields(fields...),
-	)
+	).Sugar()
 
 	log.Infof("saving response from instagrapi, saving took %s", time.Since(startedAt))
 	return nil

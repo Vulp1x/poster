@@ -76,6 +76,7 @@ func WithFields(ctx context.Context, fields Fields) context.Context {
 		With(zapFields...)
 	return ToContext(ctx, otelzap.New(log,
 		otelzap.WithCaller(true),
-		otelzap.WithCallerDepth(1),
-		otelzap.WithMinLevel(zap.InfoLevel)).Sugar())
+		otelzap.WithCallerDepth(2),
+		otelzap.WithTraceIDField(true),
+		otelzap.WithMinLevel(defaultLevel.Level())).Sugar())
 }

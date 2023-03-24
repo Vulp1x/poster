@@ -60,7 +60,7 @@ func (s *AuthServicesrvc) BasicAuth(ctx context.Context, login, pass string, sch
 	ctx = logger.WithFields(ctx, logger.Fields{"user_id": u.ID})
 	ctx = AddUserIDToContext(ctx, u.ID)
 
-	logger.Debugf(ctx, "Successfully checked credentials for login: %s", u.ID.String())
+	logger.Debugf(ctx, "Successfully checked credentials for login")
 
 	return ctx, nil
 }
@@ -84,7 +84,7 @@ func (s *AuthServicesrvc) JWTAuth(ctx context.Context, tokenString string, schem
 	if claims, ok := token.Claims.(*sessions.SessionClaims); ok && token.Valid {
 		ctx = logger.WithFields(ctx, logger.Fields{"user_id": claims.UserID})
 		ctx = AddUserIDToContext(ctx, claims.UserID)
-		logger.Debugf(ctx, "Successfully checked token")
+		logger.DebugKV(ctx, "Successfully checked token")
 		return ctx, nil
 	}
 
@@ -95,7 +95,7 @@ func (s *AuthServicesrvc) JWTAuth(ctx context.Context, tokenString string, schem
 
 // Signin Creates a valid JWT
 func (s *AuthServicesrvc) Signin(ctx context.Context, p *authservice.SigninPayload) (*authservice.Creds, error) {
-	logger.Info(ctx, "authService.signin")
+	logger.InfoKV(ctx, "authService.signin")
 
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {

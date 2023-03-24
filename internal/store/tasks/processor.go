@@ -73,14 +73,14 @@ func (w *worker) run(ctx context.Context) {
 		}
 
 		if botWithTargets == nil {
-			logger.Error(ctx, "got nil bot with targets, skpping it")
+			logger.ErrorKV(ctx, "got nil bot with targets, skpping it")
 			continue
 		}
 
 		startTime := time.Now()
 		taskCtx := logger.WithKV(ctx, "bot_account", botWithTargets.Username)
 
-		logger.Debug(taskCtx, "got account for processing")
+		logger.DebugKV(taskCtx, "got account for processing")
 
 		err = nil
 

@@ -54,7 +54,7 @@ func (s *adminServicesrvc) JWTAuth(ctx context.Context, token string, scheme *se
 
 // AddManager Add Manager by unique_id. Only admins could add Managers
 func (s *adminServicesrvc) AddManager(ctx context.Context, p *adminservice.AddManagerPayload) error {
-	logger.Debug(ctx, "admin_service.AddManager")
+	logger.DebugKV(ctx, "admin_service.AddManager")
 
 	hashPass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
 	if err != nil {

@@ -55,7 +55,7 @@ func NewTasksService(auth authservice.Auther, store taskStore) tasksservice.Serv
 // the "jwt" security scheme.
 func (s *tasksServicesrvc) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	if s.auth == nil {
-		logger.Error(ctx, "routes service has nil auther")
+		logger.ErrorKV(ctx, "routes service has nil auther")
 		return ctx, tasksservice.Unauthorized("internal error")
 	}
 
@@ -64,7 +64,7 @@ func (s *tasksServicesrvc) JWTAuth(ctx context.Context, token string, scheme *se
 
 // CreateTaskDraft создаёт драфт задачи
 func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.CreateTaskDraftPayload) (string, error) {
-	logger.Debug(ctx, "starting CreateTask")
+	logger.DebugKV(ctx, "starting CreateTask")
 
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {
@@ -180,7 +180,7 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 
 // StartTask начать выполнение задачи
 func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartTaskPayload) (*tasksservice.StartTaskResult, error) {
-	logger.Debug(ctx, "starting StartTask with payload %#v", p)
+	logger.DebugKV(ctx, "starting StartTask", "payload", p)
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -218,7 +218,7 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 
 // StopTask остановить выполнение задачи
 func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTaskPayload) (*tasksservice.StopTaskResult, error) {
-	logger.Debug(ctx, "starting StopTask with payload %#v", p)
+	logger.DebugKV(ctx, "starting StopTask", "payload", p)
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -240,17 +240,19 @@ func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTas
 	}, nil
 }
 
-// получить задачу по id
+// GetTask возвращает задачу по id
 func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskPayload) (*tasksservice.Task, error) {
-	logger.Debug(ctx, "starting GetTask with payload %#v", p)
+	var span trace.Span
+	ctx, span = tracer.Start(ctx, "tasks.Get", trace.WithAttributes(attribute.String("task_id", p.TaskID)))
+	defer span.End()
+
+	logger.DebugKV(ctx, "starting GetTask")
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
 		return nil, tasksservice.BadRequest("bad task_id")
 	}
-
-	ctx = logger.WithKV(ctx, "task_id", taskID.String())
 
 	task, err := s.store.GetTask(ctx, taskID)
 	if err != nil {
@@ -268,7 +270,7 @@ func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskP
 
 // ListTasks получить все задачи для текущего пользователя
 func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTasksPayload) ([]*tasksservice.Task, error) {
-	logger.Debug(ctx, "starting ListTasks with payload %#v", p)
+	logger.DebugKV(ctx, "starting ListTasks")
 
 	userID, err := UserIDFromContext(ctx)
 	if err != nil {

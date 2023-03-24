@@ -10,8 +10,8 @@ import (
 
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/inst-api/poster/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 	goahttp "goa.design/goa/v3/http"
-	"goa.design/goa/v3/middleware"
 )
 
 // responseDupper tees the response to a buffer and a response writer.
@@ -31,7 +31,8 @@ func RequestLoggerWithDebug(mux goahttp.Muxer, debug bool) func(http.Handler) ht
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 			f := StructuredLogger{debug: debug}
-			entry := f.NewLogEntry(r)
+			ctx, entry := f.NewLogEntry(r)
+			r = r.WithContext(ctx)
 
 			dupper := &responseDupper{ResponseWriter: rw, Buffer: &bytes.Buffer{}, startedAt: time.Now()}
 
@@ -40,87 +41,14 @@ func RequestLoggerWithDebug(mux goahttp.Muxer, debug bool) func(http.Handler) ht
 				entry.Write(dupper.Status(), dupper.BytesWritten(), dupper.Header(), time.Since(t1), dupper)
 			}()
 
-			rawTraceID := r.Context().Value(middleware.RequestIDKey)
-			traceID, ok := rawTraceID.(string)
-			if ok {
-				dupper.ResponseWriter.Header().Add("X-Trace-ID", traceID)
+			rawTraceID := trace.SpanContextFromContext(r.Context()).TraceID()
+			if rawTraceID.IsValid() {
+				dupper.ResponseWriter.Header().Add("X-Trace-ID", rawTraceID.String())
 			} else {
-				logger.Infof(r.Context(), "failed to cast trace_id to string from '%v' (type %T)", rawTraceID, rawTraceID)
+				logger.Infof(r.Context(), "failed to get trace_id from '%v' (type %T)", rawTraceID, rawTraceID)
 			}
 
 			h.ServeHTTP(dupper, chimw.WithLogEntry(r, entry))
-
-			// buf := &bytes.Buffer{}
-			// // Request ID
-			// reqID := chimw.GetReqID(r.Context())
-			//
-			// // Request URL
-			// buf.WriteString(fmt.Sprintf("> [%s] %s %s", reqID, r.Method, r.URL.String()))
-			//
-			// // Request Headers
-			// keys := make([]string, len(r.ConstructHeaders))
-			// i := 0
-			// for k := range r.ConstructHeaders {
-			// 	keys[i] = k
-			// 	i++
-			// }
-			// sort.Strings(keys)
-			// for _, k := range keys {
-			// 	buf.WriteString(fmt.Sprintf("\n> [%s] %s: %s", reqID, k, strings.Join(r.ConstructHeaders[k], ", ")))
-			// }
-			//
-			// // Request parameters
-			// params := mux.Vars(r)
-			// keys = make([]string, len(params))
-			// i = 0
-			// for k := range params {
-			// 	keys[i] = k
-			// 	i++
-			// }
-			// sort.Strings(keys)
-			// for _, k := range keys {
-			// 	buf.WriteString(fmt.Sprintf("\n> [%s] %s: %s", reqID, k, params[k]))
-			// }
-			//
-			// // Request body
-			// b, err := ioutil.ReadAll(r.Body)
-			// if err != nil {
-			// 	b = []byte("failed to read body: " + err.Error())
-			// }
-			// if len(b) > 0 {
-			// 	buf.WriteByte('\n')
-			// 	lines := strings.Split(string(b), "\n")
-			// 	for _, line := range lines {
-			// 		buf.WriteString(fmt.Sprintf("[%s] %s\n", reqID, line))
-			// 	}
-			// }
-			// r.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-			//
-			// dupper := &responseDupper{ResponseWriter: rw, Buffer: &bytes.Buffer{}}
-			// h.ServeHTTP(dupper, r)
-			//
-			// buf.WriteString(fmt.Sprintf("\n< [%s] %s", reqID, http.StatusText(dupper.Status)))
-			// keys = make([]string, len(dupper.ConstructHeaders()))
-			// i = 0
-			// for k := range dupper.ConstructHeaders() {
-			// 	keys[i] = k
-			// 	i++
-			// }
-			// sort.Strings(keys)
-			// for _, k := range keys {
-			// 	buf.WriteString(fmt.Sprintf("\n< [%s] %s: %s", reqID, k, strings.Join(dupper.ConstructHeaders()[k], ", ")))
-			// }
-			// if dupper.Buffer.Len() > 0 {
-			// 	buf.WriteByte('\n')
-			// 	lines := strings.Split(dupper.Buffer.String(), "\n")
-			// 	for _, line := range lines {
-			// 		buf.WriteString(fmt.Sprintf("[%s] %s\n", reqID, line))
-			// 	}
-			// }
-			// buf.WriteByte('\n')
-			// // w.Write(buf.Bytes())
-			//
-			// logger.Debug(r.Context(), buf.String())
 		})
 	}
 }

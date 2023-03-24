@@ -120,7 +120,7 @@ func testProxies(ctx context.Context, processNumber int, inputChan, outChan chan
 			proxyCtx = logger.WithKV(proxyCtx, "real_ip", bodyBytes[index:index+15])
 		}
 
-		logger.Info(proxyCtx, "proxy is working, adding it to best proxies array, response body len: %d", len(bodyBytes))
+		logger.InfoKV(proxyCtx, "proxy is working, adding it to best proxies array, response body len: %d", len(bodyBytes))
 		outChan <- proxyURL
 	}
 }
@@ -152,7 +152,7 @@ func testIP(ctx context.Context) {
 		logger.Errorf(ctx, "failed to close response body: %v", err)
 	}
 
-	logger.Info(ctx, "proxy is working, adding it to best proxies array, response body len: %d", len(bodyBytes))
+	logger.InfoKV(ctx, "proxy is working, adding it to best proxies array, response body len: %d", len(bodyBytes))
 }
 
 func TestDDOS(t *testing.T) {
@@ -197,7 +197,7 @@ func dosURL(ctx context.Context, address string, wg *sync.WaitGroup, processNumb
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info(ctx, "context done, stopping")
+			logger.InfoKV(ctx, "context done, stopping")
 			return
 		default:
 		}

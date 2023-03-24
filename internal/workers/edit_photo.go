@@ -85,7 +85,7 @@ func (h *EditPhotoHandler) HandleTask(ctx context.Context, task pgqueue.Task) er
 
 	if mediaToEdit.Pk == 0 {
 		// все медиа уже обновлены
-		logger.Info(ctx, "all medias are updated, setting bot status to 8 (editing posts done)")
+		logger.InfoKV(ctx, "all medias are updated, setting bot status to 8 (editing posts done)")
 		err = q.SetBotStatus(ctx, dbmodel.SetBotStatusParams{Status: dbmodel.EditingPostsDoneBotStatus, ID: bot.ID})
 		if err != nil {
 			return fmt.Errorf("failed to set bot status to %d: %v", dbmodel.EditingPostsDoneBotStatus, err)
