@@ -31,7 +31,7 @@ func TestProxiesPerTask(t *testing.T) {
 	q := dbmodel.New(db)
 
 	// proxies, err := q.FindAllCheapProxies(ctx)
-	proxies, err := q.FindCheapProxiesForTask(ctx, uuid.MustParse("54423f7a-2c0b-4d8e-b018-e1cea2c7455f"))
+	proxies, err := q.FindCheapProxiesForTask(ctx, uuid.MustParse("1aaf7292-edc7-435b-b236-0dd65e0295b0"))
 	if err != nil {
 		t.Fatalf("failed to find proxies for task: %v", err)
 	}

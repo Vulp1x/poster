@@ -110,6 +110,7 @@ func (s *tasksServicesrvc) CreateTaskDraft(ctx context.Context, p *tasksservice.
 // UpdateTask обновляет информацию о задаче. Не меняет статус задачи, можно вызывать сколько угодно раз.
 // Нельзя вызвать для задачи, которая уже выполняется, для этого надо сначала остановить выполнение.
 func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.UpdateTaskPayload) (*tasksservice.Task, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task id from '%s': %v", p.TaskID, err)
@@ -180,7 +181,8 @@ func (s *tasksServicesrvc) UpdateTask(ctx context.Context, p *tasksservice.Updat
 
 // StartTask начать выполнение задачи
 func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartTaskPayload) (*tasksservice.StartTaskResult, error) {
-	logger.DebugKV(ctx, "starting StartTask", "payload", p)
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
+	logger.DebugKV(ctx, "starting StartTask")
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -218,6 +220,7 @@ func (s *tasksServicesrvc) StartTask(ctx context.Context, p *tasksservice.StartT
 
 // StopTask остановить выполнение задачи
 func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTaskPayload) (*tasksservice.StopTaskResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.DebugKV(ctx, "starting StopTask", "payload", p)
 
 	taskID, err := uuid.Parse(p.TaskID)
@@ -242,8 +245,11 @@ func (s *tasksServicesrvc) StopTask(ctx context.Context, p *tasksservice.StopTas
 
 // GetTask возвращает задачу по id
 func (s *tasksServicesrvc) GetTask(ctx context.Context, p *tasksservice.GetTaskPayload) (*tasksservice.Task, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
+
+	// trace.WithAttributes(attribute.String("task_id", p.TaskID))
 	var span trace.Span
-	ctx, span = tracer.Start(ctx, "tasks.Get", trace.WithAttributes(attribute.String("task_id", p.TaskID)))
+	ctx, span = tracer.Start(ctx, "tasks.Get")
 	defer span.End()
 
 	logger.DebugKV(ctx, "starting GetTask")
@@ -293,6 +299,7 @@ func (s *tasksServicesrvc) ListTasks(ctx context.Context, p *tasksservice.ListTa
 }
 
 func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.UploadFilesPayload) (*tasksservice.UploadFilesResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	ctx, span := tracer.Start(ctx, "UploadFiles", trace.WithAttributes(
 		attribute.String("bots", p.Filenames.BotsFilename),
 		attribute.String("targets", p.Filenames.TargetsFilename),
@@ -301,7 +308,7 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 	))
 	defer span.End()
 
-	logger.Errorf(ctx, "starting UploadFile with filenames %+v", p.Filenames)
+	logger.Infof(ctx, "starting UploadFile with filenames %+v", p.Filenames)
 
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -356,6 +363,7 @@ func (s *tasksServicesrvc) UploadFiles(ctx context.Context, p *tasksservice.Uplo
 }
 
 func (s *tasksServicesrvc) UploadVideo(ctx context.Context, p *tasksservice.UploadVideoPayload) (*tasksservice.UploadVideoResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
@@ -388,6 +396,7 @@ func (s *tasksServicesrvc) UploadVideo(ctx context.Context, p *tasksservice.Uplo
 }
 
 func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.AssignProxiesPayload) (*tasksservice.AssignProxiesResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
@@ -416,6 +425,7 @@ func (s *tasksServicesrvc) AssignProxies(ctx context.Context, p *tasksservice.As
 }
 
 func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.ForceDeletePayload) error {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
 		logger.Errorf(ctx, "failed to parse task_id from '%s': %v", p.TaskID, err)
@@ -438,6 +448,7 @@ func (s *tasksServicesrvc) ForceDelete(ctx context.Context, p *tasksservice.Forc
 }
 
 func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetProgressPayload) (*tasksservice.TaskProgress, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.Debugf(ctx, "get progress of task %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -471,6 +482,7 @@ func (s *tasksServicesrvc) GetProgress(ctx context.Context, p *tasksservice.GetP
 }
 
 func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice.PartialStartTaskPayload) (*tasksservice.PartialStartTaskResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.Infof(ctx, "partial start task %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -497,6 +509,7 @@ func (s *tasksServicesrvc) PartialStartTask(ctx context.Context, p *tasksservice
 }
 
 func (s *tasksServicesrvc) UpdatePostContents(ctx context.Context, p *tasksservice.UpdatePostContentsPayload) (*tasksservice.UpdatePostContentsResult, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.Infof(ctx, "starting to update post contents %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -524,6 +537,7 @@ func (s *tasksServicesrvc) UpdatePostContents(ctx context.Context, p *tasksservi
 }
 
 func (s *tasksServicesrvc) DownloadTargets(ctx context.Context, p *tasksservice.DownloadTargetsPayload) ([]string, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.Infof(ctx, "download task targets %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
@@ -547,6 +561,7 @@ func (s *tasksServicesrvc) DownloadTargets(ctx context.Context, p *tasksservice.
 }
 
 func (s *tasksServicesrvc) DownloadBots(ctx context.Context, p *tasksservice.DownloadBotsPayload) ([]string, error) {
+	ctx = logger.WithKV(ctx, "task_id", p.TaskID)
 	logger.Infof(ctx, "download task bots %s", p.TaskID)
 	taskID, err := uuid.Parse(p.TaskID)
 	if err != nil {
